@@ -96,7 +96,7 @@ public:
      */
     void open() override;
 
-    void setDataProvider(IDataProvider* provider);
+    void setDataProvider(IDataProvider* provider) override ;
 
     /**
      * Smazani dat datasetu z pameti.
@@ -141,14 +141,14 @@ public:
      * @param name
      * @return
      */
-    const Field * fieldByName(const std::string& name) override;
+    Field * fieldByName(const std::string& name) override;
 
     /**
      * Nalezeni field podle jeho indexu
      * @param index
      * @return
      */
-    const Field* fieldByIndex(unsigned long index) override ;
+    Field* fieldByIndex(unsigned long index) override ;
 
     bool eof() override;
 

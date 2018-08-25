@@ -1,4 +1,5 @@
 
+
 #include <iostream>
 #include <iomanip>
 #include "Interfaces/IDataset.h"
@@ -28,11 +29,14 @@ int main(int argc, char** argv) {
     std::cout << "Open() done" << std::endl;
     printTime();
 
-    auto fieldNames = dataset->getFieldNames();
+
+    auto field0 = dataset->fieldByIndex(0);
+    auto field4 = dataset->fieldByIndex(1);
 
     std::cout << "next()" << std::endl;
     printTime();
     while(!dataset->eof()) {
+        std::cout << field0->getAsString() << " " << field4->getAsString() << std::endl;
         dataset->next();
     }
     std::cout << "next() done" << std::endl;

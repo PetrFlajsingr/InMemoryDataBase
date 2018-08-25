@@ -31,9 +31,9 @@ public:
 
     virtual bool eof()= 0;
 
-    virtual const Field * fieldByName(const std::string& name)= 0;
+    virtual Field * fieldByName(const std::string& name)= 0;
 
-    virtual const Field * fieldByIndex(unsigned long index)= 0;
+    virtual Field * fieldByIndex(unsigned long index)= 0;
 
     virtual void setFieldTypes(std::vector<ValueType> types)= 0;
 

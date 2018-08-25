@@ -2,6 +2,7 @@
 // Created by Petr Flajsingr on 25/08/2018.
 //
 
+#include <iostream>
 #include "InMemorydataset.h"
 
 void InMemorydataset::setDataProvider(IDataProvider *provider) {
@@ -153,8 +154,8 @@ void InMemorydataset::find(InMemorydataset::SearchOptions &options) {
     //TODO
 }
 
-const Field * InMemorydataset::fieldByName(const std::string &name) {
-    for(const auto &field : fields) {
+Field * InMemorydataset::fieldByName(const std::string &name) {
+    for(auto &field : fields) {
         if(field.fieldName == name) {
             return &field;
         }
@@ -163,12 +164,12 @@ const Field * InMemorydataset::fieldByName(const std::string &name) {
     throw InvalidArgumentException(("There's no field named: " + name).c_str());
 }
 
-const Field * InMemorydataset::fieldByIndex(unsigned long index) {
+Field * InMemorydataset::fieldByIndex(unsigned long index) {
     return &fields.at(index);
 }
 
 bool InMemorydataset::eof() {
-    return this->currentRecord >= this->data.size() - 1;
+    return this->currentRecord >= this->data.size();
 
 }
 
