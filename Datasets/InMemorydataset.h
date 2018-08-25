@@ -52,7 +52,7 @@ private:
 
     unsigned long currentRecord = 0;
 
-    std::vector<std::vector<DataContainer>> data;
+    std::vector<std::vector<DataContainer*>> data;
 
     void loadData();
 
@@ -64,13 +64,13 @@ private:
      */
     void createFields(std::vector<std::string> columns);
 
-    void setFieldValues(std::vector<DataContainer> value);
+    void setFieldValues(std::vector<DataContainer*> value);
 
     bool isFieldTypeSet() {
         return !(fields[0].getFieldType() == NONE);
     }
 
-    void setFieldTypes(std::vector<InMemorydataset::DataContainer> value);
+    void setFieldTypes(std::vector<InMemorydataset::DataContainer*> value);
 public:
     ~InMemorydataset() override;
 

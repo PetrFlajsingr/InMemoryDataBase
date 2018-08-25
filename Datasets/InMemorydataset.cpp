@@ -38,21 +38,21 @@ void InMemorydataset::createFields(std::vector<std::string> columns) {
 void InMemorydataset::addRecord() {
     auto record = this->dataProvider->getRow();
 
-    std::vector<DataContainer> newRecord;
+    std::vector<DataContainer*> newRecord;
     for(const auto &part : record) {
-        DataContainer dataContainer{};
+        DataContainer* dataContainer = new DataContainer();
         switch(Utilities::getType(part)){
             case INTEGER_VAL:
-                dataContainer.valueType = INTEGER_VAL;
-                dataContainer.data._integer = Utilities::StringToInt(part);
+                dataContainer->valueType = INTEGER_VAL;
+                dataContainer->data._integer = Utilities::StringToInt(part);
                 break;
             case DOUBLE_VAL:
-                dataContainer.valueType = DOUBLE_VAL;
-                dataContainer.data._double = Utilities::StringToDouble(part);
+                dataContainer->valueType = DOUBLE_VAL;
+                dataContainer->data._double = Utilities::StringToDouble(part);
                 break;
             case STRING_VAL:
-                dataContainer.valueType = STRING_VAL;
-                dataContainer.data._string = strdup(part.c_str());
+                dataContainer->valueType = STRING_VAL;
+                dataContainer->data._string = strdup(part.c_str());
                 break;
             default:
                 throw IllegalStateException("Internal error.");
@@ -68,15 +68,25 @@ void InMemorydataset::close() {
     this->dataProvider = nullptr;
 
     this->isOpen = false;
-}
 
-void InMemorydataset::setFieldTypes(std::vector<InMemorydataset::DataContainer> value) {
-    for(int iter = 0; iter < fields.size(); iter++) {
-        fields[iter].setFieldType(value[iter].valueType);
+    if(!this->data.empty()) {
+        for(auto level1 : this->data) {
+            for(auto level2 : level1) {
+                delete level2;
+            }
+            level1.clear();
+        }
+        this->data.clear();
     }
 }
 
-void InMemorydataset::setFieldValues(std::vector<InMemorydataset::DataContainer> value) {
+void InMemorydataset::setFieldTypes(std::vector<InMemorydataset::DataContainer*> value) {
+    for(int iter = 0; iter < fields.size(); iter++) {
+        fields[iter].setFieldType(value[iter]->valueType);
+    }
+}
+
+void InMemorydataset::setFieldValues(std::vector<InMemorydataset::DataContainer*> value) {
     if(!isFieldTypeSet()) {
         setFieldTypes(value); // NOLINT
         return;
@@ -87,13 +97,13 @@ void InMemorydataset::setFieldValues(std::vector<InMemorydataset::DataContainer>
 #pragma clang diagnostic ignored "-Wswitch"
         switch(fields[iter].getFieldType()) {
             case INTEGER_VAL:
-                fields[iter].setFromInteger(value[iter].data._integer);
+                fields[iter].setFromInteger(value[iter]->data._integer);
                 break;
             case DOUBLE_VAL:
-                fields[iter].setFromDouble(value[iter].data._double);
+                fields[iter].setFromDouble(value[iter]->data._double);
                 break;
             case STRING_VAL:
-                fields[iter].setAsString(value[iter].data._string);
+                fields[iter].setAsString(value[iter]->data._string);
                 break;
         }
 #pragma clang diagnostic pop
@@ -148,7 +158,7 @@ bool InMemorydataset::eof() {
 }
 
 InMemorydataset::~InMemorydataset() {
-
+    this->close();
 }
 
 

@@ -12,7 +12,7 @@ int main(int argc, char** argv) {
 
     auto fieldNames = dataset->getFieldNames();
     while(!dataset->eof()) {
-
+        break;
     }
 
     dataset->close();
