@@ -8,7 +8,7 @@
 
 #include <string>
 #include <vector>
-#include "IDataProvider.h"
+#include "Interfaces/IDataProvider.h"
 
 enum SortOrder {ASCENDING, DESCENDING};
 

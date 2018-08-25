@@ -3,5 +3,5 @@ project(csv_reader)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(SOURCE_FILES main.cpp CsvReader.cpp CsvReader.h IDataProvider.h Exceptions.h DataContainer.cpp DataContainer.h Utilities.cpp Utilities.h DataAccessor.cpp DataAccessor.h)
+set(SOURCE_FILES main.cpp CsvReader.cpp CsvReader.h Interfaces/IDataProvider.h Exceptions.h DataContainer.cpp DataContainer.h Utilities.cpp Utilities.h DataAccessor.cpp DataAccessor.h Interfaces/IDataset.h)
 add_executable(csv_reader ${SOURCE_FILES})

@@ -1,5 +1,5 @@
 #include <iostream>
-#include "IDataProvider.h"
+#include "Interfaces/IDataProvider.h"
 #include "CsvReader.h"
 
 int main(int argc, char** argv) {
