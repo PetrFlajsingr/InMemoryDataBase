@@ -47,7 +47,7 @@ public:
     /**
      * Uzavření souboru při dealokaci objektu.
      */
-    ~CsvReader();
+    ~CsvReader() override;
 
     /**
      * Vraci zaznam souboru, ktery je na rade.

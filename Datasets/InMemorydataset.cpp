@@ -121,11 +121,11 @@ void InMemorydataset::previous() {
 }
 
 void InMemorydataset::sort(InMemorydataset::SortOptions &options) {
-
+    //TODO
 }
 
 void InMemorydataset::find(InMemorydataset::SearchOptions &options) {
-
+    //TODO
 }
 
 const Field * InMemorydataset::fieldByName(const std::string &name) {
@@ -144,6 +144,10 @@ const Field * InMemorydataset::fieldByIndex(unsigned long index) {
 
 bool InMemorydataset::eof() {
     return this->currentRecord >= this->data.size() - 1;
+
+}
+
+InMemorydataset::~InMemorydataset() {
 
 }
 

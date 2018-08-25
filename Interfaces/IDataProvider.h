@@ -32,7 +32,10 @@ public:
     virtual void last()= 0;
 
     virtual bool eof()= 0;
+
+    virtual ~IDataProvider() = default;
 };
+
 
 
 #endif //CSV_READER_IDATAPROVIDER_H

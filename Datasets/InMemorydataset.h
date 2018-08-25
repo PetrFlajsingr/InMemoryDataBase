@@ -72,6 +72,8 @@ private:
 
     void setFieldTypes(std::vector<InMemorydataset::DataContainer> value);
 public:
+    ~InMemorydataset() override;
+
     /**
      * Nacteni dat do pameti datasetu.
      * @param provider objekt dodavajici data

@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include <cstring>
 #include "../Datasets/Field.h"
 #include "IDataProvider.h"
 
@@ -33,6 +34,8 @@ public:
     virtual const Field * fieldByIndex(unsigned long index)= 0;
 
     virtual std::vector<std::string> getFieldNames()= 0;
+
+    virtual ~IDataset() = default;
 };
 
 #endif //CSV_READER_IDATASET_H
