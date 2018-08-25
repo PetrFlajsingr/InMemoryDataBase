@@ -11,7 +11,7 @@
 /**
  * Jednoduche rozhrani pro cteni a pohyb v zaznamech
  */
-class IReader {
+class IDataProvider {
 public:
     virtual std::vector<std::string> getRow()= 0;
 

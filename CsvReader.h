@@ -8,14 +8,14 @@
 
 #include <fstream>
 #include <vector>
-#include "IReader.h"
+#include "IDataProvider.h"
 #include "Exceptions.h"
 
 /**
  * Trida implementujici metody IReader.
  * Slouzi ke cteni CSV formatu sekvencne ze souboru.
  */
-class CsvReader : public IReader {
+class CsvReader : public IDataProvider {
 private:
     const unsigned int BUFFER_SIZE = 1024; //< velikost bufferu pro cteni radku souboru
 

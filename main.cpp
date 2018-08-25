@@ -1,9 +1,9 @@
 #include <iostream>
-#include "IReader.h"
+#include "IDataProvider.h"
 #include "CsvReader.h"
 
 int main(int argc, char** argv) {
-    IReader* reader = new CsvReader(std::string(argv[1]));
+    IDataProvider* reader = new CsvReader(std::string(argv[1]));
 
     std::cout << "Col count: " << reader->getColumnCount() << std::endl;
 
