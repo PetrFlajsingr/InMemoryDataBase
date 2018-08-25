@@ -7,6 +7,9 @@
 
 
 class DataContainer {
+private:
+
+public:
 
 };
 
