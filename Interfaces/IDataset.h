@@ -15,7 +15,9 @@ class IDataset {
 protected:
     std::vector<Field> fields;
 public:
-    virtual void open(IDataProvider* dataProvider)= 0;
+    virtual void open()= 0;
+
+    virtual void setDataProvider(IDataProvider* provider)= 0;
 
     virtual void close()= 0;
 
@@ -32,6 +34,8 @@ public:
     virtual const Field * fieldByName(const std::string& name)= 0;
 
     virtual const Field * fieldByIndex(unsigned long index)= 0;
+
+    virtual void setFieldTypes(std::vector<ValueType> types)= 0;
 
     virtual std::vector<std::string> getFieldNames()= 0;
 

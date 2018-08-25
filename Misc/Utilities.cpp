@@ -43,13 +43,13 @@ double Utilities::StringToDouble(const std::string &str) {
 
     return result;
 }
-
+//TODO fix regex
 bool Utilities::isInteger(const std::string& value) {
     std::regex integerRegex("(\\+|-)?[[:digit:]]+");
 
     return std::regex_match(value, integerRegex);
 }
-
+//TODO fix regex
 bool Utilities::isDouble(const std::string &value) {
     std::regex doubleRegex("[+-]?([:digit:]*[.])?[:digit:]+");
 

@@ -15,14 +15,28 @@ class InMemorydataset : public IDataset {
 private:
     enum SortOrder {ASCENDING, DESCENDING};
 
-    struct SearchOptions {
+    class SearchOptions {
+    private:
         std::vector<std::string>    fieldNames;
-        std::vector<std::string>    searchString;
+        std::vector<std::string>    searchStrings;
+
+    public:
+        void addOption(std::string fieldName, std::string searchString){
+            this->fieldNames.push_back(fieldName);
+            this->searchStrings.push_back(searchString);
+        }
     };
 
-    struct SortOptions {
+    class SortOptions {
+    private:
         std::vector<std::string>    fieldNames;
         std::vector<SortOrder>      order;
+
+    public:
+        void addOption(std::string fieldName, SortOrder order){
+            this->fieldNames.push_back(fieldName);
+            this->order.push_back(order);
+        }
     };
 
     /**
@@ -52,6 +66,8 @@ private:
 
     unsigned long currentRecord = 0;
 
+    bool fieldTypesSet = false;
+
     std::vector<std::vector<DataContainer*>> data;
 
     void loadData();
@@ -62,7 +78,7 @@ private:
      * Vytvoreni Fields se jmeny podle nazvu sloupcu.
      * @param columns nazvy sloupcu
      */
-    void createFields(std::vector<std::string> columns);
+    void createFields(std::vector<std::string> columns, std::vector<ValueType> types = {});
 
     void setFieldValues(std::vector<DataContainer*> value);
 
@@ -78,7 +94,9 @@ public:
      * Nacteni dat do pameti datasetu.
      * @param provider objekt dodavajici data
      */
-    void open(IDataProvider* provider) override;
+    void open() override;
+
+    void setDataProvider(IDataProvider* provider);
 
     /**
      * Smazani dat datasetu z pameti.
@@ -142,6 +160,8 @@ public:
 
         return result;
     }
+
+    void setFieldTypes(std::vector<ValueType> types) override;
 
 };
 

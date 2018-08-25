@@ -4,12 +4,18 @@
 
 #include "InMemorydataset.h"
 
-void InMemorydataset::open(IDataProvider *provider) {
+void InMemorydataset::setDataProvider(IDataProvider *provider) {
+    this->dataProvider = provider;
+}
+
+void InMemorydataset::open() {
     if(isOpen) {
         throw IllegalStateException("Dataset is already opened");
     }
 
-    this->dataProvider = provider;
+    if(this->dataProvider == nullptr) {
+        throw IllegalStateException("Data provider has not been set.");
+    }
 
     this->loadData();
 
@@ -19,7 +25,9 @@ void InMemorydataset::open(IDataProvider *provider) {
 }
 
 void InMemorydataset::loadData() {
-    createFields(dataProvider->getColumnNames());
+    if(!this->fieldTypesSet) {
+        createFields(dataProvider->getColumnNames());
+    }
 
     while(!this->dataProvider->eof()) {
         this->addRecord();
@@ -28,10 +36,15 @@ void InMemorydataset::loadData() {
     }
 }
 
-void InMemorydataset::createFields(std::vector<std::string> columns) {
+void InMemorydataset::createFields(std::vector<std::string> columns, std::vector<ValueType> types) {
+    size_t iter = 0;
     for(const auto &col : columns) {
         Field newField(col);
+        if(!types.empty()) {
+            newField.setFieldType(types[iter]);
+        }
         fields.push_back(newField);
+        iter++;
     }
 }
 
@@ -39,9 +52,10 @@ void InMemorydataset::addRecord() {
     auto record = this->dataProvider->getRow();
 
     std::vector<DataContainer*> newRecord;
+    size_t iter = 0;
     for(const auto &part : record) {
-        DataContainer* dataContainer = new DataContainer();
-        switch(Utilities::getType(part)){
+        auto dataContainer = new DataContainer();
+        switch(fields[iter].getFieldType()){
             case INTEGER_VAL:
                 dataContainer->valueType = INTEGER_VAL;
                 dataContainer->data._integer = Utilities::StringToInt(part);
@@ -57,6 +71,7 @@ void InMemorydataset::addRecord() {
             default:
                 throw IllegalStateException("Internal error.");
         }
+        iter++;
 
         newRecord.push_back(dataContainer);
     }
@@ -160,6 +175,14 @@ bool InMemorydataset::eof() {
 InMemorydataset::~InMemorydataset() {
     this->close();
 }
+
+void InMemorydataset::setFieldTypes(std::vector<ValueType> types) {
+    fieldTypesSet = true;
+
+    createFields(this->dataProvider->getColumnNames(), types);
+}
+
+
 
 
 
