@@ -130,6 +130,10 @@ Field* InMemorydataset::fieldByIndex(int index) {
     return nullptr;
 }
 
+bool InMemorydataset::eof() {
+    return false;
+}
+
 
 
 

@@ -128,6 +128,7 @@ public:
      */
     Field* fieldByIndex(int index) override ;
 
+    bool eof() override;
 
 };
 

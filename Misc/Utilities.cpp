@@ -4,13 +4,13 @@
 
 #include <sstream>
 #include <regex>
+#include <utility>
 #include "Utilities.h"
-#include "../Datasets/Field.h"
 
 std::vector<std::string> Utilities::SplitStringByDelimiter(std::string str,
                                                            std::string delimiter) {
     std::vector<std::string> result;
-    std::string toSplit = std::string(str);
+    std::string toSplit = std::string(std::move(str));
 
     size_t pos = 0;
     std::string token;
