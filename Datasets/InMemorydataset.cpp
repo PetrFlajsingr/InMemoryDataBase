@@ -154,6 +154,9 @@ void InMemorydataset::previous() {
 }
 
 void InMemorydataset::sort(unsigned long fieldIndex, SortOrder sortOrder) {
+    if(fieldIndex >= this->getFieldNames().size()) {
+        throw InvalidArgumentException("Field index is out of bounds");
+    }
 
     if(sortOrder == ASCENDING) {
         std::sort(this->data.begin(),
