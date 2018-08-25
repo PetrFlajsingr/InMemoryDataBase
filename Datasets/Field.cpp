@@ -4,7 +4,7 @@
 
 #include "Field.h"
 
-Field::Field() = default;
+Field::Field(const std::string name) : fieldName(name) {}
 
 Field::~Field() = default;
 
@@ -20,3 +20,7 @@ void Field::setValue(std::string value) {
         this->fieldType = STRING_VAL;
     }
 }
+
+
+
+

@@ -10,8 +10,6 @@
 #include <vector>
 #include "Interfaces/IDataProvider.h"
 
-enum SortOrder {ASCENDING, DESCENDING};
-
 class DataAccessor {
 private:
 
@@ -20,19 +18,8 @@ public:
 
     ~DataAccessor();
 
-    void sort(SortOptions& options);
 
-    std::vector<std::vector<std::string>> find(SearchOptions& options);
 
-    struct SearchOptions {
-        std::vector<std::string>    columnNames;
-        std::vector<std::string>    searchString;
-    };
-
-    struct SortOptions {
-        std::vector<std::string>    columnNames;
-        std::vector<SortOrder>      order;
-    };
 
 };
 

@@ -28,10 +28,14 @@ private:
     int integerData;
 
     double doubleData;
+
+
 public:
-    Field();
+    explicit Field(std::string name);
 
     ~Field();
+
+    const std::string fieldName;
 
     /**
      * Nastaveni hodnoty pole. Typ je odvozen automaticky.
