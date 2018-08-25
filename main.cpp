@@ -13,7 +13,7 @@ void printTime(){
 }
 
 int main(int argc, char** argv) {
-    IDataset* dataset = new InMemorydataset();
+    InMemorydataset* dataset = new InMemorydataset();
 
     IDataProvider* dataProvider = new CsvReader(argv[1]);
 
@@ -32,6 +32,11 @@ int main(int argc, char** argv) {
 
     auto field0 = dataset->fieldByIndex(0);
     auto field1 = dataset->fieldByIndex(1);
+
+    std::cout << "_____sort()_____" << std::endl;
+    dataset->sort(0, ASCENDING);
+    std::cout << "_____sort() end_____" << std::endl;
+
 
     std::cout << "_____next()_____" << std::endl;
     printTime();

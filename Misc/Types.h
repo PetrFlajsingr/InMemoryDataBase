@@ -10,4 +10,6 @@
  */
 enum ValueType {NONE, INTEGER_VAL, DOUBLE_VAL, STRING_VAL};
 
+enum SortOrder {ASCENDING, DESCENDING};
+
 #endif //CSV_READER_TYPES_H

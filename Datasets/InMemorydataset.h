@@ -8,30 +8,20 @@
 
 #include "../Interfaces/IDataset.h"
 
+
 /**
  * Dataset ukladajici data primo v operacni pameti.
  */
 class InMemorydataset : public IDataset {
 private:
-    enum SortOrder {ASCENDING, DESCENDING};
 
     struct SearchOptions {
-        std::vector<std::string>    fieldNames;
+        std::vector<unsigned long>  fieldIndexes;
         std::vector<std::string>    searchStrings;
 
-        void addOption(const std::string &fieldName, const std::string &searchString){
-            this->fieldNames.push_back(fieldName);
+        void addOption(const unsigned long fieldIndex, const std::string &searchString){
+            this->fieldIndexes.push_back(fieldIndex);
             this->searchStrings.push_back(searchString);
-        }
-    };
-
-    struct SortOptions {
-        std::vector<std::string>    fieldNames;
-        std::vector<SortOrder>      order;
-
-        void addOption(const std::string &fieldName, SortOrder order){
-            this->fieldNames.push_back(fieldName);
-            this->order.push_back(order);
         }
     };
 
@@ -124,7 +114,7 @@ public:
      * Poradi klicu urcuje jejich prioritu.
      * @param options
      */
-    void sort(SortOptions& options);
+    void sort(unsigned long fieldIndex, SortOrder sortOrder);
 
     /**
      * Vyhledani zaznamu podle zadanych klicu

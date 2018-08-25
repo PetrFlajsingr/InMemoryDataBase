@@ -153,7 +153,45 @@ void InMemorydataset::previous() {
     setFieldValues(this->data[this->currentRecord]);
 }
 
-void InMemorydataset::sort(InMemorydataset::SortOptions &options) {
+void InMemorydataset::sort(unsigned long fieldIndex, SortOrder sortOrder) {
+
+    if(sortOrder == ASCENDING) {
+        std::sort(this->data.begin(),
+                  this->data.end(),
+                  [&fieldIndex](const std::vector<DataContainer *> &a,
+                                const std::vector<DataContainer *> &b) {
+                      switch (a[fieldIndex]->valueType) {
+                          case INTEGER_VAL:
+                              return a[fieldIndex]->data._integer < b[fieldIndex]->data._integer;
+                          case DOUBLE_VAL:
+                              return a[fieldIndex]->data._double < b[fieldIndex]->data._double;
+                          case STRING_VAL:
+                              return std::strcmp(a[fieldIndex]->data._string,
+                                                 b[fieldIndex]->data._string) < 0;
+                          default:
+                              throw IllegalStateException("Internal error.");
+                      }
+                  });
+    } else {
+        std::sort(this->data.begin(),
+                  this->data.end(),
+                  [&fieldIndex](const std::vector<DataContainer *> &a,
+                                const std::vector<DataContainer *> &b) {
+                      switch (a[fieldIndex]->valueType) {
+                          case INTEGER_VAL:
+                              return a[fieldIndex]->data._integer > b[fieldIndex]->data._integer;
+                          case DOUBLE_VAL:
+                              return a[fieldIndex]->data._double > b[fieldIndex]->data._double;
+                          case STRING_VAL:
+                              return std::strcmp(a[fieldIndex]->data._string,
+                                                 b[fieldIndex]->data._string) > 0;
+                          default:
+                              throw IllegalStateException("Internal error.");
+                      }
+                  });
+    }
+
+    this->first();
 }
 
 void InMemorydataset::find(InMemorydataset::SearchOptions &options) {
