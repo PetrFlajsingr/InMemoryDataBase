@@ -23,6 +23,8 @@ void InMemorydataset::open() {
     this->isOpen = true;
 
     delete this->dataProvider;
+
+    setFieldValues(this->data[0]);
 }
 
 void InMemorydataset::loadData() {
@@ -138,10 +140,15 @@ void InMemorydataset::last() {
 
 void InMemorydataset::next() {
     this->currentRecord++;
-    setFieldValues(this->data[this->currentRecord]);
+    if(!this->eof()) {
+        setFieldValues(this->data[this->currentRecord]);
+    }
 }
 
 void InMemorydataset::previous() {
+    if(this->currentRecord == 0) {
+        return;
+    }
     this->currentRecord--;
     setFieldValues(this->data[this->currentRecord]);
 }
