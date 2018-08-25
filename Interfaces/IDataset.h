@@ -31,6 +31,8 @@ public:
     virtual const Field * fieldByName(const std::string& name)= 0;
 
     virtual const Field * fieldByIndex(unsigned long index)= 0;
+
+    virtual std::vector<std::string> getFieldNames()= 0;
 };
 
 #endif //CSV_READER_IDATASET_H

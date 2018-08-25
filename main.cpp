@@ -1,27 +1,23 @@
-#include <iostream>
-#include "Interfaces/IDataProvider.h"
+
+#include "Interfaces/IDataset.h"
+#include "Datasets/InMemorydataset.h"
 #include "DataProviders/CsvReader.h"
 
 int main(int argc, char** argv) {
-    IDataProvider* reader = new CsvReader(std::string(argv[1]));
+    IDataset* dataset = new InMemorydataset();
 
-    std::cout << "Col count: " << reader->getColumnCount() << std::endl;
+    IDataProvider* dataProvider = new CsvReader(argv[1]);
 
-    for(const auto &str : reader->getColumnNames()) {
-        std::cout << "Col: " << str << std::endl;
+    dataset->open(dataProvider);
+
+    auto fieldNames = dataset->getFieldNames();
+    while(!dataset->eof()) {
+
     }
 
-    for(const auto &str : reader->getRow()) {
-        std::cout << "Record: " << str << std::endl;
-    }
+    dataset->close();
 
-    reader->next();
-
-    for(const auto &str : reader->getRow()) {
-        std::cout << "Record: " << str << std::endl;
-    }
-
-    delete reader;
+    delete dataset;
 
     return 0;
 }

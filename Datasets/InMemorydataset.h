@@ -11,7 +11,7 @@
 /**
  * Dataset ukladajici data primo v operacni pameti.
  */
-class InMemorydataset : IDataset {
+class InMemorydataset : public IDataset {
 private:
     enum SortOrder {ASCENDING, DESCENDING};
 
@@ -131,6 +131,15 @@ public:
     const Field* fieldByIndex(unsigned long index) override ;
 
     bool eof() override;
+
+    std::vector<std::string> getFieldNames() override {
+        std::vector<std::string> result;
+        for(const auto &field : fields) {
+            result.push_back(field.fieldName);
+        }
+
+        return result;
+    }
 
 };
 

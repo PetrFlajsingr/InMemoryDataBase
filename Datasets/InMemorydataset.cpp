@@ -14,6 +14,8 @@ void InMemorydataset::open(IDataProvider *provider) {
     this->loadData();
 
     this->isOpen = true;
+
+    delete this->dataProvider;
 }
 
 void InMemorydataset::loadData() {
@@ -133,7 +135,7 @@ const Field * InMemorydataset::fieldByName(const std::string &name) {
         }
     }
 
-    throw InvalidArgumentException("There's no field named: " + name);
+    throw InvalidArgumentException(("There's no field named: " + name).c_str());
 }
 
 const Field * InMemorydataset::fieldByIndex(unsigned long index) {
