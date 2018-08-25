@@ -1,6 +1,6 @@
 #include <iostream>
 #include "Interfaces/IDataProvider.h"
-#include "CsvReader.h"
+#include "DataProviders/CsvReader.h"
 
 int main(int argc, char** argv) {
     IDataProvider* reader = new CsvReader(std::string(argv[1]));

@@ -2,8 +2,8 @@
 // Created by Petr Flajsingr on 24/08/2018.
 //
 
-#ifndef CSV_READER_IREADER_H
-#define CSV_READER_IREADER_H
+#ifndef CSV_READER_IDATAPROVIDER_H
+#define CSV_READER_IDATAPROVIDER_H
 
 
 #include <string>
@@ -33,4 +33,4 @@ public:
 };
 
 
-#endif //CSV_READER_IREADER_H
+#endif //CSV_READER_IDATAPROVIDER_H

@@ -5,4 +5,8 @@
 #ifndef CSV_READER_IDATASET_H
 #define CSV_READER_IDATASET_H
 
+class IDataset {
+    virtual
+};
+
 #endif //CSV_READER_IDATASET_H

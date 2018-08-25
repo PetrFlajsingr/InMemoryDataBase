@@ -21,6 +21,13 @@ public:
     static std::vector<std::string> SplitStringByDelimiter(std::string str,
                                                            std::string delimiter);
 
+    static int StringToInt(const std::string& str);
+
+    static double StringToDouble(const std::string& str);
+
+    static bool isInteger(const std::string& value);
+
+    static bool isDouble(const std::string& value);
 };
 
 

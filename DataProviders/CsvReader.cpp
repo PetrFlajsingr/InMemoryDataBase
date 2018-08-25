@@ -3,8 +3,8 @@
 //
 
 #include "CsvReader.h"
-#include "Exceptions.h"
-#include "Utilities.h"
+#include "../Misc/Exceptions.h"
+#include "../Misc/Utilities.h"
 
 
 CsvReader::CsvReader(std::string filePath) {

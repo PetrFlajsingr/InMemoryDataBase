@@ -8,8 +8,8 @@
 
 #include <fstream>
 #include <vector>
-#include "Interfaces/IDataProvider.h"
-#include "Exceptions.h"
+#include "../Interfaces/IDataProvider.h"
+#include "../Misc/Exceptions.h"
 
 /**
  * Trida implementujici metody IReader.

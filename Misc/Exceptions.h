@@ -48,4 +48,20 @@ public:
     }
 };
 
+/**
+ * Exception pro notifikaci o chybnem pozadavku pro momentalni vnitrni stav objektu
+ */
+class IllegalStateException : public std::exception {
+private:
+    const char *errorMessage;
+public:
+    explicit IllegalStateException(const char* message) {
+        this->errorMessage = message;
+    }
+
+    char const* what() const throw() override {
+        return errorMessage;
+    }
+};
+
 #endif //CSV_READER_EXCEPTIONS_H
