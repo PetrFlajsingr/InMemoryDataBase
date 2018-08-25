@@ -16,6 +16,9 @@
  * Predpoklada se prubezne nastaveni pri jakekoliv zmene zaznamu.
  */
 class Field {
+    /**
+     * Typy ulozenych dat
+     */
     enum ValueType {NONE, INTEGER_VAL, DOUBLE_VAL, STRING_VAL};
 private:
     ValueType fieldType = NONE;
@@ -30,19 +33,42 @@ public:
 
     ~Field();
 
+    /**
+     * Nastaveni hodnoty pole. Typ je odvozen automaticky.
+     * @param value libovolna hodnota
+     */
     void setValue(std::string value);
 
+    /**
+     * Nastaveni hodnoty jako string
+     * @param value
+     */
     void setAsString(std::string value) {
         this->stringData = std::move(value);
 
         this->fieldType = STRING_VAL;
     }
 
+    /**
+     * Navrat hodnoty jako string
+     * @return
+     */
     std::string getAsString() {
-        if(fieldType != STRING_VAL) {
+        if(fieldType == NONE) {
             throw IllegalStateException("Value is not of the type string");
         }
-        return this->stringData;
+        switch(fieldType){
+            case NONE:
+                throw IllegalStateException("Value is not of the type string");
+            case INTEGER_VAL:
+                return std::to_string(this->integerData);
+            case DOUBLE_VAL:
+                return std::to_string(this->doubleData);
+            case STRING_VAL:
+                this->stringData;
+            default:
+                throw IllegalStateException("Interni chyba, fieldType: " + std::to_string(fieldType));
+        }
     }
 
     void setAsInteger(const std::string &value) {
