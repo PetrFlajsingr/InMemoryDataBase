@@ -28,9 +28,9 @@ public:
 
     virtual bool eof()= 0;
 
-    virtual Field* fieldByName(const std::string& name)= 0;
+    virtual const Field * fieldByName(const std::string& name)= 0;
 
-    virtual Field* fieldByIndex(int index)= 0;
+    virtual const Field * fieldByIndex(unsigned long index)= 0;
 };
 
 #endif //CSV_READER_IDATASET_H

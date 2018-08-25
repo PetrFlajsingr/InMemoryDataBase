@@ -50,6 +50,8 @@ private:
 
     bool isOpen = false;
 
+    unsigned long currentRecord = 0;
+
     std::vector<std::vector<DataContainer>> data;
 
     void loadData();
@@ -119,14 +121,14 @@ public:
      * @param name
      * @return
      */
-    Field* fieldByName(const std::string& name) override;
+    const Field * fieldByName(const std::string& name) override;
 
     /**
      * Nalezeni field podle jeho indexu
      * @param index
      * @return
      */
-    Field* fieldByIndex(int index) override ;
+    const Field* fieldByIndex(unsigned long index) override ;
 
     bool eof() override;
 

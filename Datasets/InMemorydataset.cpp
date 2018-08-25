@@ -99,19 +99,23 @@ void InMemorydataset::setFieldValues(std::vector<InMemorydataset::DataContainer>
 }
 
 void InMemorydataset::first() {
+    this->currentRecord = 0;
     setFieldValues(this->data[0]);
 }
 
 void InMemorydataset::last() {
-
+    this->currentRecord = this->data.size() - 1;
+    setFieldValues(this->data[this->data.size() - 1]);
 }
 
 void InMemorydataset::next() {
-
+    this->currentRecord++;
+    setFieldValues(this->data[this->currentRecord]);
 }
 
 void InMemorydataset::previous() {
-
+    this->currentRecord--;
+    setFieldValues(this->data[this->currentRecord]);
 }
 
 void InMemorydataset::sort(InMemorydataset::SortOptions &options) {
@@ -122,16 +126,23 @@ void InMemorydataset::find(InMemorydataset::SearchOptions &options) {
 
 }
 
-Field* InMemorydataset::fieldByName(const std::string &name) {
-    return nullptr;
+const Field * InMemorydataset::fieldByName(const std::string &name) {
+    for(const auto &field : fields) {
+        if(field.fieldName == name) {
+            return &field;
+        }
+    }
+
+    throw InvalidArgumentException("There's no field named: " + name);
 }
 
-Field* InMemorydataset::fieldByIndex(int index) {
-    return nullptr;
+const Field * InMemorydataset::fieldByIndex(unsigned long index) {
+    return &fields.at(index);
 }
 
 bool InMemorydataset::eof() {
-    return false;
+    return this->currentRecord >= this->data.size() - 1;
+
 }
 
 
