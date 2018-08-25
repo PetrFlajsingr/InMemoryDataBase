@@ -24,7 +24,7 @@ void InMemorydataset::open() {
 
     delete this->dataProvider;
 
-    setFieldValues(this->data[0]);
+    setFieldValues(0, true);
 }
 
 void InMemorydataset::loadData() {
@@ -34,6 +34,7 @@ void InMemorydataset::loadData() {
 
     while(!this->dataProvider->eof()) {
         this->addRecord();
+        this->dataValidity.push_back(true);
 
         this->dataProvider->next();
     }
@@ -104,15 +105,44 @@ void InMemorydataset::setFieldTypes(std::vector<InMemorydataset::DataContainer*>
     }
 }
 
-void InMemorydataset::setFieldValues(std::vector<InMemorydataset::DataContainer*> value) {
+bool InMemorydataset::setFieldValues(unsigned long index, bool searchForward) {
+    int iter = index;
+    if(dataValidityChanged) {
+        bool found = false;
+
+        if(searchForward) {
+            for (iter = index; iter < this->dataValidity.size(); iter++) {
+                if (this->dataValidity[iter]) {
+                    found = true;
+                    break;
+                }
+            }
+        } else {
+            for (iter = index; iter >= 0; iter--) {
+                if (this->dataValidity[iter]) {
+                    found = true;
+                    break;
+                }
+            }
+        }
+        if (!found) {
+            if(searchForward) {
+                this->currentRecord = this->data.size();
+            } else {
+                this->currentRecord = 0;
+            }
+            return false;
+        }
+        this->currentRecord = iter;
+    }
+
+    auto value = this->data[iter];
+
     if(!isFieldTypeSet()) {
         setFieldTypes(value); // NOLINT
-        return;
     }
 
     for(int iter = 0; iter < fields.size(); iter++) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wswitch"
         switch(fields[iter].getFieldType()) {
             case INTEGER_VAL:
                 fields[iter].setFromInteger(value[iter]->data._integer);
@@ -123,25 +153,28 @@ void InMemorydataset::setFieldValues(std::vector<InMemorydataset::DataContainer*
             case STRING_VAL:
                 fields[iter].setAsString(value[iter]->data._string);
                 break;
+            default:
+                throw IllegalStateException("Internal error.");
         }
-#pragma clang diagnostic pop
     }
+
+    return true;
 }
 
 void InMemorydataset::first() {
     this->currentRecord = 0;
-    setFieldValues(this->data[0]);
+    setFieldValues(0, true);
 }
 
 void InMemorydataset::last() {
     this->currentRecord = this->data.size() - 1;
-    setFieldValues(this->data[this->data.size() - 1]);
+    setFieldValues(this->data.size() - 1, false);
 }
 
 void InMemorydataset::next() {
     this->currentRecord++;
     if(!this->eof()) {
-        setFieldValues(this->data[this->currentRecord]);
+        setFieldValues(this->currentRecord, true);
     }
 }
 
@@ -150,7 +183,7 @@ void InMemorydataset::previous() {
         return;
     }
     this->currentRecord--;
-    setFieldValues(this->data[this->currentRecord]);
+    setFieldValues(this->currentRecord, false);
 }
 
 void InMemorydataset::sort(unsigned long fieldIndex, SortOrder sortOrder) {
@@ -198,7 +231,50 @@ void InMemorydataset::sort(unsigned long fieldIndex, SortOrder sortOrder) {
 }
 
 void InMemorydataset::find(InMemorydataset::SearchOptions &options) {
-    //TODO
+    if(options.fieldIndexes.empty()) {
+        dataValidityChanged = false;
+        for(int iter = 0; iter < this->dataValidity.size(); iter++) {
+            this->dataValidity[iter] = true;
+        }
+
+        this->first();
+
+        return;
+    }
+
+    dataValidityChanged = true;
+    for (auto iter = 0; iter < this->data.size(); iter++) {
+        bool valid = true;
+
+        for(auto fieldIndex : options.fieldIndexes) {
+            if(!valid){
+                break;
+            }
+            switch (this->data[iter][fieldIndex]->valueType) {
+                case INTEGER_VAL:
+                    if(!(std::to_string(this->data[iter][fieldIndex]->data._integer) == options.searchStrings[iter])){
+                        valid = false;
+                    }
+                    break;
+                case DOUBLE_VAL:
+                    if(!(std::to_string(this->data[iter][fieldIndex]->data._double) == options.searchStrings[iter])){
+                        valid = false;
+                    }
+                    break;
+                case STRING_VAL:
+                    if(!(this->data[iter][fieldIndex]->data._string == options.searchStrings[fieldIndex])){
+                        valid = false;
+                    }
+                    break;
+                default:
+                    throw IllegalStateException("Internal error.");
+            }
+        }
+
+        this->dataValidity[iter] = valid;
+    }
+
+    this->first();
 }
 
 Field * InMemorydataset::fieldByName(const std::string &name) {

@@ -13,8 +13,7 @@
  * Dataset ukladajici data primo v operacni pameti.
  */
 class InMemorydataset : public IDataset {
-private:
-
+public:
     struct SearchOptions {
         std::vector<unsigned long>  fieldIndexes;
         std::vector<std::string>    searchStrings;
@@ -24,6 +23,7 @@ private:
             this->searchStrings.push_back(searchString);
         }
     };
+private:
 
     /**
      * Struktura pro vnitrni reprezentaci dat
@@ -54,7 +54,10 @@ private:
 
     bool fieldTypesSet = false;
 
+    bool dataValidityChanged = false;
+
     std::vector<std::vector<DataContainer*>> data;
+    std::vector<bool> dataValidity;
 
     void loadData();
 
@@ -66,7 +69,7 @@ private:
      */
     void createFields(std::vector<std::string> columns, std::vector<ValueType> types = {});
 
-    void setFieldValues(std::vector<DataContainer*> value);
+    bool setFieldValues(unsigned long index, bool searchForward);
 
     bool isFieldTypeSet() {
         return !(fields[0].getFieldType() == NONE);
@@ -148,7 +151,6 @@ public:
     }
 
     void setFieldTypes(std::vector<ValueType> types) override;
-
 };
 
 

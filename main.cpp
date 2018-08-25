@@ -34,8 +34,19 @@ int main(int argc, char** argv) {
     auto field1 = dataset->fieldByIndex(1);
 
     std::cout << "_____sort()_____" << std::endl;
-    dataset->sort(0, ASCENDING);
+    printTime();
+    dataset->sort(1, ASCENDING);
     std::cout << "_____sort() end_____" << std::endl;
+    printTime();
+
+
+    InMemorydataset::SearchOptions options;
+    options.addOption(0, "A");
+    std::cout << "_____find()_____" << std::endl;
+    printTime();
+    dataset->find(options);
+    std::cout << "_____find() end_____" << std::endl;
+    printTime();
 
 
     std::cout << "_____next()_____" << std::endl;
