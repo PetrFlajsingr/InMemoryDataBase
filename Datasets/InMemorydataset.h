@@ -15,25 +15,21 @@ class InMemorydataset : public IDataset {
 private:
     enum SortOrder {ASCENDING, DESCENDING};
 
-    class SearchOptions {
-    private:
+    struct SearchOptions {
         std::vector<std::string>    fieldNames;
         std::vector<std::string>    searchStrings;
 
-    public:
-        void addOption(std::string fieldName, std::string searchString){
+        void addOption(const std::string &fieldName, const std::string &searchString){
             this->fieldNames.push_back(fieldName);
             this->searchStrings.push_back(searchString);
         }
     };
 
-    class SortOptions {
-    private:
+    struct SortOptions {
         std::vector<std::string>    fieldNames;
         std::vector<SortOrder>      order;
 
-    public:
-        void addOption(std::string fieldName, SortOrder order){
+        void addOption(const std::string &fieldName, SortOrder order){
             this->fieldNames.push_back(fieldName);
             this->order.push_back(order);
         }

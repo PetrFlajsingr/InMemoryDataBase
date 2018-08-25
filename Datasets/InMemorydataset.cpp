@@ -154,7 +154,6 @@ void InMemorydataset::previous() {
 }
 
 void InMemorydataset::sort(InMemorydataset::SortOptions &options) {
-    //TODO
 }
 
 void InMemorydataset::find(InMemorydataset::SearchOptions &options) {
