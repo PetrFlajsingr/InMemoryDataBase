@@ -9,6 +9,9 @@ Field::Field(const std::string name) : fieldName(name) {}
 Field::~Field() = default;
 
 void Field::setValue(std::string value) {
+    if(typeSet) {
+        throw IllegalStateException("Field type has already been set.");
+    }
     if(Utilities::isInteger(value)) {
         this->integerData = Utilities::StringToInt(value);
         this->fieldType = INTEGER_VAL;
@@ -19,6 +22,8 @@ void Field::setValue(std::string value) {
         this->stringData = value;
         this->fieldType = STRING_VAL;
     }
+
+    this->typeSet = true;
 }
 
 

@@ -63,3 +63,7 @@ void CsvReader::first() {
 
     this->currentRecordNumber = 0;
 }
+
+bool CsvReader::eof() {
+    return this->file.eof();
+}

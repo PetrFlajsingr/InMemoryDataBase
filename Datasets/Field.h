@@ -8,18 +8,14 @@
 
 #include <string>
 #include <utility>
-#include "../Misc/Utilities.h"
 #include "../Misc/Exceptions.h"
+#include "../Misc/Utilities.h"
 
 /**
  * Trida uchovavajici zaznamy datasetu pro iteraci mezi nimi.
  * Predpoklada se prubezne nastaveni pri jakekoliv zmene zaznamu.
  */
 class Field {
-    /**
-     * Typy ulozenych dat
-     */
-    enum ValueType {NONE, INTEGER_VAL, DOUBLE_VAL, STRING_VAL};
 private:
     ValueType fieldType = NONE;
 
@@ -29,7 +25,7 @@ private:
 
     double doubleData;
 
-
+    bool typeSet = false;
 public:
     explicit Field(std::string name);
 
@@ -48,9 +44,13 @@ public:
      * @param value
      */
     void setAsString(std::string value) {
+        if(typeSet && fieldType != STRING_VAL) {
+            throw IllegalStateException(("Field type has already been set to: " + std::to_string(int(fieldType))).c_str());
+        }
+
         this->stringData = std::move(value);
 
-        this->fieldType = STRING_VAL;
+        this->typeSet = true;
     }
 
     /**
@@ -59,7 +59,7 @@ public:
      */
     std::string getAsString() {
         if(fieldType == NONE) {
-            throw IllegalStateException("Value is not of the type string");
+            throw IllegalStateException("Field type has not been set");
         }
         switch(fieldType){
             case NONE:
@@ -69,19 +69,27 @@ public:
             case DOUBLE_VAL:
                 return std::to_string(this->doubleData);
             case STRING_VAL:
-                this->stringData;
+                return this->stringData;
             default:
-                throw IllegalStateException("Interni chyba, fieldType: " + std::to_string(fieldType));
+                throw IllegalStateException(("Interni chyba, fieldType: " + std::to_string(int(fieldType))).c_str());
         }
     }
 
     void setAsInteger(const std::string &value) {
+        if(typeSet && fieldType != INTEGER_VAL) {
+            throw IllegalStateException(("Field type has already been set to: " + std::to_string(int(fieldType))).c_str());
+        }
+
         if(!Utilities::isInteger(value)) {
-            throw InvalidArgumentException("Value is not integer: " + value);
+            throw InvalidArgumentException(("Value is not integer: " + value).c_str());
         }
         integerData = Utilities::StringToInt(value);
 
-        this->fieldType = INTEGER_VAL;
+        this->typeSet = true;
+    }
+
+    void setFromInteger(int value) {
+        this->integerData = value;
     }
 
     int getAsInteger() {
@@ -93,13 +101,21 @@ public:
     }
 
     void setAsDouble(const std::string &value) {
+        if(typeSet && fieldType != DOUBLE_VAL) {
+            throw IllegalStateException(("Field type has already been set to: " + std::to_string(int(fieldType))).c_str());
+        }
+
         if(!Utilities::isDouble(value)) {
-            throw InvalidArgumentException("Value is not double: " + value);
+            throw InvalidArgumentException(("Value is not double: " + value).c_str());
         }
 
         doubleData = Utilities::StringToDouble(value);
 
-        this->fieldType = DOUBLE_VAL;
+        this->typeSet = true;
+    }
+
+    void setFromDouble(double value) {
+        this->doubleData = value;
     }
 
     double getAsDouble() {
@@ -107,6 +123,10 @@ public:
             throw IllegalStateException("Value is not of the type double");
         }
         return this->doubleData;
+    }
+
+    void setFieldType(ValueType type) {
+        this->fieldType = type;
     }
 
     ValueType getFieldType() {

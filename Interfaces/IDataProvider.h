@@ -30,6 +30,8 @@ public:
     virtual void first()= 0;
 
     virtual void last()= 0;
+
+    virtual bool eof()= 0;
 };
 
 

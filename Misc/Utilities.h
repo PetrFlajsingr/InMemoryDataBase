@@ -8,6 +8,7 @@
 
 #include <string>
 #include <vector>
+#include "../Types.h"
 
 class Utilities {
 public:
@@ -28,6 +29,8 @@ public:
     static bool isInteger(const std::string& value);
 
     static bool isDouble(const std::string& value);
+
+    static ValueType getType(const std::string& value);
 };
 
 

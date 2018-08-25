@@ -8,10 +8,15 @@
 #include <string>
 #include <vector>
 #include "../Datasets/Field.h"
+#include "IDataProvider.h"
 
 class IDataset {
+protected:
+    std::vector<Field> fields;
 public:
-    virtual void loadData()= 0;
+    virtual void open(IDataProvider* dataProvider)= 0;
+
+    virtual void close()= 0;
 
     virtual void first()= 0;
 
@@ -21,7 +26,11 @@ public:
 
     virtual void previous()= 0;
 
-    virtual Field fieldByName(const std::string& name)= 0;
+    virtual bool eof()= 0;
+
+    virtual Field* fieldByName(const std::string& name)= 0;
+
+    virtual Field* fieldByIndex(int index)= 0;
 };
 
 #endif //CSV_READER_IDATASET_H

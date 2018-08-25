@@ -5,6 +5,7 @@
 #include <sstream>
 #include <regex>
 #include "Utilities.h"
+#include "../Datasets/Field.h"
 
 std::vector<std::string> Utilities::SplitStringByDelimiter(std::string str,
                                                            std::string delimiter) {
@@ -53,4 +54,14 @@ bool Utilities::isDouble(const std::string &value) {
     std::regex doubleRegex("[+-]?([:digit:]*[.])?[:digit:]+");
 
     return std::regex_match(value, doubleRegex);
+}
+
+ValueType Utilities::getType(const std::string &value) {
+    if(isInteger(value)){
+        return INTEGER_VAL;
+    } else if(isDouble(value)) {
+        return DOUBLE_VAL;
+    } else {
+        return STRING_VAL;
+    }
 }

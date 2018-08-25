@@ -107,6 +107,8 @@ public:
     unsigned long getColumnCount() override {
         return header.size();
     }
+
+    bool eof() override;
 };
 
 
