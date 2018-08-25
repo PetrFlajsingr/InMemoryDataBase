@@ -23,23 +23,23 @@ int main(int argc, char** argv) {
         types.push_back(STRING_VAL);
     }
     dataset->setFieldTypes(types);
-    std::cout << "Open()" << std::endl;
+    std::cout << "_____Open()_____" << std::endl;
     printTime();
     dataset->open();
-    std::cout << "Open() done" << std::endl;
+    std::cout << "_____Open() done_____" << std::endl;
     printTime();
 
 
     auto field0 = dataset->fieldByIndex(0);
-    auto field4 = dataset->fieldByIndex(1);
+    auto field1 = dataset->fieldByIndex(1);
 
-    std::cout << "next()" << std::endl;
+    std::cout << "_____next()_____" << std::endl;
     printTime();
     while(!dataset->eof()) {
-        std::cout << field0->getAsString() << " " << field4->getAsString() << std::endl;
+        std::cout << field0->getAsString() << " " << field1->getAsString() << std::endl;
         dataset->next();
     }
-    std::cout << "next() done" << std::endl;
+    std::cout << "_____next() done_____" << std::endl;
     printTime();
 
     dataset->close();
