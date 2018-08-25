@@ -243,32 +243,36 @@ void InMemorydataset::find(InMemorydataset::SearchOptions &options) {
     }
 
     dataValidityChanged = true;
+    size_t optionCounter;
     for (auto iter = 0; iter < this->data.size(); iter++) {
         bool valid = true;
 
+        optionCounter = 0;
         for(auto fieldIndex : options.fieldIndexes) {
             if(!valid){
                 break;
             }
             switch (this->data[iter][fieldIndex]->valueType) {
                 case INTEGER_VAL:
-                    if(!(std::to_string(this->data[iter][fieldIndex]->data._integer) == options.searchStrings[iter])){
+                    if(!(std::to_string(this->data[iter][fieldIndex]->data._integer) == options.searchStrings[optionCounter])){
                         valid = false;
                     }
                     break;
                 case DOUBLE_VAL:
-                    if(!(std::to_string(this->data[iter][fieldIndex]->data._double) == options.searchStrings[iter])){
+                    if(!(std::to_string(this->data[iter][fieldIndex]->data._double) == options.searchStrings[optionCounter])){
                         valid = false;
                     }
                     break;
                 case STRING_VAL:
-                    if(!(this->data[iter][fieldIndex]->data._string == options.searchStrings[fieldIndex])){
+                    if(std::strcmp(this->data[iter][fieldIndex]->data._string,
+                                   options.searchStrings[optionCounter].c_str()) != 0){
                         valid = false;
                     }
                     break;
                 default:
                     throw IllegalStateException("Internal error.");
             }
+            optionCounter++;
         }
 
         this->dataValidity[iter] = valid;
