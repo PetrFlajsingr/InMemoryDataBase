@@ -7,6 +7,7 @@
 #include "Interfaces/IField.h"
 #include "Datasets/Memorydataset.h"
 #include "DataProviders/CsvReader.h"
+#include "Misc/Utilities.h"
 
 void printTime(){
     auto t = std::time(nullptr);
@@ -21,7 +22,9 @@ long getMs() {
 }
 
 int main(int argc, char** argv) {
-    Memorydataset* dataset = new Memorydataset();
+
+
+    auto * dataset = new Memorydataset();
 
     IDataProvider* dataProvider = new CsvReader(argv[1]);
 

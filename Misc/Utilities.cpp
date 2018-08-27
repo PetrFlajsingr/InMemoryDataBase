@@ -26,32 +26,28 @@ std::vector<std::string> Utilities::SplitStringByDelimiter(std::string str,
 
 int Utilities::StringToInt(const std::string &str) {
     std::stringstream stringstream(str);
-
     int result;
 
     stringstream >> result;
-
     return result;
 }
 
 double Utilities::StringToDouble(const std::string &str) {
     std::stringstream stringstream(str);
-
     double result;
 
     stringstream >> result;
-
     return result;
 }
-//TODO fix regex
+
 bool Utilities::isInteger(const std::string& value) {
-    std::regex integerRegex("(\\+|-)?[[:digit:]]+");
+    std::regex integerRegex("(\\+|-)?[1-9][0-9]*");
 
     return std::regex_match(value, integerRegex);
 }
-//TODO fix regex
+
 bool Utilities::isDouble(const std::string &value) {
-    std::regex doubleRegex("[+-]?([:digit:]*[.])?[:digit:]+");
+    std::regex doubleRegex("[+-]?([0-9]*[.])?[0-9]+");
 
     return std::regex_match(value, doubleRegex);
 }

@@ -9,7 +9,7 @@
 #include <string>
 
 /**
- * Exception sloužící k označení funkcí, které nejsou implementovány
+ * Exception slouzici k oznaceni funkci, ktere nejsou implementovany
  */
 class NotImplementedException : public std::logic_error {
 public:
@@ -17,7 +17,7 @@ public:
 };
 
 /**
- * Exception sloužící k informování o chybné práci se soubory
+ * Exception slouzici k informovani o chybné praci se soubory
  */
 class IOException : public std::exception {
 private:
