@@ -8,12 +8,19 @@
 #include <string>
 #include <vector>
 #include <cstring>
-#include "../Datasets/Field.h"
+#include "IFieldPre.h"
 #include "IDataProvider.h"
+#include "../Misc/Types.h"
 
 class IDataset {
 protected:
-    std::vector<Field> fields;
+    friend class IField;
+
+    std::vector<IField*> fields;
+
+    void setFieldData(IField *field, u_int8_t *data);
+
+    virtual void setData(u_int8_t * data, unsigned long index, ValueType type)= 0;
 public:
     virtual void open()= 0;
 
@@ -31,15 +38,19 @@ public:
 
     virtual bool eof()= 0;
 
-    virtual Field * fieldByName(const std::string& name)= 0;
+    virtual IField * fieldByName(const std::string& name)= 0;
 
-    virtual Field * fieldByIndex(unsigned long index)= 0;
+    virtual IField * fieldByIndex(unsigned long index)= 0;
 
     virtual void setFieldTypes(std::vector<ValueType> types)= 0;
 
     virtual std::vector<std::string> getFieldNames()= 0;
 
-    virtual ~IDataset() = default;
+    virtual ~IDataset() {
+        for(auto tmp : this->fields) {
+            delete tmp;
+        }
+    };
 };
 
 #endif //CSV_READER_IDATASET_H

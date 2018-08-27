@@ -64,4 +64,19 @@ public:
     }
 };
 
+/**
+ * Exception pro notifikaci o nepovolene operaci objektu
+ */
+class UnsupportedOperationException : public std::exception {
+private:
+    const char *errorMessage;
+public:
+    explicit UnsupportedOperationException(const char* message) {
+        this->errorMessage = message;
+    }
+
+    char const* what() const throw() override {
+        return errorMessage;
+    }
+};
 #endif //CSV_READER_EXCEPTIONS_H

@@ -7,12 +7,14 @@
 
 
 #include "../Interfaces/IDataset.h"
+#include "../Misc/Types.h"
+#include "../Interfaces/IField.h"
 
 
 /**
  * Dataset ukladajici data primo v operacni pameti.
  */
-class InMemorydataset : public IDataset {
+class Memorydataset : public IDataset {
 public:
     struct SearchOptions {
         std::vector<unsigned long>  fieldIndexes;
@@ -40,7 +42,7 @@ private:
 
         ~DataContainer() {
             if(valueType == STRING_VAL) {
-                delete data._string;
+                delete [] data._string;
             }
         }
     };
@@ -67,17 +69,15 @@ private:
      * Vytvoreni Fields se jmeny podle nazvu sloupcu.
      * @param columns nazvy sloupcu
      */
-    void createFields(std::vector<std::string> columns, std::vector<ValueType> types = {});
+    void createFields(std::vector<std::string> columns, std::vector<ValueType> types);
 
     bool setFieldValues(unsigned long index, bool searchForward);
 
-    bool isFieldTypeSet() {
-        return !(fields[0].getFieldType() == NONE);
-    }
+protected:
+    void setData(u_int8_t *data, unsigned long index, ValueType type) override;
 
-    void setFieldTypes(std::vector<InMemorydataset::DataContainer*> value);
 public:
-    ~InMemorydataset() override;
+    ~Memorydataset() override;
 
     /**
      * Nacteni dat do pameti datasetu.
@@ -130,21 +130,21 @@ public:
      * @param name
      * @return
      */
-    Field * fieldByName(const std::string& name) override;
+    IField* fieldByName(const std::string& name) override;
 
     /**
      * Nalezeni field podle jeho indexu
      * @param index
      * @return
      */
-    Field* fieldByIndex(unsigned long index) override ;
+    IField* fieldByIndex(unsigned long index) override ;
 
     bool eof() override;
 
     std::vector<std::string> getFieldNames() override {
         std::vector<std::string> result;
         for(const auto &field : fields) {
-            result.push_back(field.fieldName);
+            result.push_back(field->getFieldName());
         }
 
         return result;

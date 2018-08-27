@@ -4,7 +4,8 @@
 #include <iomanip>
 #include <sys/time.h>
 #include "Interfaces/IDataset.h"
-#include "Datasets/InMemorydataset.h"
+#include "Interfaces/IField.h"
+#include "Datasets/Memorydataset.h"
 #include "DataProviders/CsvReader.h"
 
 void printTime(){
@@ -14,13 +15,13 @@ void printTime(){
 }
 
 long getMs() {
-    struct timeval tp;
-    gettimeofday(&tp, NULL);
+    struct timeval tp{};
+    gettimeofday(&tp, nullptr);
     return tp.tv_sec * 1000 + tp.tv_usec / 1000;
 }
 
 int main(int argc, char** argv) {
-    InMemorydataset* dataset = new InMemorydataset();
+    Memorydataset* dataset = new Memorydataset();
 
     IDataProvider* dataProvider = new CsvReader(argv[1]);
 
@@ -49,7 +50,7 @@ int main(int argc, char** argv) {
     printTime();
 
 
-    InMemorydataset::SearchOptions options;
+    Memorydataset::SearchOptions options;
     options.addOption(4, "00231525");
     start = getMs();
     std::cout << "_____find()_____" << std::endl;

@@ -3,13 +3,18 @@
 //
 
 #include <iostream>
-#include "InMemorydataset.h"
+#include "Memorydataset.h"
+#include "../Misc/Exceptions.h"
+#include "../Misc/Utilities.h"
+#include "Fields/IntegerField.h"
+#include "Fields/DoubleField.h"
+#include "Fields/StringField.h"
 
-void InMemorydataset::setDataProvider(IDataProvider *provider) {
+void Memorydataset::setDataProvider(IDataProvider *provider) {
     this->dataProvider = provider;
 }
 
-void InMemorydataset::open() {
+void Memorydataset::open() {
     if(isOpen) {
         throw IllegalStateException("Dataset is already opened");
     }
@@ -27,9 +32,9 @@ void InMemorydataset::open() {
     setFieldValues(0, true);
 }
 
-void InMemorydataset::loadData() {
+void Memorydataset::loadData() {
     if(!this->fieldTypesSet) {
-        createFields(dataProvider->getColumnNames());
+        createFields(dataProvider->getColumnNames(), {});
     }
 
     while(!this->dataProvider->eof()) {
@@ -40,26 +45,42 @@ void InMemorydataset::loadData() {
     }
 }
 
-void InMemorydataset::createFields(std::vector<std::string> columns, std::vector<ValueType> types) {
+void Memorydataset::createFields(std::vector<std::string> columns, std::vector<ValueType> types) {
+    if(columns.size() != types.size()) {
+        throw InvalidArgumentException("Amount of columns and types must match.");
+    }
     size_t iter = 0;
     for(const auto &col : columns) {
-        Field newField(col);
-        if(!types.empty()) {
-            newField.setFieldType(types[iter]);
+        IField* newField = nullptr;
+        switch(types[iter]){
+            case INTEGER_VAL: {
+                newField = new IntegerField(col, this, iter);
+                break;
+            }
+            case DOUBLE_VAL: {
+                newField = new DoubleField(col, this, iter);
+                break;
+            }
+            case STRING_VAL: {
+                newField = new StringField(col, this, iter);
+                break;
+            }
+            default:
+                throw IllegalStateException("Internal error.");
         }
         fields.push_back(newField);
         iter++;
     }
 }
 
-void InMemorydataset::addRecord() {
+void Memorydataset::addRecord() {
     auto record = this->dataProvider->getRow();
 
     std::vector<DataContainer*> newRecord;
     size_t iter = 0;
     for(const auto &part : record) {
         auto dataContainer = new DataContainer();
-        switch(fields[iter].getFieldType()){
+        switch(fields[iter]->getFieldType()){
             case INTEGER_VAL:
                 dataContainer->valueType = INTEGER_VAL;
                 dataContainer->data._integer = Utilities::StringToInt(part);
@@ -83,7 +104,7 @@ void InMemorydataset::addRecord() {
     this->data.push_back(newRecord);
 }
 
-void InMemorydataset::close() {
+void Memorydataset::close() {
     this->dataProvider = nullptr;
 
     this->isOpen = false;
@@ -99,14 +120,9 @@ void InMemorydataset::close() {
     }
 }
 
-void InMemorydataset::setFieldTypes(std::vector<InMemorydataset::DataContainer*> value) {
-    for(int iter = 0; iter < fields.size(); iter++) {
-        fields[iter].setFieldType(value[iter]->valueType);
-    }
-}
 
-bool InMemorydataset::setFieldValues(unsigned long index, bool searchForward) {
-    int iter = index;
+bool Memorydataset::setFieldValues(unsigned long index, bool searchForward) {
+    long iter = index;
     if(dataValidityChanged) {
         bool found = false;
 
@@ -133,25 +149,22 @@ bool InMemorydataset::setFieldValues(unsigned long index, bool searchForward) {
             }
             return false;
         }
-        this->currentRecord = iter;
+        this->currentRecord = static_cast<unsigned long>(iter);
     }
 
     auto value = this->data[iter];
 
-    if(!isFieldTypeSet()) {
-        setFieldTypes(value); // NOLINT
-    }
 
-    for(int iter = 0; iter < fields.size(); iter++) {
-        switch(fields[iter].getFieldType()) {
+    for(int i = 0; i < fields.size(); i++) {
+        switch(fields[i]->getFieldType()) {
             case INTEGER_VAL:
-                fields[iter].setFromInteger(value[iter]->data._integer);
+                this->setFieldData(fields[i], reinterpret_cast<u_int8_t *>(&value[i]->data._integer));
                 break;
             case DOUBLE_VAL:
-                fields[iter].setFromDouble(value[iter]->data._double);
+                this->setFieldData(fields[i], reinterpret_cast<u_int8_t *>(&value[i]->data._double));
                 break;
             case STRING_VAL:
-                fields[iter].setAsString(value[iter]->data._string);
+                this->setFieldData(fields[i], reinterpret_cast<u_int8_t *>(value[i]->data._string));
                 break;
             default:
                 throw IllegalStateException("Internal error.");
@@ -161,24 +174,24 @@ bool InMemorydataset::setFieldValues(unsigned long index, bool searchForward) {
     return true;
 }
 
-void InMemorydataset::first() {
+void Memorydataset::first() {
     this->currentRecord = 0;
     setFieldValues(0, true);
 }
 
-void InMemorydataset::last() {
+void Memorydataset::last() {
     this->currentRecord = this->data.size() - 1;
     setFieldValues(this->data.size() - 1, false);
 }
 
-void InMemorydataset::next() {
+void Memorydataset::next() {
     this->currentRecord++;
     if(!this->eof()) {
         setFieldValues(this->currentRecord, true);
     }
 }
 
-void InMemorydataset::previous() {
+void Memorydataset::previous() {
     if(this->currentRecord == 0) {
         return;
     }
@@ -186,7 +199,7 @@ void InMemorydataset::previous() {
     setFieldValues(this->currentRecord, false);
 }
 
-void InMemorydataset::sort(unsigned long fieldIndex, SortOrder sortOrder) {
+void Memorydataset::sort(unsigned long fieldIndex, SortOrder sortOrder) {
     if(fieldIndex >= this->getFieldNames().size()) {
         throw InvalidArgumentException("Field index is out of bounds");
     }
@@ -230,7 +243,7 @@ void InMemorydataset::sort(unsigned long fieldIndex, SortOrder sortOrder) {
     this->first();
 }
 
-void InMemorydataset::find(InMemorydataset::SearchOptions &options) {
+void Memorydataset::find(Memorydataset::SearchOptions &options) {
     if(options.fieldIndexes.empty()) {
         dataValidityChanged = false;
         for(int iter = 0; iter < this->dataValidity.size(); iter++) {
@@ -281,33 +294,53 @@ void InMemorydataset::find(InMemorydataset::SearchOptions &options) {
     this->first();
 }
 
-Field * InMemorydataset::fieldByName(const std::string &name) {
+IField * Memorydataset::fieldByName(const std::string &name) {
     for(auto &field : fields) {
-        if(field.fieldName == name) {
-            return &field;
+        if(field->getFieldName() == name) {
+            return field;
         }
     }
 
     throw InvalidArgumentException(("There's no field named: " + name).c_str());
 }
 
-Field * InMemorydataset::fieldByIndex(unsigned long index) {
-    return &fields.at(index);
+IField * Memorydataset::fieldByIndex(unsigned long index) {
+    return fields.at(index);
 }
 
-bool InMemorydataset::eof() {
+bool Memorydataset::eof() {
     return this->currentRecord >= this->data.size();
 
 }
 
-InMemorydataset::~InMemorydataset() {
+Memorydataset::~Memorydataset() {
     this->close();
 }
 
-void InMemorydataset::setFieldTypes(std::vector<ValueType> types) {
+void Memorydataset::setFieldTypes(std::vector<ValueType> types) {
     fieldTypesSet = true;
 
     createFields(this->dataProvider->getColumnNames(), types);
+}
+
+void Memorydataset::setData(u_int8_t *data, unsigned long index, ValueType type) {
+    switch(type) {
+        case INTEGER_VAL:
+            this->data[currentRecord][index]->data._integer = *data;
+            break;
+        case DOUBLE_VAL:
+            this->data[currentRecord][index]->data._double = *data;
+            break;
+        case STRING_VAL:
+            if(this->data[currentRecord][index]->data._string != nullptr) {
+                delete [] this->data[currentRecord][index]->data._string;
+            }
+            this->data[currentRecord][index]->data._string = reinterpret_cast<char *>(data);
+            break;
+        default:
+            throw IllegalStateException("Invalid value type.");
+    }
+
 }
 
 
