@@ -34,18 +34,21 @@ private:
      */
     void readHeader();
 
+    /**
+     * Zpracovani zaznamu pred jeho zpristupnenim
+     */
     void parseRecord();
 public:
     /**
-     * Vytvoří ctecku nad zadaným souborem.
+     * Vytvori ctecku nad zadanym souborem.
      *
-     * Pokud se soubor nepodaří otevřít je vyhozena IOException.
-     * @param filePath cesta k souboru
+     * Pokud se soubor nepodari otevrit je vyhozena IOException.
+     * @param filePath Cesta k souboru
      */
     explicit CsvReader(std::string filePath);
 
     /**
-     * Uzavření souboru při dealokaci objektu.
+     * Uzavreni souboru pri dealokaci objektu.
      */
     ~CsvReader() override;
 
@@ -57,11 +60,6 @@ public:
         return std::vector<std::string>(currentRecord);
     }
 
-    /**
-     * Nazev sloupce podle indexu.
-     * @param columnIndex index sloupce
-     * @return Nazev sloupce
-     */
     std::string getColumn(unsigned int columnIndex) override {
         return this->header.at(columnIndex);
     }
@@ -80,14 +78,8 @@ public:
         throw NotImplementedException();
     }
 
-    /**
-     * Presun na prvni zaznam.
-     */
     void first() override;
 
-    /**
-     * Neimplementovana metoda - zbytecne pro CSV
-     */
     void last() override {
         throw NotImplementedException();
     }
@@ -96,10 +88,6 @@ public:
         return this->currentRecordNumber;
     }
 
-    /**
-     * Nazvy vsech sloupcu
-     * @return nazvy vsech sloupcu jako vector
-     */
     std::vector<std::string> getColumnNames() override {
         return std::vector<std::string>(header);
     }
