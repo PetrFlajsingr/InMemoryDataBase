@@ -22,8 +22,8 @@ std::string IntegerField::getAsString() {
     return std::to_string(this->data);
 }
 
-void IntegerField::setValue(u_int8_t *data) {
-    std::memcpy(&this->data, data, sizeof(int));
+void IntegerField::setValue(void *data) {
+    this->data = *(int*)data;
 }
 
 void IntegerField::setAsInteger(int value) {

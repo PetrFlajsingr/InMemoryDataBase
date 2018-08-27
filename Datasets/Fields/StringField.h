@@ -12,7 +12,7 @@ class StringField : public IField {
 protected:
     std::string data;
 
-    void setValue(u_int8_t *data) override;
+    void setValue(void *data) override;
 public:
     StringField(const std::string &fieldName, IDataset *dataset, unsigned long index);
 

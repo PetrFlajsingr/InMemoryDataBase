@@ -21,7 +21,6 @@ std::string StringField::getAsString() {
     return this->data;
 }
 
-void StringField::setValue(u_int8_t *data) {
-    auto pointer = reinterpret_cast<char *>(data);
-    this->data = std::string(pointer);
+void StringField::setValue(void *data) {
+    this->data = std::string((char*)data);
 }

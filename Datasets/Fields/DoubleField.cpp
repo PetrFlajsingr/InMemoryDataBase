@@ -22,8 +22,8 @@ std::string DoubleField::getAsString() {
     return std::to_string(this->data);
 }
 
-void DoubleField::setValue(u_int8_t *data) {
-    std::memcpy(&this->data, data, sizeof(double));
+void DoubleField::setValue(void *data) {
+    this->data = *(double*)data;
 }
 
 void DoubleField::setAsDouble(double value) {

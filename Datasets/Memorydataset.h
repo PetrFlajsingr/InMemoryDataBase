@@ -26,7 +26,6 @@ public:
         }
     };
 private:
-
     /**
      * Struktura pro vnitrni reprezentaci dat
      */
@@ -48,21 +47,25 @@ private:
     };
     //\
 
-    IDataProvider* dataProvider = nullptr;
+    IDataProvider* dataProvider = nullptr; //< dodavatel dat
 
     bool isOpen = false;
 
-    unsigned long currentRecord = 0;
+    unsigned long currentRecord = 0; //< Pocitadlo zaznamu
 
-    bool fieldTypesSet = false;
+    bool dataValidityChanged = false; //< Nastaveno pri zmene dat naprikald pomoci find
 
-    bool dataValidityChanged = false;
+    std::vector<std::vector<DataContainer*>> data; //< Data uvnitr datasetu
+    std::vector<bool> dataValidity; //< Vyrazeni dat nevyhovujici pozadavkum
 
-    std::vector<std::vector<DataContainer*>> data;
-    std::vector<bool> dataValidity;
-
+    /**
+     * Nacteni dat do this->data
+     */
     void loadData();
 
+    /**
+     * Pridani zaznamu do this->data()
+     */
     void addRecord();
 
     /**
@@ -71,45 +74,32 @@ private:
      */
     void createFields(std::vector<std::string> columns, std::vector<ValueType> types);
 
+    /**
+     * Nastaveni hodnot this->fields.
+     *
+     * Vynechava zaznamy s dataValidity == false
+     * @param index Index Field
+     * @param searchForward Smer vyhledavani validniho zaznamu
+     * @return
+     */
     bool setFieldValues(unsigned long index, bool searchForward);
-
 protected:
-    void setData(u_int8_t *data, unsigned long index, ValueType type) override;
-
+    void setData(void *data, unsigned long index, ValueType type) override;
 public:
     ~Memorydataset() override;
 
-    /**
-     * Nacteni dat do pameti datasetu.
-     * @param provider objekt dodavajici data
-     */
     void open() override;
 
-    void setDataProvider(IDataProvider* provider) override ;
+    void setDataProvider(IDataProvider* provider) override;
 
-    /**
-     * Smazani dat datasetu z pameti.
-     */
     void close() override;
 
-    /**
-     * Presun na prvni polozku.
-     */
     void first() override;
 
-    /**
-     * Presun na posledni polozku.
-     */
     void last() override;
 
-    /**
-     * Presun na nasledujici polozku.
-     */
     void next() override;
 
-    /**
-     * Presun na predchazejici polozku.
-     */
     void previous() override;
 
     /**
@@ -125,18 +115,8 @@ public:
      */
     void find(SearchOptions& options);
 
-    /**
-     * Nalezeni field podle jeho jmena
-     * @param name
-     * @return
-     */
     IField* fieldByName(const std::string& name) override;
 
-    /**
-     * Nalezeni field podle jeho indexu
-     * @param index
-     * @return
-     */
     IField* fieldByIndex(unsigned long index) override ;
 
     bool eof() override;

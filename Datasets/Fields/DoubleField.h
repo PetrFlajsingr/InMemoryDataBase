@@ -10,7 +10,7 @@
 
 class DoubleField : public IField{
 protected:
-    void setValue(u_int8_t *data) override;
+    void setValue(void *data) override;
 
     double data;
 public:

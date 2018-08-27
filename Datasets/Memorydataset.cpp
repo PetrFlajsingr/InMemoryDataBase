@@ -33,10 +33,6 @@ void Memorydataset::open() {
 }
 
 void Memorydataset::loadData() {
-    if(!this->fieldTypesSet) {
-        createFields(dataProvider->getColumnNames(), {});
-    }
-
     while(!this->dataProvider->eof()) {
         this->addRecord();
         this->dataValidity.push_back(true);
@@ -318,24 +314,21 @@ Memorydataset::~Memorydataset() {
 }
 
 void Memorydataset::setFieldTypes(std::vector<ValueType> types) {
-    fieldTypesSet = true;
-
     createFields(this->dataProvider->getColumnNames(), types);
 }
 
-void Memorydataset::setData(u_int8_t *data, unsigned long index, ValueType type) {
+void Memorydataset::setData(void *data, unsigned long index, ValueType type) {
     switch(type) {
         case INTEGER_VAL:
-            this->data[currentRecord][index]->data._integer = *data;
+            this->data[currentRecord][index]->data._integer = *(int*)data;
             break;
         case DOUBLE_VAL:
-            this->data[currentRecord][index]->data._double = *data;
+            this->data[currentRecord][index]->data._double = *(int*)data;
             break;
         case STRING_VAL:
-            if(this->data[currentRecord][index]->data._string != nullptr) {
-                delete [] this->data[currentRecord][index]->data._string;
-            }
-            this->data[currentRecord][index]->data._string = reinterpret_cast<char *>(data);
+            delete [] this->data[currentRecord][index]->data._string;
+
+            this->data[currentRecord][index]->data._string = (char*)data;
             break;
         default:
             throw IllegalStateException("Invalid value type.");
