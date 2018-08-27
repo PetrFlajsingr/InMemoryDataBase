@@ -58,6 +58,8 @@ void CsvReader::first() {
     this->file.clear();
     this->file.seekg(0, std::ios::beg);
 
+    this->readHeader();
+
     this->parseRecord();
 
     this->currentRecordNumber = 0;
