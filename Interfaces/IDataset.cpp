@@ -5,6 +5,6 @@
 #include "IDataset.h"
 #include "IField.h"
 
-void IDataset::setFieldData(IField *field, u_int8_t *data)  {
+void IDataset::setFieldData(IField *field, void *data)  {
     field->setValue(data);
 }
