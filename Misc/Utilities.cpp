@@ -4,7 +4,6 @@
 
 #include <sstream>
 #include <regex>
-#include <utility>
 #include "Utilities.h"
 
 std::vector<std::string> Utilities::SplitStringByDelimiter(std::string str,

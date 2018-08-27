@@ -51,7 +51,7 @@ public:
      * @param dataset Rodicovsky dataset
      * @param index Index pole v zaznamu
      */
-    explicit IField(const std::string &fieldName,
+    explicit IField(std::string fieldName,
                             IDataset* dataset,
                             unsigned long index) : fieldName(std::move(fieldName)),
                                                    dataset(dataset),

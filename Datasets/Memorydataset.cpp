@@ -58,7 +58,7 @@ void Memorydataset::createFields(std::vector<std::string> columns, std::vector<V
                 break;
             }
             case STRING_VAL: {
-                newField = new StringField(col, this, iter);
+                newField = new StringField(std::string(), nullptr, 0, col, this, iter);
                 break;
             }
             default:
@@ -242,8 +242,8 @@ void Memorydataset::sort(unsigned long fieldIndex, SortOrder sortOrder) {
 void Memorydataset::find(Memorydataset::SearchOptions &options) {
     if(options.fieldIndexes.empty()) {
         dataValidityChanged = false;
-        for(int iter = 0; iter < this->dataValidity.size(); iter++) {
-            this->dataValidity[iter] = true;
+        for (auto &&iter : this->dataValidity) {
+            iter = true;
         }
 
         this->first();

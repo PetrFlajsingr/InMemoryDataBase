@@ -14,6 +14,7 @@ protected:
 
     int data;
 public:
+
     IntegerField(const std::string &fieldName, IDataset *dataset, unsigned long index);
 
     ValueType getFieldType() override;

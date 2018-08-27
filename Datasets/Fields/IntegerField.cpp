@@ -34,4 +34,3 @@ void IntegerField::setAsInteger(int value) {
 int IntegerField::getAsInteger() {
     return this->data;
 }
-
