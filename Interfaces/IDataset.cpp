@@ -8,3 +8,9 @@
 void IDataset::setFieldData(IField *field, void *data)  {
     field->setValue(data);
 }
+
+IDataset::~IDataset() {
+    for(auto tmp : this->fields) {
+        delete tmp;
+    }
+};

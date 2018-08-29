@@ -112,11 +112,7 @@ public:
     /**
      * Smazani vsech alokovanych Fields
      */
-    virtual ~IDataset() {
-        for(auto tmp : this->fields) {
-            delete tmp;
-        }
-    };
+    virtual ~IDataset();
 };
 
 #endif //CSV_READER_IDATASET_H

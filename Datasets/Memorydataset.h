@@ -9,22 +9,13 @@
 #include "../Interfaces/IDataset.h"
 #include "../Misc/Types.h"
 #include "../Interfaces/IField.h"
+#include "FilterStructures.h"
 
 
 /**
  * Dataset ukladajici data primo v operacni pameti.
  */
 class Memorydataset : public IDataset {
-public:
-    struct SearchOptions {
-        std::vector<unsigned long>  fieldIndexes;
-        std::vector<std::string>    searchStrings;
-
-        void addOption(const unsigned long fieldIndex, const std::string &searchString){
-            this->fieldIndexes.push_back(fieldIndex);
-            this->searchStrings.push_back(searchString);
-        }
-    };
 private:
     /**
      * Struktura pro vnitrni reprezentaci dat
@@ -113,7 +104,7 @@ public:
      * Vyhledani zaznamu podle zadanych klicu
      * @param options
      */
-    void find(SearchOptions& options);
+    void filter(FilterOptions &options);
 
     IField* fieldByName(const std::string& name) override;
 

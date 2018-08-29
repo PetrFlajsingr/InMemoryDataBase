@@ -52,12 +52,12 @@ int main(int argc, char** argv) {
     printTime();
 
 
-    Memorydataset::SearchOptions options;
-    options.addOption(4, "00231525");
+    FilterOptions options;
+    options.addOption(4, "00231525", STARTS_WITH);
     start = getMs();
     std::cout << "_____find()_____" << std::endl;
     printTime();
-    dataset->find(options);
+    dataset->filter(options);
     std::cout << "_____find() end_____ time: " << getMs() - start << " ms" << std::endl;
     printTime();
 

@@ -78,4 +78,5 @@ public:
     virtual std::string getAsString()= 0;
 };
 
+
 #endif //CSV_READER_FIELDBASE_H

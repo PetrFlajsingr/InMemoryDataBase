@@ -58,7 +58,7 @@ void Memorydataset::createFields(std::vector<std::string> columns, std::vector<V
                 break;
             }
             case STRING_VAL: {
-                newField = new StringField(std::string(), nullptr, 0, col, this, iter);
+                newField = new StringField(col, this, iter);
                 break;
             }
             default:
@@ -239,8 +239,8 @@ void Memorydataset::sort(unsigned long fieldIndex, SortOrder sortOrder) {
     this->first();
 }
 
-void Memorydataset::find(Memorydataset::SearchOptions &options) {
-    if(options.fieldIndexes.empty()) {
+void Memorydataset::filter(FilterOptions &options) {
+    if(options.options.empty()) {
         dataValidityChanged = false;
         for (auto &&iter : this->dataValidity) {
             iter = true;
@@ -253,28 +253,30 @@ void Memorydataset::find(Memorydataset::SearchOptions &options) {
 
     dataValidityChanged = true;
     size_t optionCounter;
-    for (auto iter = 0; iter < this->data.size(); iter++) {
+    //for (auto iter = 0; iter < this->data.size(); iter++) {
+    int i = 0;
+    for(const auto &iter : this->data) {
         bool valid = true;
 
         optionCounter = 0;
-        for(auto fieldIndex : options.fieldIndexes) {
+        for(auto filter : options.options) {
             if(!valid){
                 break;
             }
-            switch (this->data[iter][fieldIndex]->valueType) {
+            switch (iter[filter.fieldIndex]->valueType) {
                 case INTEGER_VAL:
-                    if(!(std::to_string(this->data[iter][fieldIndex]->data._integer) == options.searchStrings[optionCounter])){
+                    if(!(std::to_string(iter[filter.fieldIndex]->data._integer) == options.options[optionCounter].searchString)){
                         valid = false;
                     }
                     break;
                 case DOUBLE_VAL:
-                    if(!(std::to_string(this->data[iter][fieldIndex]->data._double) == options.searchStrings[optionCounter])){
+                    if(!(std::to_string(iter[filter.fieldIndex]->data._double) == options.options[optionCounter].searchString)){
                         valid = false;
                     }
                     break;
                 case STRING_VAL:
-                    if(std::strcmp(this->data[iter][fieldIndex]->data._string,
-                                   options.searchStrings[optionCounter].c_str()) != 0){
+                    if(std::strcmp(iter[filter.fieldIndex]->data._string,
+                                   options.options[optionCounter].searchString.c_str()) != 0){
                         valid = false;
                     }
                     break;
@@ -284,7 +286,8 @@ void Memorydataset::find(Memorydataset::SearchOptions &options) {
             optionCounter++;
         }
 
-        this->dataValidity[iter] = valid;
+        this->dataValidity[i] = valid;
+        i++;
     }
 
     this->first();

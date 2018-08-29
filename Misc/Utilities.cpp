@@ -5,9 +5,13 @@
 #include <sstream>
 #include <regex>
 #include "Utilities.h"
+#include "Exceptions.h"
 
 std::vector<std::string> Utilities::SplitStringByDelimiter(std::string str,
                                                            std::string delimiter) {
+    if(delimiter.empty()) {
+        throw InvalidArgumentException("Delimiter can't be empty.");
+    }
     std::vector<std::string> result;
     std::string toSplit = std::string(std::move(str));
 
