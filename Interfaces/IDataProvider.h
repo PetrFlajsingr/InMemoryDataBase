@@ -70,7 +70,7 @@ public:
      * Kontrola dostupnosti zaznamu
      * @return false pokud neni dostupny dalsi zaznam, jinak true
      */
-    virtual bool eof()= 0;
+    inline virtual bool eof()= 0;
 
     virtual ~IDataProvider() = default;
 };

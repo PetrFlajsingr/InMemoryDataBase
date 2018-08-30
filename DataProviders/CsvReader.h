@@ -11,6 +11,7 @@
 #include "../Interfaces/IDataProvider.h"
 #include "../Misc/Exceptions.h"
 
+// TODO: rozšířit o nastavení delimiteru
 /**
  * Trida implementujici metody IReader.
  * Slouzi ke cteni CSV formatu sekvencne ze souboru.
@@ -56,11 +57,11 @@ public:
      * Vraci zaznam souboru, ktery je na rade.
      * @return rozdeleny zaznamu podle CSV delimiter.
      */
-    std::vector<std::string> getRow() override {
+    inline std::vector<std::string> getRow() override {
         return std::vector<std::string>(currentRecord);
     }
 
-    std::string getColumn(unsigned int columnIndex) override {
+    inline std::string getColumn(unsigned int columnIndex) override {
         return this->header.at(columnIndex);
     }
 
@@ -88,11 +89,11 @@ public:
         return this->currentRecordNumber;
     }
 
-    std::vector<std::string> getColumnNames() override {
+    inline std::vector<std::string> getColumnNames() override {
         return std::vector<std::string>(header);
     }
 
-    unsigned long getColumnCount() override {
+    inline unsigned long getColumnCount() override {
         return header.size();
     }
 
