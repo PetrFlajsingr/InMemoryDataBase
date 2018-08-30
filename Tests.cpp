@@ -4,3 +4,4 @@
 
 
 #include "Misc/tests/tests_splitStringByDelimiter.h"
+#include "Misc/tests/tests_isDouble_isInteger.h"
