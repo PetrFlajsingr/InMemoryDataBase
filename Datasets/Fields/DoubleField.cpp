@@ -14,7 +14,7 @@ ValueType DoubleField::getFieldType() {
 }
 
 void DoubleField::setAsString(const std::string &value) {
-    this->data = Utilities::StringToDouble(value);
+    this->data = Utilities::stringToDouble(value);
     IField::setDatasetData((u_int8_t *) &this->data, getFieldType());
 }
 

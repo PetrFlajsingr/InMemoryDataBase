@@ -7,11 +7,12 @@
 #include "Utilities.h"
 #include "Exceptions.h"
 
-std::vector<std::string> Utilities::SplitStringByDelimiter(std::string str,
+std::vector<std::string> Utilities::splitStringByDelimiter(std::string str,
                                                            std::string delimiter) {
     if(delimiter.empty()) {
         throw InvalidArgumentException("Delimiter can't be empty.");
     }
+
     std::vector<std::string> result;
     std::string toSplit = std::string(std::move(str));
 
@@ -27,7 +28,7 @@ std::vector<std::string> Utilities::SplitStringByDelimiter(std::string str,
     return result;
 }
 
-int Utilities::StringToInt(const std::string &str) {
+int Utilities::stringToInt(const std::string &str) {
     std::stringstream stringstream(str);
     int result;
 
@@ -35,7 +36,7 @@ int Utilities::StringToInt(const std::string &str) {
     return result;
 }
 
-double Utilities::StringToDouble(const std::string &str) {
+double Utilities::stringToDouble(const std::string &str) {
     std::stringstream stringstream(str);
     double result;
 

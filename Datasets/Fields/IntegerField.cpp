@@ -14,7 +14,7 @@ ValueType IntegerField::getFieldType() {
 }
 
 void IntegerField::setAsString(const std::string &value) {
-    this->data = Utilities::StringToInt(value);
+    this->data = Utilities::stringToInt(value);
     IField::setDatasetData((u_int8_t *) &this->data, getFieldType());
 }
 

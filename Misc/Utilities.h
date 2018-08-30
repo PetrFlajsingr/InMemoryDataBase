@@ -22,7 +22,7 @@ public:
      * @param delimiter rozdelovac
      * @return vector casti
      */
-    static std::vector<std::string> SplitStringByDelimiter(std::string str,
+    static std::vector<std::string> splitStringByDelimiter(std::string str,
                                                            std::string delimiter);
 
     /**
@@ -30,14 +30,14 @@ public:
      * @param str string ve tvaru integer
      * @return
      */
-    static int StringToInt(const std::string& str);
+    static int stringToInt(const std::string &str);
 
     /**
      * Prevod string do double
      * @param str string ve tvaru double
      * @return
      */
-    static double StringToDouble(const std::string& str);
+    static double stringToDouble(const std::string &str);
 
     /**
      * Kontrola jestli je string integer za pomoci regex

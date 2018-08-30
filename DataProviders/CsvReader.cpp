@@ -27,7 +27,7 @@ void CsvReader::readHeader() {
     char buffer[BUFFER_SIZE];
 
     this->file.getline(buffer, BUFFER_SIZE);
-    header = Utilities::SplitStringByDelimiter(std::string(buffer), std::string(1, DELIMITER));
+    header = Utilities::splitStringByDelimiter(std::string(buffer), std::string(1, DELIMITER));
 }
 
 
@@ -46,7 +46,7 @@ void CsvReader::parseRecord() {
     char buffer[BUFFER_SIZE];
 
     this->file.getline(buffer, BUFFER_SIZE);
-    this->currentRecord = Utilities::SplitStringByDelimiter(std::string(buffer), std::string(1, DELIMITER));
+    this->currentRecord = Utilities::splitStringByDelimiter(std::string(buffer), std::string(1, DELIMITER));
 }
 
 void CsvReader::first() {

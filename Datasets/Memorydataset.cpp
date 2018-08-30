@@ -79,11 +79,11 @@ void Memorydataset::addRecord() {
         switch(fields[iter]->getFieldType()){
             case INTEGER_VAL:
                 dataContainer->valueType = INTEGER_VAL;
-                dataContainer->data._integer = Utilities::StringToInt(part);
+                dataContainer->data._integer = Utilities::stringToInt(part);
                 break;
             case DOUBLE_VAL:
                 dataContainer->valueType = DOUBLE_VAL;
-                dataContainer->data._double = Utilities::StringToDouble(part);
+                dataContainer->data._double = Utilities::stringToDouble(part);
                 break;
             case STRING_VAL:
                 dataContainer->valueType = STRING_VAL;
