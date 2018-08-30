@@ -27,13 +27,17 @@ public:
 
     /**
      * Prevod string do int.
+     *
+     * Nedefinovane pro neplatne vstupy.
      * @param str string ve tvaru integer
      * @return
      */
     static int stringToInt(const std::string &str);
 
     /**
-     * Prevod string do double
+     * Prevod string do double.
+     *
+     * Nedefinovane pro neplatne vstupy
      * @param str string ve tvaru double
      * @return
      */
