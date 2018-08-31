@@ -34,7 +34,7 @@ public:
     }
 
     std::string getColumn(unsigned int columnIndex) override {
-        std::to_string(columnIndex);
+        return std::to_string(columnIndex);
     }
 
     unsigned long getColumnCount() override {
@@ -55,15 +55,19 @@ public:
     }
 
     bool next() override {
-        if(row < data.size() - 1) {
+        if(row < data.size()) {
             row++;
+            return true;
         }
+        return false;
     }
 
     bool previous() override {
         if(row > 0) {
             row--;
+            return true;
         }
+        return false;
     }
 
     void first() override {
@@ -75,7 +79,7 @@ public:
     }
 
     bool eof() override {
-        return row == data.size() - 1;
+        return row == data.size();
     }
 };
 
