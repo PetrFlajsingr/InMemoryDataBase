@@ -27,8 +27,6 @@ void Memorydataset::open() {
 
     this->isOpen = true;
 
-    delete this->dataProvider;
-
     setFieldValues(0, true);
 }
 
@@ -381,6 +379,20 @@ void Memorydataset::append() {
     }
     this->data.push_back(newRecord);
     this->last();
+}
+
+void Memorydataset::appendDataProvider(IDataProvider *provider) {
+    if(!isOpen) {
+        throw IllegalStateException("Dataset is not opened.");
+    }
+
+    if(provider == nullptr) {
+        throw InvalidArgumentException("Data provider has not been set.");
+    }
+
+    this->dataProvider = provider;
+
+    this->loadData();
 }
 
 

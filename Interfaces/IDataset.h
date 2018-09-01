@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 #include <cstring>
-#include "IFieldPre.h"
+#include "IFieldFwd.h"
 #include "IDataProvider.h"
 #include "../Misc/Types.h"
 

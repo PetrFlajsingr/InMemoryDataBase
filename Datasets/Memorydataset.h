@@ -124,6 +124,8 @@ public:
     void setFieldTypes(std::vector<ValueType> types) override;
 
     void append() override;
+
+    void appendDataProvider(IDataProvider* provider);
 };
 
 

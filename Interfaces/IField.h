@@ -8,7 +8,7 @@
 #include <string>
 #include <utility>
 #include "../Misc/Types.h"
-#include "IDatasetPre.h"
+#include "IDatasetFwd.h"
 
 /**
  * Interface pro fields datasetu.

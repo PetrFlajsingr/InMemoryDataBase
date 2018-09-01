@@ -5,7 +5,7 @@
 #ifndef CSV_READER_TESTS_MEMORYDATASET_H
 #define CSV_READER_TESTS_MEMORYDATASET_H
 
-#include <gtest/gtest.h>
+#include "gtest/gtest.h"
 #include <vector>
 #include "../Memorydataset.h"
 #include "../../DataProviders/ArrayDataProvider.h"
@@ -48,7 +48,7 @@ public:
 
     void TearDown() override {
         delete dataset;
-        //delete dataProvider;
+        delete dataProvider;
     }
 
     ~MemoryDataset_tests() override = default;
@@ -295,10 +295,36 @@ TEST_F (MemoryDataset_tests, append) {
     }
 }
 
+TEST_F (MemoryDataset_tests, append_provider) {
+    ASSERT_NO_THROW(dataset->open());
+
+    IDataProvider* provider = new ArrayDataProvider(test);
+
+    ASSERT_NO_THROW(dataset->appendDataProvider(provider));
+
+    dataset->first();
+
+    int row = 0;
+    while(!dataset->eof()) {
+        for(int i = 0; i < dataset->getFieldNames().size(); ++i) {
+            EXPECT_EQ(dataset->fieldByIndex(i)->getAsString(), test[row % test.size()][i]);
+        }
+
+        dataset->next();
+        row++;
+    }
+}
+
 TEST_F (MemoryDataset_tests, exceptions) {
+    ASSERT_NO_THROW(dataset->open());
+
     EXPECT_THROW(dataset->sort(233, ASCENDING), InvalidArgumentException);
 
     EXPECT_THROW(dataset->fieldByName("this column can't exist"), InvalidArgumentException);
+
+    EXPECT_THROW(dataset->appendDataProvider(nullptr), InvalidArgumentException);
 }
+
+
 
 #endif //CSV_READER_TESTS_MEMORYDATASET_H
