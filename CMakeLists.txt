@@ -9,10 +9,26 @@ include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 
 project(csv_reader)
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -g ")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=undefined -g ")
+
 set(CMAKE_CXX_STANDARD 17)
 
-set(SOURCE_FILES DataProviders/CsvReader.cpp DataProviders/CsvReader.h Interfaces/IDataProvider.h Misc/Exceptions.h Misc/Utilities.cpp Misc/Utilities.h Interfaces/IDataset.h Datasets/Memorydataset.cpp Datasets/Memorydataset.h Misc/Types.h Interfaces/IField.h Datasets/Fields/StringField.cpp Datasets/Fields/StringField.h Datasets/Fields/IntegerField.cpp Datasets/Fields/IntegerField.h Datasets/Fields/DoubleField.cpp Datasets/Fields/DoubleField.h Interfaces/IFieldFwd.h Interfaces/IDataset.cpp Interfaces/IDatasetFwd.h Interfaces/IField.cpp Datasets/FilterStructures.h Misc/tests/tests_splitStringByDelimiter.h)
-set(TEST_SOURCE_FILES Tests.cpp DataProviders/CsvReader.cpp DataProviders/CsvReader.h Interfaces/IDataProvider.h Misc/Exceptions.h Misc/Utilities.cpp Misc/Utilities.h Interfaces/IDataset.h Datasets/Memorydataset.cpp Datasets/Memorydataset.h Misc/Types.h Interfaces/IField.h Datasets/Fields/StringField.cpp Datasets/Fields/StringField.h Datasets/Fields/IntegerField.cpp Datasets/Fields/IntegerField.h Datasets/Fields/DoubleField.cpp Datasets/Fields/DoubleField.h Interfaces/IFieldFwd.h Interfaces/IDataset.cpp Interfaces/IDatasetFwd.h Interfaces/IField.cpp Datasets/FilterStructures.h Misc/tests/tests_isDouble_isInteger.h Misc/tests/tests_stringToInt_Double.h DataProviders/tests/tests_CsvReader.h Datasets/tests/tests_MemoryDataset.h DataProviders/ArrayDataProvider.cpp DataProviders/ArrayDataProvider.h)
+set(SOURCE_FILES DataProviders/CsvReader.cpp DataProviders/CsvReader.h Interfaces/IDataProvider.h Misc/Exceptions.h
+        Misc/Utilities.cpp Misc/Utilities.h Interfaces/IDataset.h Datasets/Memorydataset.cpp Datasets/Memorydataset.h
+        Misc/Types.h Interfaces/IField.h Datasets/Fields/StringField.cpp Datasets/Fields/StringField.h
+        Datasets/Fields/IntegerField.cpp Datasets/Fields/IntegerField.h Datasets/Fields/DoubleField.cpp
+        Datasets/Fields/DoubleField.h Interfaces/IFieldFwd.h Interfaces/IDataset.cpp Interfaces/IDatasetFwd.h
+        Interfaces/IField.cpp Datasets/FilterStructures.h Misc/tests/tests_splitStringByDelimiter.h)
+
+set(TEST_SOURCE_FILES Tests.cpp DataProviders/CsvReader.cpp DataProviders/CsvReader.h Interfaces/IDataProvider.h
+        Misc/Exceptions.h Misc/Utilities.cpp Misc/Utilities.h Interfaces/IDataset.h Datasets/Memorydataset.cpp
+        Datasets/Memorydataset.h Misc/Types.h Interfaces/IField.h Datasets/Fields/StringField.cpp
+        Datasets/Fields/StringField.h Datasets/Fields/IntegerField.cpp Datasets/Fields/IntegerField.h
+        Datasets/Fields/DoubleField.cpp Datasets/Fields/DoubleField.h Interfaces/IFieldFwd.h Interfaces/IDataset.cpp
+        Interfaces/IDatasetFwd.h Interfaces/IField.cpp Datasets/FilterStructures.h Misc/tests/tests_isDouble_isInteger.h
+        Misc/tests/tests_stringToInt_Double.h DataProviders/tests/tests_CsvReader.h Datasets/tests/tests_MemoryDataset.h
+        DataProviders/ArrayDataProvider.cpp DataProviders/ArrayDataProvider.h)
 
 
 add_subdirectory(lib/googletest-master)
