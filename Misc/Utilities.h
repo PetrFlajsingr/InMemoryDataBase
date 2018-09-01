@@ -63,6 +63,10 @@ public:
      * @return
      */
     static ValueType getType(const std::string& value);
+
+    static bool endsWith(std::string const & value, std::string const & ending);
+
+    static char* copyStringToNewChar(const std::string& str);
 };
 
 

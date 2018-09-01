@@ -122,6 +122,8 @@ public:
     }
 
     void setFieldTypes(std::vector<ValueType> types) override;
+
+    void append() override;
 };
 
 

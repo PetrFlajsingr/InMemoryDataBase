@@ -9,6 +9,7 @@
 #include <string>
 
 enum FilterOption {
+    EQUALS,
     STARTS_WITH,
     CONTAINS,
     ENDS_WITH,

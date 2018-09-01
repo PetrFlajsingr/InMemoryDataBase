@@ -166,8 +166,71 @@ TEST_F (MemoryDataset_tests, move_in_dataset) {
     }
 }
 
-TEST_F (MemoryDataset_tests, filter) {
+TEST_F (MemoryDataset_tests, filter_equals) {
+    ASSERT_NO_THROW(dataset->open());
 
+    FilterOptions options;
+    for(int i = 0; i < test[0].size(); ++i) {
+        options.addOption(i, "COLUMN" + std::to_string(i), EQUALS);
+        dataset->filter(options);
+
+        EXPECT_TRUE(dataset->eof());
+
+        options.options.clear();
+    }
+    for(int i = 0; i < test.size(); ++i) {
+        for (int j = 0; j < test[i].size(); ++j) {
+            options.addOption(j, "COLUMN" + std::to_string(i + 1) + std::to_string(j + 1), EQUALS);
+            dataset->filter(options);
+
+            ASSERT_FALSE(dataset->eof());
+            dataset->first();
+            EXPECT_EQ(dataset->fieldByIndex(j)->getAsString(), test[i][j]);
+
+            options.options.clear();
+        }
+    }
+}
+
+TEST_F (MemoryDataset_tests, filter_starts_with) {
+    ASSERT_NO_THROW(dataset->open());
+
+    FilterOptions options;
+    for(int i = 0; i < test[0].size(); ++i) {
+        options.addOption(i, "COL", STARTS_WITH);
+        dataset->filter(options);
+
+        ASSERT_FALSE(dataset->eof());
+
+        options.options.clear();
+
+        dataset->first();
+
+        EXPECT_EQ(dataset->fieldByIndex(i)->getAsString(), test[0][i]);
+    }
+}
+
+TEST_F (MemoryDataset_tests, filter_ends_with) {
+    ASSERT_NO_THROW(dataset->open());
+
+    FilterOptions options;
+    for(int i = 0; i < test[0].size(); ++i) {
+        options.addOption(i, "1", ENDS_WITH);
+        dataset->filter(options);
+
+        options.options.clear();
+
+        dataset->first();
+        if(i == 0) {
+            ASSERT_FALSE(dataset->eof());
+            for(int j = 0; j < test.size(); ++j) {
+                EXPECT_EQ(dataset->fieldByIndex(i)->getAsString(), test[j][i]);
+                dataset->next();
+            }
+        } else {
+            ASSERT_TRUE(dataset->eof());
+        }
+    }
 }
 
 TEST_F (MemoryDataset_tests, sort) {
@@ -202,8 +265,34 @@ TEST_F (MemoryDataset_tests, sort) {
     }
 }
 
-TEST_F (MemoryDataset_tests, sort_filter) {
+TEST_F (MemoryDataset_tests, append) {
+    ASSERT_NO_THROW(dataset->open());
 
+    std::vector<std::string> last;
+
+    dataset->last();
+    for(int i = 0; i < test[0].size(); ++i) {
+        last.push_back(dataset->fieldByIndex(i)->getAsString());
+    }
+
+    dataset->append();
+    for(unsigned long i = 0; i < test[0].size(); ++i) {
+        dataset->fieldByIndex(i)->setAsString(std::to_string(i));
+    }
+
+    for(int i = 0; i < test[0].size(); ++i) {
+        EXPECT_EQ(dataset->fieldByIndex(i)->getAsString(), std::to_string(i));
+    }
+
+    dataset->previous();
+    for(int i = 0; i < test[0].size(); ++i) {
+        EXPECT_EQ(dataset->fieldByIndex(i)->getAsString(), last[i]);
+    }
+
+    dataset->next();
+    for(int i = 0; i < test[0].size(); ++i) {
+        EXPECT_EQ(dataset->fieldByIndex(i)->getAsString(), std::to_string(i));
+    }
 }
 
 TEST_F (MemoryDataset_tests, exceptions) {

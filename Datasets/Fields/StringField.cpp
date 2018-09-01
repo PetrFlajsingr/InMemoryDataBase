@@ -3,6 +3,7 @@
 //
 
 #include "StringField.h"
+#include "../../Misc/Utilities.h"
 
 StringField::StringField(const std::string &fieldName, IDataset *dataset, unsigned long index) : IField(fieldName,
                                                                                                         dataset,
@@ -14,7 +15,7 @@ ValueType StringField::getFieldType() {
 
 void StringField::setAsString(const std::string& value) {
     this->data = value;
-    IField::setDatasetData((u_int8_t *) this->data.c_str(), getFieldType());
+    IField::setDatasetData((u_int8_t *) Utilities::copyStringToNewChar(value), getFieldType());
 }
 
 std::string StringField::getAsString() {
@@ -22,5 +23,9 @@ std::string StringField::getAsString() {
 }
 
 void StringField::setValue(void *data) {
+    if(data == nullptr) {
+        this->data = "";
+        return;
+    }
     this->data = std::string((char*)data);
 }

@@ -65,3 +65,16 @@ ValueType Utilities::getType(const std::string &value) {
         return STRING_VAL;
     }
 }
+
+bool Utilities::endsWith(const std::string &value, const std::string &ending) {
+    if (ending.size() > value.size())
+        return false;
+    return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
+}
+
+char *Utilities::copyStringToNewChar(const std::string& str) {
+    auto result = new char [str.length() + 1];
+    strcpy (result, str.c_str());
+
+    return result;
+}

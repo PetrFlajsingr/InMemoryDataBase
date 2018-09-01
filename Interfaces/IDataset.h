@@ -110,6 +110,11 @@ public:
     virtual std::vector<std::string> getFieldNames()= 0;
 
     /**
+     * Vytvoreni noveho zaznamu v datasetu
+     */
+    virtual void append()= 0;
+
+    /**
      * Smazani vsech alokovanych Fields
      */
     virtual ~IDataset();

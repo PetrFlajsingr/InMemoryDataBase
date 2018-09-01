@@ -255,6 +255,7 @@ void Memorydataset::filter(FilterOptions &options) {
     size_t optionCounter;
     //for (auto iter = 0; iter < this->data.size(); iter++) {
     int i = 0;
+    std::string toCompare;
     for(const auto &iter : this->data) {
         bool valid = true;
 
@@ -265,24 +266,41 @@ void Memorydataset::filter(FilterOptions &options) {
             }
             switch (iter[filter.fieldIndex]->valueType) {
                 case INTEGER_VAL:
-                    if(!(std::to_string(iter[filter.fieldIndex]->data._integer) == options.options[optionCounter].searchString)){
-                        valid = false;
-                    }
+                    toCompare = std::to_string(iter[filter.fieldIndex]->data._integer);
                     break;
                 case DOUBLE_VAL:
-                    if(!(std::to_string(iter[filter.fieldIndex]->data._double) == options.options[optionCounter].searchString)){
-                        valid = false;
-                    }
+                    toCompare = std::to_string(iter[filter.fieldIndex]->data._double);
                     break;
                 case STRING_VAL:
-                    if(std::strcmp(iter[filter.fieldIndex]->data._string,
-                                   options.options[optionCounter].searchString.c_str()) != 0){
-                        valid = false;
-                    }
+                    toCompare = iter[filter.fieldIndex]->data._string;
                     break;
                 default:
                     throw IllegalStateException("Internal error.");
             }
+            switch(filter.filterOption) {
+                case EQUALS:
+                    valid = toCompare == filter.searchString;
+                    break;
+                case STARTS_WITH:
+                    valid = std::strncmp(toCompare.c_str(), filter.searchString.c_str(), filter.searchString.size()) == 0;
+                    break;
+                case CONTAINS:
+                    valid = toCompare.find(filter.searchString) != std::string::npos;
+                    break;
+                case ENDS_WITH:
+                    valid = Utilities::endsWith(toCompare, filter.searchString);
+                    break;
+                case NOT_CONTAINS:
+                    valid = toCompare.find(filter.searchString) == std::string::npos;
+                    break;
+                case NOT_STARTS_WITH:
+                    valid = std::strncmp(toCompare.c_str(), filter.searchString.c_str(), filter.searchString.size()) != 0;
+                    break;
+                case NOT_ENDS_WITH:
+                    valid = !Utilities::endsWith(toCompare, filter.searchString);
+                    break;
+            }
+
             optionCounter++;
         }
 
@@ -337,6 +355,32 @@ void Memorydataset::setData(void *data, unsigned long index, ValueType type) {
             throw IllegalStateException("Invalid value type.");
     }
 
+}
+
+void Memorydataset::append() {
+    std::vector<DataContainer*> newRecord;
+    for(int i = 0; i < this->getFieldNames().size(); ++i) {
+        auto dataContainer = new DataContainer();
+        switch(fields[i]->getFieldType()) {
+            case INTEGER_VAL:
+                dataContainer->valueType = INTEGER_VAL;
+                dataContainer->data._integer = 0;
+                break;
+            case DOUBLE_VAL:
+                dataContainer->valueType = DOUBLE_VAL;
+                dataContainer->data._double = 0;
+                break;
+            case STRING_VAL:
+                dataContainer->valueType = STRING_VAL;
+                dataContainer->data._string = nullptr;
+                break;
+            default:
+                throw IllegalStateException("Internal error.");
+        }
+        newRecord.push_back(dataContainer);
+    }
+    this->data.push_back(newRecord);
+    this->last();
 }
 
 
