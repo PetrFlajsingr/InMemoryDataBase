@@ -2,9 +2,6 @@
 // Created by Petr Flajsingr on 30/08/2018.
 //
 
-#ifndef CSV_READER_TESTS_MEMORYDATASET_H
-#define CSV_READER_TESTS_MEMORYDATASET_H
-
 #include "gtest/gtest.h"
 #include <vector>
 #include "../Memorydataset.h"
@@ -324,7 +321,3 @@ TEST_F (MemoryDataset_tests, exceptions) {
 
     EXPECT_THROW(dataset->appendDataProvider(nullptr), InvalidArgumentException);
 }
-
-
-
-#endif //CSV_READER_TESTS_MEMORYDATASET_H

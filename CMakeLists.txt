@@ -27,22 +27,22 @@ set(SOURCE_FILES DataProviders/CsvReader.cpp DataProviders/CsvReader.h Interface
         Misc/Types.h Interfaces/IField.h Datasets/Fields/StringField.cpp Datasets/Fields/StringField.h
         Datasets/Fields/IntegerField.cpp Datasets/Fields/IntegerField.h Datasets/Fields/DoubleField.cpp
         Datasets/Fields/DoubleField.h Interfaces/IFieldFwd.h Interfaces/IDataset.cpp Interfaces/IDatasetFwd.h
-        Interfaces/IField.cpp Datasets/FilterStructures.h Misc/tests/tests_splitStringByDelimiter.h
+        Interfaces/IField.cpp Datasets/FilterStructures.h Misc/tests/tests_splitStringByDelimiter.cpp
         Datasets/AsyncMemoryDataset.cpp Datasets/AsyncMemoryDataset.h)
 
-set(TEST_SOURCE_FILES Tests.cpp DataProviders/CsvReader.cpp DataProviders/CsvReader.h Interfaces/IDataProvider.h
+set(TEST_SOURCE_FILES DataProviders/CsvReader.cpp DataProviders/CsvReader.h Interfaces/IDataProvider.h
         Misc/Exceptions.h Misc/Utilities.cpp Misc/Utilities.h Interfaces/IDataset.h Datasets/Memorydataset.cpp
         Datasets/Memorydataset.h Misc/Types.h Interfaces/IField.h Datasets/Fields/StringField.cpp
         Datasets/Fields/StringField.h Datasets/Fields/IntegerField.cpp Datasets/Fields/IntegerField.h
         Datasets/Fields/DoubleField.cpp Datasets/Fields/DoubleField.h Interfaces/IFieldFwd.h Interfaces/IDataset.cpp
-        Interfaces/IDatasetFwd.h Interfaces/IField.cpp Datasets/FilterStructures.h Misc/tests/tests_isDouble_isInteger.h
-        Misc/tests/tests_stringToInt_Double.h DataProviders/tests/tests_CsvReader.h Datasets/tests/tests_MemoryDataset.h
+        Interfaces/IDatasetFwd.h Interfaces/IField.cpp Datasets/FilterStructures.h Misc/tests/tests_isDouble_isInteger.cpp
+        Misc/tests/tests_stringToInt_Double.cpp DataProviders/tests/tests_CsvReader.cpp Datasets/tests/tests_MemoryDataset.cpp
         DataProviders/ArrayDataProvider.cpp DataProviders/ArrayDataProvider.h
-        Datasets/AsyncMemoryDataset.cpp Datasets/AsyncMemoryDataset.h Datasets/tests/tests_AsyncMemoryDataset.h)
+        Datasets/AsyncMemoryDataset.cpp Datasets/AsyncMemoryDataset.h Datasets/tests/tests_AsyncMemoryDataset.cpp)
 
 
 add_executable(csv_reader main.cpp ${SOURCE_FILES})
-add_executable(csv_reader_test Tests.cpp ${TEST_SOURCE_FILES})
+add_executable(csv_reader_test ${TEST_SOURCE_FILES})
 
 target_link_libraries(csv_reader_test gmock_main)
 

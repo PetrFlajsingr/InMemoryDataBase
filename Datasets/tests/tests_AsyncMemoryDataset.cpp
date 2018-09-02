@@ -1,10 +1,6 @@
 //
 // Created by Petr Flajsingr on 02/09/2018.
 //
-
-#ifndef CSV_READER_TESTS_ASYNCMEMORYDATASET_H
-#define CSV_READER_TESTS_ASYNCMEMORYDATASET_H
-
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "../AsyncMemoryDataset.h"
@@ -123,5 +119,3 @@ TEST_F(AsyncMemoryDataset_tests, append_data_provider) {
 
     dataset->appendDataProvider(dataProvider);
 }
-
-#endif //CSV_READER_TESTS_ASYNCMEMORYDATASET_H

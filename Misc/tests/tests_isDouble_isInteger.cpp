@@ -2,9 +2,6 @@
 // Created by Petr Flajsingr on 30/08/2018.
 //
 
-#ifndef CSV_READER_TESTS_ISDOUBLE_ISINTEGER_H
-#define CSV_READER_TESTS_ISDOUBLE_ISINTEGER_H
-
 #include <gtest/gtest.h>
 #include "../Utilities.h"
 
@@ -58,6 +55,3 @@ TEST_F (isDouble_isInteger_tests, isdouble) {
         EXPECT_FALSE(Utilities::isDouble(iter));
     }
 }
-
-
-#endif //CSV_READER_TESTS_ISDOUBLE_ISINTEGER_H

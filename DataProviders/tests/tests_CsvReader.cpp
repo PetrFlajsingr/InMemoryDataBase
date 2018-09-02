@@ -2,9 +2,7 @@
 // Created by Petr Flajsingr on 30/08/2018.
 //
 
-#ifndef CSV_READER_TESTS_CSVREADER_H
-#define CSV_READER_TESTS_CSVREADER_H
-
+#include <gtest/gtest.h>
 #include "../CsvReader.h"
 
 class CsvReader_tests : public ::testing::Test {
@@ -90,5 +88,3 @@ TEST_F(CsvReader_tests, exceptions) {
     EXPECT_THROW(reader->previous(), NotImplementedException);
 
 }
-
-#endif //CSV_READER_TESTS_CSVREADER_H

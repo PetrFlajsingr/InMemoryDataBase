@@ -2,9 +2,6 @@
 // Created by Petr Flajsingr on 30/08/2018.
 //
 
-#ifndef CSV_READER_TESTS_STRINGTOINT_DOUBLE_H
-#define CSV_READER_TESTS_STRINGTOINT_DOUBLE_H
-
 #include <gtest/gtest.h>
 #include "../Utilities.h"
 
@@ -57,5 +54,3 @@ TEST_F (stringToInt_Double_tests, stringToDouble_test) {
         EXPECT_EQ(Utilities::stringToDouble(doubleStrings[i]), doubles[i]);
     }
 }
-
-#endif //CSV_READER_TESTS_STRINGTOINT_DOUBLE_H
