@@ -30,7 +30,7 @@ set(TEST_SOURCE_FILES Tests.cpp DataProviders/CsvReader.cpp DataProviders/CsvRea
         Interfaces/IDatasetFwd.h Interfaces/IField.cpp Datasets/FilterStructures.h Misc/tests/tests_isDouble_isInteger.h
         Misc/tests/tests_stringToInt_Double.h DataProviders/tests/tests_CsvReader.h Datasets/tests/tests_MemoryDataset.h
         DataProviders/ArrayDataProvider.cpp DataProviders/ArrayDataProvider.h
-        Datasets/AsyncMemoryDataset.cpp Datasets/AsyncMemoryDataset.h)
+        Datasets/AsyncMemoryDataset.cpp Datasets/AsyncMemoryDataset.h Datasets/tests/tests_AsyncMemoryDataset.h)
 
 
 add_subdirectory(lib/googletest-master)
