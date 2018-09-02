@@ -19,7 +19,8 @@ set(SOURCE_FILES DataProviders/CsvReader.cpp DataProviders/CsvReader.h Interface
         Misc/Types.h Interfaces/IField.h Datasets/Fields/StringField.cpp Datasets/Fields/StringField.h
         Datasets/Fields/IntegerField.cpp Datasets/Fields/IntegerField.h Datasets/Fields/DoubleField.cpp
         Datasets/Fields/DoubleField.h Interfaces/IFieldFwd.h Interfaces/IDataset.cpp Interfaces/IDatasetFwd.h
-        Interfaces/IField.cpp Datasets/FilterStructures.h Misc/tests/tests_splitStringByDelimiter.h)
+        Interfaces/IField.cpp Datasets/FilterStructures.h Misc/tests/tests_splitStringByDelimiter.h
+        Datasets/AsyncMemoryDataset.cpp Datasets/AsyncMemoryDataset.h)
 
 set(TEST_SOURCE_FILES Tests.cpp DataProviders/CsvReader.cpp DataProviders/CsvReader.h Interfaces/IDataProvider.h
         Misc/Exceptions.h Misc/Utilities.cpp Misc/Utilities.h Interfaces/IDataset.h Datasets/Memorydataset.cpp
@@ -28,7 +29,8 @@ set(TEST_SOURCE_FILES Tests.cpp DataProviders/CsvReader.cpp DataProviders/CsvRea
         Datasets/Fields/DoubleField.cpp Datasets/Fields/DoubleField.h Interfaces/IFieldFwd.h Interfaces/IDataset.cpp
         Interfaces/IDatasetFwd.h Interfaces/IField.cpp Datasets/FilterStructures.h Misc/tests/tests_isDouble_isInteger.h
         Misc/tests/tests_stringToInt_Double.h DataProviders/tests/tests_CsvReader.h Datasets/tests/tests_MemoryDataset.h
-        DataProviders/ArrayDataProvider.cpp DataProviders/ArrayDataProvider.h)
+        DataProviders/ArrayDataProvider.cpp DataProviders/ArrayDataProvider.h
+        Datasets/AsyncMemoryDataset.cpp Datasets/AsyncMemoryDataset.h)
 
 
 add_subdirectory(lib/googletest-master)

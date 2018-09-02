@@ -98,13 +98,13 @@ public:
      * Poradi klicu urcuje jejich prioritu.
      * @param options
      */
-    void sort(unsigned long fieldIndex, SortOrder sortOrder);
+    virtual void sort(unsigned long fieldIndex, SortOrder sortOrder);
 
     /**
      * Vyhledani zaznamu podle zadanych klicu
      * @param options
      */
-    void filter(FilterOptions &options);
+    virtual void filter(FilterOptions &options);
 
     IField* fieldByName(const std::string& name) override;
 
@@ -125,7 +125,7 @@ public:
 
     void append() override;
 
-    void appendDataProvider(IDataProvider* provider);
+    virtual void appendDataProvider(IDataProvider* provider);
 };
 
 
