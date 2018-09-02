@@ -6,9 +6,25 @@
 #define CSV_READER_ASYNCHRONOUSMEMORYDATASET_H
 
 #include "Memorydataset.h"
+#include <vector>
+
+class IAsyncMemoryDatasetObserver;
 
 class AsyncMemoryDataset : public Memorydataset {
 protected:
+    std::vector<IAsyncMemoryDatasetObserver*> observers;
+
+    enum EventType {
+        BEFORE_OPEN,
+        AFTER_OPEN,
+        BEFORE_SORT,
+        AFTER_SORT,
+        BEFORE_FILTER,
+        AFTER_FILTER,
+        BEFORE_APPEND,
+        AFTER_APPEND
+    };
+
     void innerOpen();
 
     void innerFilter(FilterOptions &options);
@@ -16,6 +32,8 @@ protected:
     void innerSort(unsigned long fieldIndex, SortOrder sortOrder);
 
     void innerAppendDataProvider();
+
+    void notify(EventType type);
 public:
     void open() override;
 
@@ -24,9 +42,14 @@ public:
     void sort(unsigned long fieldIndex, SortOrder sortOrder) override;
 
     void appendDataProvider(IDataProvider* provider) override;
+
+    void addObserver(IAsyncMemoryDatasetObserver* observer);
+
+    void removeObserver(IAsyncMemoryDatasetObserver* observer);
 };
 
-class AsyncMemoryDatasetObserver {
+class IAsyncMemoryDatasetObserver {
+public:
     virtual void onBeforeOpen(AsyncMemoryDataset* sender)= 0;
     virtual void onAfterOpen(AsyncMemoryDataset* sender)= 0;
 
@@ -38,6 +61,8 @@ class AsyncMemoryDatasetObserver {
 
     virtual void onBeforeAppendDataProvider(AsyncMemoryDataset* sender)= 0;
     virtual void onAfterAppendDataProvider(AsyncMemoryDataset* sender)= 0;
+
+    virtual ~IAsyncMemoryDatasetObserver() = default;
 };
 
 #endif //CSV_READER_ASYNCHRONOUSMEMORYDATASET_H

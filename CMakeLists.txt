@@ -6,6 +6,14 @@ if (APPLE)
 endif (APPLE)
 
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
+include_directories(${gmock_SOURCE_DIR}/include ${gmock_SOURCE_DIR})
+
+
+add_subdirectory(lib/googletest-master)
+
+include_directories(lib/googletest-master/googletest/include)
+
+include_directories(lib/googletest-master/googlemock/include)
 
 project(csv_reader)
 
@@ -33,17 +41,9 @@ set(TEST_SOURCE_FILES Tests.cpp DataProviders/CsvReader.cpp DataProviders/CsvRea
         Datasets/AsyncMemoryDataset.cpp Datasets/AsyncMemoryDataset.h Datasets/tests/tests_AsyncMemoryDataset.h)
 
 
-add_subdirectory(lib/googletest-master)
-
-include_directories(lib/googletest-master/googletest/include)
-
-include_directories(lib/googletest-master/googlemock/include)
-
-
-
 add_executable(csv_reader main.cpp ${SOURCE_FILES})
 add_executable(csv_reader_test Tests.cpp ${TEST_SOURCE_FILES})
 
-target_link_libraries(csv_reader_test gtest gtest_main)
+target_link_libraries(csv_reader_test gmock_main)
 
 

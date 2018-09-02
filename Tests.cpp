@@ -8,3 +8,4 @@
 #include "Misc/tests/tests_stringToInt_Double.h"
 #include "DataProviders/tests/tests_CsvReader.h"
 #include "Datasets/tests/tests_MemoryDataset.h"
+#include "Datasets/tests/tests_AsyncMemoryDataset.h"
