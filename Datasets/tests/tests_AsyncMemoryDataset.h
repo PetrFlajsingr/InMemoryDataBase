@@ -81,20 +81,47 @@ TEST_F(AsyncMemoryDataset_tests, open) {
     EXPECT_CALL(observer, onAfterOpen(dataset));
 
     ASSERT_NO_THROW(dataset->open());
-
-    dataset->removeObserver(&observer);
 }
 
 TEST_F(AsyncMemoryDataset_tests, sort) {
-    FAIL();
+    MockAsyncMemoryDatasetObserver observer;
+    dataset->addObserver(&observer);
+
+    ASSERT_NO_THROW(dataset->open());
+
+    EXPECT_CALL(observer, onBeforeSort(dataset));
+
+    EXPECT_CALL(observer, onAfterSort(dataset));
+
+    dataset->sort(0, ASCENDING);
 }
 
 TEST_F(AsyncMemoryDataset_tests, filter) {
-    FAIL();
+    MockAsyncMemoryDatasetObserver observer;
+    dataset->addObserver(&observer);
+
+    ASSERT_NO_THROW(dataset->open());
+
+    EXPECT_CALL(observer, onBeforeFilter(dataset));
+
+    EXPECT_CALL(observer, onAfterFilter(dataset));
+
+    FilterOptions options;
+    options.addOption(0, "A", CONTAINS);
+    dataset->filter(options);
 }
 
 TEST_F(AsyncMemoryDataset_tests, append_data_provider) {
-    FAIL();
+    MockAsyncMemoryDatasetObserver observer;
+    dataset->addObserver(&observer);
+
+    ASSERT_NO_THROW(dataset->open());
+
+    EXPECT_CALL(observer, onBeforeAppendDataProvider(dataset));
+
+    EXPECT_CALL(observer, onAfterAppendDataProvider(dataset));
+
+    dataset->appendDataProvider(dataProvider);
 }
 
 #endif //CSV_READER_TESTS_ASYNCMEMORYDATASET_H

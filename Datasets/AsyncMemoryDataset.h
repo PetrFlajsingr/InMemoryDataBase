@@ -31,7 +31,7 @@ protected:
 
     void innerSort(unsigned long fieldIndex, SortOrder sortOrder);
 
-    void innerAppendDataProvider();
+    void innerAppendDataProvider(IDataProvider *provider);
 
     void notify(EventType type);
 public:
