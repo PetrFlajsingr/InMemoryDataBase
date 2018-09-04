@@ -3,10 +3,10 @@
 #include <iostream>
 #include <iomanip>
 #include <sys/time.h>
-#include "Interfaces/IDataset.h"
-#include "Interfaces/IField.h"
-#include "Datasets/Memorydataset.h"
-#include "DataProviders/CsvReader.h"
+#include "Interfaces/Headers/IDataset.h"
+#include "Interfaces/Headers/IField.h"
+#include "Datasets/Headers/Memorydataset.h"
+#include "DataProviders/Headers/CsvReader.h"
 
 void printTime(){
     auto t = std::time(nullptr);

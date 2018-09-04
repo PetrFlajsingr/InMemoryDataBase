@@ -4,11 +4,11 @@
 
 #include <iostream>
 #include "Memorydataset.h"
-#include "../Misc/Exceptions.h"
-#include "../Misc/Utilities.h"
-#include "Fields/IntegerField.h"
-#include "Fields/DoubleField.h"
-#include "Fields/StringField.h"
+#include "Exceptions.h"
+#include "IntegerField.h"
+#include "StringField.h"
+#include "DoubleField.h"
+#include "Utilities.h"
 
 void Memorydataset::setDataProvider(IDataProvider *provider) {
     this->dataProvider = provider;

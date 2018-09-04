@@ -6,7 +6,7 @@
 #define CSV_READER_INTEGERFIELD_H
 
 
-#include "../../Interfaces/IField.h"
+#include "IField.h"
 
 class IntegerField : public IField {
 protected:

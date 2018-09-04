@@ -3,7 +3,7 @@
 //
 
 #include <gtest/gtest.h>
-#include "../CsvReader.h"
+#include "CsvReader.h"
 
 class CsvReader_tests : public ::testing::Test {
 protected:

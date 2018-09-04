@@ -6,7 +6,7 @@
 #define CSV_READER_DOUBLEFIELD_H
 
 
-#include "../../Interfaces/IField.h"
+#include "IField.h"
 
 class DoubleField : public IField{
 protected:

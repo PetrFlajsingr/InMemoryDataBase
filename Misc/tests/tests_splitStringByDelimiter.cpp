@@ -3,8 +3,8 @@
 //
 
 #include <gtest/gtest.h>
-#include "../Utilities.h"
-#include "../Exceptions.h"
+#include "Utilities.h"
+#include "Exceptions.h"
 
 class splitStringByDelimiter_tests : public ::testing::Test {
 protected:

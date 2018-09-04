@@ -6,7 +6,7 @@
 #define CSV_READER_STRINGFIELD_H
 
 
-#include "../../Interfaces/IField.h"
+#include "IField.h"
 
 class StringField : public IField {
 protected:

@@ -3,7 +3,7 @@
 //
 
 #include <gtest/gtest.h>
-#include "../Utilities.h"
+#include "Utilities.h"
 
 class stringToInt_Double_tests : public ::testing::Test {
 protected:
@@ -54,3 +54,4 @@ TEST_F (stringToInt_Double_tests, stringToDouble_test) {
         EXPECT_EQ(Utilities::stringToDouble(doubleStrings[i]), doubles[i]);
     }
 }
+

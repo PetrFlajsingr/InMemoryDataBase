@@ -3,7 +3,7 @@
 //
 
 #include "IntegerField.h"
-#include "../../Misc/Utilities.h"
+#include "Utilities.h"
 
 IntegerField::IntegerField(const std::string &fieldName, IDataset *dataset, unsigned long index) : IField(fieldName,
                                                                                                           dataset,

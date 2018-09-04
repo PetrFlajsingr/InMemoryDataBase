@@ -4,10 +4,10 @@
 
 #include "gtest/gtest.h"
 #include <vector>
-#include "../Memorydataset.h"
-#include "../../DataProviders/ArrayDataProvider.h"
-#include "../../Interfaces/IField.h"
-#include "../../Misc/Exceptions.h"
+#include "Memorydataset.h"
+#include "ArrayDataProvider.h"
+#include "IField.h"
+#include "Exceptions.h"
 
 class MemoryDataset_tests : public ::testing::Test {
 protected:

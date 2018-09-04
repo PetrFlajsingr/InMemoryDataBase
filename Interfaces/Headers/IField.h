@@ -7,7 +7,7 @@
 
 #include <string>
 #include <utility>
-#include "../Misc/Types.h"
+#include "Types.h"
 #include "IDatasetFwd.h"
 
 /**

@@ -3,7 +3,7 @@
 //
 
 #include "AsyncMemoryDataset.h"
-#include "../Misc/Exceptions.h"
+#include "Exceptions.h"
 #include <future>
 
 void AsyncMemoryDataset::open() {

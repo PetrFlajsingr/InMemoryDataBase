@@ -3,9 +3,9 @@
 //
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "../AsyncMemoryDataset.h"
-#include "../../Interfaces/IDataProvider.h"
-#include "../../DataProviders/ArrayDataProvider.h"
+#include "AsyncMemoryDataset.h"
+#include "IDataProvider.h"
+#include "ArrayDataProvider.h"
 
 class MockAsyncMemoryDatasetObserver : public IAsyncMemoryDatasetObserver {
 public:
@@ -80,7 +80,7 @@ TEST_F(AsyncMemoryDataset_tests, open) {
 }
 
 TEST_F(AsyncMemoryDataset_tests, sort) {
-    MockAsyncMemoryDatasetObserver observer;
+    testing::NiceMock<MockAsyncMemoryDatasetObserver> observer;
     dataset->addObserver(&observer);
 
     ASSERT_NO_THROW(dataset->open());
@@ -93,7 +93,7 @@ TEST_F(AsyncMemoryDataset_tests, sort) {
 }
 
 TEST_F(AsyncMemoryDataset_tests, filter) {
-    MockAsyncMemoryDatasetObserver observer;
+    testing::NiceMock<MockAsyncMemoryDatasetObserver> observer;
     dataset->addObserver(&observer);
 
     ASSERT_NO_THROW(dataset->open());
@@ -108,7 +108,7 @@ TEST_F(AsyncMemoryDataset_tests, filter) {
 }
 
 TEST_F(AsyncMemoryDataset_tests, append_data_provider) {
-    MockAsyncMemoryDatasetObserver observer;
+    testing::NiceMock<MockAsyncMemoryDatasetObserver> observer;
     dataset->addObserver(&observer);
 
     ASSERT_NO_THROW(dataset->open());

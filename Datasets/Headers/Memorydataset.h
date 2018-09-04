@@ -6,9 +6,9 @@
 #define CSV_READER_INMEMORYDATASET_H
 
 
-#include "../Interfaces/IDataset.h"
-#include "../Misc/Types.h"
-#include "../Interfaces/IField.h"
+#include "IDataset.h"
+#include "Types.h"
+#include "IField.h"
 #include "FilterStructures.h"
 
 

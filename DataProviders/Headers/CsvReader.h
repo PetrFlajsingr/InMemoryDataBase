@@ -8,8 +8,8 @@
 
 #include <fstream>
 #include <vector>
-#include "../Interfaces/IDataProvider.h"
-#include "../Misc/Exceptions.h"
+#include "IDataProvider.h"
+#include "Exceptions.h"
 
 // TODO: rozšířit o nastavení delimiteru
 /**

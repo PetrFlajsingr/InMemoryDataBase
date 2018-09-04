@@ -8,7 +8,7 @@
 
 #include <utility>
 #include <vector>
-#include "../Interfaces/IDataProvider.h"
+#include "IDataProvider.h"
 
 class ArrayDataProvider : public IDataProvider{
 private:

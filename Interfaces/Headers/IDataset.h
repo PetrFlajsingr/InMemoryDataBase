@@ -10,7 +10,7 @@
 #include <cstring>
 #include "IFieldFwd.h"
 #include "IDataProvider.h"
-#include "../Misc/Types.h"
+#include "Types.h"
 
 /**
  * Rozhrani pro objekt dodavajici data.
