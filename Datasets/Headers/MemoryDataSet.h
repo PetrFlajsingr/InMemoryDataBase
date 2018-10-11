@@ -2,21 +2,30 @@
 // Created by Petr Flajsingr on 25/08/2018.
 //
 
-#ifndef CSV_READER_INMEMORYDATASET_H
-#define CSV_READER_INMEMORYDATASET_H
+#ifndef DATASETS_HEADERS_MEMORYDATASET_H_
+#define DATASETS_HEADERS_MEMORYDATASET_H_
 
 
-#include "IDataset.h"
+#include "IDataSet.h"
 #include "Types.h"
 #include "IField.h"
 #include "FilterStructures.h"
+#include "Exceptions.h"
+#include "IntegerField.h"
+#include "StringField.h"
+#include "DoubleField.h"
+#include "Utilities.h"
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <iostream>
 
 
 /**
  * Dataset ukladajici data primo v operacni pameti.
  */
-class Memorydataset : public IDataset {
-private:
+class MemoryDataSet : public IDataSet {
+ private:
     /**
      * Struktura pro vnitrni reprezentaci dat
      */
@@ -31,16 +40,17 @@ private:
     };
     //\
 
-    IDataProvider* dataProvider = nullptr; //< dodavatel dat
+    IDataProvider* dataProvider = nullptr;  //< dodavatel dat
 
     bool isOpen = false;
 
-    unsigned long currentRecord = 0; //< Pocitadlo zaznamu
+    uint64_t currentRecord = 0;  //< Pocitadlo zaznamu
 
-    bool dataValidityChanged = false; //< Nastaveno pri zmene dat naprikald pomoci find
+    bool dataValidityChanged = false;
+        //< Nastaveno pri zmene dat naprikald pomoci find
 
-    std::vector<std::vector<DataContainer*>*> data; //< Data uvnitr datasetu
-    std::vector<bool> dataValidity; //< Vyrazeni dat nevyhovujici pozadavkum
+    std::vector<std::vector<DataContainer*>*> data;  //< Data uvnitr datasetu
+    std::vector<bool> dataValidity;  //< Vyrazeni dat nevyhovujici pozadavkum
 
     /**
      * Nacteni dat do this->data
@@ -56,7 +66,8 @@ private:
      * Vytvoreni Fields se jmeny podle nazvu sloupcu.
      * @param columns nazvy sloupcu
      */
-    void createFields(std::vector<std::string> columns, std::vector<ValueType> types);
+    void createFields(std::vector<std::string> columns,
+            std::vector<ValueType> types);
 
     /**
      * Nastaveni hodnot this->fields.
@@ -66,11 +77,13 @@ private:
      * @param searchForward Smer vyhledavani validniho zaznamu
      * @return
      */
-    bool setFieldValues(unsigned long index, bool searchForward);
-protected:
-    void setData(void *data, unsigned long index, ValueType type) override;
-public:
-    ~Memorydataset() override;
+    bool setFieldValues(uint64_t index, bool searchForward);
+
+ protected:
+    void setData(void *data, uint64_t index, ValueType type) override;
+
+ public:
+    ~MemoryDataSet() override;
 
     void open() override;
 
@@ -91,23 +104,23 @@ public:
      * Poradi klicu urcuje jejich prioritu.
      * @param options
      */
-    virtual void sort(unsigned long fieldIndex, SortOrder sortOrder);
+    virtual void sort(uint64_t fieldIndex, SortOrder sortOrder);
 
     /**
      * Vyhledani zaznamu podle zadanych klicu
      * @param options
      */
-    virtual void filter(FilterOptions &options);
+    virtual void filter(const FilterOptions &options);
 
     IField* fieldByName(const std::string& name) override;
 
-    IField* fieldByIndex(unsigned long index) override ;
+    IField* fieldByIndex(uint64_t index) override;
 
     bool eof() override;
 
     std::vector<std::string> getFieldNames() override {
         std::vector<std::string> result;
-        for(const auto &field : fields) {
+        for (const auto &field : fields) {
             result.push_back(field->getFieldName());
         }
 
@@ -122,4 +135,4 @@ public:
 };
 
 
-#endif //CSV_READER_INMEMORYDATASET_H
+#endif //  DATASETS_HEADERS_MEMORYDATASET_H_

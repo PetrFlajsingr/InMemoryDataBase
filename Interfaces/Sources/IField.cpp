@@ -4,7 +4,7 @@
 
 #include "Types.h"
 #include "IField.h"
-#include "IDataset.h"
+#include "IDataSet.h"
 
 void IField::setDatasetData(void * data, ValueType type) {
     this->dataset->setData(data, this->index, type);

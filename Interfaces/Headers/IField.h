@@ -2,32 +2,34 @@
 // Created by Petr Flajsingr on 27/08/2018.
 //
 
-#ifndef CSV_READER_FIELDBASE_H
-#define CSV_READER_FIELDBASE_H
+#ifndef INTERFACES_HEADERS_IFIELD_H_
+#define INTERFACES_HEADERS_IFIELD_H_
 
 #include <string>
 #include <utility>
 #include "Types.h"
-#include "IDatasetFwd.h"
+
+class IDataSet;
 
 /**
  * Interface pro fields datasetu.
  */
 class IField{
-protected:
-    std::string fieldName; //< Nazev reprezentovaneho sloupce
+ protected:
+    std::string fieldName;  //< Nazev reprezentovaneho sloupce
 
-    unsigned long index; //< Index sloupce
-public:
+    uint64_t index;  //< Index sloupce
+
+ public:
     const std::string &getFieldName() const {
         return fieldName;
     }
 
-protected:
-    // Kvuli pristupu k metode IDataset::SetData(...)
+ protected:
+    // Kvuli pristupu k metode IDataSet::SetData(...)
     friend class IDataset;
 
-    IDataset* dataset; //< Rodicovsky dataset
+    IDataSet* dataset;  //< Rodicovsky dataset
 
     /**
      * Nastaveni hodnoty field.
@@ -44,7 +46,7 @@ protected:
      */
     void setDatasetData(void * data, ValueType type);
 
-public:
+ public:
     /**
      * Nastaveni datasetu, nazvu a indexu field
      * @param fieldName Nazev field
@@ -52,10 +54,10 @@ public:
      * @param index Index pole v zaznamu
      */
     explicit IField(std::string fieldName,
-                            IDataset* dataset,
-                            unsigned long index) : fieldName(std::move(fieldName)),
+            IDataSet* dataset,
+            uint64_t index) : fieldName(std::move(fieldName)),
                                                    dataset(dataset),
-                                                   index(index){}
+                                                   index(index) {}
 
     virtual ~IField() = default;
 
@@ -79,4 +81,4 @@ public:
 };
 
 
-#endif //CSV_READER_FIELDBASE_H
+#endif //  INTERFACES_HEADERS_IFIELD_H_

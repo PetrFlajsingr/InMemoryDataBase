@@ -2,24 +2,24 @@
 // Created by Petr Flajsingr on 25/08/2018.
 //
 
-#ifndef CSV_READER_IDATASET_H
-#define CSV_READER_IDATASET_H
+#ifndef INTERFACES_HEADERS_IDATASET_H_
+#define INTERFACES_HEADERS_IDATASET_H_
 
 #include <string>
 #include <vector>
 #include <cstring>
-#include "IFieldFwd.h"
 #include "IDataProvider.h"
 #include "Types.h"
 
+class IField;
 /**
  * Rozhrani pro objekt dodavajici data.
  */
-class IDataset {
-protected:
-    friend class IField; //< kvuli pristupu k IField::setData(...)
+class IDataSet {
+ protected:
+    friend class IField;  //< kvuli pristupu k IField::setData(...)
 
-    std::vector<IField*> fields; //< Pole umoznujici pristup k datum
+    std::vector<IField*> fields;  //< Pole umoznujici pristup k datum
 
     /**
      * Nastaveni dat pole.
@@ -38,8 +38,9 @@ protected:
      * @param index Index v zaznamu
      * @param type Typ dat
      */
-    virtual void setData(void * data, unsigned long index, ValueType type)= 0;
-public:
+    virtual void setData(void * data, uint64_t index, ValueType type)= 0;
+
+ public:
     /**
      * Nacteni dat datasetu z IDataProvider
      */
@@ -94,7 +95,7 @@ public:
      * @param index
      * @return
      */
-    virtual IField * fieldByIndex(unsigned long index)= 0;
+    virtual IField * fieldByIndex(uint64_t index)= 0;
 
     /**
      * Nastaveni typu Fields.
@@ -117,7 +118,7 @@ public:
     /**
      * Smazani vsech alokovanych Fields
      */
-    virtual ~IDataset();
+    virtual ~IDataSet();
 };
 
-#endif //CSV_READER_IDATASET_H
+#endif //  INTERFACES_HEADERS_IDATASET_H_

@@ -2,33 +2,35 @@
 // Created by Petr Flajsingr on 24/08/2018.
 //
 
-#ifndef CSV_READER_CSVREADER_H
-#define CSV_READER_CSVREADER_H
+#ifndef DATAPROVIDERS_HEADERS_CSVREADER_H_
+#define DATAPROVIDERS_HEADERS_CSVREADER_H_
 
 
 #include <fstream>
 #include <vector>
+#include <string>
+#include "Utilities.h"
 #include "IDataProvider.h"
 #include "Exceptions.h"
 
-// TODO: rozšířit o nastavení delimiteru
+// TODO(petr): rozšířit o nastavení delimiteru
 /**
  * Trida implementujici metody IReader.
  * Slouzi ke cteni CSV formatu sekvencne ze souboru.
  */
 class CsvReader : public IDataProvider {
-private:
-    const unsigned int BUFFER_SIZE = 1024; //< velikost bufferu pro cteni radku souboru
+ private:
+    const uint32_t BUFFER_SIZE = 1024;  //< velikost bufferu pro cteni radku
 
-    const char DELIMITER = ';'; //< rozdelovac CSV dat
+    const char DELIMITER = ';';  //< rozdelovac CSV dat
 
-    std::ifstream file; //< vstupni soubor
+    std::ifstream file;  //< vstupni soubor
 
-    std::vector<std::string> header; //< nazvy sloupcu zaznamu
+    std::vector<std::string> header;  //< nazvy sloupcu zaznamu
 
-    std::vector<std::string> currentRecord; //< momentalni zaznam, rozdeleny
+    std::vector<std::string> currentRecord;  //< momentalni zaznam, rozdeleny
 
-    unsigned long currentRecordNumber = 0; //< cislo momentalniho zaznamu
+    uint64_t currentRecordNumber = 0;  //< cislo momentalniho zaznamu
 
     /**
      * Precteni hlavicky CSV souboru a zapsani do this->header
@@ -39,7 +41,8 @@ private:
      * Zpracovani zaznamu pred jeho zpristupnenim
      */
     void parseRecord();
-public:
+
+ public:
     /**
      * Vytvori ctecku nad zadanym souborem.
      *
@@ -85,7 +88,7 @@ public:
         throw NotImplementedException();
     }
 
-    unsigned long getCurrentRecordNumber() override {
+    uint64_t getCurrentRecordNumber() override {
         return this->currentRecordNumber;
     }
 
@@ -93,7 +96,7 @@ public:
         return std::vector<std::string>(header);
     }
 
-    inline unsigned long getColumnCount() override {
+    inline uint64_t getColumnCount() override {
         return header.size();
     }
 
@@ -101,4 +104,4 @@ public:
 };
 
 
-#endif //CSV_READER_CSVREADER_H
+#endif  // DATAPROVIDERS_HEADERS_CSVREADER_H_

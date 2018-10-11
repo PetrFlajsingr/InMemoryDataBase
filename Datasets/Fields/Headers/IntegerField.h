@@ -2,20 +2,22 @@
 // Created by Petr Flajsingr on 27/08/2018.
 //
 
-#ifndef CSV_READER_INTEGERFIELD_H
-#define CSV_READER_INTEGERFIELD_H
+#ifndef DATASETS_FIELDS_HEADERS_INTEGERFIELD_H_
+#define DATASETS_FIELDS_HEADERS_INTEGERFIELD_H_
 
-
+#include <string>
 #include "IField.h"
 
 class IntegerField : public IField {
-protected:
+ protected:
     void setValue(void *data) override;
 
     int data;
-public:
+ public:
 
-    IntegerField(const std::string &fieldName, IDataset *dataset, unsigned long index);
+    IntegerField(const std::string &fieldName,
+            IDataSet *dataset,
+            uint64_t index);
 
     ValueType getFieldType() override;
 
@@ -29,4 +31,4 @@ public:
 };
 
 
-#endif //CSV_READER_INTEGERFIELD_H
+#endif //  DATASETS_FIELDS_HEADERS_INTEGERFIELD_H_

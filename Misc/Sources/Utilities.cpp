@@ -4,12 +4,13 @@
 
 #include <sstream>
 #include <regex>
+#include <cstdio>
 #include "Utilities.h"
 #include "Exceptions.h"
 
 std::vector<std::string> Utilities::splitStringByDelimiter(std::string str,
-                                                           std::string delimiter) {
-    if(delimiter.empty()) {
+        std::string delimiter) {
+    if (delimiter.empty()) {
         throw InvalidArgumentException("Delimiter can't be empty.");
     }
 
@@ -57,9 +58,9 @@ bool Utilities::isDouble(const std::string &value) {
 }
 
 ValueType Utilities::getType(const std::string &value) {
-    if(isInteger(value)){
+    if (isInteger(value)) {
         return INTEGER_VAL;
-    } else if(isDouble(value)) {
+    } else if (isDouble(value)) {
         return DOUBLE_VAL;
     } else {
         return STRING_VAL;
@@ -73,8 +74,7 @@ bool Utilities::endsWith(const std::string &value, const std::string &ending) {
 }
 
 char *Utilities::copyStringToNewChar(const std::string& str) {
-    auto result = new char [str.length() + 1];
-    strcpy (result, str.c_str());
-
+    auto result = new char[str.length() + 1];
+    strcpy(result, str.c_str());
     return result;
 }

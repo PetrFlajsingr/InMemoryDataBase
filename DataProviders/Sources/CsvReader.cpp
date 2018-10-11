@@ -3,12 +3,11 @@
 //
 
 #include "CsvReader.h"
-#include "Utilities.h"
 
 
 CsvReader::CsvReader(std::string filePath) {
     this->file.open(filePath);
-    if(!this->file.is_open()) {
+    if (!this->file.is_open()) {
         throw IOException("File could not be opened.");
     }
 
@@ -17,7 +16,7 @@ CsvReader::CsvReader(std::string filePath) {
 }
 
 CsvReader::~CsvReader() {
-    if(this->file.is_open()) {
+    if (this->file.is_open()) {
         this->file.close();
     }
 }
@@ -27,12 +26,13 @@ void CsvReader::readHeader() {
     char buffer[BUFFER_SIZE];
 
     this->file.getline(buffer, BUFFER_SIZE);
-    header = Utilities::splitStringByDelimiter(std::string(buffer), std::string(1, DELIMITER));
+    header = Utilities::splitStringByDelimiter(std::string(buffer),
+            std::string(1, DELIMITER));
 }
 
 
 bool CsvReader::next() {
-    if(this->file.eof()) {
+    if (this->file.eof()) {
         return false;
     }
 
@@ -46,7 +46,8 @@ void CsvReader::parseRecord() {
     char buffer[BUFFER_SIZE];
 
     this->file.getline(buffer, BUFFER_SIZE);
-    this->currentRecord = Utilities::splitStringByDelimiter(std::string(buffer), std::string(1, DELIMITER));
+    this->currentRecord = Utilities::splitStringByDelimiter(std::string(buffer),
+            std::string(1, DELIMITER));
 }
 
 void CsvReader::first() {

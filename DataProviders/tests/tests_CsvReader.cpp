@@ -7,9 +7,9 @@
 
 class CsvReader_tests : public ::testing::Test {
 protected:
-    CsvReader* reader;
+    CsvReader *reader;
 
-    std::string columnNamesSmall[5] {
+    std::string columnNamesSmall[5]{
             "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4", "COLUMN5"
     };
 
@@ -21,6 +21,7 @@ protected:
     };
 
     void prepareReaderSmall();
+
 public:
     CsvReader_tests() = default;
 
@@ -43,7 +44,7 @@ TEST_F (CsvReader_tests, columns_small) {
     prepareReaderSmall();
 
     ASSERT_EQ(reader->getColumnCount(), 5);
-    for(int i = 0; i < 5; ++i){
+    for (int i = 0; i < 5; ++i) {
         EXPECT_EQ(reader->getColumnNames()[i], columnNamesSmall[i]);
         EXPECT_EQ(reader->getColumn(i), columnNamesSmall[i]);
     }
@@ -53,10 +54,10 @@ TEST_F(CsvReader_tests, records_small) {
     prepareReaderSmall();
 
     int x = 0;
-    while(!reader->eof()) {
+    while (!reader->eof()) {
         auto value = reader->getRow();
         EXPECT_EQ(reader->getCurrentRecordNumber(), x);
-        for(int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 3; ++i) {
             EXPECT_EQ(value[i], recordsSmall[x][i]);
         }
         x++;
@@ -67,14 +68,14 @@ TEST_F(CsvReader_tests, records_small) {
 
 TEST_F(CsvReader_tests, first_small) {
     prepareReaderSmall();
-    while(!reader->eof()) {
+    while (!reader->eof()) {
         reader->next();
     }
 
     reader->first();
 
     auto value = reader->getRow();
-    for(int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 5; ++i) {
         EXPECT_EQ(value[i], recordsSmall[0][i]);
     }
 

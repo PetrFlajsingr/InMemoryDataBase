@@ -3,9 +3,9 @@
 #include <iostream>
 #include <iomanip>
 #include <sys/time.h>
-#include "Interfaces/Headers/IDataset.h"
+#include "IDataSet.h"
 #include "Interfaces/Headers/IField.h"
-#include "Datasets/Headers/Memorydataset.h"
+#include "MemoryDataSet.h"
 #include "DataProviders/Headers/CsvReader.h"
 
 void printTime(){
@@ -23,7 +23,7 @@ long getMs() {
 int main(int argc, char** argv) {
 
 
-    auto * dataset = new Memorydataset();
+    auto * dataset = new MemoryDataSet();
 
     IDataProvider* dataProvider = new CsvReader(argv[1]);
 

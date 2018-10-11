@@ -2,8 +2,8 @@
 // Created by Petr Flajsingr on 24/08/2018.
 //
 
-#ifndef CSV_READER_EXCEPTIONS_H
-#define CSV_READER_EXCEPTIONS_H
+#ifndef MISC_HEADERS_EXCEPTIONS_H_
+#define MISC_HEADERS_EXCEPTIONS_H_
 
 #include <stdexcept>
 #include <string>
@@ -12,7 +12,7 @@
  * Exception slouzici k oznaceni funkci, ktere nejsou implementovany
  */
 class NotImplementedException : public std::logic_error {
-public:
+ public:
     NotImplementedException() : logic_error("Function is not implemented"){}
 };
 
@@ -20,14 +20,14 @@ public:
  * Exception slouzici k informovani o chybné praci se soubory
  */
 class IOException : public std::exception {
-private:
+ private:
     const char *errorMessage;
-public:
+ public:
     explicit IOException(const char* message) {
         this->errorMessage = message;
     }
 
-    char const* what() const throw() override {
+    char const* what() const noexcept override {
         return errorMessage;
     }
 };
@@ -36,14 +36,14 @@ public:
  * Exception pro informovani o chybne zadanych argumentech
  */
 class InvalidArgumentException : public std::exception {
-private:
+ private:
     const char *errorMessage;
-public:
+ public:
     explicit InvalidArgumentException(const char* message) {
         this->errorMessage = message;
     }
 
-    char const* what() const throw() override {
+    char const* what() const noexcept override {
         return errorMessage;
     }
 };
@@ -52,14 +52,14 @@ public:
  * Exception pro notifikaci o chybnem pozadavku pro momentalni vnitrni stav objektu
  */
 class IllegalStateException : public std::exception {
-private:
+ private:
     const char *errorMessage;
-public:
+ public:
     explicit IllegalStateException(const char* message) {
         this->errorMessage = message;
     }
 
-    char const* what() const throw() override {
+    char const* what() const noexcept override {
         return errorMessage;
     }
 };
@@ -68,15 +68,15 @@ public:
  * Exception pro notifikaci o nepovolene operaci objektu
  */
 class UnsupportedOperationException : public std::exception {
-private:
+ private:
     const char *errorMessage;
-public:
+ public:
     explicit UnsupportedOperationException(const char* message) {
         this->errorMessage = message;
     }
 
-    char const* what() const throw() override {
+    char const* what() const noexcept override {
         return errorMessage;
     }
 };
-#endif //CSV_READER_EXCEPTIONS_H
+#endif //  MISC_HEADERS_EXCEPTIONS_H_

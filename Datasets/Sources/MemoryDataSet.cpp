@@ -2,24 +2,19 @@
 // Created by Petr Flajsingr on 25/08/2018.
 //
 
-#include <iostream>
-#include "Memorydataset.h"
-#include "Exceptions.h"
-#include "IntegerField.h"
-#include "StringField.h"
-#include "DoubleField.h"
-#include "Utilities.h"
+#include "MemoryDataSet.h"
 
-void Memorydataset::setDataProvider(IDataProvider *provider) {
+
+void MemoryDataSet::setDataProvider(IDataProvider *provider) {
     this->dataProvider = provider;
 }
 
-void Memorydataset::open() {
-    if(isOpen) {
+void MemoryDataSet::open() {
+    if (isOpen) {
         throw IllegalStateException("Dataset is already open.");
     }
 
-    if(this->dataProvider == nullptr) {
+    if (this->dataProvider == nullptr) {
         throw IllegalStateException("Data provider has not been set.");
     }
 
@@ -30,8 +25,8 @@ void Memorydataset::open() {
     setFieldValues(0, true);
 }
 
-void Memorydataset::loadData() {
-    while(!this->dataProvider->eof()) {
+void MemoryDataSet::loadData() {
+    while (!this->dataProvider->eof()) {
         this->addRecord();
         this->dataValidity.push_back(true);
 
@@ -39,14 +34,16 @@ void Memorydataset::loadData() {
     }
 }
 
-void Memorydataset::createFields(std::vector<std::string> columns, std::vector<ValueType> types) {
-    if(columns.size() != types.size()) {
-        throw InvalidArgumentException("Amount of columns and types must match.");
+void MemoryDataSet::createFields(std::vector<std::string> columns,
+        std::vector<ValueType> types) {
+    if (columns.size() != types.size()) {
+        throw InvalidArgumentException(
+                "Amount of columns and types must match.");
     }
     size_t iter = 0;
-    for(const auto &col : columns) {
-        IField* newField = nullptr;
-        switch(types[iter]){
+    for (const auto &col : columns) {
+        IField *newField = nullptr;
+        switch (types[iter]) {
             case INTEGER_VAL: {
                 newField = new IntegerField(col, this, iter);
                 break;
@@ -67,14 +64,14 @@ void Memorydataset::createFields(std::vector<std::string> columns, std::vector<V
     }
 }
 
-void Memorydataset::addRecord() {
+void MemoryDataSet::addRecord() {
     auto record = this->dataProvider->getRow();
 
-    auto newRecord = new std::vector<DataContainer*>();
+    auto newRecord = new std::vector<DataContainer *>();
     size_t iter = 0;
-    for(const auto &part : record) {
+    for (const auto &part : record) {
         auto dataContainer = new DataContainer();
-        switch(fields[iter]->getFieldType()){
+        switch (fields[iter]->getFieldType()) {
             case INTEGER_VAL:
                 dataContainer->data._integer = Utilities::stringToInt(part);
                 break;
@@ -95,18 +92,17 @@ void Memorydataset::addRecord() {
     this->data.push_back(newRecord);
 }
 
-void Memorydataset::close() {
+void MemoryDataSet::close() {
     this->dataProvider = nullptr;
 
     this->isOpen = false;
 
-    if(!this->data.empty()) {
-        size_t iter = 0;
-        for(auto level1 : this->data) {
-            iter = 0;
-            for(auto level2 : *level1) {
-                if(this->fields[iter])
-                delete level2;
+    if (!this->data.empty()) {
+        for (auto level1 : this->data) {
+            size_t iter = 0;
+            for (auto level2 : *level1) {
+                if (this->fields[iter])
+                    delete level2;
                 iter++;
             }
             level1->clear();
@@ -117,12 +113,12 @@ void Memorydataset::close() {
 }
 
 
-bool Memorydataset::setFieldValues(unsigned long index, bool searchForward) {
-    long iter = index;
-    if(dataValidityChanged) {
+bool MemoryDataSet::setFieldValues(uint64_t index, bool searchForward) {
+    uint64_t iter = index;
+    if (dataValidityChanged) {
         bool found = false;
 
-        if(searchForward) {
+        if (searchForward) {
             for (iter = index; iter < this->dataValidity.size(); iter++) {
                 if (this->dataValidity[iter]) {
                     found = true;
@@ -138,20 +134,20 @@ bool Memorydataset::setFieldValues(unsigned long index, bool searchForward) {
             }
         }
         if (!found) {
-            if(searchForward) {
+            if (searchForward) {
                 this->currentRecord = this->data.size();
             } else {
                 this->currentRecord = 0;
             }
             return false;
         }
-        this->currentRecord = static_cast<unsigned long>(iter);
+        this->currentRecord = iter;
     }
 
-    std::vector<DataContainer*>* value = this->data[iter];
+    std::vector<DataContainer *> *value = this->data[iter];
 
-    for(int i = 0; i < fields.size(); i++) {
-        switch(fields[i]->getFieldType()) {
+    for (int i = 0; i < fields.size(); i++) {
+        switch (fields[i]->getFieldType()) {
             case INTEGER_VAL:
                 this->setFieldData(fields[i], &(*value)[i]->data._integer);
                 break;
@@ -169,49 +165,51 @@ bool Memorydataset::setFieldValues(unsigned long index, bool searchForward) {
     return true;
 }
 
-void Memorydataset::first() {
+void MemoryDataSet::first() {
     this->currentRecord = 0;
     setFieldValues(0, true);
 }
 
-void Memorydataset::last() {
+void MemoryDataSet::last() {
     this->currentRecord = this->data.size() - 1;
     setFieldValues(this->data.size() - 1, false);
 }
 
-void Memorydataset::next() {
+void MemoryDataSet::next() {
     this->currentRecord++;
-    if(!this->eof()) {
+    if (!this->eof()) {
         setFieldValues(this->currentRecord, true);
     }
 }
 
-void Memorydataset::previous() {
-    if(this->currentRecord == 0) {
+void MemoryDataSet::previous() {
+    if (this->currentRecord == 0) {
         return;
     }
     this->currentRecord--;
     setFieldValues(this->currentRecord, false);
 }
 
-void Memorydataset::sort(unsigned long fieldIndex, SortOrder sortOrder) {
-    if(fieldIndex >= this->getFieldNames().size()) {
+void MemoryDataSet::sort(uint64_t fieldIndex, SortOrder sortOrder) {
+    if (fieldIndex >= this->getFieldNames().size()) {
         throw InvalidArgumentException("Field index is out of bounds");
     }
 
-    if(sortOrder == ASCENDING) {
+    if (sortOrder == ASCENDING) {
         std::sort(this->data.begin(),
                   this->data.end(),
-                  [&fieldIndex, this](const std::vector<DataContainer *>* a,
-                                const std::vector<DataContainer *>* b) {
+                  [&fieldIndex, this](const std::vector<DataContainer *> *a,
+                                      const std::vector<DataContainer *> *b) {
                       switch (this->fields[fieldIndex]->getFieldType()) {
                           case INTEGER_VAL:
-                              return (*a)[fieldIndex]->data._integer < (*b)[fieldIndex]->data._integer;
+                              return (*a)[fieldIndex]->data._integer
+                                      < (*b)[fieldIndex]->data._integer;
                           case DOUBLE_VAL:
-                              return (*a)[fieldIndex]->data._double < (*b)[fieldIndex]->data._double;
+                              return (*a)[fieldIndex]->data._double
+                                      < (*b)[fieldIndex]->data._double;
                           case STRING_VAL:
                               return std::strcmp((*a)[fieldIndex]->data._string,
-                                                 (*b)[fieldIndex]->data._string) < 0;
+                                      (*b)[fieldIndex]->data._string) < 0;
                           default:
                               throw IllegalStateException("Internal error.");
                       }
@@ -219,16 +217,18 @@ void Memorydataset::sort(unsigned long fieldIndex, SortOrder sortOrder) {
     } else {
         std::sort(this->data.begin(),
                   this->data.end(),
-                  [&fieldIndex, this](const std::vector<DataContainer *>* a,
-                                const std::vector<DataContainer *>* b) {
+                  [&fieldIndex, this](const std::vector<DataContainer *> *a,
+                                      const std::vector<DataContainer *> *b) {
                       switch (this->fields[fieldIndex]->getFieldType()) {
                           case INTEGER_VAL:
-                              return (*a)[fieldIndex]->data._integer > (*b)[fieldIndex]->data._integer;
+                              return (*a)[fieldIndex]->data._integer
+                                        > (*b)[fieldIndex]->data._integer;
                           case DOUBLE_VAL:
-                              return (*a)[fieldIndex]->data._double > (*b)[fieldIndex]->data._double;
+                              return (*a)[fieldIndex]->data._double
+                                        > (*b)[fieldIndex]->data._double;
                           case STRING_VAL:
                               return std::strcmp((*a)[fieldIndex]->data._string,
-                                                 (*b)[fieldIndex]->data._string) > 0;
+                                      (*b)[fieldIndex]->data._string) > 0;
                           default:
                               throw IllegalStateException("Internal error.");
                       }
@@ -238,8 +238,8 @@ void Memorydataset::sort(unsigned long fieldIndex, SortOrder sortOrder) {
     this->first();
 }
 
-void Memorydataset::filter(FilterOptions &options) {
-    if(options.options.empty()) {
+void MemoryDataSet::filter(const FilterOptions &options) {
+    if (options.options.empty()) {
         dataValidityChanged = false;
         for (auto &&iter : this->dataValidity) {
             iter = true;
@@ -255,20 +255,22 @@ void Memorydataset::filter(FilterOptions &options) {
 
     int i = 0;
     std::string toCompare;
-    for(auto iter : this->data) {
+    for (auto iter : this->data) {
         bool valid = true;
 
         optionCounter = 0;
-        for(auto filter : options.options) {
-            if(!valid){
+        for (auto filter : options.options) {
+            if (!valid) {
                 break;
             }
             switch (this->fields[filter.fieldIndex]->getFieldType()) {
                 case INTEGER_VAL:
-                    toCompare = std::to_string((*iter)[filter.fieldIndex]->data._integer);
+                    toCompare = std::to_string(
+                            (*iter)[filter.fieldIndex]->data._integer);
                     break;
                 case DOUBLE_VAL:
-                    toCompare = std::to_string((*iter)[filter.fieldIndex]->data._double);
+                    toCompare = std::to_string(
+                            (*iter)[filter.fieldIndex]->data._double);
                     break;
                 case STRING_VAL:
                     toCompare = (*iter)[filter.fieldIndex]->data._string;
@@ -276,27 +278,34 @@ void Memorydataset::filter(FilterOptions &options) {
                 default:
                     throw IllegalStateException("Internal error.");
             }
-            switch(filter.filterOption) {
+            switch (filter.filterOption) {
                 case EQUALS:
                     valid = toCompare == filter.searchString;
                     break;
                 case STARTS_WITH:
-                    valid = std::strncmp(toCompare.c_str(), filter.searchString.c_str(), filter.searchString.size()) == 0;
+                    valid = std::strncmp(toCompare.c_str(),
+                            filter.searchString.c_str(),
+                            filter.searchString.size()) == 0;
                     break;
                 case CONTAINS:
-                    valid = toCompare.find(filter.searchString) != std::string::npos;
+                    valid = toCompare.find(filter.searchString)
+                            != std::string::npos;
                     break;
                 case ENDS_WITH:
                     valid = Utilities::endsWith(toCompare, filter.searchString);
                     break;
                 case NOT_CONTAINS:
-                    valid = toCompare.find(filter.searchString) == std::string::npos;
+                    valid = toCompare.find(filter.searchString)
+                            == std::string::npos;
                     break;
                 case NOT_STARTS_WITH:
-                    valid = std::strncmp(toCompare.c_str(), filter.searchString.c_str(), filter.searchString.size()) != 0;
+                    valid = std::strncmp(toCompare.c_str(),
+                            filter.searchString.c_str(),
+                            filter.searchString.size()) != 0;
                     break;
                 case NOT_ENDS_WITH:
-                    valid = !Utilities::endsWith(toCompare, filter.searchString);
+                    valid = !Utilities::endsWith(toCompare,
+                            filter.searchString);
                     break;
             }
 
@@ -310,9 +319,9 @@ void Memorydataset::filter(FilterOptions &options) {
     this->first();
 }
 
-IField * Memorydataset::fieldByName(const std::string &name) {
-    for(auto &field : fields) {
-        if(field->getFieldName() == name) {
+IField *MemoryDataSet::fieldByName(const std::string &name) {
+    for (auto &field : fields) {
+        if (field->getFieldName() == name) {
             return field;
         }
     }
@@ -320,35 +329,38 @@ IField * Memorydataset::fieldByName(const std::string &name) {
     throw InvalidArgumentException(("There's no field named: " + name).c_str());
 }
 
-IField * Memorydataset::fieldByIndex(unsigned long index) {
+IField *MemoryDataSet::fieldByIndex(uint64_t index) {
     return fields.at(index);
 }
 
-bool Memorydataset::eof() {
+bool MemoryDataSet::eof() {
     return this->currentRecord >= this->data.size();
 
 }
 
-Memorydataset::~Memorydataset() {
+MemoryDataSet::~MemoryDataSet() {
     this->close();
 }
 
-void Memorydataset::setFieldTypes(std::vector<ValueType> types) {
+void MemoryDataSet::setFieldTypes(std::vector<ValueType> types) {
     createFields(this->dataProvider->getColumnNames(), types);
 }
 
-void Memorydataset::setData(void *data, unsigned long index, ValueType type) {
-    switch(type) {
+void MemoryDataSet::setData(void *data, uint64_t index, ValueType type) {
+    switch (type) {
         case INTEGER_VAL:
-            (*this->data[currentRecord])[index]->data._integer = *(int*)data;
+            (*this->data[currentRecord])[index]->data._integer
+                = *reinterpret_cast<int *>(data);
             break;
         case DOUBLE_VAL:
-            (*this->data[currentRecord])[index]->data._double = *(int*)data;
+            (*this->data[currentRecord])[index]->data._double
+                = *reinterpret_cast<int *>(data);
             break;
         case STRING_VAL:
-            delete [] (*this->data[currentRecord])[index]->data._string;
+            delete[] (*this->data[currentRecord])[index]->data._string;
 
-            (*this->data[currentRecord])[index]->data._string = (char*)data;
+            (*this->data[currentRecord])[index]->data._string
+                = reinterpret_cast<char *>(data);
             break;
         default:
             throw IllegalStateException("Invalid value type.");
@@ -356,11 +368,11 @@ void Memorydataset::setData(void *data, unsigned long index, ValueType type) {
 
 }
 
-void Memorydataset::append() {
-    auto newRecord = new std::vector<DataContainer*>();
-    for(int i = 0; i < this->getFieldNames().size(); ++i) {
+void MemoryDataSet::append() {
+    auto newRecord = new std::vector<DataContainer *>();
+    for (int i = 0; i < this->getFieldNames().size(); ++i) {
         auto dataContainer = new DataContainer();
-        switch(fields[i]->getFieldType()) {
+        switch (fields[i]->getFieldType()) {
             case INTEGER_VAL:
                 dataContainer->data._integer = 0;
                 break;
@@ -379,12 +391,12 @@ void Memorydataset::append() {
     this->last();
 }
 
-void Memorydataset::appendDataProvider(IDataProvider *provider) {
-    if(!isOpen) {
+void MemoryDataSet::appendDataProvider(IDataProvider *provider) {
+    if (!isOpen) {
         throw IllegalStateException("Dataset is not opened.");
     }
 
-    if(provider == nullptr) {
+    if (provider == nullptr) {
         throw InvalidArgumentException("Data provider has not been set.");
     }
 

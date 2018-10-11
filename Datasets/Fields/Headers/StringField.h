@@ -2,19 +2,22 @@
 // Created by Petr Flajsingr on 27/08/2018.
 //
 
-#ifndef CSV_READER_STRINGFIELD_H
-#define CSV_READER_STRINGFIELD_H
+#ifndef DATASETS_FIELDS_HEADERS_STRINGFIELD_H_
+#define DATASETS_FIELDS_HEADERS_STRINGFIELD_H_
 
 
 #include "IField.h"
+#include <string>
 
 class StringField : public IField {
-protected:
+ protected:
     std::string data;
 
     void setValue(void *data) override;
-public:
-    StringField(const std::string &fieldName, IDataset *dataset, unsigned long index);
+ public:
+    StringField(const std::string &fieldName,
+            IDataSet *dataset,
+            uint64_t index);
 
     ValueType getFieldType() override;
 
@@ -24,4 +27,4 @@ public:
 };
 
 
-#endif //CSV_READER_STRINGFIELD_H
+#endif //  DATASETS_FIELDS_HEADERS_STRINGFIELD_H_

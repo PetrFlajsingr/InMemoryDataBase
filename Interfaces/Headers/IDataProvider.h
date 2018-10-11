@@ -2,11 +2,12 @@
 // Created by Petr Flajsingr on 24/08/2018.
 //
 
-#ifndef CSV_READER_IDATAPROVIDER_H
-#define CSV_READER_IDATAPROVIDER_H
+#ifndef INTERFACES_HEADERS_IDATAPROVIDER_H_
+#define INTERFACES_HEADERS_IDATAPROVIDER_H_
 
 
 #include <string>
+#include <vector>
 
 /**
  * Jednoduche rozhrani pro cteni a pohyb v zaznamech
@@ -30,7 +31,7 @@ public:
      * Pocet sloupcu zaznamu
      * @return
      */
-    virtual unsigned long getColumnCount()= 0;
+    virtual uint64_t getColumnCount()= 0;
 
     /**
      * Nazvy sloupcu
@@ -42,7 +43,7 @@ public:
      * Pocet prozatim prectenych zaznamu
      * @return
      */
-    virtual unsigned long getCurrentRecordNumber()= 0;
+    virtual uint64_t getCurrentRecordNumber()= 0;
 
     /**
      * Presun na nasledujici zaznam
@@ -77,4 +78,4 @@ public:
 
 
 
-#endif //CSV_READER_IDATAPROVIDER_H
+#endif //  INTERFACES_HEADERS_IDATAPROVIDER_H_

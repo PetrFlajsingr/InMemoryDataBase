@@ -2,8 +2,8 @@
 // Created by Petr Flajsingr on 27/08/2018.
 //
 
-#ifndef CSV_READER_FILTERSTRUCTURES_H
-#define CSV_READER_FILTERSTRUCTURES_H
+#ifndef DATASETS_HEADERS_FILESTRUCTURES_H_
+#define DATASETS_HEADERS_FILESTRUCTURES_H_
 
 #include <vector>
 #include <string>
@@ -18,7 +18,7 @@ enum FilterOption {
     NOT_ENDS_WITH};
 
 struct FilterItem {
-    unsigned long fieldIndex;
+    uint64_t fieldIndex;
     std::string searchString;
     FilterOption filterOption;
 };
@@ -26,7 +26,7 @@ struct FilterItem {
 struct FilterOptions {
     std::vector<FilterItem> options;
 
-    void addOption(const unsigned long fieldIndex,
+    void addOption(const uint64_t fieldIndex,
                    const std::string &searchString,
                    const FilterOption filterOption){
         FilterItem item{
@@ -38,4 +38,4 @@ struct FilterOptions {
         options.push_back(item);
     }
 };
-#endif //CSV_READER_FILTERSTRUCTURES_H
+#endif //  DATASETS_HEADERS_FILESTRUCTURES_H_

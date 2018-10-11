@@ -2,19 +2,22 @@
 // Created by Petr Flajsingr on 27/08/2018.
 //
 
-#ifndef CSV_READER_DOUBLEFIELD_H
-#define CSV_READER_DOUBLEFIELD_H
+#ifndef DATASETS_FIELDS_HEADERS_DOUBLEFIELD_H_
+#define DATASETS_FIELDS_HEADERS_DOUBLEFIELD_H_
 
 
 #include "IField.h"
+#include <string>
 
-class DoubleField : public IField{
-protected:
+class DoubleField : public IField {
+ protected:
     void setValue(void *data) override;
 
     double data;
-public:
-    DoubleField(const std::string &fieldName, IDataset *dataset, unsigned long index);
+ public:
+    DoubleField(const std::string &fieldName,
+            IDataSet *dataset,
+            uint64_t index);
 
     ValueType getFieldType() override;
 
@@ -28,4 +31,4 @@ public:
 };
 
 
-#endif //CSV_READER_DOUBLEFIELD_H
+#endif //  DATASETS_FIELDS_HEADERS_DOUBLEFIELD_H_

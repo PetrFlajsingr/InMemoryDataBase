@@ -2,8 +2,8 @@
 // Created by Petr Flajsingr on 24/08/2018.
 //
 
-#ifndef CSV_READER_UTILITIES_H
-#define CSV_READER_UTILITIES_H
+#ifndef MISC_HEADERS_UTILITIES_H_
+#define MISC_HEADERS_UTILITIES_H_
 
 
 #include <string>
@@ -14,7 +14,7 @@
  * Obecne metody pro
  */
 class Utilities {
-public:
+ public:
     /**
      * Rozdeleni stringu pomoci urceneho delimiteru.
      * Delimiter neni v rozdelenych retezcich obsazen.
@@ -23,7 +23,7 @@ public:
      * @return vector casti
      */
     static std::vector<std::string> splitStringByDelimiter(std::string str,
-                                                           std::string delimiter);
+            std::string delimiter);
 
     /**
      * Prevod string do int.
@@ -70,4 +70,4 @@ public:
 };
 
 
-#endif //CSV_READER_UTILITIES_H
+#endif //  MISC_HEADERS_UTILITIES_H_

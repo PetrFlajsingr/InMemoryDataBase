@@ -33,7 +33,6 @@ public:
 };
 
 TEST_F (isDouble_isInteger_tests, isinteger) {
-    std::string a = validIntegers[12];
     for(const auto &iter : validIntegers) {
         EXPECT_TRUE(Utilities::isInteger(iter));
     }
@@ -55,4 +54,8 @@ TEST_F (isDouble_isInteger_tests, isdouble) {
     for(const auto &iter : invalids) {
         EXPECT_FALSE(Utilities::isDouble(iter));
     }
+}
+
+TEST(copyStringToNewChar, copy_test) {
+    EXPECT_EQ(*Utilities::copyStringToNewChar("a"), *"a");
 }

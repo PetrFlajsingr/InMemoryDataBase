@@ -3,7 +3,7 @@
 //
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "AsyncMemoryDataset.h"
+#include "AsyncMemoryDataSet.h"
 #include "IDataProvider.h"
 #include "ArrayDataProvider.h"
 
@@ -30,7 +30,7 @@ class AsyncMemoryDataset_tests : public ::testing::Test {
 protected:
     static const unsigned int columnCount = 5;
 
-    AsyncMemoryDataset* dataset{};
+    AsyncMemoryDataSet* dataset{};
 
     IDataProvider* dataProvider{};
 
@@ -48,7 +48,7 @@ public:
     AsyncMemoryDataset_tests() = default;
 
     void SetUp() override {
-        dataset = new AsyncMemoryDataset();
+        dataset = new AsyncMemoryDataSet();
         dataProvider = new ArrayDataProvider(test);
 
         dataset->setDataProvider(dataProvider);
