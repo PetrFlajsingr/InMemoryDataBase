@@ -12,28 +12,28 @@ using namespace DataProviders;
 
 class MockAsyncMemoryDatasetObserver : public IAsyncMemoryDataSetObserver {
  public:
-  MOCK_METHOD1(onBeforeOpen, void(AsyncMemoryDataSet
+  MOCK_METHOD1(onBeforeOpen, void(Async_MemoryDataSet
       *sender));
 
-  MOCK_METHOD1(onAfterOpen, void(AsyncMemoryDataSet
+  MOCK_METHOD1(onAfterOpen, void(Async_MemoryDataSet
       *sender));
 
-  MOCK_METHOD1(onBeforeSort, void(AsyncMemoryDataSet
+  MOCK_METHOD1(onBeforeSort, void(Async_MemoryDataSet
       *sender));
 
-  MOCK_METHOD1(onAfterSort, void(AsyncMemoryDataSet
+  MOCK_METHOD1(onAfterSort, void(Async_MemoryDataSet
       *sender));
 
-  MOCK_METHOD1(onBeforeFilter, void(AsyncMemoryDataSet
+  MOCK_METHOD1(onBeforeFilter, void(Async_MemoryDataSet
       *sender));
 
-  MOCK_METHOD1(onAfterFilter, void(AsyncMemoryDataSet
+  MOCK_METHOD1(onAfterFilter, void(Async_MemoryDataSet
       *sender));
 
-  MOCK_METHOD1(onBeforeAppendDataProvider, void(AsyncMemoryDataSet
+  MOCK_METHOD1(onBeforeAppendDataProvider, void(Async_MemoryDataSet
       *sender));
 
-  MOCK_METHOD1(onAfterAppendDataProvider, void(AsyncMemoryDataSet
+  MOCK_METHOD1(onAfterAppendDataProvider, void(Async_MemoryDataSet
       *sender));
 };
 
