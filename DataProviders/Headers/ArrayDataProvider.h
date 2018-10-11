@@ -4,87 +4,86 @@
 // Created by Petr Flajsingr on 30/08/2018.
 //
 
-#ifndef CSV_READER_ARRAYDATAPROVIDER_H
-#define CSV_READER_ARRAYDATAPROVIDER_H
-
+#ifndef DATAPROVIDERS_HEADERES_ARRAYDATAPROVIDER_H_
+#define DATAPROVIDERS_HEADERES_ARRAYDATAPROVIDER_H_
 
 #include <utility>
 #include <vector>
 #include <string>
 #include "IDataProvider.h"
 
+namespace DataProviders {
 class ArrayDataProvider : public IDataProvider {
  private:
-    std::vector<std::vector<std::string>> data;
+  std::vector<std::vector<std::string>> data;
 
-    uint64_t row = 0;
-
+  uint64_t row = 0;
 
  public:
-    explicit ArrayDataProvider(std::vector<std::vector<std::string>> data) :
-            data(std::move(data)) {};
+  explicit ArrayDataProvider(std::vector<std::vector<std::string>> data) :
+      data(std::move(data)) {};
 
-    ~ArrayDataProvider() override {}
+  ~ArrayDataProvider() override {}
 
-    std::vector<std::string> getRow() override {
-        std::vector<std::string> result;
+  std::vector<std::string> getRow() override {
+    std::vector<std::string> result;
 
-        for (uint64_t i = 0; i < data[0].size(); ++i) {
-            result.push_back(data[row][i]);
-        }
-
-        return result;
+    for (uint64_t i = 0; i < data[0].size(); ++i) {
+      result.push_back(data[row][i]);
     }
 
-    std::string getColumn(unsigned int columnIndex) override {
-        return std::to_string(columnIndex);
+    return result;
+  }
+
+  std::string getColumn(unsigned int columnIndex) override {
+    return std::to_string(columnIndex);
+  }
+
+  uint64_t getColumnCount() override {
+    return data[0].size();
+  }
+
+  std::vector<std::string> getColumnNames() override {
+    std::vector<std::string> result;
+    for (uint64_t i = 0; i < data[0].size(); ++i) {
+      result.push_back(std::to_string(i));
     }
 
-    uint64_t getColumnCount() override {
-        return data[0].size();
-    }
+    return result;
+  }
 
-    std::vector<std::string> getColumnNames() override {
-        std::vector<std::string> result;
-        for (uint64_t i = 0; i < data[0].size(); ++i) {
-            result.push_back(std::to_string(i));
-        }
+  uint64_t getCurrentRecordNumber() override {
+    return row;
+  }
 
-        return result;
+  bool next() override {
+    if (row < data.size()) {
+      row++;
+      return true;
     }
+    return false;
+  }
 
-    uint64_t getCurrentRecordNumber() override {
-        return row;
+  bool previous() override {
+    if (row > 0) {
+      row--;
+      return true;
     }
+    return false;
+  }
 
-    bool next() override {
-        if (row < data.size()) {
-            row++;
-            return true;
-        }
-        return false;
-    }
+  void first() override {
+    row = 0;
+  }
 
-    bool previous() override {
-        if (row > 0) {
-            row--;
-            return true;
-        }
-        return false;
-    }
+  void last() override {
+    row = data.size() - 1;
+  }
 
-    void first() override {
-        row = 0;
-    }
-
-    void last() override {
-        row = data.size() - 1;
-    }
-
-    bool eof() override {
-        return row == data.size();
-    }
+  bool eof() override {
+    return row == data.size();
+  }
 };
+}
 
-
-#endif //CSV_READER_ARRAYDATAPROVIDER_H
+#endif //  DATAPROVIDERS_HEADERES_ARRAYDATAPROVIDER_H_

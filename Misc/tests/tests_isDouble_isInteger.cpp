@@ -6,56 +6,56 @@
 #include "Utilities.h"
 
 class isDouble_isInteger_tests : public ::testing::Test {
-protected:
-    std::string validIntegers[12] {
-        "1", "1278623", "193482", "29382",
-        "+1", "+1278623", "+193482", "+29382",
-        "-1", "-1278623", "-193482", "-29382"
-    };
+ protected:
+  std::string validIntegers[12]{
+      "1", "1278623", "193482", "29382",
+      "+1", "+1278623", "+193482", "+29382",
+      "-1", "-1278623", "-193482", "-29382"
+  };
 
-    std::string validDoubles[4] {
-        "0.1334242", ".22343", "23234243.00022932", "2430.23243"
-    };
+  std::string validDoubles[4]{
+      "0.1334242", ".22343", "23234243.00022932", "2430.23243"
+  };
 
-    std::string invalids[6] {
-            "notanumber", "NaN", "112e", "fgfDSD",
-            "", "number",
-    };
+  std::string invalids[6]{
+      "notanumber", "NaN", "112e", "fgfDSD",
+      "", "number",
+  };
 
-public:
-    isDouble_isInteger_tests() = default;
+ public:
+  isDouble_isInteger_tests() = default;
 
-    void SetUp() override {}
+  void SetUp() override {}
 
-    void TearDown() override {}
+  void TearDown() override {}
 
-    ~isDouble_isInteger_tests() override = default;
+  ~isDouble_isInteger_tests() override = default;
 };
 
 TEST_F (isDouble_isInteger_tests, isinteger) {
-    for(const auto &iter : validIntegers) {
-        EXPECT_TRUE(Utilities::isInteger(iter));
-    }
-    for(const auto &iter : validDoubles) {
-        EXPECT_FALSE(Utilities::isInteger(iter));
-    }
-    for(const auto &iter : invalids) {
-        EXPECT_FALSE(Utilities::isInteger(iter));
-    }
+  for (const auto &iter : validIntegers) {
+    EXPECT_TRUE(Utilities::isInteger(iter));
+  }
+  for (const auto &iter : validDoubles) {
+    EXPECT_FALSE(Utilities::isInteger(iter));
+  }
+  for (const auto &iter : invalids) {
+    EXPECT_FALSE(Utilities::isInteger(iter));
+  }
 }
 
 TEST_F (isDouble_isInteger_tests, isdouble) {
-    for(const auto &iter : validIntegers) {
-        EXPECT_TRUE(Utilities::isDouble(iter));
-    }
-    for(const auto &iter : validDoubles) {
-        EXPECT_TRUE(Utilities::isDouble(iter));
-    }
-    for(const auto &iter : invalids) {
-        EXPECT_FALSE(Utilities::isDouble(iter));
-    }
+  for (const auto &iter : validIntegers) {
+    EXPECT_TRUE(Utilities::isDouble(iter));
+  }
+  for (const auto &iter : validDoubles) {
+    EXPECT_TRUE(Utilities::isDouble(iter));
+  }
+  for (const auto &iter : invalids) {
+    EXPECT_FALSE(Utilities::isDouble(iter));
+  }
 }
 
 TEST(copyStringToNewChar, copy_test) {
-    EXPECT_EQ(*Utilities::copyStringToNewChar("a"), *"a");
+  EXPECT_EQ(*Utilities::copyStringToNewChar("a"), *"a");
 }

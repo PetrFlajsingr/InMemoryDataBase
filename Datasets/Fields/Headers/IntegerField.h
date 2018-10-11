@@ -7,28 +7,30 @@
 
 #include <string>
 #include "IField.h"
+#include "Utilities.h"
 
+namespace DataSets {
 class IntegerField : public IField {
  protected:
-    void setValue(void *data) override;
+  void setValue(void *data) override;
 
-    int data;
+  int data;
  public:
 
-    IntegerField(const std::string &fieldName,
-            IDataSet *dataset,
-            uint64_t index);
+  IntegerField(const std::string &fieldName,
+               IDataSet *dataset,
+               uint64_t index);
 
-    ValueType getFieldType() override;
+  ValueType getFieldType() override;
 
-    void setAsString(const std::string &value) override;
+  void setAsString(const std::string &value) override;
 
-    std::string getAsString() override;
+  std::string getAsString() override;
 
-    void setAsInteger(int value);
+  void setAsInteger(int value);
 
-    int getAsInteger();
+  int getAsInteger();
 };
-
+}
 
 #endif //  DATASETS_FIELDS_HEADERS_INTEGERFIELD_H_

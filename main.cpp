@@ -4,7 +4,7 @@
 #include <iomanip>
 #include <sys/time.h>
 #include "IDataSet.h"
-#include "Interfaces/Headers/IField.h"
+#include "IField.h"
 #include "MemoryDataSet.h"
 #include "DataProviders/Headers/CsvReader.h"
 

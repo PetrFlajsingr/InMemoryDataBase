@@ -13,7 +13,7 @@
  */
 class NotImplementedException : public std::logic_error {
  public:
-    NotImplementedException() : logic_error("Function is not implemented"){}
+  NotImplementedException() : logic_error("Function is not implemented") {}
 };
 
 /**
@@ -21,15 +21,15 @@ class NotImplementedException : public std::logic_error {
  */
 class IOException : public std::exception {
  private:
-    const char *errorMessage;
+  const char *errorMessage;
  public:
-    explicit IOException(const char* message) {
-        this->errorMessage = message;
-    }
+  explicit IOException(const char *message) {
+    this->errorMessage = message;
+  }
 
-    char const* what() const noexcept override {
-        return errorMessage;
-    }
+  char const *what() const noexcept override {
+    return errorMessage;
+  }
 };
 
 /**
@@ -37,15 +37,15 @@ class IOException : public std::exception {
  */
 class InvalidArgumentException : public std::exception {
  private:
-    const char *errorMessage;
+  const char *errorMessage;
  public:
-    explicit InvalidArgumentException(const char* message) {
-        this->errorMessage = message;
-    }
+  explicit InvalidArgumentException(const char *message) {
+    this->errorMessage = message;
+  }
 
-    char const* what() const noexcept override {
-        return errorMessage;
-    }
+  char const *what() const noexcept override {
+    return errorMessage;
+  }
 };
 
 /**
@@ -53,15 +53,15 @@ class InvalidArgumentException : public std::exception {
  */
 class IllegalStateException : public std::exception {
  private:
-    const char *errorMessage;
+  const char *errorMessage;
  public:
-    explicit IllegalStateException(const char* message) {
-        this->errorMessage = message;
-    }
+  explicit IllegalStateException(const char *message) {
+    this->errorMessage = message;
+  }
 
-    char const* what() const noexcept override {
-        return errorMessage;
-    }
+  char const *what() const noexcept override {
+    return errorMessage;
+  }
 };
 
 /**
@@ -69,14 +69,14 @@ class IllegalStateException : public std::exception {
  */
 class UnsupportedOperationException : public std::exception {
  private:
-    const char *errorMessage;
+  const char *errorMessage;
  public:
-    explicit UnsupportedOperationException(const char* message) {
-        this->errorMessage = message;
-    }
+  explicit UnsupportedOperationException(const char *message) {
+    this->errorMessage = message;
+  }
 
-    char const* what() const noexcept override {
-        return errorMessage;
-    }
+  char const *what() const noexcept override {
+    return errorMessage;
+  }
 };
 #endif //  MISC_HEADERS_EXCEPTIONS_H_

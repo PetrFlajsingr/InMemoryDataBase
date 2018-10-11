@@ -5,7 +5,6 @@
 #ifndef DATASETS_HEADERS_MEMORYDATASET_H_
 #define DATASETS_HEADERS_MEMORYDATASET_H_
 
-
 #include "IDataSet.h"
 #include "Types.h"
 #include "IField.h"
@@ -20,119 +19,118 @@
 #include <algorithm>
 #include <iostream>
 
-
+namespace DataSets {
 /**
  * Dataset ukladajici data primo v operacni pameti.
  */
 class MemoryDataSet : public IDataSet {
  private:
-    /**
-     * Struktura pro vnitrni reprezentaci dat
-     */
-    union InnerData {
-        char* _string = nullptr;
-        int _integer;
-        double _double;
-    };
+  /**
+   * Struktura pro vnitrni reprezentaci dat
+   */
+  union InnerData {
+    char *_string = nullptr;
+    int _integer;
+    double _double;
+  };
 
-    struct DataContainer {
-        InnerData data;
-    };
-    //\
+  struct DataContainer {
+    InnerData data;
+  };
+  //\
 
-    IDataProvider* dataProvider = nullptr;  //< dodavatel dat
+  IDataProvider *dataProvider = nullptr;  //< dodavatel dat
 
-    bool isOpen = false;
+  bool isOpen = false;
 
-    uint64_t currentRecord = 0;  //< Pocitadlo zaznamu
+  uint64_t currentRecord = 0;  //< Pocitadlo zaznamu
 
-    bool dataValidityChanged = false;
-        //< Nastaveno pri zmene dat naprikald pomoci find
+  bool dataValidityChanged = false;
+  //< Nastaveno pri zmene dat naprikald pomoci find
 
-    std::vector<std::vector<DataContainer*>*> data;  //< Data uvnitr datasetu
-    std::vector<bool> dataValidity;  //< Vyrazeni dat nevyhovujici pozadavkum
+  std::vector<std::vector<DataContainer *> *> data;  //< Data uvnitr datasetu
+  std::vector<bool> dataValidity;  //< Vyrazeni dat nevyhovujici pozadavkum
 
-    /**
-     * Nacteni dat do this->data
-     */
-    void loadData();
+  /**
+   * Nacteni dat do this->data
+   */
+  void loadData();
 
-    /**
-     * Pridani zaznamu do this->data()
-     */
-    void addRecord();
+  /**
+   * Pridani zaznamu do this->data()
+   */
+  void addRecord();
 
-    /**
-     * Vytvoreni Fields se jmeny podle nazvu sloupcu.
-     * @param columns nazvy sloupcu
-     */
-    void createFields(std::vector<std::string> columns,
-            std::vector<ValueType> types);
+  /**
+   * Vytvoreni Fields se jmeny podle nazvu sloupcu.
+   * @param columns nazvy sloupcu
+   */
+  void createFields(std::vector<std::string> columns,
+                    std::vector<ValueType> types);
 
-    /**
-     * Nastaveni hodnot this->fields.
-     *
-     * Vynechava zaznamy s dataValidity == false
-     * @param index Index Field
-     * @param searchForward Smer vyhledavani validniho zaznamu
-     * @return
-     */
-    bool setFieldValues(uint64_t index, bool searchForward);
+  /**
+   * Nastaveni hodnot this->fields.
+   *
+   * Vynechava zaznamy s dataValidity == false
+   * @param index Index Field
+   * @param searchForward Smer vyhledavani validniho zaznamu
+   * @return
+   */
+  bool setFieldValues(uint64_t index, bool searchForward);
 
  protected:
-    void setData(void *data, uint64_t index, ValueType type) override;
+  void setData(void *data, uint64_t index, ValueType type) override;
 
  public:
-    ~MemoryDataSet() override;
+  ~MemoryDataSet() override;
 
-    void open() override;
+  void open() override;
 
-    void setDataProvider(IDataProvider* provider) override;
+  void setDataProvider(IDataProvider *provider) override;
 
-    void close() override;
+  void close() override;
 
-    void first() override;
+  void first() override;
 
-    void last() override;
+  void last() override;
 
-    void next() override;
+  void next() override;
 
-    void previous() override;
+  void previous() override;
 
-    /**
-     * Serazeni hodnot datasetu podle zadanych klicu.
-     * Poradi klicu urcuje jejich prioritu.
-     * @param options
-     */
-    virtual void sort(uint64_t fieldIndex, SortOrder sortOrder);
+  /**
+   * Serazeni hodnot datasetu podle zadanych klicu.
+   * Poradi klicu urcuje jejich prioritu.
+   * @param options
+   */
+  virtual void sort(uint64_t fieldIndex, SortOrder sortOrder);
 
-    /**
-     * Vyhledani zaznamu podle zadanych klicu
-     * @param options
-     */
-    virtual void filter(const FilterOptions &options);
+  /**
+   * Vyhledani zaznamu podle zadanych klicu
+   * @param options
+   */
+  virtual void filter(const FilterOptions &options);
 
-    IField* fieldByName(const std::string& name) override;
+  IField *fieldByName(const std::string &name) override;
 
-    IField* fieldByIndex(uint64_t index) override;
+  IField *fieldByIndex(uint64_t index) override;
 
-    bool eof() override;
+  bool eof() override;
 
-    std::vector<std::string> getFieldNames() override {
-        std::vector<std::string> result;
-        for (const auto &field : fields) {
-            result.push_back(field->getFieldName());
-        }
-
-        return result;
+  std::vector<std::string> getFieldNames() override {
+    std::vector<std::string> result;
+    for (const auto &field : fields) {
+      result.push_back(field->getFieldName());
     }
 
-    void setFieldTypes(std::vector<ValueType> types) override;
+    return result;
+  }
 
-    void append() override;
+  void setFieldTypes(std::vector<ValueType> types) override;
 
-    virtual void appendDataProvider(IDataProvider* provider);
+  void append() override;
+
+  virtual void appendDataProvider(IDataProvider *provider);
 };
-
-
+}
 #endif //  DATASETS_HEADERS_MEMORYDATASET_H_
