@@ -12,7 +12,7 @@
 namespace DataSets {
 class IAsyncMemoryDataSetObserver;
 
-class AsyncMemoryDataSet1 : public MemoryDataSet {
+class Async_MemoryDataSet : public MemoryDataSet {
  protected:
   std::vector<IAsyncMemoryDataSetObserver *> observers;
 
@@ -53,21 +53,21 @@ class AsyncMemoryDataSet1 : public MemoryDataSet {
 
 class IAsyncMemoryDataSetObserver {
  public:
-  virtual void onBeforeOpen(AsyncMemoryDataSet1 *sender) = 0;
+  virtual void onBeforeOpen(Async_MemoryDataSet *sender) = 0;
 
-  virtual void onAfterOpen(AsyncMemoryDataSet1 *sender) = 0;
+  virtual void onAfterOpen(Async_MemoryDataSet *sender) = 0;
 
-  virtual void onBeforeSort(AsyncMemoryDataSet1 *sender) = 0;
+  virtual void onBeforeSort(Async_MemoryDataSet *sender) = 0;
 
-  virtual void onAfterSort(AsyncMemoryDataSet1 *sender) = 0;
+  virtual void onAfterSort(Async_MemoryDataSet *sender) = 0;
 
-  virtual void onBeforeFilter(AsyncMemoryDataSet1 *sender) = 0;
+  virtual void onBeforeFilter(Async_MemoryDataSet *sender) = 0;
 
-  virtual void onAfterFilter(AsyncMemoryDataSet1 *sender) = 0;
+  virtual void onAfterFilter(Async_MemoryDataSet *sender) = 0;
 
-  virtual void onBeforeAppendDataProvider(AsyncMemoryDataSet1 *sender) = 0;
+  virtual void onBeforeAppendDataProvider(Async_MemoryDataSet *sender) = 0;
 
-  virtual void onAfterAppendDataProvider(AsyncMemoryDataSet1 *sender) = 0;
+  virtual void onAfterAppendDataProvider(Async_MemoryDataSet *sender) = 0;
 
   virtual ~IAsyncMemoryDataSetObserver() = default;
 };
