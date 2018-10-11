@@ -27,14 +27,7 @@ private:
     };
 
     struct DataContainer {
-        ValueType valueType = NONE;
         InnerData data;
-
-        ~DataContainer() {
-            if(valueType == STRING_VAL) {
-                delete [] data._string;
-            }
-        }
     };
     //\
 
@@ -46,7 +39,7 @@ private:
 
     bool dataValidityChanged = false; //< Nastaveno pri zmene dat naprikald pomoci find
 
-    std::vector<std::vector<DataContainer*>> data; //< Data uvnitr datasetu
+    std::vector<std::vector<DataContainer*>*> data; //< Data uvnitr datasetu
     std::vector<bool> dataValidity; //< Vyrazeni dat nevyhovujici pozadavkum
 
     /**

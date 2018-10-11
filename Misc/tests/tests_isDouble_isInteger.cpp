@@ -33,6 +33,7 @@ public:
 };
 
 TEST_F (isDouble_isInteger_tests, isinteger) {
+    std::string a = validIntegers[12];
     for(const auto &iter : validIntegers) {
         EXPECT_TRUE(Utilities::isInteger(iter));
     }
