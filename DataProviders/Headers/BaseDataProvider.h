@@ -2,8 +2,8 @@
 // Created by Petr Flajsingr on 24/08/2018.
 //
 
-#ifndef INTERFACES_HEADERS_IDATAPROVIDER_H_
-#define INTERFACES_HEADERS_IDATAPROVIDER_H_
+#ifndef DATAPROVIDERS_HEADERS_BASEDATAPROVIDER_H_
+#define DATAPROVIDERS_HEADERS_BASEDATAPROVIDER_H_
 
 #include <string>
 #include <vector>
@@ -75,5 +75,6 @@ class BaseDataProvider {
 
   virtual ~BaseDataProvider() = default;
 };
-}
-#endif //  INTERFACES_HEADERS_IDATAPROVIDER_H_
+}  // namespace DataProviders
+
+#endif //  DATAPROVIDERS_HEADERS_BASEDATAPROVIDER_H_
