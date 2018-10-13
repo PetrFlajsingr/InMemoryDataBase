@@ -12,4 +12,4 @@ enum ValueType { NONE, INTEGER_VAL, DOUBLE_VAL, STRING_VAL };
 
 enum SortOrder { ASCENDING, DESCENDING };
 
-#endif //  MISC_HEADERS_TYPES_H_
+#endif  // MISC_HEADERS_TYPES_H_

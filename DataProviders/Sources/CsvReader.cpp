@@ -7,7 +7,7 @@
 DataProviders::CsvReader::CsvReader(std::string filePath) {
   this->file.open(filePath);
   if (!this->file.is_open()) {
-    throw IOException("File could not be opened.");
+    throw IOException("File could not be open.");
   }
 
   this->readHeader();

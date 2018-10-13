@@ -5,8 +5,8 @@
 #include "DoubleField.h"
 
 DataSets::DoubleField::DoubleField(const std::string &fieldName,
-                                   IDataSet *dataset,
-                                   uint64_t index) : IField(fieldName,
+                                   BaseDataSet *dataset,
+                                   uint64_t index) : BaseField(fieldName,
                                                             dataset,
                                                             index) {}
 
@@ -16,7 +16,7 @@ ValueType DataSets::DoubleField::getFieldType() {
 
 void DataSets::DoubleField::setAsString(const std::string &value) {
   this->data = Utilities::stringToDouble(value);
-  IField::setDataSetData(&this->data, getFieldType());
+  setDataSetData(&this->data, getFieldType());
 }
 
 std::string DataSets::DoubleField::getAsString() {
@@ -29,7 +29,7 @@ void DataSets::DoubleField::setValue(void *data) {
 
 void DataSets::DoubleField::setAsDouble(double value) {
   this->data = value;
-  IField::setDataSetData(&this->data, getFieldType());
+  setDataSetData(&this->data, getFieldType());
 }
 
 double DataSets::DoubleField::getAsDouble() {

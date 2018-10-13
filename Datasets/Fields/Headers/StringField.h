@@ -5,12 +5,12 @@
 #ifndef DATASETS_FIELDS_HEADERS_STRINGFIELD_H_
 #define DATASETS_FIELDS_HEADERS_STRINGFIELD_H_
 
-#include "IField.h"
+#include "BaseField.h"
 #include "Utilities.h"
 #include <string>
 
 namespace DataSets {
-class StringField : public IField {
+class StringField : public BaseField {
  protected:
   std::string data;
 
@@ -18,7 +18,7 @@ class StringField : public IField {
 
  public:
   StringField(const std::string &fieldName,
-              IDataSet *dataset,
+              BaseDataSet *dataset,
               uint64_t index);
 
   ValueType getFieldType() override;

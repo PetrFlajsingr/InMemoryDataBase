@@ -2,20 +2,20 @@
 // Created by Petr Flajsingr on 27/08/2018.
 //
 
-#ifndef DATASETS_FIELDS_HEADERS_IFIELD_H_
-#define DATASETS_FIELDS_HEADERS_IFIELD_H_
+#ifndef DATASETS_FIELDS_HEADERS_BASEFIELD_H_
+#define DATASETS_FIELDS_HEADERS_BASEFIELD_H_
 
 #include <string>
 #include <utility>
 #include "Types.h"
-#include "IDataSet.h"
+#include "BaseDataSet.h"
 
 namespace DataSets {
-class IDataSet;
+class BaseDataSet;
 /**
  * Interface pro fields datasetu.
  */
-class IField {
+class BaseField {
  protected:
   std::string fieldName;  //< Nazev reprezentovaneho sloupce
 
@@ -27,9 +27,9 @@ class IField {
   }
 
  protected:
-  friend class IDataSet;
+  friend class BaseDataSet;
 
-  IDataSet *dataset;  //< Rodicovsky dataset
+  BaseDataSet *dataSet;  //< Rodicovsky dataset
 
   /**
    * Nastaveni hodnoty field.
@@ -53,13 +53,13 @@ class IField {
    * @param dataset Rodicovsky dataset
    * @param index Index pole v zaznamu
    */
-  explicit IField(std::string fieldName,
-                  IDataSet *dataset,
-                  uint64_t index) : fieldName(std::move(fieldName)),
-                                    dataset(dataset),
+  explicit BaseField(const std::string& fieldName,
+                  BaseDataSet *dataset,
+                  uint64_t index) : fieldName(fieldName),
+                                    dataSet(dataset),
                                     index(index) {}
 
-  virtual ~IField() = default;
+  virtual ~BaseField() = default;
 
   /**
    * Typ dat ulozenych ve Field
@@ -78,7 +78,11 @@ class IField {
    * @return
    */
   virtual std::string getAsString() = 0;
-};
-}
 
-#endif //  DATASETS_FIELDS_HEADERS_IFIELD_H_
+  uint64_t getIndex() {
+      return this->index;
+  }
+};
+}  // namespace DataSets
+
+#endif  // DATASETS_FIELDS_HEADERS_BASEFIELD_H_

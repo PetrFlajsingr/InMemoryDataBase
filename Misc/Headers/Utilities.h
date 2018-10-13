@@ -64,8 +64,14 @@ class Utilities {
    */
   static ValueType getType(const std::string &value);
 
+  /**
+   * Kontrola, jestli string konci jinym stringem
+   * @param value Kontrolovany string
+   * @param ending Hledany konec
+   * @return true pokud value konci ending, jinak false
+   */
   static bool endsWith(std::string const &value, std::string const &ending);
-
+  
   static char *copyStringToNewChar(const std::string &str);
 };
 

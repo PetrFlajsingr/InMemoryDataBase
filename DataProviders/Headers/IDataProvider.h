@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 
+namespace DataProviders {
 /**
  * Jednoduche rozhrani pro cteni a pohyb v zaznamech
  */
@@ -74,5 +75,5 @@ class IDataProvider {
 
   virtual ~IDataProvider() = default;
 };
-
+}
 #endif //  INTERFACES_HEADERS_IDATAPROVIDER_H_

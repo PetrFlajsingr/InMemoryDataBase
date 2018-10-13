@@ -5,8 +5,8 @@
 #include "StringField.h"
 
 DataSets::StringField::StringField(const std::string &fieldName,
-                                   IDataSet *dataset,
-                                   uint64_t index) : IField(fieldName,
+                                   BaseDataSet *dataset,
+                                   uint64_t index) : BaseField(fieldName,
                                                             dataset,
                                                             index) {}
 
@@ -16,7 +16,7 @@ ValueType DataSets::StringField::getFieldType() {
 
 void DataSets::StringField::setAsString(const std::string &value) {
   this->data = value;
-  IField::setDataSetData(Utilities::copyStringToNewChar(value),
+  BaseField::setDataSetData(Utilities::copyStringToNewChar(value),
                          getFieldType());
 }
 

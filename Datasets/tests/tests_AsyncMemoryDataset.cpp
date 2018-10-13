@@ -114,7 +114,7 @@ TEST_F(AsyncMemoryDataset_tests, filter) {
   EXPECT_CALL(observer, onAfterFilter(dataset));
 
   FilterOptions options;
-  options.addOption(0, "A", CONTAINS);
+  options.addOption(0, {"A"}, CONTAINS);
   dataset->filter(options);
 }
 

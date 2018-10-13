@@ -5,9 +5,9 @@
 #ifndef DATASETS_HEADERS_MEMORYDATASET_H_
 #define DATASETS_HEADERS_MEMORYDATASET_H_
 
-#include "IDataSet.h"
+#include "BaseDataSet.h"
 #include "Types.h"
-#include "IField.h"
+#include "BaseField.h"
 #include "FilterStructures.h"
 #include "Exceptions.h"
 #include "IntegerField.h"
@@ -18,12 +18,13 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include <IDataProvider.h>
 
 namespace DataSets {
 /**
  * Dataset ukladajici data primo v operacni pameti.
  */
-class MemoryDataSet : public IDataSet {
+class MemoryDataSet : public BaseDataSet {
  private:
   /**
    * Struktura pro vnitrni reprezentaci dat
@@ -39,7 +40,7 @@ class MemoryDataSet : public IDataSet {
   };
   //\
 
-  IDataProvider *dataProvider = nullptr;  //< dodavatel dat
+  DataProviders::IDataProvider *dataProvider = nullptr;  //< dodavatel dat
 
   bool isOpen = false;
 
@@ -48,8 +49,7 @@ class MemoryDataSet : public IDataSet {
   bool dataValidityChanged = false;
   //< Nastaveno pri zmene dat naprikald pomoci find
 
-  std::vector<std::vector<DataContainer *> *> data;  //< Data uvnitr datasetu
-  std::vector<bool> dataValidity;  //< Vyrazeni dat nevyhovujici pozadavkum
+  std::vector<std::pair<bool, std::vector<DataContainer *>*>> data;  //< Data uvnitr datasetu, bool určuje validitu
 
   /**
    * Nacteni dat do this->data
@@ -86,7 +86,7 @@ class MemoryDataSet : public IDataSet {
 
   void open() override;
 
-  void setDataProvider(IDataProvider *provider) override;
+  void setDataProvider(DataProviders::IDataProvider *provider) override;
 
   void close() override;
 
@@ -111,9 +111,9 @@ class MemoryDataSet : public IDataSet {
    */
   virtual void filter(const FilterOptions &options);
 
-  IField *fieldByName(const std::string &name) override;
+  BaseField *fieldByName(const std::string &name) override;
 
-  IField *fieldByIndex(uint64_t index) override;
+  BaseField *fieldByIndex(uint64_t index) override;
 
   bool eof() override;
 
@@ -128,9 +128,13 @@ class MemoryDataSet : public IDataSet {
 
   void setFieldTypes(std::vector<ValueType> types) override;
 
+  /**
+   * Pridani prazdneho zaznamu na konec data setu.
+   */
   void append() override;
 
-  virtual void appendDataProvider(IDataProvider *provider);
+  virtual void appendDataProvider(DataProviders::IDataProvider *provider);
 };
-}
+}  // namespace DataSets
+
 #endif //  DATASETS_HEADERS_MEMORYDATASET_H_

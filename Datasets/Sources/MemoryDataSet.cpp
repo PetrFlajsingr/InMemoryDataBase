@@ -4,7 +4,7 @@
 
 #include "MemoryDataSet.h"
 
-void DataSets::MemoryDataSet::setDataProvider(IDataProvider *provider) {
+void DataSets::MemoryDataSet::setDataProvider(DataProviders::IDataProvider *provider) {
   this->dataProvider = provider;
 }
 
@@ -27,7 +27,6 @@ void DataSets::MemoryDataSet::open() {
 void DataSets::MemoryDataSet::loadData() {
   while (!this->dataProvider->eof()) {
     this->addRecord();
-    this->dataValidity.push_back(true);
 
     this->dataProvider->next();
   }
@@ -41,7 +40,7 @@ void DataSets::MemoryDataSet::createFields(std::vector<std::string> columns,
   }
   size_t iter = 0;
   for (const auto &col : columns) {
-    IField *newField = nullptr;
+    BaseField *newField = nullptr;
     switch (types[iter]) {
       case INTEGER_VAL: {
         newField = new IntegerField(col, this, iter);
@@ -83,7 +82,7 @@ void DataSets::MemoryDataSet::addRecord() {
     newRecord->push_back(dataContainer);
   }
 
-  this->data.push_back(newRecord);
+  this->data.push_back(std::make_pair(true, newRecord));
 }
 
 void DataSets::MemoryDataSet::close() {
@@ -94,33 +93,33 @@ void DataSets::MemoryDataSet::close() {
   if (!this->data.empty()) {
     for (auto level1 : this->data) {
       size_t iter = 0;
-      for (auto level2 : *level1) {
+      for (auto level2 : *level1.second) {
         if (this->fields[iter])
           delete level2;
         iter++;
       }
-      level1->clear();
-      delete level1;
+      level1.second->clear();
+      delete level1.second;
     }
     this->data.clear();
   }
 }
 
 bool DataSets::MemoryDataSet::setFieldValues(uint64_t index, bool searchForward) {
-  uint64_t iter = index;
+  int64_t iter = index;
   if (dataValidityChanged) {
     bool found = false;
 
     if (searchForward) {
-      for (iter = index; iter < this->dataValidity.size(); iter++) {
-        if (this->dataValidity[iter]) {
+      for (iter = index; iter < this->data.size(); iter++) {
+        if (this->data[iter].first) {
           found = true;
           break;
         }
       }
     } else {
       for (iter = index; iter >= 0; iter--) {
-        if (this->dataValidity[iter]) {
+        if (this->data[iter].first) {
           found = true;
           break;
         }
@@ -137,9 +136,9 @@ bool DataSets::MemoryDataSet::setFieldValues(uint64_t index, bool searchForward)
     this->currentRecord = iter;
   }
 
-  std::vector<DataContainer *> *value = this->data[iter];
+  std::vector<DataContainer *> *value = this->data[iter].second;
 
-  for (int i = 0; i < fields.size(); i++) {
+  for (size_t i = 0; i < fields.size(); i++) {
     switch (fields[i]->getFieldType()) {
       case INTEGER_VAL:this->setFieldData(fields[i], &(*value)[i]->data._integer);
         break;
@@ -187,36 +186,36 @@ void DataSets::MemoryDataSet::sort(uint64_t fieldIndex, SortOrder sortOrder) {
   if (sortOrder == ASCENDING) {
     std::sort(this->data.begin(),
               this->data.end(),
-              [&fieldIndex, this](const std::vector<DataContainer *> *a,
-                                  const std::vector<DataContainer *> *b) {
+              [&fieldIndex, this](const std::pair<bool, std::vector<DataContainer *>*> &a,
+                                  const std::pair<bool, std::vector<DataContainer *>*> &b) {
                 switch (this->fields[fieldIndex]->getFieldType()) {
                   case INTEGER_VAL:
-                    return (*a)[fieldIndex]->data._integer
-                        < (*b)[fieldIndex]->data._integer;
+                    return (*a.second)[fieldIndex]->data._integer
+                        < (*b.second)[fieldIndex]->data._integer;
                   case DOUBLE_VAL:
-                    return (*a)[fieldIndex]->data._double
-                        < (*b)[fieldIndex]->data._double;
+                    return (*a.second)[fieldIndex]->data._double
+                        < (*b.second)[fieldIndex]->data._double;
                   case STRING_VAL:
-                    return std::strcmp((*a)[fieldIndex]->data._string,
-                                       (*b)[fieldIndex]->data._string) < 0;
+                    return std::strcmp((*a.second)[fieldIndex]->data._string,
+                                       (*b.second)[fieldIndex]->data._string) < 0;
                   default:throw IllegalStateException("Internal error.");
                 }
               });
   } else {
     std::sort(this->data.begin(),
               this->data.end(),
-              [&fieldIndex, this](const std::vector<DataContainer *> *a,
-                                  const std::vector<DataContainer *> *b) {
+              [&fieldIndex, this](const std::pair<bool, std::vector<DataContainer *>*> &a,
+                                  const std::pair<bool, std::vector<DataContainer *>*> &b) {
                 switch (this->fields[fieldIndex]->getFieldType()) {
                   case INTEGER_VAL:
-                    return (*a)[fieldIndex]->data._integer
-                        > (*b)[fieldIndex]->data._integer;
+                    return (*a.second)[fieldIndex]->data._integer
+                        > (*b.second)[fieldIndex]->data._integer;
                   case DOUBLE_VAL:
-                    return (*a)[fieldIndex]->data._double
-                        > (*b)[fieldIndex]->data._double;
+                    return (*a.second)[fieldIndex]->data._double
+                        > (*b.second)[fieldIndex]->data._double;
                   case STRING_VAL:
-                    return std::strcmp((*a)[fieldIndex]->data._string,
-                                       (*b)[fieldIndex]->data._string) > 0;
+                    return std::strcmp((*a.second)[fieldIndex]->data._string,
+                                       (*b.second)[fieldIndex]->data._string) > 0;
                   default:throw IllegalStateException("Internal error.");
                 }
               });
@@ -228,8 +227,9 @@ void DataSets::MemoryDataSet::sort(uint64_t fieldIndex, SortOrder sortOrder) {
 void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
   if (options.options.empty()) {
     dataValidityChanged = false;
-    for (auto &&iter : this->dataValidity) {
-      iter = true;
+
+    for(size_t iter = 0; iter < this->data.size(); ++iter) {
+        this->data[iter].first = true;
     }
 
     this->first();
@@ -240,7 +240,7 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
   dataValidityChanged = true;
   size_t optionCounter;
 
-  int i = 0;
+  size_t i = 0;
   std::string toCompare;
   for (auto iter : this->data) {
     bool valid = true;
@@ -250,59 +250,66 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
       if (!valid) {
         break;
       }
+
       switch (this->fields[filter.fieldIndex]->getFieldType()) {
         case INTEGER_VAL:
           toCompare = std::to_string(
-              (*iter)[filter.fieldIndex]->data._integer);
+              (*iter.second)[filter.fieldIndex]->data._integer);
           break;
         case DOUBLE_VAL:
           toCompare = std::to_string(
-              (*iter)[filter.fieldIndex]->data._double);
+              (*iter.second)[filter.fieldIndex]->data._double);
           break;
-        case STRING_VAL:toCompare = (*iter)[filter.fieldIndex]->data._string;
+        case STRING_VAL:toCompare = (*iter.second)[filter.fieldIndex]->data._string;
           break;
         default:throw IllegalStateException("Internal error.");
       }
-      switch (filter.filterOption) {
-        case EQUALS:valid = toCompare == filter.searchString;
-          break;
-        case STARTS_WITH:
-          valid = std::strncmp(toCompare.c_str(),
-                               filter.searchString.c_str(),
-                               filter.searchString.size()) == 0;
-          break;
-        case CONTAINS:
-          valid = toCompare.find(filter.searchString)
-              != std::string::npos;
-          break;
-        case ENDS_WITH:valid = Utilities::endsWith(toCompare, filter.searchString);
-          break;
-        case NOT_CONTAINS:
-          valid = toCompare.find(filter.searchString)
-              == std::string::npos;
-          break;
-        case NOT_STARTS_WITH:
-          valid = std::strncmp(toCompare.c_str(),
-                               filter.searchString.c_str(),
-                               filter.searchString.size()) != 0;
-          break;
-        case NOT_ENDS_WITH:
-          valid = !Utilities::endsWith(toCompare,
-                                       filter.searchString);
-          break;
+
+      for(auto searchString : filter.searchString) {
+          switch (filter.filterOption) {
+            case EQUALS:valid = toCompare == searchString;
+              break;
+            case STARTS_WITH:
+              valid = std::strncmp(toCompare.c_str(),
+                                   searchString.c_str(),
+                                   searchString.size()) == 0;
+              break;
+            case CONTAINS:
+              valid = toCompare.find(searchString)
+                  != std::string::npos;
+              break;
+            case ENDS_WITH:valid = Utilities::endsWith(toCompare, searchString);
+              break;
+            case NOT_CONTAINS:
+              valid = toCompare.find(searchString)
+                  == std::string::npos;
+              break;
+            case NOT_STARTS_WITH:
+              valid = std::strncmp(toCompare.c_str(),
+                                   searchString.c_str(),
+                                   searchString.size()) != 0;
+              break;
+            case NOT_ENDS_WITH:
+              valid = !Utilities::endsWith(toCompare,
+                                           searchString);
+              break;
+          }
+          if(valid) {
+              break;
+          }
       }
 
       optionCounter++;
     }
 
-    this->dataValidity[i] = valid;
+    this->data[i].first = valid;
     i++;
   }
 
   this->first();
 }
 
-DataSets::IField *DataSets::MemoryDataSet::fieldByName(const std::string &name) {
+DataSets::BaseField *DataSets::MemoryDataSet::fieldByName(const std::string &name) {
   for (auto &field : fields) {
     if (field->getFieldName() == name) {
       return field;
@@ -312,7 +319,7 @@ DataSets::IField *DataSets::MemoryDataSet::fieldByName(const std::string &name) 
   throw InvalidArgumentException(("There's no field named: " + name).c_str());
 }
 
-DataSets::IField *DataSets::MemoryDataSet::fieldByIndex(uint64_t index) {
+DataSets::BaseField *DataSets::MemoryDataSet::fieldByIndex(uint64_t index) {
   return fields.at(index);
 }
 
@@ -332,16 +339,16 @@ void DataSets::MemoryDataSet::setFieldTypes(std::vector<ValueType> types) {
 void DataSets::MemoryDataSet::setData(void *data, uint64_t index, ValueType type) {
   switch (type) {
     case INTEGER_VAL:
-      (*this->data[currentRecord])[index]->data._integer
+      (*this->data[currentRecord].second)[index]->data._integer
           = *reinterpret_cast<int *>(data);
       break;
     case DOUBLE_VAL:
-      (*this->data[currentRecord])[index]->data._double
+      (*this->data[currentRecord].second)[index]->data._double
           = *reinterpret_cast<int *>(data);
       break;
-    case STRING_VAL:delete[] (*this->data[currentRecord])[index]->data._string;
+    case STRING_VAL:delete[] (*this->data[currentRecord].second)[index]->data._string;
 
-      (*this->data[currentRecord])[index]->data._string
+      (*this->data[currentRecord].second)[index]->data._string
           = reinterpret_cast<char *>(data);
       break;
     default:throw IllegalStateException("Invalid value type.");
@@ -351,7 +358,7 @@ void DataSets::MemoryDataSet::setData(void *data, uint64_t index, ValueType type
 
 void DataSets::MemoryDataSet::append() {
   auto newRecord = new std::vector<DataContainer *>();
-  for (int i = 0; i < this->getFieldNames().size(); ++i) {
+  for (size_t i = 0; i < this->getFieldNames().size(); ++i) {
     auto dataContainer = new DataContainer();
     switch (fields[i]->getFieldType()) {
       case INTEGER_VAL:dataContainer->data._integer = 0;
@@ -364,11 +371,11 @@ void DataSets::MemoryDataSet::append() {
     }
     newRecord->push_back(dataContainer);
   }
-  this->data.push_back(newRecord);
+  this->data.push_back(std::make_pair(true, newRecord));
   this->last();
 }
 
-void DataSets::MemoryDataSet::appendDataProvider(IDataProvider *provider) {
+void DataSets::MemoryDataSet::appendDataProvider(DataProviders::IDataProvider *provider) {
   if (!isOpen) {
     throw IllegalStateException("Dataset is not open.");
   }

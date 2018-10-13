@@ -7,7 +7,7 @@
 #include "Utilities.h"
 
 std::vector<std::string> Utilities::splitStringByDelimiter(std::string str,
-                                                           std::string delimiter) {
+    std::string delimiter) {
   if (delimiter.empty()) {
     throw InvalidArgumentException("Delimiter can't be empty.");
   }
@@ -28,18 +28,18 @@ std::vector<std::string> Utilities::splitStringByDelimiter(std::string str,
 }
 
 int Utilities::stringToInt(const std::string &str) {
-  std::stringstream stringstream(str);
+  std::stringstream stringStream(str);
   int result;
 
-  stringstream >> result;
+  stringStream >> result;
   return result;
 }
 
 double Utilities::stringToDouble(const std::string &str) {
-  std::stringstream stringstream(str);
+  std::stringstream stringStream(str);
   double result;
 
-  stringstream >> result;
+  stringStream >> result;
   return result;
 }
 

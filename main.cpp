@@ -3,8 +3,8 @@
 #include <iostream>
 #include <iomanip>
 #include <sys/time.h>
-#include "IDataSet.h"
-#include "IField.h"
+#include "BaseDataSet.h"
+#include "BaseField.h"
 #include "MemoryDataSet.h"
 #include "DataProviders/Headers/CsvReader.h"
 

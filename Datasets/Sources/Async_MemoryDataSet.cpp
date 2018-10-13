@@ -99,7 +99,7 @@ void DataSets::Async_MemoryDataSet::innerSort(uint64_t fieldIndex,
   notify(AFTER_SORT);
 }
 
-void DataSets::Async_MemoryDataSet::appendDataProvider(IDataProvider *provider) {
+void DataSets::Async_MemoryDataSet::appendDataProvider(DataProviders::IDataProvider *provider) {
   notify(BEFORE_APPEND);
   auto handle = std::async(std::launch::async,
                            &Async_MemoryDataSet::innerAppendDataProvider,
@@ -107,7 +107,7 @@ void DataSets::Async_MemoryDataSet::appendDataProvider(IDataProvider *provider) 
                            provider);
 }
 
-void DataSets::Async_MemoryDataSet::innerAppendDataProvider(IDataProvider *provider) {
+void DataSets::Async_MemoryDataSet::innerAppendDataProvider(DataProviders::IDataProvider *provider) {
   MemoryDataSet::appendDataProvider(provider);
   notify(AFTER_APPEND);
 }

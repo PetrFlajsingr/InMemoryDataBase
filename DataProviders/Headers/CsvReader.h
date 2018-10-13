@@ -13,7 +13,6 @@
 #include "Exceptions.h"
 
 namespace DataProviders {
-// TODO(petr): rozšířit o nastavení delimiteru
 /**
  * Trida implementujici metody IReader.
  * Slouzi ke cteni CSV formatu sekvencne ze souboru.
@@ -102,6 +101,6 @@ class CsvReader : public IDataProvider {
 
   bool eof() override;
 };
-}
+}  // namespace DataProviders
 
 #endif  // DATAPROVIDERS_HEADERS_CSVREADER_H_

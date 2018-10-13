@@ -5,19 +5,22 @@
 #ifndef DATASETS_FIELDS_HEADERS_DOUBLEFIELD_H_
 #define DATASETS_FIELDS_HEADERS_DOUBLEFIELD_H_
 
-#include "IField.h"
+#include "BaseField.h"
 #include "Utilities.h"
 #include <string>
 
 namespace DataSets {
-class DoubleField : public IField {
+/**
+ * Field umoznujici pristup k datum typu Double.
+ */
+class DoubleField : public BaseField {
  protected:
   void setValue(void *data) override;
 
   double data;
  public:
   DoubleField(const std::string &fieldName,
-              IDataSet *dataset,
+              BaseDataSet *dataset,
               uint64_t index);
 
   ValueType getFieldType() override;

@@ -33,19 +33,19 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=undefined -g ")
 set(CMAKE_CXX_STANDARD 17)
 
 set(SOURCE_FILES DataProviders/Sources/CsvReader.cpp DataProviders/Headers/CsvReader.h DataProviders/Headers/IDataProvider.h Misc/Headers/Exceptions.h
-        Misc/Sources/Utilities.cpp Misc/Headers/Utilities.h Datasets/Headers/IDataSet.h Datasets/Sources/MemoryDataSet.cpp Datasets/Headers/MemoryDataSet.h
-        Misc/Headers/Types.h Datasets/Fields/Headers/IField.h Datasets/Fields/Sources/StringField.cpp Datasets/Fields/Headers/StringField.h
+        Misc/Sources/Utilities.cpp Misc/Headers/Utilities.h Datasets/Headers/BaseDataSet.h Datasets/Sources/MemoryDataSet.cpp Datasets/Headers/MemoryDataSet.h
+        Misc/Headers/Types.h Datasets/Fields/Headers/BaseField.h Datasets/Fields/Sources/StringField.cpp Datasets/Fields/Headers/StringField.h
         Datasets/Fields/Sources/IntegerField.cpp Datasets/Fields/Headers/IntegerField.h Datasets/Fields/Sources/DoubleField.cpp
-        Datasets/Fields/Headers/DoubleField.h DataProviders/Sources/IDataSet.cpp
-        Datasets/Fields/Sources/IField.cpp Datasets/Headers/FilterStructures.h Misc/tests/tests_splitStringByDelimiter.cpp
+        Datasets/Fields/Headers/DoubleField.h Datasets/Sources/BaseDataSet.cpp
+        Datasets/Fields/Sources/BaseField.cpp Datasets/Headers/FilterStructures.h Misc/tests/tests_splitStringByDelimiter.cpp
         Datasets/Sources/Async_MemoryDataSet.cpp Datasets/Headers/Async_MemoryDataSet.h)
 
 set(TEST_SOURCE_FILES DataProviders/Sources/CsvReader.cpp DataProviders/Headers/CsvReader.h DataProviders/Headers/IDataProvider.h
-        Misc/Headers/Exceptions.h Misc/Sources/Utilities.cpp Misc/Headers/Utilities.h Datasets/Headers/IDataSet.h Datasets/Sources/MemoryDataSet.cpp
-        Datasets/Headers/MemoryDataSet.h Misc/Headers/Types.h Datasets/Fields/Headers/IField.h Datasets/Fields/Sources/StringField.cpp
+        Misc/Headers/Exceptions.h Misc/Sources/Utilities.cpp Misc/Headers/Utilities.h Datasets/Headers/BaseDataSet.h Datasets/Sources/MemoryDataSet.cpp
+        Datasets/Headers/MemoryDataSet.h Misc/Headers/Types.h Datasets/Fields/Headers/BaseField.h Datasets/Fields/Sources/StringField.cpp
         Datasets/Fields/Headers/StringField.h Datasets/Fields/Sources/IntegerField.cpp Datasets/Fields/Headers/IntegerField.h
-        Datasets/Fields/Sources/DoubleField.cpp Datasets/Fields/Headers/DoubleField.h DataProviders/Sources/IDataSet.cpp
-        Datasets/Fields/Sources/IField.cpp Datasets/Headers/FilterStructures.h Misc/tests/tests_isDouble_isInteger.cpp
+        Datasets/Fields/Sources/DoubleField.cpp Datasets/Fields/Headers/DoubleField.h Datasets/Sources/BaseDataSet.cpp
+        Datasets/Fields/Sources/BaseField.cpp Datasets/Headers/FilterStructures.h Misc/tests/tests_isDouble_isInteger.cpp
         Misc/tests/tests_stringToInt_Double.cpp DataProviders/tests/tests_CsvReader.cpp Datasets/tests/tests_MemoryDataset.cpp
         DataProviders/Headers/ArrayDataProvider.h
         Datasets/Sources/Async_MemoryDataSet.cpp Datasets/Headers/Async_MemoryDataSet.h Datasets/tests/tests_AsyncMemoryDataset.cpp)

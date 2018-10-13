@@ -2,8 +2,8 @@
 // Created by Petr Flajsingr on 02/09/2018.
 //
 
-#ifndef DATASETS_HEADERS_ASYNCMEMORYDATASET_H_
-#define DATASETS_HEADERS_ASYNCMEMORYDATASET_H_
+#ifndef DATASETS_HEADERS_ASYNC_MEMORYDATASET_H_
+#define DATASETS_HEADERS_ASYNC_MEMORYDATASET_H_
 
 #include "MemoryDataSet.h"
 #include <vector>
@@ -12,6 +12,12 @@
 namespace DataSets {
 class IAsyncMemoryDataSetObserver;
 
+/**
+ * Modifikace data setu v pameti, pracuje asynchrone.
+ * Vyvolava udalosti pred/po dokonceni nejake operace.
+ *
+ * Udalosti jsou vyvolany ve stejnem vlakne, ve kterem pracuje tento data set.
+ */
 class Async_MemoryDataSet : public MemoryDataSet {
  protected:
   std::vector<IAsyncMemoryDataSetObserver *> observers;
@@ -33,7 +39,7 @@ class Async_MemoryDataSet : public MemoryDataSet {
 
   void innerSort(uint64_t fieldIndex, SortOrder sortOrder);
 
-  void innerAppendDataProvider(IDataProvider *provider);
+  void innerAppendDataProvider(DataProviders::IDataProvider *provider);
 
   void notify(EventType type);
 
@@ -44,7 +50,7 @@ class Async_MemoryDataSet : public MemoryDataSet {
 
   void sort(uint64_t fieldIndex, SortOrder sortOrder) override;
 
-  void appendDataProvider(IDataProvider *provider) override;
+  void appendDataProvider(DataProviders::IDataProvider *provider) override;
 
   void addObserver(IAsyncMemoryDataSetObserver *observer);
 
@@ -71,6 +77,6 @@ class IAsyncMemoryDataSetObserver {
 
   virtual ~IAsyncMemoryDataSetObserver() = default;
 };
-}
+}  // namespace DataSets
 
-#endif //  DATASETS_HEADERS_ASYNCMEMORYDATASET_H_
+#endif  // DATASETS_HEADERS_ASYNC_MEMORYDATASET_H_

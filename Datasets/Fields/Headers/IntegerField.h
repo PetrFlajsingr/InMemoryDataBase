@@ -6,11 +6,11 @@
 #define DATASETS_FIELDS_HEADERS_INTEGERFIELD_H_
 
 #include <string>
-#include "IField.h"
+#include "BaseField.h"
 #include "Utilities.h"
 
 namespace DataSets {
-class IntegerField : public IField {
+class IntegerField : public BaseField {
  protected:
   void setValue(void *data) override;
 
@@ -18,7 +18,7 @@ class IntegerField : public IField {
  public:
 
   IntegerField(const std::string &fieldName,
-               IDataSet *dataset,
+               BaseDataSet *dataset,
                uint64_t index);
 
   ValueType getFieldType() override;

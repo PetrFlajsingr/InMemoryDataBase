@@ -5,8 +5,8 @@
 #include "IntegerField.h"
 
 DataSets::IntegerField::IntegerField(const std::string &fieldName,
-                                     IDataSet *dataset,
-                                     uint64_t index) : IField(fieldName,
+                                     BaseDataSet *dataset,
+                                     uint64_t index) : BaseField(fieldName,
                                                               dataset,
                                                               index) {}
 
@@ -16,7 +16,7 @@ ValueType DataSets::IntegerField::getFieldType() {
 
 void DataSets::IntegerField::setAsString(const std::string &value) {
   this->data = Utilities::stringToInt(value);
-  IField::setDataSetData(&this->data, getFieldType());
+  BaseField::setDataSetData(&this->data, getFieldType());
 }
 
 std::string DataSets::IntegerField::getAsString() {
@@ -29,7 +29,7 @@ void DataSets::IntegerField::setValue(void *data) {
 
 void DataSets::IntegerField::setAsInteger(int value) {
   this->data = value;
-  IField::setDataSetData(&this->data, getFieldType());
+  BaseField::setDataSetData(&this->data, getFieldType());
 }
 
 int DataSets::IntegerField::getAsInteger() {

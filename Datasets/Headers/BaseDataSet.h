@@ -2,8 +2,8 @@
 // Created by Petr Flajsingr on 25/08/2018.
 //
 
-#ifndef DATASETS_HEADERS_IDATASET_H_
-#define DATASETS_HEADERS_IDATASET_H_
+#ifndef DATASETS_HEADERS_BASEDATASET_H_
+#define DATASETS_HEADERS_BASEDATASET_H_
 
 #include <string>
 #include <vector>
@@ -12,15 +12,15 @@
 #include "Types.h"
 
 namespace DataSets {
-class IField;
+class BaseField;
 /**
  * Rozhrani pro objekt dodavajici data.
  */
-class IDataSet {
+class BaseDataSet {
  protected:
-  friend class IField;  //< kvuli pristupu k IField::setData(...)
+  friend class BaseField;  //< kvuli pristupu k BaseField::setData(...)
 
-  std::vector<IField *> fields;  //< Pole umoznujici pristup k datum
+  std::vector<BaseField *> fields;  //< Pole umoznujici pristup k datum
 
   /**
    * Nastaveni dat pole.
@@ -29,7 +29,7 @@ class IDataSet {
    * @param field Field, kteremu budou nastavena data
    * @param data Data pro zapis
    */
-  void setFieldData(IField *field, void *data);
+  void setFieldData(BaseField *field, void *data);
 
   /**
    * Nastaveni dat uvnitr datasetu.
@@ -51,7 +51,7 @@ class IDataSet {
    * Nastaveni IDataProvider dodavajici data
    * @param provider
    */
-  virtual void setDataProvider(IDataProvider *provider) = 0;
+  virtual void setDataProvider(DataProviders::IDataProvider *provider) = 0;
 
   /**
    * Uzavreni datasetu a znepristupneni jeho dat
@@ -89,14 +89,14 @@ class IDataSet {
    * @param name Nazev sloupce/Field
    * @return
    */
-  virtual IField *fieldByName(const std::string &name) = 0;
+  virtual BaseField *fieldByName(const std::string &name) = 0;
 
   /**
    * Field podle jeho indexu v zaznamu
    * @param index
    * @return
    */
-  virtual IField *fieldByIndex(uint64_t index) = 0;
+  virtual BaseField *fieldByIndex(uint64_t index) = 0;
 
   /**
    * Nastaveni typu Fields.
@@ -119,8 +119,8 @@ class IDataSet {
   /**
    * Smazani vsech alokovanych Fields
    */
-  virtual ~IDataSet();
+  virtual ~BaseDataSet();
 };
-}
+}  // namespace DataSets
 
-#endif //  DATASETS_HEADERS_IDATASET_H_
+#endif //  DATASETS_HEADERS_BASEDATASET_H_

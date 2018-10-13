@@ -75,7 +75,7 @@ TEST_F(MemoryDataset_tests, columns) {
 }
 
 TEST_F (MemoryDataset_tests, fields) {
-  std::vector<IField *> fieldVector{};
+  std::vector<BaseField *> fieldVector{};
 
   unsigned int i = 0;
   for (auto iter : columnNamesSmall) {
@@ -106,7 +106,7 @@ TEST_F(MemoryDataset_tests, read) {
 TEST_F(MemoryDataset_tests, move_in_dataset) {
   ASSERT_NO_THROW(dataset->open());
 
-  std::vector<IField *> fields;
+  std::vector<BaseField *> fields;
   for (int i = 0; i < dataset->getFieldNames().size(); ++i) {
     fields.push_back(dataset->fieldByIndex(i));
   }
@@ -167,7 +167,7 @@ TEST_F(MemoryDataset_tests, filter_equals) {
 
   FilterOptions options;
   for (int i = 0; i < test[0].size(); ++i) {
-    options.addOption(i, "COLUMN" + std::to_string(i), EQUALS);
+    options.addOption(i, {"COLUMN" + std::to_string(i)}, EQUALS);
     dataset->filter(options);
 
     EXPECT_TRUE(dataset->eof());
@@ -176,7 +176,7 @@ TEST_F(MemoryDataset_tests, filter_equals) {
   }
   for (int i = 0; i < test.size(); ++i) {
     for (int j = 0; j < test[i].size(); ++j) {
-      options.addOption(j, "COLUMN" + std::to_string(i + 1) + std::to_string(j + 1), EQUALS);
+      options.addOption(j, {"COLUMN" + std::to_string(i + 1) + std::to_string(j + 1)}, EQUALS);
       dataset->filter(options);
 
       ASSERT_FALSE(dataset->eof());
@@ -193,7 +193,7 @@ TEST_F(MemoryDataset_tests, filter_starts_with) {
 
   FilterOptions options;
   for (int i = 0; i < test[0].size(); ++i) {
-    options.addOption(i, "COL", STARTS_WITH);
+    options.addOption(i, {"COL"}, STARTS_WITH);
     dataset->filter(options);
 
     ASSERT_FALSE(dataset->eof());
@@ -211,7 +211,7 @@ TEST_F(MemoryDataset_tests, filter_ends_with) {
 
   FilterOptions options;
   for (int i = 0; i < test[0].size(); ++i) {
-    options.addOption(i, "1", ENDS_WITH);
+    options.addOption(i, {"1"}, ENDS_WITH);
     dataset->filter(options);
 
     options.options.clear();
@@ -234,7 +234,7 @@ TEST_F(MemoryDataset_tests, sort) {
 
   //
   dataset->sort(0, DESCENDING);
-  IField *col1 = dataset->fieldByIndex(0);
+  BaseField *col1 = dataset->fieldByIndex(0);
 
   std::string previous = col1->getAsString();
 
@@ -248,7 +248,7 @@ TEST_F(MemoryDataset_tests, sort) {
   //\
     //
   dataset->sort(3, ASCENDING);
-  IField *col3 = dataset->fieldByIndex(3);
+  BaseField *col3 = dataset->fieldByIndex(3);
 
   previous = col3->getAsString();
 

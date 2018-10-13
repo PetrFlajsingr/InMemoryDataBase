@@ -79,4 +79,4 @@ class UnsupportedOperationException : public std::exception {
     return errorMessage;
   }
 };
-#endif //  MISC_HEADERS_EXCEPTIONS_H_
+#endif  //  MISC_HEADERS_EXCEPTIONS_H_
