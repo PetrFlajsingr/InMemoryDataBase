@@ -245,14 +245,13 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
   }
 
   dataValidityChanged = true;
-  size_t optionCounter;
 
   size_t i = 0;
   std::string toCompare;
   for (auto iter : this->data) {
     bool valid = true;
 
-    optionCounter = 0;
+    size_t optionCounter = 0;
     for (auto filter : options.options) {
       if (!valid) {
         break;
