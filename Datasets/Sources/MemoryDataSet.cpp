@@ -343,7 +343,9 @@ void DataSets::MemoryDataSet::setFieldTypes(std::vector<ValueType> types) {
   createFields(this->dataProvider->getColumnNames(), types);
 }
 
-void DataSets::MemoryDataSet::setData(void *data, uint64_t index, ValueType type) {
+void DataSets::MemoryDataSet::setData(void *data,
+    uint64_t index,
+    ValueType type) {
   switch (type) {
     case INTEGER_VAL:
       (*this->data[currentRecord]->cells)[index]->_integer
