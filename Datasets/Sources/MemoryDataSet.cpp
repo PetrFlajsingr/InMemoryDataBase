@@ -137,7 +137,7 @@ bool DataSets::MemoryDataSet::setFieldValues(uint64_t index,
       }
       return false;
     }
-    this->currentRecord = iter;
+    this->currentRecord = static_cast<uint64_t>(iter);
   }
 
   DataSetRowCells *value = this->data[iter]->cells;
@@ -301,7 +301,7 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
                                            searchString);
               break;
           }
-          if(valid) {
+          if (valid) {
               break;
           }
       }
