@@ -21,6 +21,27 @@
 #include <BaseDataProvider.h>
 
 namespace DataSets {
+
+/**
+ * Union ukladajici data v pameti.
+ */
+union DataContainer {
+  char *_string = nullptr;
+  int _integer;
+  double _double;
+};
+
+typedef std::vector<DataContainer*> DataSetRowCells;
+
+/**
+ * Struktura pro jeden zaznam v data setu.
+ */
+struct DataSetRow {
+  bool valid;
+  DataSetRowCells* cells;
+};
+
+typedef std::vector<DataSetRow*> DataSetData;
 /**
  * Dataset ukladajici data primo v operacni pameti.
  */
@@ -29,15 +50,8 @@ class MemoryDataSet : public BaseDataSet {
   /**
    * Struktura pro vnitrni reprezentaci dat
    */
-  union InnerData {
-    char *_string = nullptr;
-    int _integer;
-    double _double;
-  };
 
-  struct DataContainer {
-    InnerData data;
-  };
+
   //\
 
   DataProviders::BaseDataProvider *dataProvider = nullptr;  //< dodavatel dat
@@ -49,7 +63,7 @@ class MemoryDataSet : public BaseDataSet {
   bool dataValidityChanged = false;
   //< Nastaveno pri zmene dat naprikald pomoci find
 
-  std::vector<std::pair<bool, std::vector<DataContainer *>*>> data;  //< Data uvnitr datasetu, bool určuje validitu
+  DataSetData data;
 
   /**
    * Nacteni dat do this->data
