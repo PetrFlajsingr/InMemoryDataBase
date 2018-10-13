@@ -8,7 +8,7 @@
 #include <utility>
 #include <vector>
 #include <string>
-#include "IDataProvider.h"
+#include "BaseDataProvider.h"
 
 namespace DataProviders {
 /**
@@ -16,7 +16,7 @@ namespace DataProviders {
  *
  * Podporuje jen dvojity vector, slouzi k testovani.
  */
-class ArrayDataProvider : public IDataProvider {
+class ArrayDataProvider : public BaseDataProvider {
  private:
   std::vector<std::vector<std::string>> data;
 

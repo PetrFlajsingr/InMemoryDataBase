@@ -15,7 +15,7 @@ class MemoryDataset_tests : public ::testing::Test {
 
   MemoryDataSet *dataset{};
 
-  IDataProvider *dataProvider{};
+  BaseDataProvider *dataProvider{};
 
   std::string columnNamesSmall[columnCount]{
       "0", "1", "2", "3", "4"
@@ -294,7 +294,7 @@ TEST_F(MemoryDataset_tests, append) {
 TEST_F(MemoryDataset_tests, append_provider) {
   ASSERT_NO_THROW(dataset->open());
 
-  IDataProvider *provider = new ArrayDataProvider(test);
+  BaseDataProvider *provider = new ArrayDataProvider(test);
 
   ASSERT_NO_THROW(dataset->appendDataProvider(provider));
 

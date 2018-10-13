@@ -43,7 +43,7 @@ class AsyncMemoryDataset_tests : public ::testing::Test {
 
   Async_MemoryDataSet *dataset{};
 
-  IDataProvider *dataProvider{};
+  BaseDataProvider *dataProvider{};
 
   std::string columnNamesSmall[columnCount]{
       "0", "1", "2", "3", "4"

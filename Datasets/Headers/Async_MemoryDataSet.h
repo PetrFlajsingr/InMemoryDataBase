@@ -39,7 +39,7 @@ class Async_MemoryDataSet : public MemoryDataSet {
 
   void innerSort(uint64_t fieldIndex, SortOrder sortOrder);
 
-  void innerAppendDataProvider(DataProviders::IDataProvider *provider);
+  void innerAppendDataProvider(DataProviders::BaseDataProvider *provider);
 
   void notify(EventType type);
 
@@ -50,7 +50,7 @@ class Async_MemoryDataSet : public MemoryDataSet {
 
   void sort(uint64_t fieldIndex, SortOrder sortOrder) override;
 
-  void appendDataProvider(DataProviders::IDataProvider *provider) override;
+  void appendDataProvider(DataProviders::BaseDataProvider *provider) override;
 
   void addObserver(IAsyncMemoryDataSetObserver *observer);
 

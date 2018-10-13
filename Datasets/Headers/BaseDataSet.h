@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 #include <cstring>
-#include "IDataProvider.h"
+#include "BaseDataProvider.h"
 #include "Types.h"
 
 namespace DataSets {
@@ -51,7 +51,7 @@ class BaseDataSet {
    * Nastaveni IDataProvider dodavajici data
    * @param provider
    */
-  virtual void setDataProvider(DataProviders::IDataProvider *provider) = 0;
+  virtual void setDataProvider(DataProviders::BaseDataProvider *provider) = 0;
 
   /**
    * Uzavreni datasetu a znepristupneni jeho dat

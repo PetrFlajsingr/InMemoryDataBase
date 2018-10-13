@@ -18,7 +18,7 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
-#include <IDataProvider.h>
+#include <BaseDataProvider.h>
 
 namespace DataSets {
 /**
@@ -40,7 +40,7 @@ class MemoryDataSet : public BaseDataSet {
   };
   //\
 
-  DataProviders::IDataProvider *dataProvider = nullptr;  //< dodavatel dat
+  DataProviders::BaseDataProvider *dataProvider = nullptr;  //< dodavatel dat
 
   bool isOpen = false;
 
@@ -86,7 +86,7 @@ class MemoryDataSet : public BaseDataSet {
 
   void open() override;
 
-  void setDataProvider(DataProviders::IDataProvider *provider) override;
+  void setDataProvider(DataProviders::BaseDataProvider *provider) override;
 
   void close() override;
 
@@ -133,7 +133,7 @@ class MemoryDataSet : public BaseDataSet {
    */
   void append() override;
 
-  virtual void appendDataProvider(DataProviders::IDataProvider *provider);
+  virtual void appendDataProvider(DataProviders::BaseDataProvider *provider);
 };
 }  // namespace DataSets
 

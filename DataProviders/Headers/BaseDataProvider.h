@@ -12,7 +12,7 @@ namespace DataProviders {
 /**
  * Jednoduche rozhrani pro cteni a pohyb v zaznamech
  */
-class IDataProvider {
+class BaseDataProvider {
  public:
   /**
    * Zaznam rozdeleny na sloupce
@@ -73,7 +73,7 @@ class IDataProvider {
    */
   inline virtual bool eof() = 0;
 
-  virtual ~IDataProvider() = default;
+  virtual ~BaseDataProvider() = default;
 };
 }
 #endif //  INTERFACES_HEADERS_IDATAPROVIDER_H_

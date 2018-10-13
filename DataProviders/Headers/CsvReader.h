@@ -9,7 +9,7 @@
 #include <vector>
 #include <string>
 #include "Utilities.h"
-#include "IDataProvider.h"
+#include "BaseDataProvider.h"
 #include "Exceptions.h"
 
 namespace DataProviders {
@@ -17,7 +17,7 @@ namespace DataProviders {
  * Trida implementujici metody IReader.
  * Slouzi ke cteni CSV formatu sekvencne ze souboru.
  */
-class CsvReader : public IDataProvider {
+class CsvReader : public BaseDataProvider {
  private:
   const uint32_t BUFFER_SIZE = 1024;  //< velikost bufferu pro cteni radku
 

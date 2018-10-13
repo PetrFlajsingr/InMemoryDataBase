@@ -4,7 +4,7 @@
 
 #include "MemoryDataSet.h"
 
-void DataSets::MemoryDataSet::setDataProvider(DataProviders::IDataProvider *provider) {
+void DataSets::MemoryDataSet::setDataProvider(DataProviders::BaseDataProvider *provider) {
   this->dataProvider = provider;
 }
 
@@ -375,7 +375,7 @@ void DataSets::MemoryDataSet::append() {
   this->last();
 }
 
-void DataSets::MemoryDataSet::appendDataProvider(DataProviders::IDataProvider *provider) {
+void DataSets::MemoryDataSet::appendDataProvider(DataProviders::BaseDataProvider *provider) {
   if (!isOpen) {
     throw IllegalStateException("Dataset is not open.");
   }
