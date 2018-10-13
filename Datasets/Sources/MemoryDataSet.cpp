@@ -235,8 +235,8 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
   if (options.options.empty()) {
     dataValidityChanged = false;
 
-    for(size_t iter = 0; iter < this->data.size(); ++iter) {
-        this->data[iter]->valid = true;
+    for (auto &iter : this->data) {
+      iter->valid = true;
     }
 
     this->first();
