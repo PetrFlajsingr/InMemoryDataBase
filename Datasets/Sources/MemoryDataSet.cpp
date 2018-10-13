@@ -272,7 +272,7 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
         default:throw IllegalStateException("Internal error.");
       }
 
-      for (auto searchString : filter.searchString) {
+      for (const auto &searchString : filter.searchString) {
           switch (filter.filterOption) {
             case EQUALS:valid = toCompare == searchString;
               break;
