@@ -4,7 +4,8 @@
 
 #include "MemoryDataSet.h"
 
-void DataSets::MemoryDataSet::setDataProvider(DataProviders::BaseDataProvider *provider) {
+void DataSets::MemoryDataSet::setDataProvider(
+    DataProviders::BaseDataProvider *provider) {
   this->dataProvider = provider;
 }
 
