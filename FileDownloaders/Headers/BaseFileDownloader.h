@@ -15,21 +15,27 @@ class BaseFileDownloader {
   std::vector<FileDownloadObserver*> observers;
 
   void notifyDownloadStarted(const std::string &fileName) {
-    for (auto observer: observers) {
-      observer.
+    for (auto observer : observers) {
+      observer->onDownloadStarted(fileName);
     }
   }
 
   void notifyDownloadFailed(const std::string &fileName,
-                            const std::string &errorMessage) = 0;
+                            const std::string &errorMessage) {
+    for (auto observer : observers) {
+      observer->onDownloadFailed(fileName, errorMessage);
+    }
+  }
 
   void notifyDownloadFinished(const std::string &fileName,
-                              const std::string &filePath) = 0;
+                              const std::string &filePath) {
+    for (auto observer : observers) {
+      observer->onDownloadFinished(fileName, filePath);
+    }
+  }
 
  protected:
   std::vector<std::string> availableFiles;
-
-
 
  public:
   virtual ~BaseFileDownloader() = default;
