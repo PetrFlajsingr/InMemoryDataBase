@@ -194,39 +194,11 @@ void DataSets::MemoryDataSet::sort(uint64_t fieldIndex, SortOrder sortOrder) {
   if (sortOrder == ASCENDING) {
     std::sort(data.begin(),
               data.end(),
-              [&fieldIndex, this](const DataSetRow *a,
-                                  const DataSetRow *b) {
-                switch (fields[fieldIndex]->getFieldType()) {
-                  case INTEGER_VAL:
-                    return (*a->cells)[fieldIndex]->_integer
-                        < (*b->cells)[fieldIndex]->_integer;
-                  case DOUBLE_VAL:
-                    return (*a->cells)[fieldIndex]->_double
-                        < (*b->cells)[fieldIndex]->_double;
-                  case STRING_VAL:
-                    return std::strcmp((*a->cells)[fieldIndex]->_string,
-                                       (*b->cells)[fieldIndex]->_string) < 0;
-                  default:throw IllegalStateException("Internal error.");
-                }
-              });
+              fields[fieldIndex]->getCompareFunction(ASCENDING));
   } else {
     std::sort(data.begin(),
               data.end(),
-              [&fieldIndex, this](const DataSetRow *a,
-                                  const DataSetRow *b) {
-                switch (fields[fieldIndex]->getFieldType()) {
-                  case INTEGER_VAL:
-                    return (*a->cells)[fieldIndex]->_integer
-                        > (*b->cells)[fieldIndex]->_integer;
-                  case DOUBLE_VAL:
-                    return (*a->cells)[fieldIndex]->_double
-                        > (*b->cells)[fieldIndex]->_double;
-                  case STRING_VAL:
-                    return std::strcmp((*a->cells)[fieldIndex]->_string,
-                                       (*b->cells)[fieldIndex]->_string) > 0;
-                  default:throw IllegalStateException("Internal error.");
-                }
-              });
+              fields[fieldIndex]->getCompareFunction(DESCENDING));
   }
 
   first();

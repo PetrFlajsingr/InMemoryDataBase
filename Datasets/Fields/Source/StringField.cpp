@@ -3,6 +3,7 @@
 //
 
 #include "StringField.h"
+#include "MemoryDataSet.h"
 
 DataSets::StringField::StringField(const std::string &fieldName,
                                    BaseDataSet *dataset,
@@ -30,4 +31,18 @@ void DataSets::StringField::setValue(void *data) {
     return;
   }
   this->data = std::string(reinterpret_cast<char *>(data));
+}
+
+std::function<bool(DataSets::DataSetRow *,
+                   DataSets::DataSetRow *)> DataSets::StringField::getCompareFunction(SortOrder order) {
+  return [this, order](const DataSetRow *a,
+                       const DataSetRow *b) {
+    if(order == SortOrder::ASCENDING) {
+      return strcmp((*a->cells)[index]->_string,
+        (*b->cells)[index]->_string) < 0;
+    } else {
+      return strcmp((*a->cells)[index]->_string,
+          (*b->cells)[index]->_string) > 0;
+    }
+  };
 }

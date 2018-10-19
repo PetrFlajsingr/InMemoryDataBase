@@ -30,6 +30,8 @@ class IntegerField : public BaseField {
   void setAsInteger(int value);
 
   int getAsInteger();
+
+  std::function<bool(DataSetRow *, DataSetRow *)> getCompareFunction(SortOrder order) override;
 };
 }
 

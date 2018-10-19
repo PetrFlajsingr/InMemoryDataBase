@@ -32,6 +32,8 @@ class DoubleField : public BaseField {
   void setAsDouble(double value);
 
   double getAsDouble();
+
+  std::function<bool(DataSetRow*, DataSetRow*)>  getCompareFunction(SortOrder order) override;
 };
 }
 

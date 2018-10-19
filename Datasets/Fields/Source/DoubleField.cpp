@@ -1,8 +1,8 @@
 //
 // Created by Petr Flajsingr on 27/08/2018.
 //
-
 #include "DoubleField.h"
+#include "MemoryDataSet.h"
 
 DataSets::DoubleField::DoubleField(const std::string &fieldName,
                                    BaseDataSet *dataset,
@@ -35,3 +35,18 @@ void DataSets::DoubleField::setAsDouble(double value) {
 double DataSets::DoubleField::getAsDouble() {
   return data;
 }
+
+std::function<bool(DataSets::DataSetRow * , DataSets::DataSetRow * )> DataSets::DoubleField::getCompareFunction(SortOrder order) {
+  return [this, order](const DataSetRow *a,
+                        const DataSetRow *b) {
+    if(order == SortOrder::ASCENDING) {
+      return (*a->cells)[index]->_double
+          < (*b->cells)[index]->_double;
+    } else {
+      return (*a->cells)[index]->_double
+          > (*b->cells)[index]->_double;
+    }
+  };
+}
+
+

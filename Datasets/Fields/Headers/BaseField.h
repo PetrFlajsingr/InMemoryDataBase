@@ -7,11 +7,14 @@
 
 #include <string>
 #include <utility>
+#include <functional>
 #include "Types.h"
 #include "BaseDataSet.h"
 
 namespace DataSets {
 class BaseDataSet;
+struct DataSetRow;
+
 /**
  * Interface pro fields datasetu.
  */
@@ -82,6 +85,9 @@ class BaseField {
   uint64_t getIndex() {
       return index;
   }
+
+  virtual std::function<bool(DataSetRow *, DataSetRow *)> getCompareFunction(SortOrder order) = 0;
+
 };
 }  // namespace DataSets
 

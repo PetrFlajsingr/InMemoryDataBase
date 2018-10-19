@@ -3,6 +3,7 @@
 //
 
 #include "IntegerField.h"
+#include "MemoryDataSet.h"
 
 DataSets::IntegerField::IntegerField(const std::string &fieldName,
                                      BaseDataSet *dataset,
@@ -34,4 +35,18 @@ void DataSets::IntegerField::setAsInteger(int value) {
 
 int DataSets::IntegerField::getAsInteger() {
   return data;
+}
+
+std::function<bool(DataSets::DataSetRow *,
+                   DataSets::DataSetRow *)> DataSets::IntegerField::getCompareFunction(SortOrder order) {
+  return [this, order](const DataSetRow *a,
+                           const DataSetRow *b) {
+    if(order == SortOrder::ASCENDING) {
+      return (*a->cells)[index]->_integer
+          < (*b->cells)[index]->_integer;
+    } else {
+      return (*a->cells)[index]->_integer
+          > (*b->cells)[index]->_integer;
+    }
+  };
 }
