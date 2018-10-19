@@ -15,6 +15,14 @@ class BaseFileDownloader {
  protected:
   std::vector<std::string> availableFiles;
 
+  virtual void notifyDownloadStarted(const std::string &fileName) = 0;
+
+  virtual void notifyDownloadFailed(const std::string &fileName,
+      const std::string &errorMessage) = 0;
+
+  virtual void notifyDownloadFinished(const std::string &fileName,
+      const std::string &filePath) = 0;
+
  public:
   virtual ~BaseFileDownloader() = default;
 
