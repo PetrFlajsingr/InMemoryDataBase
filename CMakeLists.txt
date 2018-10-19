@@ -25,6 +25,8 @@ include_directories(DataWriters/Headers)
 
 include_directories(Datasets/Fields/Headers)
 
+include_directories(FileDownloaders/Headers)
+
 project(csv_reader)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -g ")
@@ -49,7 +51,7 @@ set(TEST_SOURCE_FILES DataProviders/Source/CsvReader.cpp DataProviders/Headers/C
         Misc/tests/tests_stringToInt_Double.cpp DataProviders/tests/tests_CsvReader.cpp Datasets/tests/tests_MemoryDataset.cpp
         DataProviders/Headers/ArrayDataProvider.h
         Datasets/Source/Async_MemoryDataSet.cpp Datasets/Headers/Async_MemoryDataSet.h Datasets/tests/tests_AsyncMemoryDataset.cpp
-        DataWriters/Source/CsvWriter.cpp DataWriters/Headers/CsvWriter.h FileDownloaders/Headers/BaseFileDownloader.h)
+        DataWriters/Source/CsvWriter.cpp DataWriters/Headers/CsvWriter.h FileDownloaders/Headers/BaseFileDownloader.h FileDownloaders/Headers/FileDownloadObserver.h)
 
 
 add_executable(csv_reader main.cpp ${SOURCE_FILES})
