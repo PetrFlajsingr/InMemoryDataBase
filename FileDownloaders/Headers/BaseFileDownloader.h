@@ -8,20 +8,28 @@
 #include <vector>
 #include <string>
 #include "Exceptions.h"
+#include "FileDownloadObserver.h"
 
 class BaseFileDownloader {
  private:
+  std::vector<FileDownloadObserver*> observers;
+
+  void notifyDownloadStarted(const std::string &fileName) {
+    for (auto observer: observers) {
+      observer.
+    }
+  }
+
+  void notifyDownloadFailed(const std::string &fileName,
+                            const std::string &errorMessage) = 0;
+
+  void notifyDownloadFinished(const std::string &fileName,
+                              const std::string &filePath) = 0;
 
  protected:
   std::vector<std::string> availableFiles;
 
-  virtual void notifyDownloadStarted(const std::string &fileName) = 0;
 
-  virtual void notifyDownloadFailed(const std::string &fileName,
-      const std::string &errorMessage) = 0;
-
-  virtual void notifyDownloadFinished(const std::string &fileName,
-      const std::string &filePath) = 0;
 
  public:
   virtual ~BaseFileDownloader() = default;
@@ -44,6 +52,10 @@ class BaseFileDownloader {
   }
 
   virtual void downloadFile(size_t fileIndex) = 0;
+
+  virtual void addObserver(FileDownloadObserver* observer) {
+    observers.push_back(observer);
+  }
 };
 
-#endif  //FILEDOWNLOADERS_HEADERS_BASEFILEDOWNLOADER_H_
+#endif  // FILEDOWNLOADERS_HEADERS_BASEFILEDOWNLOADER_H_
