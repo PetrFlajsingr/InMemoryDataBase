@@ -10,6 +10,24 @@
 #include "Exceptions.h"
 #include "FileDownloadObserver.h"
 
+/**
+ * Zakladni trida pro stahovani souboru ze serveru.
+ * Pripravuje metody pro:
+ *  - Stazeni souboru (predpoklada se implementace v jinem vlakne)
+ *  - Sledovani prubehu stahovani pomoci [observers]
+ *
+ * Pouziti:
+ * class FINMFileDownloader : BaseFileDownloader {
+ *  public:
+ *   void downloadFile(size_t fileIndex) override;
+ * };
+ *
+ * Je nutne implementovat:
+ *  Nacteni nazvu dostupnych souboru do vector availableFiles (asi v konstruktoru).
+ *  Implementace stazeni souboru na disk. Pri stahovani je nutne volat notify metody.
+ *  Umisteni pro stazeni bude definovano v konstruktoru.
+ *
+ */
 class BaseFileDownloader {
  private:
   std::vector<FileDownloadObserver*> observers;
@@ -37,7 +55,11 @@ class BaseFileDownloader {
  protected:
   std::vector<std::string> availableFiles;
 
+  std::string downloadLocation;
+
  public:
+  explicit BaseFileDownloader(const std::string &downloadLocation) : downloadLocation(downloadLocation) {}
+
   virtual ~BaseFileDownloader() = default;
 
   virtual std::vector<std::string> getAvailableFiles() {
