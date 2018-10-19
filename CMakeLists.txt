@@ -49,7 +49,7 @@ set(TEST_SOURCE_FILES DataProviders/Sources/CsvReader.cpp DataProviders/Headers/
         Misc/tests/tests_stringToInt_Double.cpp DataProviders/tests/tests_CsvReader.cpp Datasets/tests/tests_MemoryDataset.cpp
         DataProviders/Headers/ArrayDataProvider.h
         Datasets/Sources/Async_MemoryDataSet.cpp Datasets/Headers/Async_MemoryDataSet.h Datasets/tests/tests_AsyncMemoryDataset.cpp
-        DataWriters/Sources/CsvWriter.cpp DataWriters/Headers/CsvWriter.h DataWriters/tests/tests_CsvWriter.cpp)
+        DataWriters/Sources/CsvWriter.cpp DataWriters/Headers/CsvWriter.h)
 
 
 add_executable(csv_reader main.cpp ${SOURCE_FILES})
