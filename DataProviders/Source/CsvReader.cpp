@@ -5,36 +5,36 @@
 #include "CsvReader.h"
 
 DataProviders::CsvReader::CsvReader(std::string filePath) {
-  this->file.open(filePath);
-  if (!this->file.is_open()) {
+  file.open(filePath);
+  if (!file.is_open()) {
     throw IOException("File could not be open.");
   }
 
-  this->readHeader();
-  this->parseRecord();
+  readHeader();
+  parseRecord();
 }
 
 DataProviders::CsvReader::~CsvReader() {
-  if (this->file.is_open()) {
-    this->file.close();
+  if (file.is_open()) {
+    file.close();
   }
 }
 
 void DataProviders::CsvReader::readHeader() {
   char buffer[BUFFER_SIZE];
 
-  this->file.getline(buffer, BUFFER_SIZE);
+  file.getline(buffer, BUFFER_SIZE);
   header = Utilities::splitStringByDelimiter(std::string(buffer),
                                              std::string(1, DELIMITER));
 }
 
 bool DataProviders::CsvReader::next() {
-  if (this->file.eof()) {
+  if (file.eof()) {
     return false;
   }
 
-  this->parseRecord();
-  this->currentRecordNumber++;
+  parseRecord();
+  currentRecordNumber++;
 
   return true;
 }
@@ -42,21 +42,21 @@ bool DataProviders::CsvReader::next() {
 void DataProviders::CsvReader::parseRecord() {
   char buffer[BUFFER_SIZE];
 
-  this->file.getline(buffer, BUFFER_SIZE);
-  this->currentRecord = Utilities::splitStringByDelimiter(std::string(buffer),
+  file.getline(buffer, BUFFER_SIZE);
+  currentRecord = Utilities::splitStringByDelimiter(std::string(buffer),
       std::string(1, DELIMITER));
 }
 
 void DataProviders::CsvReader::first() {
-  this->file.clear();
-  this->file.seekg(0, std::ios::beg);
+  file.clear();
+  file.seekg(0, std::ios::beg);
 
-  this->readHeader();
-  this->parseRecord();
+  readHeader();
+  parseRecord();
 
-  this->currentRecordNumber = 0;
+  currentRecordNumber = 0;
 }
 
 bool DataProviders::CsvReader::eof() {
-  return this->file.eof();
+  return file.eof();
 }

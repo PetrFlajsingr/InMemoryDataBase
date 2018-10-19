@@ -88,7 +88,7 @@ class CsvReader : public BaseDataProvider {
   }
 
   uint64_t getCurrentRecordNumber() override {
-    return this->currentRecordNumber;
+    return currentRecordNumber;
   }
 
   inline std::vector<std::string> getColumnNames() override {
