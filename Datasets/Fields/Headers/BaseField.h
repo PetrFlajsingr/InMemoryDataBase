@@ -80,7 +80,7 @@ class BaseField {
   virtual std::string getAsString() = 0;
 
   uint64_t getIndex() {
-      return this->index;
+      return index;
   }
 };
 }  // namespace DataSets

@@ -6,5 +6,5 @@
 #include "BaseField.h"
 
 void DataSets::BaseField::setDataSetData(void *data, ValueType type) {
-  this->dataSet->setData(data, this->index, type);
+  dataSet->setData(data, index, type);
 }

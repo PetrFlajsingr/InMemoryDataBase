@@ -15,12 +15,12 @@ ValueType DataSets::IntegerField::getFieldType() {
 }
 
 void DataSets::IntegerField::setAsString(const std::string &value) {
-  this->data = Utilities::stringToInt(value);
-  BaseField::setDataSetData(&this->data, getFieldType());
+  data = Utilities::stringToInt(value);
+  BaseField::setDataSetData(&data, getFieldType());
 }
 
 std::string DataSets::IntegerField::getAsString() {
-  return std::to_string(this->data);
+  return std::to_string(data);
 }
 
 void DataSets::IntegerField::setValue(void *data) {
@@ -28,10 +28,10 @@ void DataSets::IntegerField::setValue(void *data) {
 }
 
 void DataSets::IntegerField::setAsInteger(int value) {
-  this->data = value;
-  BaseField::setDataSetData(&this->data, getFieldType());
+  data = value;
+  BaseField::setDataSetData(&data, getFieldType());
 }
 
 int DataSets::IntegerField::getAsInteger() {
-  return this->data;
+  return data;
 }

@@ -15,13 +15,13 @@ ValueType DataSets::StringField::getFieldType() {
 }
 
 void DataSets::StringField::setAsString(const std::string &value) {
-  this->data = value;
+  data = value;
   BaseField::setDataSetData(Utilities::copyStringToNewChar(value),
                          getFieldType());
 }
 
 std::string DataSets::StringField::getAsString() {
-  return this->data;
+  return data;
 }
 
 void DataSets::StringField::setValue(void *data) {
