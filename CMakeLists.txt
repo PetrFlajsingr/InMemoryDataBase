@@ -32,24 +32,24 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=undefined -g ")
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(SOURCE_FILES DataProviders/Sources/CsvReader.cpp DataProviders/Headers/CsvReader.h DataProviders/Headers/BaseDataProvider.h Misc/Headers/Exceptions.h
-        Misc/Sources/Utilities.cpp Misc/Headers/Utilities.h Datasets/Headers/BaseDataSet.h Datasets/Sources/MemoryDataSet.cpp Datasets/Headers/MemoryDataSet.h
-        Misc/Headers/Types.h Datasets/Fields/Headers/BaseField.h Datasets/Fields/Sources/StringField.cpp Datasets/Fields/Headers/StringField.h
-        Datasets/Fields/Sources/IntegerField.cpp Datasets/Fields/Headers/IntegerField.h Datasets/Fields/Sources/DoubleField.cpp
-        Datasets/Fields/Headers/DoubleField.h Datasets/Sources/BaseDataSet.cpp
-        Datasets/Fields/Sources/BaseField.cpp Datasets/Headers/FilterStructures.h Misc/tests/tests_splitStringByDelimiter.cpp
-        Datasets/Sources/Async_MemoryDataSet.cpp Datasets/Headers/Async_MemoryDataSet.h)
+set(SOURCE_FILES DataProviders/Source/CsvReader.cpp DataProviders/Headers/CsvReader.h DataProviders/Headers/BaseDataProvider.h Misc/Headers/Exceptions.h
+        Misc/Source/Utilities.cpp Misc/Headers/Utilities.h Datasets/Headers/BaseDataSet.h Datasets/Source/MemoryDataSet.cpp Datasets/Headers/MemoryDataSet.h
+        Misc/Headers/Types.h Datasets/Fields/Headers/BaseField.h Datasets/Fields/Source/StringField.cpp Datasets/Fields/Headers/StringField.h
+        Datasets/Fields/Source/IntegerField.cpp Datasets/Fields/Headers/IntegerField.h Datasets/Fields/Source/DoubleField.cpp
+        Datasets/Fields/Headers/DoubleField.h Datasets/Source/BaseDataSet.cpp
+        Datasets/Fields/Source/BaseField.cpp Datasets/Headers/FilterStructures.h Misc/tests/tests_splitStringByDelimiter.cpp
+        Datasets/Source/Async_MemoryDataSet.cpp Datasets/Headers/Async_MemoryDataSet.h)
 
-set(TEST_SOURCE_FILES DataProviders/Sources/CsvReader.cpp DataProviders/Headers/CsvReader.h DataProviders/Headers/BaseDataProvider.h
-        Misc/Headers/Exceptions.h Misc/Sources/Utilities.cpp Misc/Headers/Utilities.h Datasets/Headers/BaseDataSet.h Datasets/Sources/MemoryDataSet.cpp
-        Datasets/Headers/MemoryDataSet.h Misc/Headers/Types.h Datasets/Fields/Headers/BaseField.h Datasets/Fields/Sources/StringField.cpp
-        Datasets/Fields/Headers/StringField.h Datasets/Fields/Sources/IntegerField.cpp Datasets/Fields/Headers/IntegerField.h
-        Datasets/Fields/Sources/DoubleField.cpp Datasets/Fields/Headers/DoubleField.h Datasets/Sources/BaseDataSet.cpp
-        Datasets/Fields/Sources/BaseField.cpp Datasets/Headers/FilterStructures.h Misc/tests/tests_isDouble_isInteger.cpp
+set(TEST_SOURCE_FILES DataProviders/Source/CsvReader.cpp DataProviders/Headers/CsvReader.h DataProviders/Headers/BaseDataProvider.h
+        Misc/Headers/Exceptions.h Misc/Source/Utilities.cpp Misc/Headers/Utilities.h Datasets/Headers/BaseDataSet.h Datasets/Source/MemoryDataSet.cpp
+        Datasets/Headers/MemoryDataSet.h Misc/Headers/Types.h Datasets/Fields/Headers/BaseField.h Datasets/Fields/Source/StringField.cpp
+        Datasets/Fields/Headers/StringField.h Datasets/Fields/Source/IntegerField.cpp Datasets/Fields/Headers/IntegerField.h
+        Datasets/Fields/Source/DoubleField.cpp Datasets/Fields/Headers/DoubleField.h Datasets/Source/BaseDataSet.cpp
+        Datasets/Fields/Source/BaseField.cpp Datasets/Headers/FilterStructures.h Misc/tests/tests_isDouble_isInteger.cpp
         Misc/tests/tests_stringToInt_Double.cpp DataProviders/tests/tests_CsvReader.cpp Datasets/tests/tests_MemoryDataset.cpp
         DataProviders/Headers/ArrayDataProvider.h
-        Datasets/Sources/Async_MemoryDataSet.cpp Datasets/Headers/Async_MemoryDataSet.h Datasets/tests/tests_AsyncMemoryDataset.cpp
-        DataWriters/Sources/CsvWriter.cpp DataWriters/Headers/CsvWriter.h)
+        Datasets/Source/Async_MemoryDataSet.cpp Datasets/Headers/Async_MemoryDataSet.h Datasets/tests/tests_AsyncMemoryDataset.cpp
+        DataWriters/Source/CsvWriter.cpp DataWriters/Headers/CsvWriter.h)
 
 
 add_executable(csv_reader main.cpp ${SOURCE_FILES})
