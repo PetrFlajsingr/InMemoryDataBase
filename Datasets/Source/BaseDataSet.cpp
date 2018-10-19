@@ -10,7 +10,7 @@ void DataSets::BaseDataSet::setFieldData(BaseField *field, void *data) {
 }
 
 DataSets::BaseDataSet::~BaseDataSet() {
-  for (auto tmp : this->fields) {
+  for (auto tmp : fields) {
     delete tmp;
   }
 }

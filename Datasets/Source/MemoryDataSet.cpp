@@ -6,7 +6,7 @@
 
 void DataSets::MemoryDataSet::setDataProvider(
     DataProviders::BaseDataProvider *provider) {
-  this->dataProvider = provider;
+  dataProvider = provider;
 }
 
 void DataSets::MemoryDataSet::open() {
@@ -14,22 +14,22 @@ void DataSets::MemoryDataSet::open() {
     throw IllegalStateException("Dataset is already open.");
   }
 
-  if (this->dataProvider == nullptr) {
+  if (dataProvider == nullptr) {
     throw IllegalStateException("Data provider has not been set.");
   }
 
-  this->loadData();
+  loadData();
 
-  this->isOpen = true;
+  isOpen = true;
 
   setFieldValues(0, true);
 }
 
 void DataSets::MemoryDataSet::loadData() {
-  while (!this->dataProvider->eof()) {
-    this->addRecord();
+  while (!dataProvider->eof()) {
+    addRecord();
 
-    this->dataProvider->next();
+    dataProvider->next();
   }
 }
 
@@ -63,7 +63,7 @@ void DataSets::MemoryDataSet::createFields(std::vector<std::string> columns,
 }
 
 void DataSets::MemoryDataSet::addRecord() {
-  auto record = this->dataProvider->getRow();
+  auto record = dataProvider->getRow();
 
   auto newRecord = new DataSetRowCells();
   size_t iter = 0;
@@ -86,26 +86,26 @@ void DataSets::MemoryDataSet::addRecord() {
     newRecord->push_back(dataContainer);
   }
 
-  this->data.push_back(new DataSetRow {true, newRecord});
+  data.push_back(new DataSetRow {true, newRecord});
 }
 
 void DataSets::MemoryDataSet::close() {
-  this->dataProvider = nullptr;
+  dataProvider = nullptr;
 
-  this->isOpen = false;
+  isOpen = false;
 
-  if (!this->data.empty()) {
-    for (auto level1 : this->data) {
+  if (!data.empty()) {
+    for (auto level1 : data) {
       size_t iter = 0;
       for (auto level2 : *level1->cells) {
-        if (this->fields[iter])
+        if (fields[iter])
           delete level2;
         iter++;
       }
       level1->cells->clear();
       delete level1->cells;
     }
-    this->data.clear();
+    data.clear();
   }
 }
 
@@ -116,15 +116,15 @@ bool DataSets::MemoryDataSet::setFieldValues(uint64_t index,
     bool found = false;
 
     if (searchForward) {
-      for (iter = index; iter < this->data.size(); iter++) {
-        if (this->data[iter]->valid) {
+      for (iter = index; iter < data.size(); iter++) {
+        if (data[iter]->valid) {
           found = true;
           break;
         }
       }
     } else {
       for (iter = index; iter >= 0; iter--) {
-        if (this->data[iter]->valid) {
+        if (data[iter]->valid) {
           found = true;
           break;
         }
@@ -132,27 +132,27 @@ bool DataSets::MemoryDataSet::setFieldValues(uint64_t index,
     }
     if (!found) {
       if (searchForward) {
-        this->currentRecord = this->data.size();
+        currentRecord = data.size();
       } else {
-        this->currentRecord = 0;
+        currentRecord = 0;
       }
       return false;
     }
-    this->currentRecord = static_cast<uint64_t>(iter);
+    currentRecord = static_cast<uint64_t>(iter);
   }
 
-  DataSetRowCells *value = this->data[iter]->cells;
+  DataSetRowCells *value = data[iter]->cells;
 
   for (size_t i = 0; i < fields.size(); i++) {
     switch (fields[i]->getFieldType()) {
       case INTEGER_VAL:
-        this->setFieldData(fields[i], &(*value)[i]->_integer);
+        setFieldData(fields[i], &(*value)[i]->_integer);
         break;
       case DOUBLE_VAL:
-        this->setFieldData(fields[i], &(*value)[i]->_double);
+        setFieldData(fields[i], &(*value)[i]->_double);
         break;
       case STRING_VAL:
-        this->setFieldData(fields[i], (*value)[i]->_string);
+        setFieldData(fields[i], (*value)[i]->_string);
         break;
       default:throw IllegalStateException("Internal error.");
     }
@@ -162,41 +162,41 @@ bool DataSets::MemoryDataSet::setFieldValues(uint64_t index,
 }
 
 void DataSets::MemoryDataSet::first() {
-  this->currentRecord = 0;
+  currentRecord = 0;
   setFieldValues(0, true);
 }
 
 void DataSets::MemoryDataSet::last() {
-  this->currentRecord = this->data.size() - 1;
-  setFieldValues(this->data.size() - 1, false);
+  currentRecord = data.size() - 1;
+  setFieldValues(data.size() - 1, false);
 }
 
 void DataSets::MemoryDataSet::next() {
-  this->currentRecord++;
-  if (!this->eof()) {
-    setFieldValues(this->currentRecord, true);
+  currentRecord++;
+  if (!eof()) {
+    setFieldValues(currentRecord, true);
   }
 }
 
 void DataSets::MemoryDataSet::previous() {
-  if (this->currentRecord == 0) {
+  if (currentRecord == 0) {
     return;
   }
-  this->currentRecord--;
-  setFieldValues(this->currentRecord, false);
+  currentRecord--;
+  setFieldValues(currentRecord, false);
 }
 
 void DataSets::MemoryDataSet::sort(uint64_t fieldIndex, SortOrder sortOrder) {
-  if (fieldIndex >= this->getFieldNames().size()) {
+  if (fieldIndex >= getFieldNames().size()) {
     throw InvalidArgumentException("Field index is out of bounds");
   }
 
   if (sortOrder == ASCENDING) {
-    std::sort(this->data.begin(),
-              this->data.end(),
+    std::sort(data.begin(),
+              data.end(),
               [&fieldIndex, this](const DataSetRow *a,
                                   const DataSetRow *b) {
-                switch (this->fields[fieldIndex]->getFieldType()) {
+                switch (fields[fieldIndex]->getFieldType()) {
                   case INTEGER_VAL:
                     return (*a->cells)[fieldIndex]->_integer
                         < (*b->cells)[fieldIndex]->_integer;
@@ -210,11 +210,11 @@ void DataSets::MemoryDataSet::sort(uint64_t fieldIndex, SortOrder sortOrder) {
                 }
               });
   } else {
-    std::sort(this->data.begin(),
-              this->data.end(),
+    std::sort(data.begin(),
+              data.end(),
               [&fieldIndex, this](const DataSetRow *a,
                                   const DataSetRow *b) {
-                switch (this->fields[fieldIndex]->getFieldType()) {
+                switch (fields[fieldIndex]->getFieldType()) {
                   case INTEGER_VAL:
                     return (*a->cells)[fieldIndex]->_integer
                         > (*b->cells)[fieldIndex]->_integer;
@@ -229,18 +229,18 @@ void DataSets::MemoryDataSet::sort(uint64_t fieldIndex, SortOrder sortOrder) {
               });
   }
 
-  this->first();
+  first();
 }
 
 void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
   if (options.options.empty()) {
     dataValidityChanged = false;
 
-    for (auto &iter : this->data) {
+    for (auto &iter : data) {
       iter->valid = true;
     }
 
-    this->first();
+    first();
 
     return;
   }
@@ -249,7 +249,7 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
 
   size_t i = 0;
   std::string toCompare;
-  for (auto iter : this->data) {
+  for (auto iter : data) {
     bool valid = true;
 
     size_t optionCounter = 0;
@@ -258,7 +258,7 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
         break;
       }
 
-      switch (this->fields[filter.fieldIndex]->getFieldType()) {
+      switch (fields[filter.fieldIndex]->getFieldType()) {
         case INTEGER_VAL:
           toCompare = std::to_string(
               (*iter->cells)[filter.fieldIndex]->_integer);
@@ -310,11 +310,11 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
       optionCounter++;
     }
 
-    this->data[i]->valid = valid;
+    data[i]->valid = valid;
     i++;
   }
 
-  this->first();
+  first();
 }
 
 DataSets::BaseField *DataSets::MemoryDataSet::fieldByName(
@@ -333,15 +333,15 @@ DataSets::BaseField *DataSets::MemoryDataSet::fieldByIndex(uint64_t index) {
 }
 
 bool DataSets::MemoryDataSet::eof() {
-  return this->currentRecord >= this->data.size();
+  return currentRecord >= data.size();
 }
 
 DataSets::MemoryDataSet::~MemoryDataSet() {
-  this->close();
+  close();
 }
 
 void DataSets::MemoryDataSet::setFieldTypes(std::vector<ValueType> types) {
-  createFields(this->dataProvider->getColumnNames(), types);
+  createFields(dataProvider->getColumnNames(), types);
 }
 
 void DataSets::MemoryDataSet::setData(void *data,
@@ -368,7 +368,7 @@ void DataSets::MemoryDataSet::setData(void *data,
 
 void DataSets::MemoryDataSet::append() {
   auto newRecord = new DataSetRowCells();
-  for (size_t i = 0; i < this->getFieldNames().size(); ++i) {
+  for (size_t i = 0; i < getFieldNames().size(); ++i) {
     auto dataContainer = new DataContainer();
     switch (fields[i]->getFieldType()) {
       case INTEGER_VAL:dataContainer->_integer = 0;
@@ -382,8 +382,8 @@ void DataSets::MemoryDataSet::append() {
     newRecord->push_back(dataContainer);
   }
 
-  this->data.push_back(new DataSetRow {true, newRecord});
-  this->last();
+  data.push_back(new DataSetRow {true, newRecord});
+  last();
 }
 
 void DataSets::MemoryDataSet::appendDataProvider(
@@ -396,9 +396,9 @@ void DataSets::MemoryDataSet::appendDataProvider(
     throw InvalidArgumentException("Data provider has not been set.");
   }
 
-  this->dataProvider = provider;
+  dataProvider = provider;
 
-  this->loadData();
+  loadData();
 }
 
 
