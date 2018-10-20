@@ -36,7 +36,7 @@ class CsvReader_tests : public ::testing::Test {
 };
 
 void CsvReader_tests::prepareReaderSmall() {
-  reader = new DataProviders::CsvReader("/Users/petr/CLionProjects/csv_reader/DataProviders/tests/Files/small.csv");
+  reader = new DataProviders::CsvReader("../DataProviders/tests/Files/small.csv");
 }
 
 TEST_F (CsvReader_tests, columns_small) {
