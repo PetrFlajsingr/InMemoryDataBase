@@ -9,11 +9,11 @@ include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 include_directories(${gmock_SOURCE_DIR}/include ${gmock_SOURCE_DIR})
 
 
-add_subdirectory(lib/googletest-master)
+add_subdirectory(lib/google_test)
 
-include_directories(lib/googletest-master/googletest/include)
+include_directories(lib/google_test/googletest/include)
 
-include_directories(lib/googletest-master/googlemock/include)
+include_directories(lib/google_test/googlemock/include)
 
 include_directories(Misc/Headers)
 
