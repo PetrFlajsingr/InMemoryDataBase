@@ -2,8 +2,7 @@
 // Created by Petr Flajsingr on 08/11/2018.
 //
 
-#include <CurrencyField.h>
-
+#include "MemoryDataSet.h"
 #include "CurrencyField.h"
 
 void DataSets::CurrencyField::setValue(void *data) {
@@ -15,20 +14,30 @@ ValueType DataSets::CurrencyField::getFieldType() {
 }
 
 void DataSets::CurrencyField::setAsString(const std::string &value) {
-  throw NotImplementedException();
+  data = dec::fromString<Currency>(value);
+  setDataSetData(&data, getFieldType());
 }
 
 std::string DataSets::CurrencyField::getAsString() {
-  throw NotImplementedException();
+  return dec::toString(data);
 }
 
 std::function<bool(DataSets::DataSetRow *, DataSets::DataSetRow *)> DataSets::CurrencyField::getCompareFunction(
     SortOrder order) {
-  throw NotImplementedException();
+  return [this, order](const DataSetRow *a,
+                       const DataSetRow *b) {
+    if (order == SortOrder::ASCENDING) {
+      return (*a->cells)[index]->_currency
+          < (*b->cells)[index]->_currency;
+    } else {
+      return (*a->cells)[index]->_currency
+          > (*b->cells)[index]->_currency;
+    }
+  };
 }
-void DataSets::CurrencyField::setAsCurrency(DataSets::Currency &value) {
-  throw NotImplementedException();
+void DataSets::CurrencyField::setAsCurrency(Currency &value) {
+  data = value;
 }
-DataSets::Currency DataSets::CurrencyField::getAsCurrency() {
-  throw NotImplementedException();
+Currency DataSets::CurrencyField::getAsCurrency() {
+  return data;
 }

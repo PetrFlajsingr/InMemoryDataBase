@@ -29,6 +29,7 @@ union DataContainer {
   char *_string = nullptr;
   int _integer;
   double _double;
+  Currency* _currency;
 };
 
 typedef std::vector<DataContainer*> DataSetRowCells;
