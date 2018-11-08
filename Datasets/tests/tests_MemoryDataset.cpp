@@ -51,6 +51,45 @@ class MemoryDataset_tests : public ::testing::Test {
   ~MemoryDataset_tests() override = default;
 };
 
+class MemoryDatasetCurrency_tests : public ::testing::Test {
+ protected:
+  std::vector<std::vector<std::string>> currencyData{{"0.00", "0.01", "0.10", "23.80", "248.99"},
+                                                     {"0.80", "0.01", "0.10", "23.80", "248.99"},
+                                                     {"1.00", "232.01", "0.10", "23.80", "248.99"},
+                                                     {"2.00", "88.89", "0.10", "23.80", "248.99"},
+                                                     {"3.00", "29999.92", "232.10", "23.80", "248.99"},
+  };
+
+  static const unsigned int columnCount = 5;
+
+  MemoryDataSet *dataset{};
+
+  BaseDataProvider *dataProvider{};
+
+ public:
+  MemoryDatasetCurrency_tests() = default;
+
+  void SetUp() override {
+    dataset = new MemoryDataSet();
+    dataProvider = new ArrayDataProvider(currencyData);
+
+    dataset->setDataProvider(dataProvider);
+
+    std::vector<ValueType> types;
+    for (int iter = 0; iter < dataProvider->getColumnCount(); iter++) {
+      types.push_back(CURRENCY);
+    }
+    dataset->setFieldTypes(types);
+  }
+
+  void TearDown() override {
+    delete dataset;
+    delete dataProvider;
+  }
+
+  ~MemoryDatasetCurrency_tests() override = default;
+};
+
 TEST_F(MemoryDataset_tests, open) {
   ASSERT_NO_THROW(dataset->open());
 
@@ -319,4 +358,23 @@ TEST_F(MemoryDataset_tests, exceptions) {
   EXPECT_THROW(dataset->fieldByName("this column can't exist"), InvalidArgumentException);
 
   EXPECT_THROW(dataset->appendDataProvider(nullptr), InvalidArgumentException);
+}
+
+TEST_F(MemoryDatasetCurrency_tests, read) {
+  ASSERT_NO_THROW(dataset->open());
+
+  unsigned int row = 0;
+  while (!dataset->eof()) {
+    for (int j = 0; j < 5; ++j) {
+      auto *field = dynamic_cast<CurrencyField *>(dataset->fieldByIndex(j));
+      EXPECT_EQ(field->getAsString(),
+          currencyData[row][j]);
+      EXPECT_EQ(field->getAsCurrency(),
+          dec::fromString<Currency>(currencyData[row][j]));
+    }
+    row++;
+    dataset->next();
+  }
+
+  EXPECT_EQ(row, 5);
 }
