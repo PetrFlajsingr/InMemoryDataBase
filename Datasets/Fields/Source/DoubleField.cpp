@@ -37,16 +37,19 @@ double DataSets::DoubleField::getAsDouble() {
 }
 
 std::function<bool(DataSets::DataSetRow * , DataSets::DataSetRow * )> DataSets::DoubleField::getCompareFunction(SortOrder order) {
-  return [this, order](const DataSetRow *a,
-                        const DataSetRow *b) {
-    if(order == SortOrder::ASCENDING) {
+  if (order == SortOrder::ASCENDING) {
+    return [this, order](const DataSetRow *a,
+                         const DataSetRow *b) {
       return (*a->cells)[index]->_double
-          < (*b->cells)[index]->_double;
-    } else {
+        < (*b->cells)[index]->_double;
+    };
+  } else {
+    return [this, order](const DataSetRow *a,
+                         const DataSetRow *b) {
       return (*a->cells)[index]->_double
-          > (*b->cells)[index]->_double;
-    }
-  };
+        > (*b->cells)[index]->_double;
+    };
+  }
 }
 
 

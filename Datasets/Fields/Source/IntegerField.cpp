@@ -39,14 +39,17 @@ int DataSets::IntegerField::getAsInteger() {
 
 std::function<bool(DataSets::DataSetRow *,
                    DataSets::DataSetRow *)> DataSets::IntegerField::getCompareFunction(SortOrder order) {
-  return [this, order](const DataSetRow *a,
-                           const DataSetRow *b) {
-    if(order == SortOrder::ASCENDING) {
+  if (order == SortOrder::ASCENDING) {
+    return [this, order](const DataSetRow *a,
+                         const DataSetRow *b) {
       return (*a->cells)[index]->_integer
-          < (*b->cells)[index]->_integer;
-    } else {
+        < (*b->cells)[index]->_integer;
+    };
+  } else {
+    return [this, order](const DataSetRow *a,
+                         const DataSetRow *b) {
       return (*a->cells)[index]->_integer
-          > (*b->cells)[index]->_integer;
-    }
-  };
+        > (*b->cells)[index]->_integer;
+    };
+  }
 }

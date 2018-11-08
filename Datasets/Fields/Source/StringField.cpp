@@ -35,14 +35,17 @@ void DataSets::StringField::setValue(void *data) {
 
 std::function<bool(DataSets::DataSetRow *,
                    DataSets::DataSetRow *)> DataSets::StringField::getCompareFunction(SortOrder order) {
-  return [this, order](const DataSetRow *a,
-                       const DataSetRow *b) {
-    if(order == SortOrder::ASCENDING) {
+  if (order == SortOrder::ASCENDING) {
+    return [this, order](const DataSetRow *a,
+                         const DataSetRow *b) {
       return strcmp((*a->cells)[index]->_string,
-        (*b->cells)[index]->_string) < 0;
-    } else {
+          (*b->cells)[index]->_string) < 0;
+    };
+  } else {
+    return [this, order](const DataSetRow *a,
+                         const DataSetRow *b) {
       return strcmp((*a->cells)[index]->_string,
           (*b->cells)[index]->_string) > 0;
-    }
-  };
+    };
+  }
 }

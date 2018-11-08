@@ -26,16 +26,19 @@ std::string DataSets::CurrencyField::getAsString() {
 
 std::function<bool(DataSets::DataSetRow *, DataSets::DataSetRow *)> DataSets::CurrencyField::getCompareFunction(
     SortOrder order) {
-  return [this, order](const DataSetRow *a,
-                       const DataSetRow *b) {
-    if (order == SortOrder::ASCENDING) {
+  if (order == SortOrder::ASCENDING) {
+    return [this, order](const DataSetRow *a,
+                         const DataSetRow *b) {
       return (*a->cells)[index]->_currency
-          < (*b->cells)[index]->_currency;
-    } else {
+        < (*b->cells)[index]->_currency;
+    };
+  } else {
+    return [this, order](const DataSetRow *a,
+                         const DataSetRow *b) {
       return (*a->cells)[index]->_currency
-          > (*b->cells)[index]->_currency;
-    }
-  };
+        > (*b->cells)[index]->_currency;
+    };
+  }
 }
 void DataSets::CurrencyField::setAsCurrency(Currency &value) {
   data = value;
