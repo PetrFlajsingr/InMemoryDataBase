@@ -11,8 +11,6 @@
 #include "decimal.h"
 
 namespace DataSets {
-typedef dec::decimal<2> Currency;
-
 class CurrencyField : BaseField {
  protected:
   void setValue(void *data) override;
