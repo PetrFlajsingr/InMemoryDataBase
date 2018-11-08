@@ -2,6 +2,8 @@
 // Created by Petr Flajsingr on 08/11/2018.
 //
 
+#include <CurrencyField.h>
+
 #include "CurrencyField.h"
 
 void DataSets::CurrencyField::setValue(void *data) {
@@ -22,5 +24,11 @@ std::string DataSets::CurrencyField::getAsString() {
 
 std::function<bool(DataSets::DataSetRow *, DataSets::DataSetRow *)> DataSets::CurrencyField::getCompareFunction(
     SortOrder order) {
+  throw NotImplementedException();
+}
+void DataSets::CurrencyField::setAsCurrency(DataSets::Currency &value) {
+  throw NotImplementedException();
+}
+DataSets::Currency DataSets::CurrencyField::getAsCurrency() {
   throw NotImplementedException();
 }
