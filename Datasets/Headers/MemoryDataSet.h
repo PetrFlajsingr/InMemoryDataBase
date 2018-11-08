@@ -30,20 +30,20 @@ union DataContainer {
   char *_string = nullptr;
   int _integer;
   double _double;
-  Currency* _currency;
+  Currency *_currency;
 };
 
-typedef std::vector<DataContainer*> DataSetRowCells;
+typedef std::vector<DataContainer *> DataSetRowCells;
 
 /**
  * Struktura pro jeden zaznam v data setu.
  */
 struct DataSetRow {
   bool valid;
-  DataSetRowCells* cells;
+  DataSetRowCells *cells;
 };
 
-typedef std::vector<DataSetRow*> DataSetData;
+typedef std::vector<DataSetRow *> DataSetData;
 /**
  * Dataset ukladajici data primo v operacni pameti.
  */

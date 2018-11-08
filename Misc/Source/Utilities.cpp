@@ -7,7 +7,7 @@
 #include "Utilities.h"
 
 std::vector<std::string> Utilities::splitStringByDelimiter(std::string str,
-    std::string delimiter) {
+                                                           std::string delimiter) {
   if (delimiter.empty()) {
     throw InvalidArgumentException("Delimiter can't be empty.");
   }

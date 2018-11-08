@@ -44,7 +44,7 @@ void DataProviders::CsvReader::parseRecord() {
 
   file.getline(buffer, BUFFER_SIZE);
   currentRecord = Utilities::splitStringByDelimiter(std::string(buffer),
-      std::string(1, DELIMITER));
+                                                    std::string(1, DELIMITER));
 }
 
 void DataProviders::CsvReader::first() {

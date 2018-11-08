@@ -8,8 +8,8 @@
 DataSets::IntegerField::IntegerField(const std::string &fieldName,
                                      BaseDataSet *dataset,
                                      uint64_t index) : BaseField(fieldName,
-                                                              dataset,
-                                                              index) {}
+                                                                 dataset,
+                                                                 index) {}
 
 ValueType DataSets::IntegerField::getFieldType() {
   return INTEGER_VAL;
@@ -43,13 +43,13 @@ std::function<bool(DataSets::DataSetRow *,
     return [this, order](const DataSetRow *a,
                          const DataSetRow *b) {
       return (*a->cells)[index]->_integer
-        < (*b->cells)[index]->_integer;
+          < (*b->cells)[index]->_integer;
     };
   } else {
     return [this, order](const DataSetRow *a,
                          const DataSetRow *b) {
       return (*a->cells)[index]->_integer
-        > (*b->cells)[index]->_integer;
+          > (*b->cells)[index]->_integer;
     };
   }
 }

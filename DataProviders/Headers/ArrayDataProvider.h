@@ -27,7 +27,7 @@ class ArrayDataProvider : public BaseDataProvider {
    * Kopiruje predana data
    */
   explicit ArrayDataProvider(const std::vector<std::vector<std::string>> &data)
-    : data(data) {}
+      : data(data) {}
 
   ~ArrayDataProvider() override = default;
 

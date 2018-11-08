@@ -7,8 +7,8 @@
 DataSets::DoubleField::DoubleField(const std::string &fieldName,
                                    BaseDataSet *dataset,
                                    uint64_t index) : BaseField(fieldName,
-                                                            dataset,
-                                                            index) {}
+                                                               dataset,
+                                                               index) {}
 
 ValueType DataSets::DoubleField::getFieldType() {
   return DOUBLE_VAL;
@@ -36,18 +36,19 @@ double DataSets::DoubleField::getAsDouble() {
   return data;
 }
 
-std::function<bool(DataSets::DataSetRow * , DataSets::DataSetRow * )> DataSets::DoubleField::getCompareFunction(SortOrder order) {
+std::function<bool(DataSets::DataSetRow *,
+                   DataSets::DataSetRow *)> DataSets::DoubleField::getCompareFunction(SortOrder order) {
   if (order == SortOrder::ASCENDING) {
     return [this, order](const DataSetRow *a,
                          const DataSetRow *b) {
       return (*a->cells)[index]->_double
-        < (*b->cells)[index]->_double;
+          < (*b->cells)[index]->_double;
     };
   } else {
     return [this, order](const DataSetRow *a,
                          const DataSetRow *b) {
       return (*a->cells)[index]->_double
-        > (*b->cells)[index]->_double;
+          > (*b->cells)[index]->_double;
     };
   }
 }

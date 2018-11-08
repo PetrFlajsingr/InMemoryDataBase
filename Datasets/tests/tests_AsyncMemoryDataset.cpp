@@ -9,7 +9,6 @@
 using namespace DataSets;
 using namespace DataProviders;
 
-
 class MockAsyncMemoryDatasetObserver : public IAsyncMemoryDataSetObserver {
  public:
   MOCK_METHOD1(onBeforeOpen, void(Async_MemoryDataSet

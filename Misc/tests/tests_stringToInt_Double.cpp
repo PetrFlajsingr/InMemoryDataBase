@@ -3,7 +3,6 @@
 //
 
 #include <gtest/gtest.h>
-#include "Utilities.h"
 
 class stringToInt_Double_tests : public ::testing::Test {
  protected:

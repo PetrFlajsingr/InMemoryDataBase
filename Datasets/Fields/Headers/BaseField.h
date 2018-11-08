@@ -56,11 +56,11 @@ class BaseField {
    * @param dataset Rodicovsky dataset
    * @param index Index pole v zaznamu
    */
-  explicit BaseField(const std::string& fieldName,
-                  BaseDataSet *dataset,
-                  uint64_t index) : fieldName(fieldName),
-                                    dataSet(dataset),
-                                    index(index) {}
+  explicit BaseField(const std::string &fieldName,
+                     BaseDataSet *dataset,
+                     uint64_t index) : fieldName(fieldName),
+                                       dataSet(dataset),
+                                       index(index) {}
 
   virtual ~BaseField() = default;
 
@@ -83,7 +83,7 @@ class BaseField {
   virtual std::string getAsString() = 0;
 
   uint64_t getIndex() {
-      return index;
+    return index;
   }
 
   virtual std::function<bool(DataSetRow *, DataSetRow *)> getCompareFunction(SortOrder order) = 0;

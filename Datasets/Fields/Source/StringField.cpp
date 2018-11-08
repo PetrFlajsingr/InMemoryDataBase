@@ -8,8 +8,8 @@
 DataSets::StringField::StringField(const std::string &fieldName,
                                    BaseDataSet *dataset,
                                    uint64_t index) : BaseField(fieldName,
-                                                            dataset,
-                                                            index) {}
+                                                               dataset,
+                                                               index) {}
 
 ValueType DataSets::StringField::getFieldType() {
   return STRING_VAL;
@@ -39,13 +39,13 @@ std::function<bool(DataSets::DataSetRow *,
     return [this, order](const DataSetRow *a,
                          const DataSetRow *b) {
       return strcmp((*a->cells)[index]->_string,
-          (*b->cells)[index]->_string) < 0;
+                    (*b->cells)[index]->_string) < 0;
     };
   } else {
     return [this, order](const DataSetRow *a,
                          const DataSetRow *b) {
       return strcmp((*a->cells)[index]->_string,
-          (*b->cells)[index]->_string) > 0;
+                    (*b->cells)[index]->_string) > 0;
     };
   }
 }

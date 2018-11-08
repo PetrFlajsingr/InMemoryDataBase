@@ -34,7 +34,7 @@ void DataSets::MemoryDataSet::loadData() {
 }
 
 void DataSets::MemoryDataSet::createFields(std::vector<std::string> columns,
-                                 std::vector<ValueType> types) {
+                                           std::vector<ValueType> types) {
   if (columns.size() != types.size()) {
     throw InvalidArgumentException(
         "Amount of columns and types must match.");
@@ -74,17 +74,13 @@ void DataSets::MemoryDataSet::addRecord() {
   for (const auto &part : record) {
     auto dataContainer = new DataContainer();
     switch (fields[iter]->getFieldType()) {
-      case INTEGER_VAL:
-        dataContainer->_integer = Utilities::stringToInt(part);
+      case INTEGER_VAL:dataContainer->_integer = Utilities::stringToInt(part);
         break;
-      case DOUBLE_VAL:
-        dataContainer->_double = Utilities::stringToDouble(part);
+      case DOUBLE_VAL:dataContainer->_double = Utilities::stringToDouble(part);
         break;
-      case STRING_VAL:
-        dataContainer->_string = strdup(part.c_str());
+      case STRING_VAL:dataContainer->_string = strdup(part.c_str());
         break;
-      case CURRENCY:
-        dataContainer->_currency = new Currency(part);
+      case CURRENCY:dataContainer->_currency = new Currency(part);
         break;
       default:throw IllegalStateException("Internal error.");
     }
@@ -93,7 +89,7 @@ void DataSets::MemoryDataSet::addRecord() {
     newRecord->push_back(dataContainer);
   }
 
-  data.push_back(new DataSetRow {true, newRecord});
+  data.push_back(new DataSetRow{true, newRecord});
 }
 
 void DataSets::MemoryDataSet::close() {
@@ -117,7 +113,7 @@ void DataSets::MemoryDataSet::close() {
 }
 
 bool DataSets::MemoryDataSet::setFieldValues(uint64_t index,
-    bool searchForward) {
+                                             bool searchForward) {
   int64_t iter = index;
   if (dataValidityChanged) {
     bool found = false;
@@ -152,17 +148,13 @@ bool DataSets::MemoryDataSet::setFieldValues(uint64_t index,
 
   for (size_t i = 0; i < fields.size(); i++) {
     switch (fields[i]->getFieldType()) {
-      case INTEGER_VAL:
-        setFieldData(fields[i], &(*value)[i]->_integer);
+      case INTEGER_VAL:setFieldData(fields[i], &(*value)[i]->_integer);
         break;
-      case DOUBLE_VAL:
-        setFieldData(fields[i], &(*value)[i]->_double);
+      case DOUBLE_VAL:setFieldData(fields[i], &(*value)[i]->_double);
         break;
-      case STRING_VAL:
-        setFieldData(fields[i], (*value)[i]->_string);
+      case STRING_VAL:setFieldData(fields[i], (*value)[i]->_string);
         break;
-      case CURRENCY:
-        setFieldData(fields[i], (*value)[i]->_currency);
+      case CURRENCY:setFieldData(fields[i], (*value)[i]->_currency);
         break;
       default:throw IllegalStateException("Internal error.");
     }
@@ -249,47 +241,45 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
           toCompare = std::to_string(
               (*iter->cells)[filter.fieldIndex]->_double);
           break;
-        case STRING_VAL:
-          toCompare = (*iter->cells)[filter.fieldIndex]->_string;
+        case STRING_VAL:toCompare = (*iter->cells)[filter.fieldIndex]->_string;
           break;
-        case CURRENCY:
-          toCompare = dec::toString(*(*iter->cells)[filter.fieldIndex]->_currency);
+        case CURRENCY:toCompare = dec::toString(*(*iter->cells)[filter.fieldIndex]->_currency);
           break;
         default:throw IllegalStateException("Internal error.");
       }
 
       for (const auto &searchString : filter.searchString) {
-          switch (filter.filterOption) {
-            case EQUALS:valid = toCompare == searchString;
-              break;
-            case STARTS_WITH:
-              valid = std::strncmp(toCompare.c_str(),
-                                   searchString.c_str(),
-                                   searchString.size()) == 0;
-              break;
-            case CONTAINS:
-              valid = toCompare.find(searchString)
-                  != std::string::npos;
-              break;
-            case ENDS_WITH:valid = Utilities::endsWith(toCompare, searchString);
-              break;
-            case NOT_CONTAINS:
-              valid = toCompare.find(searchString)
-                  == std::string::npos;
-              break;
-            case NOT_STARTS_WITH:
-              valid = std::strncmp(toCompare.c_str(),
-                                   searchString.c_str(),
-                                   searchString.size()) != 0;
-              break;
-            case NOT_ENDS_WITH:
-              valid = !Utilities::endsWith(toCompare,
-                                           searchString);
-              break;
-          }
-          if (valid) {
-              break;
-          }
+        switch (filter.filterOption) {
+          case EQUALS:valid = toCompare == searchString;
+            break;
+          case STARTS_WITH:
+            valid = std::strncmp(toCompare.c_str(),
+                                 searchString.c_str(),
+                                 searchString.size()) == 0;
+            break;
+          case CONTAINS:
+            valid = toCompare.find(searchString)
+                != std::string::npos;
+            break;
+          case ENDS_WITH:valid = Utilities::endsWith(toCompare, searchString);
+            break;
+          case NOT_CONTAINS:
+            valid = toCompare.find(searchString)
+                == std::string::npos;
+            break;
+          case NOT_STARTS_WITH:
+            valid = std::strncmp(toCompare.c_str(),
+                                 searchString.c_str(),
+                                 searchString.size()) != 0;
+            break;
+          case NOT_ENDS_WITH:
+            valid = !Utilities::endsWith(toCompare,
+                                         searchString);
+            break;
+        }
+        if (valid) {
+          break;
+        }
       }
 
       optionCounter++;
@@ -330,8 +320,8 @@ void DataSets::MemoryDataSet::setFieldTypes(std::vector<ValueType> types) {
 }
 
 void DataSets::MemoryDataSet::setData(void *data,
-    uint64_t index,
-    ValueType type) {
+                                      uint64_t index,
+                                      ValueType type) {
   switch (type) {
     case INTEGER_VAL:
       (*this->data[currentRecord]->cells)[index]->_integer
@@ -341,13 +331,11 @@ void DataSets::MemoryDataSet::setData(void *data,
       (*this->data[currentRecord]->cells)[index]->_double
           = *reinterpret_cast<int *>(data);
       break;
-    case STRING_VAL:
-      delete[] (*this->data[currentRecord]->cells)[index]->_string;
+    case STRING_VAL:delete[] (*this->data[currentRecord]->cells)[index]->_string;
       (*this->data[currentRecord]->cells)[index]->_string
           = reinterpret_cast<char *>(data);
       break;
-    case CURRENCY:
-      delete (*this->data[currentRecord]->cells)[index]->_currency;
+    case CURRENCY:delete (*this->data[currentRecord]->cells)[index]->_currency;
       (*this->data[currentRecord]->cells)[index]->_currency
           = reinterpret_cast<Currency *>(data);
       break;
@@ -362,24 +350,20 @@ void DataSets::MemoryDataSet::append() {
     auto dataContainer = new DataContainer();
 
     switch (fields[i]->getFieldType()) {
-      case INTEGER_VAL:
-        dataContainer->_integer = 0;
+      case INTEGER_VAL:dataContainer->_integer = 0;
         break;
-      case DOUBLE_VAL:
-        dataContainer->_double = 0;
+      case DOUBLE_VAL:dataContainer->_double = 0;
         break;
-      case STRING_VAL:
-        dataContainer->_string = nullptr;
+      case STRING_VAL:dataContainer->_string = nullptr;
         break;
-      case CURRENCY:
-        dataContainer->_currency = nullptr;
+      case CURRENCY:dataContainer->_currency = nullptr;
         break;
       default:throw IllegalStateException("Internal error.");
     }
     newRecord->push_back(dataContainer);
   }
 
-  data.push_back(new DataSetRow {true, newRecord});
+  data.push_back(new DataSetRow{true, newRecord});
   last();
 }
 

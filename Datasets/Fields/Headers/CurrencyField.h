@@ -17,7 +17,7 @@ class CurrencyField : public BaseField {
 
   Currency data;
  public:
-  CurrencyField(const std::string& fieldName,
+  CurrencyField(const std::string &fieldName,
                 BaseDataSet *dataset,
                 uint64_t index);
 
@@ -27,7 +27,7 @@ class CurrencyField : public BaseField {
 
   std::string getAsString() override;
 
-  void setAsCurrency(Currency& value);
+  void setAsCurrency(Currency &value);
 
   Currency getAsCurrency();
 

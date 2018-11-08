@@ -5,7 +5,6 @@
 #include <CurrencyField.h>
 
 #include "MemoryDataSet.h"
-#include "CurrencyField.h"
 
 void DataSets::CurrencyField::setValue(void *data) {
   this->data = *reinterpret_cast<Currency *>(data);
@@ -30,13 +29,13 @@ std::function<bool(DataSets::DataSetRow *, DataSets::DataSetRow *)> DataSets::Cu
     return [this, order](const DataSetRow *a,
                          const DataSetRow *b) {
       return (*a->cells)[index]->_currency
-        < (*b->cells)[index]->_currency;
+          < (*b->cells)[index]->_currency;
     };
   } else {
     return [this, order](const DataSetRow *a,
                          const DataSetRow *b) {
       return (*a->cells)[index]->_currency
-        > (*b->cells)[index]->_currency;
+          > (*b->cells)[index]->_currency;
     };
   }
 }

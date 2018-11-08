@@ -33,7 +33,7 @@ class DoubleField : public BaseField {
 
   double getAsDouble();
 
-  std::function<bool(DataSetRow*, DataSetRow*)>  getCompareFunction(SortOrder order) override;
+  std::function<bool(DataSetRow *, DataSetRow *)> getCompareFunction(SortOrder order) override;
 };
 }
 

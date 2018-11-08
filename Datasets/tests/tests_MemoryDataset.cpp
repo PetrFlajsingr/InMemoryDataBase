@@ -368,9 +368,9 @@ TEST_F(MemoryDatasetCurrency_tests, read) {
     for (int j = 0; j < 5; ++j) {
       auto *field = dynamic_cast<CurrencyField *>(dataset->fieldByIndex(j));
       EXPECT_EQ(field->getAsString(),
-          currencyData[row][j]);
+                currencyData[row][j]);
       EXPECT_EQ(field->getAsCurrency(),
-          dec::fromString<Currency>(currencyData[row][j]));
+                dec::fromString<Currency>(currencyData[row][j]));
     }
     row++;
     dataset->next();

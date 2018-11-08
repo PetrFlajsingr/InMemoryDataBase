@@ -84,7 +84,7 @@ void DataSets::Async_MemoryDataSet::innerFilter(const FilterOptions &options) {
 }
 
 void DataSets::Async_MemoryDataSet::sort(uint64_t fieldIndex,
-    SortOrder sortOrder) {
+                                         SortOrder sortOrder) {
   notify(BEFORE_SORT);
   auto handle = std::async(std::launch::async,
                            &Async_MemoryDataSet::innerSort,
@@ -94,7 +94,7 @@ void DataSets::Async_MemoryDataSet::sort(uint64_t fieldIndex,
 }
 
 void DataSets::Async_MemoryDataSet::innerSort(uint64_t fieldIndex,
-    SortOrder sortOrder) {
+                                              SortOrder sortOrder) {
   MemoryDataSet::sort(fieldIndex, sortOrder);
   notify(AFTER_SORT);
 }

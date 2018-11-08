@@ -3,7 +3,6 @@
 //
 
 #include <gtest/gtest.h>
-#include "Utilities.h"
 
 class isDouble_isInteger_tests : public ::testing::Test {
  protected:

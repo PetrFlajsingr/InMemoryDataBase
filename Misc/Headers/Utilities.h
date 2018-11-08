@@ -71,7 +71,7 @@ class Utilities {
    * @return true pokud value konci ending, jinak false
    */
   static bool endsWith(std::string const &value, std::string const &ending);
-  
+
   static char *copyStringToNewChar(const std::string &str);
 };
 
