@@ -56,7 +56,7 @@ set(TEST_SOURCE_FILES DataProviders/Source/CsvReader.cpp DataProviders/Headers/C
         Datasets/Source/Async_MemoryDataSet.cpp Datasets/Headers/Async_MemoryDataSet.h
         Datasets/tests/tests_AsyncMemoryDataset.cpp
         DataWriters/Source/CsvWriter.cpp DataWriters/Headers/CsvWriter.h FileDownloaders/Headers/BaseFileDownloader.h
-        FileDownloaders/Headers/FileDownloadObserver.h
+        FileDownloaders/Headers/FileDownloadObserver.h lib/decimal/Decimal.h
         )
 
 
