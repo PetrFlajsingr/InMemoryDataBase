@@ -27,6 +27,8 @@ include_directories(Datasets/Fields/Headers)
 
 include_directories(FileDownloaders/Headers)
 
+include_directories(lib/Decimal)
+
 project(csv_reader)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -g ")

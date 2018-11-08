@@ -7,12 +7,14 @@
 
 #include "BaseField.h"
 #include "Exceptions.h"
+#include "Decimal.h"
 
 namespace DataSets {
 class CurrencyField : BaseField {
  protected:
   void setValue(void *data) override;
 
+  dec::decimal<2> data;
  public:
   ValueType getFieldType() override;
 
