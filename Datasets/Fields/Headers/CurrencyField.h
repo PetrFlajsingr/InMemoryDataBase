@@ -11,12 +11,16 @@
 #include "decimal.h"
 
 namespace DataSets {
-class CurrencyField : BaseField {
+class CurrencyField : public BaseField {
  protected:
   void setValue(void *data) override;
 
   Currency data;
  public:
+  CurrencyField(const std::string& fieldName,
+                BaseDataSet *dataset,
+                uint64_t index);
+
   ValueType getFieldType() override;
 
   void setAsString(const std::string &value) override;

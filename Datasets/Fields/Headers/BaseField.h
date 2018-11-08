@@ -47,7 +47,7 @@ class BaseField {
    * @param data data pro ulozeni
    * @param type typ dat
    */
-  void setDataSetData(void *data, ValueType type);
+  void setData(void *data, ValueType type);
 
  public:
   /**

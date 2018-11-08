@@ -14,6 +14,7 @@
 #include "StringField.h"
 #include "DoubleField.h"
 #include "Utilities.h"
+#include "CurrencyField.h"
 #include <string>
 #include <vector>
 #include <algorithm>
@@ -134,6 +135,7 @@ class MemoryDataSet : public BaseDataSet {
 
   std::vector<std::string> getFieldNames() override {
     std::vector<std::string> result;
+
     for (const auto &field : fields) {
       result.push_back(field->getFieldName());
     }

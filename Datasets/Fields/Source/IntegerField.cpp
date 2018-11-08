@@ -17,7 +17,7 @@ ValueType DataSets::IntegerField::getFieldType() {
 
 void DataSets::IntegerField::setAsString(const std::string &value) {
   data = Utilities::stringToInt(value);
-  BaseField::setDataSetData(&data, getFieldType());
+  BaseField::setData(&data, getFieldType());
 }
 
 std::string DataSets::IntegerField::getAsString() {
@@ -30,7 +30,7 @@ void DataSets::IntegerField::setValue(void *data) {
 
 void DataSets::IntegerField::setAsInteger(int value) {
   data = value;
-  BaseField::setDataSetData(&data, getFieldType());
+  BaseField::setData(&data, getFieldType());
 }
 
 int DataSets::IntegerField::getAsInteger() {

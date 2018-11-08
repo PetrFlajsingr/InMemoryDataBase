@@ -16,7 +16,7 @@ ValueType DataSets::DoubleField::getFieldType() {
 
 void DataSets::DoubleField::setAsString(const std::string &value) {
   data = Utilities::stringToDouble(value);
-  setDataSetData(&data, getFieldType());
+  setData(&data, getFieldType());
 }
 
 std::string DataSets::DoubleField::getAsString() {
@@ -29,7 +29,7 @@ void DataSets::DoubleField::setValue(void *data) {
 
 void DataSets::DoubleField::setAsDouble(double value) {
   data = value;
-  setDataSetData(&data, getFieldType());
+  setData(&data, getFieldType());
 }
 
 double DataSets::DoubleField::getAsDouble() {

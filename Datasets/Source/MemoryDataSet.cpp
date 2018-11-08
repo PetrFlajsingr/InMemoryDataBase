@@ -55,6 +55,10 @@ void DataSets::MemoryDataSet::createFields(std::vector<std::string> columns,
         newField = new StringField(col, this, iter);
         break;
       }
+      case CURRENCY: {
+        newField = new CurrencyField(col, this, iter);
+        break;
+      }
       default:throw IllegalStateException("Internal error.");
     }
     fields.push_back(newField);
@@ -78,6 +82,9 @@ void DataSets::MemoryDataSet::addRecord() {
         break;
       case STRING_VAL:
         dataContainer->_string = strdup(part.c_str());
+        break;
+      case CURRENCY:
+        dataContainer->_currency = new Currency(part);
         break;
       default:throw IllegalStateException("Internal error.");
     }
@@ -153,6 +160,9 @@ bool DataSets::MemoryDataSet::setFieldValues(uint64_t index,
         break;
       case STRING_VAL:
         setFieldData(fields[i], (*value)[i]->_string);
+        break;
+      case CURRENCY:
+        setFieldData(fields[i], (*value)[i]->_currency);
         break;
       default:throw IllegalStateException("Internal error.");
     }
@@ -241,6 +251,9 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
           break;
         case STRING_VAL:
           toCompare = (*iter->cells)[filter.fieldIndex]->_string;
+          break;
+        case CURRENCY:
+          toCompare = dec::toString(*(*iter->cells)[filter.fieldIndex]->_currency);
           break;
         default:throw IllegalStateException("Internal error.");
       }
@@ -333,6 +346,11 @@ void DataSets::MemoryDataSet::setData(void *data,
       (*this->data[currentRecord]->cells)[index]->_string
           = reinterpret_cast<char *>(data);
       break;
+    case CURRENCY:
+      delete (*this->data[currentRecord]->cells)[index]->_currency;
+      (*this->data[currentRecord]->cells)[index]->_currency
+          = reinterpret_cast<Currency *>(data);
+      break;
     default:throw IllegalStateException("Invalid value type.");
   }
 
@@ -342,12 +360,19 @@ void DataSets::MemoryDataSet::append() {
   auto newRecord = new DataSetRowCells();
   for (size_t i = 0; i < getFieldNames().size(); ++i) {
     auto dataContainer = new DataContainer();
+
     switch (fields[i]->getFieldType()) {
-      case INTEGER_VAL:dataContainer->_integer = 0;
+      case INTEGER_VAL:
+        dataContainer->_integer = 0;
         break;
-      case DOUBLE_VAL:dataContainer->_double = 0;
+      case DOUBLE_VAL:
+        dataContainer->_double = 0;
         break;
-      case STRING_VAL:dataContainer->_string = nullptr;
+      case STRING_VAL:
+        dataContainer->_string = nullptr;
+        break;
+      case CURRENCY:
+        dataContainer->_currency = nullptr;
         break;
       default:throw IllegalStateException("Internal error.");
     }

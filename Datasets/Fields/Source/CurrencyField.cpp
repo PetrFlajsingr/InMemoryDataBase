@@ -2,11 +2,13 @@
 // Created by Petr Flajsingr on 08/11/2018.
 //
 
+#include <CurrencyField.h>
+
 #include "MemoryDataSet.h"
 #include "CurrencyField.h"
 
 void DataSets::CurrencyField::setValue(void *data) {
-  throw NotImplementedException();
+  this->data = *reinterpret_cast<Currency *>(data);
 }
 
 ValueType DataSets::CurrencyField::getFieldType() {
@@ -15,7 +17,7 @@ ValueType DataSets::CurrencyField::getFieldType() {
 
 void DataSets::CurrencyField::setAsString(const std::string &value) {
   data = dec::fromString<Currency>(value);
-  setDataSetData(&data, getFieldType());
+  setData(&data, getFieldType());
 }
 
 std::string DataSets::CurrencyField::getAsString() {
@@ -37,7 +39,10 @@ std::function<bool(DataSets::DataSetRow *, DataSets::DataSetRow *)> DataSets::Cu
 }
 void DataSets::CurrencyField::setAsCurrency(Currency &value) {
   data = value;
+  BaseField::setData(&data, getFieldType());
 }
 Currency DataSets::CurrencyField::getAsCurrency() {
   return data;
 }
+DataSets::CurrencyField::CurrencyField(const std::string &fieldName, DataSets::BaseDataSet *dataset, uint64_t index)
+    : BaseField(fieldName, dataset, index) {}

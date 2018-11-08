@@ -5,6 +5,6 @@
 #include "Types.h"
 #include "BaseField.h"
 
-void DataSets::BaseField::setDataSetData(void *data, ValueType type) {
+void DataSets::BaseField::setData(void *data, ValueType type) {
   dataSet->setData(data, index, type);
 }

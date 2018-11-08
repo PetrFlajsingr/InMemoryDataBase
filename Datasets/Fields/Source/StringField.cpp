@@ -17,8 +17,8 @@ ValueType DataSets::StringField::getFieldType() {
 
 void DataSets::StringField::setAsString(const std::string &value) {
   data = value;
-  BaseField::setDataSetData(Utilities::copyStringToNewChar(value),
-                         getFieldType());
+  BaseField::setData(Utilities::copyStringToNewChar(value),
+                     getFieldType());
 }
 
 std::string DataSets::StringField::getAsString() {
