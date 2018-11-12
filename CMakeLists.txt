@@ -59,7 +59,7 @@ set(TEST_SOURCE_FILES DataProviders/Source/CsvReader.cpp DataProviders/Headers/C
         Datasets/tests/tests_AsyncMemoryDataset.cpp
         DataWriters/Source/CsvWriter.cpp DataWriters/Headers/CsvWriter.h FileDownloaders/Headers/BaseFileDownloader.h
         FileDownloaders/Headers/FileDownloadObserver.h lib/decimal/Decimal.h
-        Datasets/Fields/Source/CurrencyField.cpp Datasets/Fields/Headers/CurrencyField.h DataWorkers/BaseDataWorker.cpp DataWorkers/BaseDataWorker.h)
+        Datasets/Fields/Source/CurrencyField.cpp Datasets/Fields/Headers/CurrencyField.h DataWorkers/Headers/BaseDataWorker.h)
 
 
 add_executable(csv_reader main.cpp ${SOURCE_FILES})
