@@ -11,6 +11,10 @@
 namespace DataWorkers {
 class FINMDataWorker : public BaseDataWorker {
  public:
+  FINMDataWorker(CsvWriter *writer,
+      DataProviders::BaseDataProvider *dataProvider,
+                 std::vector<ValueType> fieldTypes);
+
   std::string getMultiChoiceNames() override;
 
   std::vector<std::string> getChoices(std::string choiceName) override;
