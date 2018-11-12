@@ -12,7 +12,9 @@ namespace DataWorkers {
 class FINMDataWorker : public BaseDataWorker {
  public:
   std::string getMultiChoiceNames() override;
-  std::string getChoices(std::string choiceName) override;
+
+  std::vector<std::string> getChoices(std::string choiceName) override;
+
   void setFilters(std::vector<DataSets::FilterOptions> filters) override;
 };
 }  // namespace DataWorkers

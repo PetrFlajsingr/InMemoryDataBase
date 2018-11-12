@@ -8,7 +8,7 @@ std::string DataWorkers::FINMDataWorker::getMultiChoiceNames() {
   throw NotImplementedException();
 }
 
-std::string DataWorkers::FINMDataWorker::getChoices(std::string choiceName) {
+std::vector<std::string> DataWorkers::FINMDataWorker::getChoices(std::string choiceName) {
   throw NotImplementedException();
 }
 

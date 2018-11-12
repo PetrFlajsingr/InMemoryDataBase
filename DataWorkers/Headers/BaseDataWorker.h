@@ -26,7 +26,7 @@ class BaseDataWorker {
 
   virtual std::string getMultiChoiceNames() = 0;
 
-  virtual std::string getChoices(std::string choiceName) = 0;
+  virtual std::vector<std::string> getChoices(std::string choiceName) = 0;
 
   void setDataWriter(CsvWriter& writer) {
     this->writer = &writer;
