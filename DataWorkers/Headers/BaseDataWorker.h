@@ -24,7 +24,7 @@ class BaseDataWorker {
     delete dataset;
   }
 
-  virtual std::string getMultiChoiceNames() = 0;
+  virtual std::vector<std::string> getMultiChoiceNames() = 0;
 
   virtual std::vector<std::string> getChoices(std::string choiceName) = 0;
 

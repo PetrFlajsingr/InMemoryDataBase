@@ -300,7 +300,7 @@ DataSets::BaseField *DataSets::MemoryDataSet::fieldByName(
     }
   }
 
-  throw InvalidArgumentException(("There's no field named: " + name).c_str());
+  return nullptr;
 }
 
 DataSets::BaseField *DataSets::MemoryDataSet::fieldByIndex(uint64_t index) {

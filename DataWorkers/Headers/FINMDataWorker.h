@@ -11,12 +11,14 @@
 
 namespace DataWorkers {
 class FINMDataWorker : public BaseDataWorker {
+ private:
+  const std::vector<std::string> columnChoices = {"aa"};
  public:
   FINMDataWorker(CsvWriter *writer,
       DataProviders::BaseDataProvider *dataProvider,
                  std::vector<ValueType> fieldTypes);
 
-  std::string getMultiChoiceNames() override;
+  std::vector<std::string> getMultiChoiceNames() override;
 
   std::vector<std::string> getChoices(std::string choiceName) override;
 

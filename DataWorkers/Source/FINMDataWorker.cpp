@@ -5,12 +5,16 @@
 #include <MemoryDataSet.h>
 #include "FINMDataWorker.h"
 
-std::string DataWorkers::FINMDataWorker::getMultiChoiceNames() {
-  throw NotImplementedException();
+std::vector<std::string> DataWorkers::FINMDataWorker::getMultiChoiceNames() {
+  return columnChoices;
 }
 
 std::vector<std::string> DataWorkers::FINMDataWorker::getChoices(std::string choiceName) {
   DataSets::BaseField* field = dataset->fieldByName(choiceName);
+
+  if(field == nullptr) {
+    return {};
+  }
 
   DataSets::MemoryDataSet* memoryDataSet = dynamic_cast<DataSets::MemoryDataSet*>(dataset);
 
