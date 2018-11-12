@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 
+//TODO: predelat tak, aby podporoval double, integer, currency...
 namespace DataSets {
 enum FilterOption {
   EQUALS,
