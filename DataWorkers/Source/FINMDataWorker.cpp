@@ -57,6 +57,21 @@ DataWorkers::FINMDataWorker::FINMDataWorker(
 void DataWorkers::FINMDataWorker::writeResult(CsvWriter &writer) {
   writeHeaders(writer);
 
+  auto *memoryDataSet = dynamic_cast<DataSets::MemoryDataSet*>(dataset);
+
+  //TODO
+  memoryDataSet->sort(memoryDataSet->fieldByName("aa")->getIndex(), ASCENDING);
+
+  memoryDataSet->first();
+
+
+
+  while (!memoryDataSet->eof()) {
+
+    memoryDataSet->next();
+  }
+
+
 
 }
 

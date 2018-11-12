@@ -241,9 +241,11 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
           toCompare = std::to_string(
               (*iter->cells)[filter.fieldIndex]->_double);
           break;
-        case STRING_VAL:toCompare = (*iter->cells)[filter.fieldIndex]->_string;
+        case STRING_VAL:
+          toCompare = (*iter->cells)[filter.fieldIndex]->_string;
           break;
-        case CURRENCY:toCompare = dec::toString(*(*iter->cells)[filter.fieldIndex]->_currency);
+        case CURRENCY:
+          toCompare = dec::toString(*(*iter->cells)[filter.fieldIndex]->_currency);
           break;
         default:throw IllegalStateException("Internal error.");
       }
@@ -331,11 +333,13 @@ void DataSets::MemoryDataSet::setData(void *data,
       (*this->data[currentRecord]->cells)[index]->_double
           = *reinterpret_cast<int *>(data);
       break;
-    case STRING_VAL:delete[] (*this->data[currentRecord]->cells)[index]->_string;
+    case STRING_VAL:
+      delete[] (*this->data[currentRecord]->cells)[index]->_string;
       (*this->data[currentRecord]->cells)[index]->_string
           = reinterpret_cast<char *>(data);
       break;
-    case CURRENCY:delete (*this->data[currentRecord]->cells)[index]->_currency;
+    case CURRENCY:
+      delete (*this->data[currentRecord]->cells)[index]->_currency;
       (*this->data[currentRecord]->cells)[index]->_currency
           = reinterpret_cast<Currency *>(data);
       break;
