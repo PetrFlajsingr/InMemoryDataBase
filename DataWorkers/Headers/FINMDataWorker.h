@@ -13,6 +13,8 @@ namespace DataWorkers {
 class FINMDataWorker : public BaseDataWorker {
  private:
   const std::vector<std::string> columnChoices = {"aa"};
+
+  void writeHeaders(CsvWriter &writer);
  public:
   FINMDataWorker(DataProviders::BaseDataProvider *dataProvider,
                  std::vector<ValueType> fieldTypes);

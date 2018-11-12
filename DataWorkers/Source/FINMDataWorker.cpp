@@ -3,6 +3,8 @@
 //
 
 #include <MemoryDataSet.h>
+#include <FINMDataWorker.h>
+
 #include "FINMDataWorker.h"
 
 std::vector<std::string> DataWorkers::FINMDataWorker::getMultiChoiceNames() {
@@ -53,5 +55,20 @@ DataWorkers::FINMDataWorker::FINMDataWorker(
 }
 
 void DataWorkers::FINMDataWorker::writeResult(CsvWriter &writer) {
-  throw new NotImplementedException();
+  writeHeaders(writer);
+
+
+}
+
+void DataWorkers::FINMDataWorker::writeHeaders(CsvWriter &writer) {
+  std::vector<std::string> header;
+
+  std::transform(columnOperations.begin(),
+                 columnOperations.end(),
+                 std::back_inserter(header),
+                 [](const ColumnOperation &op) {
+    return op.columnName;
+  });
+
+  writer.writeHeader(header);
 }
