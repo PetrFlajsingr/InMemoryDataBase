@@ -29,6 +29,8 @@ include_directories(FileDownloaders/Headers)
 
 include_directories(lib/Decimal)
 
+include_directories(DataWorkers/Headers)
+
 project(csv_reader)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -g ")
@@ -59,7 +61,7 @@ set(TEST_SOURCE_FILES DataProviders/Source/CsvReader.cpp DataProviders/Headers/C
         Datasets/tests/tests_AsyncMemoryDataset.cpp
         DataWriters/Source/CsvWriter.cpp DataWriters/Headers/CsvWriter.h FileDownloaders/Headers/BaseFileDownloader.h
         FileDownloaders/Headers/FileDownloadObserver.h lib/decimal/Decimal.h
-        Datasets/Fields/Source/CurrencyField.cpp Datasets/Fields/Headers/CurrencyField.h DataWorkers/Headers/BaseDataWorker.h)
+        Datasets/Fields/Source/CurrencyField.cpp Datasets/Fields/Headers/CurrencyField.h DataWorkers/Headers/BaseDataWorker.h DataWorkers/Source/FINMDataWorker.cpp DataWorkers/Headers/FINMDataWorker.h)
 
 
 add_executable(csv_reader main.cpp ${SOURCE_FILES})
