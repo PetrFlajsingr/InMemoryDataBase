@@ -10,12 +10,31 @@ std::string DataWorkers::FINMDataWorker::getMultiChoiceNames() {
 }
 
 std::vector<std::string> DataWorkers::FINMDataWorker::getChoices(std::string choiceName) {
-  throw NotImplementedException();
+  DataSets::BaseField* field = dataset->fieldByName(choiceName);
+
+  DataSets::MemoryDataSet* memoryDataSet = dynamic_cast<DataSets::MemoryDataSet*>(dataset);
+
+  memoryDataSet->sort(field->getIndex(), SortOrder::ASCENDING);
+
+  std::string value;
+
+  std::vector<std::string> result;
+
+  while (!memoryDataSet->eof()) {
+    if (field->getAsString() != value) {
+      value = field->getAsString();
+      result.push_back(value);
+    }
+    memoryDataSet->next();
+  }
+
+  return result;
 }
 
 void DataWorkers::FINMDataWorker::setFilters(std::vector<DataSets::FilterOptions> filters) {
   throw NotImplementedException();
 }
+
 DataWorkers::FINMDataWorker::FINMDataWorker(CsvWriter *writer,
     DataProviders::BaseDataProvider *dataProvider,
     std::vector<ValueType> fieldTypes)

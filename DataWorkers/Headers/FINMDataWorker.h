@@ -7,6 +7,7 @@
 
 #include "BaseDataWorker.h"
 #include "Exceptions.h"
+#include "BaseField.h"
 
 namespace DataWorkers {
 class FINMDataWorker : public BaseDataWorker {
