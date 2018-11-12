@@ -14,15 +14,16 @@ class FINMDataWorker : public BaseDataWorker {
  private:
   const std::vector<std::string> columnChoices = {"aa"};
  public:
-  FINMDataWorker(CsvWriter *writer,
-      DataProviders::BaseDataProvider *dataProvider,
+  FINMDataWorker(DataProviders::BaseDataProvider *dataProvider,
                  std::vector<ValueType> fieldTypes);
 
   std::vector<std::string> getMultiChoiceNames() override;
 
   std::vector<std::string> getChoices(std::string choiceName) override;
 
-  void setFilters(std::vector<DataSets::FilterOptions> filters) override;
+  void filter(DataSets::FilterOptions &filters) override;
+
+  void writeResult(CsvWriter &writer) override;
 };
 }  // namespace DataWorkers
 

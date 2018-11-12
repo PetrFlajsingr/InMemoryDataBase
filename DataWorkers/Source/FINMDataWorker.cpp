@@ -12,11 +12,11 @@ std::vector<std::string> DataWorkers::FINMDataWorker::getMultiChoiceNames() {
 std::vector<std::string> DataWorkers::FINMDataWorker::getChoices(std::string choiceName) {
   DataSets::BaseField* field = dataset->fieldByName(choiceName);
 
-  if(field == nullptr) {
+  if (field == nullptr) {
     return {};
   }
 
-  DataSets::MemoryDataSet* memoryDataSet = dynamic_cast<DataSets::MemoryDataSet*>(dataset);
+  auto * memoryDataSet = dynamic_cast<DataSets::MemoryDataSet*>(dataset);
 
   memoryDataSet->sort(field->getIndex(), SortOrder::ASCENDING);
 
@@ -35,14 +35,14 @@ std::vector<std::string> DataWorkers::FINMDataWorker::getChoices(std::string cho
   return result;
 }
 
-void DataWorkers::FINMDataWorker::setFilters(std::vector<DataSets::FilterOptions> filters) {
-  throw NotImplementedException();
+void DataWorkers::FINMDataWorker::filter(DataSets::FilterOptions &filters) {
+  dynamic_cast<DataSets::MemoryDataSet*>(dataset)->filter(filters);
 }
 
-DataWorkers::FINMDataWorker::FINMDataWorker(CsvWriter *writer,
+DataWorkers::FINMDataWorker::FINMDataWorker(
     DataProviders::BaseDataProvider *dataProvider,
     std::vector<ValueType> fieldTypes)
-    : BaseDataWorker(writer, dataProvider) {
+    : BaseDataWorker() {
   dataset = new DataSets::MemoryDataSet();
 
   dataset->setDataProvider(dataProvider);
@@ -50,4 +50,8 @@ DataWorkers::FINMDataWorker::FINMDataWorker(CsvWriter *writer,
   dataset->setFieldTypes(fieldTypes);
 
   dataset->open();
+}
+
+void DataWorkers::FINMDataWorker::writeResult(CsvWriter &writer) {
+  throw new NotImplementedException();
 }

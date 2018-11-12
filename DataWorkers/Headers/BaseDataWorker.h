@@ -11,16 +11,26 @@
 #include <FilterStructures.h>
 
 namespace DataWorkers {
+
+enum Operation {
+  Distinct, Sum, Average
+};
+
+struct ColumnOperation {
+  std::string columnName;
+  Operation operation;
+};
+
 class BaseDataWorker {
  protected:
-  CsvWriter* writer = nullptr;
-
   DataSets::BaseDataSet* dataset = nullptr;
+
+  std::vector<ColumnOperation> columnOperations;
+
  public:
-  BaseDataWorker(CsvWriter *writer, DataProviders::BaseDataProvider* dataProvider) : writer(writer) {}
+  BaseDataWorker() = default;
 
   virtual ~BaseDataWorker() {
-    delete writer;
     delete dataset;
   }
 
@@ -28,12 +38,15 @@ class BaseDataWorker {
 
   virtual std::vector<std::string> getChoices(std::string choiceName) = 0;
 
-  void setDataWriter(CsvWriter& writer) {
-    this->writer = &writer;
+  virtual void filter(DataSets::FilterOptions &filters)=0;
+
+  void setColumnOperations(std::vector<ColumnOperation>& columnOperations) {
+    this->columnOperations = columnOperations;
   }
 
-  virtual void setFilters(std::vector<DataSets::FilterOptions> filters)=0;
+  virtual void writeResult(CsvWriter& writer) = 0;
+
 };
-} // namespace DataWorkers
+}  // namespace DataWorkers
 
 #endif  //CSV_READER_BASEDATAWORKER_H
