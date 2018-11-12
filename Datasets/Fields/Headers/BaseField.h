@@ -83,23 +83,6 @@ class BaseField {
    */
   virtual std::string getAsString() = 0;
 
-
-  template <typename T>
-  T getValue();
-
-  template <>
-  int getValue();
-
-  template <>
-  double getValue();
-
-  template <>
-  Currency getValue();
-
-  uint64_t getIndex() {
-    return index;
-  }
-
   /**
    * Funkce pro razeni polozek datasetu podle jejich datoveho typu
    * @param order poradi (ascending nebo descending)
