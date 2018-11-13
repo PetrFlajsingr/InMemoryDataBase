@@ -23,6 +23,8 @@ struct ColumnOperation {
 
 class BaseDataWorker {
  protected:
+  std::vector<std::string> columnChoices;
+
   DataSets::BaseDataSet* dataset = nullptr;
 
   std::vector<ColumnOperation> columnOperations;
@@ -45,6 +47,10 @@ class BaseDataWorker {
   }
 
   virtual void writeResult(CsvWriter& writer) = 0;
+
+  void setColumnChoices(std::vector<std::string> &data) {
+    columnChoices = data;
+  }
 
 };
 }  // namespace DataWorkers

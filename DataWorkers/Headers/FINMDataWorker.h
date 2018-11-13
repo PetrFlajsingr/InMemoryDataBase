@@ -54,9 +54,6 @@ class ResultAccumulator {
 
 class FINMDataWorker : public BaseDataWorker {
  private:
-  //TODO
-  const std::vector<std::string> columnChoices = {"aa"};
-
   void writeHeaders(CsvWriter &writer);
  public:
   FINMDataWorker(DataProviders::BaseDataProvider *dataProvider,
