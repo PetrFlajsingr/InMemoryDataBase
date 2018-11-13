@@ -355,8 +355,6 @@ TEST_F(MemoryDataset_tests, exceptions) {
 
   EXPECT_THROW(dataset->sort(233, ASCENDING), InvalidArgumentException);
 
-  EXPECT_THROW(dataset->fieldByName("this column can't exist"), InvalidArgumentException);
-
   EXPECT_THROW(dataset->appendDataProvider(nullptr), InvalidArgumentException);
 }
 

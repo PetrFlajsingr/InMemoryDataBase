@@ -87,3 +87,24 @@ void DataWorkers::FINMDataWorker::writeHeaders(CsvWriter &writer) {
 
   writer.writeHeader(header);
 }
+
+
+
+
+DataWorkers::ResultAccumulator::ResultAccumulator(DataSets::BaseField *field,
+    Operation op) : field(field), operation(op) {
+  switch (field->getFieldType()) {
+    case STRING_VAL:
+      data._string = "";
+      break;
+    case INTEGER_VAL:
+      data._int = 0;
+      break;
+    case DOUBLE_VAL:
+      data._double = 0.0;
+      break;
+    case CURRENCY:
+      data._currency = new Currency();
+      break;
+  }
+}
