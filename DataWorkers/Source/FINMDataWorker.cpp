@@ -71,24 +71,24 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer) {
         op.operation));
   }
 
-  bool saveResult = false;
+  bool savedResults = false;
+  std::vector<std::string> results;
   while (!memoryDataSet->eof()) {
     for (auto acc : accumulators) {
-      if (acc->step()) {
-        saveResult = true;
+      if (acc->step() && !savedResults) {
+        for (auto toSave : accumulators) {
+          results.push_back(toSave->getResult());
+
+          toSave->reset();
+        }
+        savedResults = true;
       }
     }
 
-    if (saveResult) {
-      std::vector<std::string> results;
-      for (auto acc : accumulators) {
-        results.push_back(acc->getResult());
-
-        acc->reset();
-      }
+    if (savedResults) {
       writer.writeRecord(results);
 
-      saveResult = false;
+      savedResults = false;
     }
 
     memoryDataSet->next();
@@ -158,7 +158,7 @@ bool DataWorkers::ResultAccumulator::handleDistinct() {
     }
     case STRING_VAL: {
       std::string value = field->getAsString();
-      if(data._string == nullptr) {
+      if (data._string == nullptr) {
         data._string = strdup(value.c_str());
         return false;
       }
