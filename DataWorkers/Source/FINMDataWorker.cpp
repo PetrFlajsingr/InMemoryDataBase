@@ -95,10 +95,15 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer) {
     memoryDataSet->next();
   }
 
+  for (auto toSave : accumulators) {
+    results.push_back(toSave->getResultForce());
+
+    writer.writeRecord(results);
+  }
+
   for (auto *acc : accumulators) {
     delete acc;
   }
-
 }
 
 void DataWorkers::FINMDataWorker::writeHeaders(BaseDataWriter &writer) {
@@ -309,5 +314,21 @@ void DataWorkers::ResultAccumulator::reset() {
     case CURRENCY:
       *data._currency = 0;
       break;
+  }
+}
+std::string DataWorkers::ResultAccumulator::getResultForce() {
+  switch (field->getFieldType()) {
+    case INTEGER_VAL: {
+      return std::to_string(data._int);
+    }
+    case DOUBLE_VAL: {
+      return std::to_string(data._double);
+    }
+    case CURRENCY: {
+      return dec::toString(*data._currency);
+    }
+    case STRING_VAL: {
+      return data._string;
+    }
   }
 }

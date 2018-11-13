@@ -49,6 +49,8 @@ class ResultAccumulator {
 
   std::string getResult();
 
+  std::string getResultForce();
+
   void reset();
 
 };
