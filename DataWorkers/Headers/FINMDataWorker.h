@@ -70,7 +70,7 @@ class ResultAccumulator {
 
 class FINMDataWorker : public BaseDataWorker {
  private:
-  void writeHeaders(CsvWriter &writer);
+  void writeHeaders(BaseDataWriter &writer);
  public:
   FINMDataWorker(DataProviders::BaseDataProvider *dataProvider,
                  std::vector<ValueType> fieldTypes);
@@ -81,7 +81,7 @@ class FINMDataWorker : public BaseDataWorker {
 
   void filter(DataSets::FilterOptions &filters) override;
 
-  void writeResult(CsvWriter &writer) override;
+  void writeResult(BaseDataWriter &writer) override;
 };
 }  // namespace DataWorkers
 

@@ -7,8 +7,9 @@
 
 #include <string>
 #include <fstream>
+#include "BaseDataWriter.h"
 
-class CsvWriter {
+class CsvWriter : public BaseDataWriter {
  private:
   std::ofstream *outputStream;
 
@@ -22,9 +23,9 @@ class CsvWriter {
 
   virtual ~CsvWriter();
 
-  void writeHeader(const std::vector<std::string> &header);
+  void writeHeader(const std::vector<std::string> &header) override;
 
-  void writeRecord(const std::vector<std::string> &record);
+  void writeRecord(const std::vector<std::string> &record) override;
 };
 
 #endif  //DATAWRITERS_HEADERS_CSVWRITER_H_

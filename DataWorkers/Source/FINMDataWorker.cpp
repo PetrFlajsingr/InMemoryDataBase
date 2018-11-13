@@ -54,7 +54,7 @@ DataWorkers::FINMDataWorker::FINMDataWorker(
   dataset->open();
 }
 
-void DataWorkers::FINMDataWorker::writeResult(CsvWriter &writer) {
+void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer) {
   writeHeaders(writer);
 
   auto *memoryDataSet = dynamic_cast<DataSets::MemoryDataSet*>(dataset);
@@ -100,7 +100,7 @@ void DataWorkers::FINMDataWorker::writeResult(CsvWriter &writer) {
 
 }
 
-void DataWorkers::FINMDataWorker::writeHeaders(CsvWriter &writer) {
+void DataWorkers::FINMDataWorker::writeHeaders(BaseDataWriter &writer) {
   std::vector<std::string> header;
 
   std::transform(columnOperations.begin(),

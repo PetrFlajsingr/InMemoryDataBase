@@ -63,7 +63,7 @@ set(TEST_SOURCE_FILES DataProviders/Source/CsvReader.cpp DataProviders/Headers/C
         FileDownloaders/Headers/FileDownloadObserver.h lib/decimal/Decimal.h
         Datasets/Fields/Source/CurrencyField.cpp Datasets/Fields/Headers/CurrencyField.h
         DataWorkers/Headers/BaseDataWorker.h DataWorkers/Source/FINMDataWorker.cpp DataWorkers/Headers/FINMDataWorker.h
-        DataWorkers/tests/tests_DataWorkers.cpp)
+        DataWorkers/tests/tests_DataWorkers.cpp DataWriters/Headers/BaseDataWriter.h)
 
 
 add_executable(csv_reader main.cpp ${SOURCE_FILES})

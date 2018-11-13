@@ -46,7 +46,7 @@ class BaseDataWorker {
     this->columnOperations = columnOperations;
   }
 
-  virtual void writeResult(CsvWriter& writer) = 0;
+  virtual void writeResult(BaseDataWriter& writer) = 0;
 
   void setColumnChoices(std::vector<std::string> &data) {
     columnChoices = data;
