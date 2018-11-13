@@ -59,19 +59,42 @@ void DataWorkers::FINMDataWorker::writeResult(CsvWriter &writer) {
 
   auto *memoryDataSet = dynamic_cast<DataSets::MemoryDataSet*>(dataset);
 
-  //TODO
-  memoryDataSet->sort(memoryDataSet->fieldByName("aa")->getIndex(), ASCENDING);
+  memoryDataSet->sort(memoryDataSet
+    ->fieldByName(columnOperations[0].columnName)->getIndex(),
+    ASCENDING);
 
-  memoryDataSet->first();
+  std::vector<ResultAccumulator*> accumulators;
 
+  for (auto &op : columnOperations) {
+    accumulators.push_back(
+        new ResultAccumulator(memoryDataSet->fieldByName(op.columnName),
+        op.operation));
+  }
 
-
+  bool saveResult = false;
   while (!memoryDataSet->eof()) {
+    for (auto acc : accumulators) {
+      if (acc->step()) {
+        saveResult = true;
+      }
+    }
+
+    if (saveResult) {
+      std::vector<std::string> results;
+      for (auto acc : accumulators) {
+        results.push_back(acc->getResult());
+      }
+      writer.writeRecord(results);
+
+      saveResult = false;
+    }
 
     memoryDataSet->next();
   }
 
-
+  for (auto *acc : accumulators) {
+    delete acc;
+  }
 
 }
 

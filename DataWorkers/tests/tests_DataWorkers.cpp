@@ -60,3 +60,26 @@ TEST_F(DataWorker_tests, choices) {
   delete worker;
 }
 
+TEST_F(DataWorker_tests, basicDistinct) {
+  EXPECT_NO_THROW(worker = new FINMDataWorker(dataProvider,
+                                              {STRING_VAL, STRING_VAL, STRING_VAL, STRING_VAL, STRING_VAL}));
+
+
+  delete worker;
+}
+
+TEST_F(DataWorker_tests, basicSum) {
+  EXPECT_NO_THROW(worker = new FINMDataWorker(dataProvider,
+                                              {STRING_VAL, STRING_VAL, STRING_VAL, STRING_VAL, STRING_VAL}));
+
+
+  delete worker;
+}
+
+TEST_F(DataWorker_tests, basicAverage) {
+  EXPECT_NO_THROW(worker = new FINMDataWorker(dataProvider,
+                                              {STRING_VAL, STRING_VAL, STRING_VAL, STRING_VAL, STRING_VAL}));
+
+
+  delete worker;
+}
