@@ -87,6 +87,7 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer) {
 
     if (savedResults) {
       writer.writeRecord(results);
+      results.clear();
 
       savedResults = false;
     }

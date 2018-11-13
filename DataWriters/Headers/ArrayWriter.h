@@ -13,6 +13,7 @@ class ArrayWriter : public BaseDataWriter {
   void writeHeader(const std::vector<std::string> &header) override;
   void writeRecord(const std::vector<std::string> &record) override;
 
+  void print();
 };
 
 #endif //CSV_READER_ARRAYWRITER_H
