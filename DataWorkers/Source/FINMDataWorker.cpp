@@ -97,9 +97,9 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer) {
 
   for (auto toSave : accumulators) {
     results.push_back(toSave->getResultForce());
-
-    writer.writeRecord(results);
   }
+
+  writer.writeRecord(results);
 
   for (auto *acc : accumulators) {
     delete acc;
