@@ -120,7 +120,7 @@ DataWorkers::ResultAccumulator::ResultAccumulator(DataSets::BaseField *field,
     Operation op) : field(field), operation(op) {
   switch (field->getFieldType()) {
     case STRING_VAL:
-      data._string = "";
+      data._string = nullptr;
       break;
     case INTEGER_VAL:
       data._int = 0;
@@ -158,6 +158,10 @@ bool DataWorkers::ResultAccumulator::handleDistinct() {
     }
     case STRING_VAL: {
       std::string value = field->getAsString();
+      if(data._string == nullptr) {
+        data._string = strdup(value.c_str());
+        return false;
+      }
       if (value != data._string) {
         result = data._string;
         delete[] data._string;
@@ -286,4 +290,23 @@ std::string DataWorkers::ResultAccumulator::getResult() {
       return resultAverage();
   }
   throw IllegalStateException("Internal error.");
+}
+
+void DataWorkers::ResultAccumulator::reset() {
+  if(operation == Distinct) {
+    return;
+  }
+  dataCount = 0;
+
+  switch (field->getFieldType()) {
+    case INTEGER_VAL:
+      data._int = 0;
+      break;
+    case DOUBLE_VAL:
+      data._double = 0;
+      break;
+    case CURRENCY:
+      *data._currency = 0;
+      break;
+  }
 }

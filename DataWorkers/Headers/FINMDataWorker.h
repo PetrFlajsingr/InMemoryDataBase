@@ -49,21 +49,7 @@ class ResultAccumulator {
 
   std::string getResult();
 
-  void reset() {
-    dataCount = 0;
-
-    switch (field->getFieldType()) {
-      case INTEGER_VAL:
-        data._int = 0;
-        break;
-      case DOUBLE_VAL:
-        data._double = 0;
-        break;
-      case CURRENCY:
-        *data._currency = 0;
-        break;
-    }
-  }
+  void reset();
 
 };
 

@@ -4,6 +4,7 @@
 
 #include <BaseDataWorker.h>
 #include <FINMDataWorker.h>
+#include <ArrayWriter.h>
 #include "gtest/gtest.h"
 #include "MemoryDataSet.h"
 #include "ArrayDataProvider.h"
@@ -64,6 +65,23 @@ TEST_F(DataWorker_tests, basicDistinct) {
   EXPECT_NO_THROW(worker = new FINMDataWorker(dataProvider,
                                               {STRING_VAL, STRING_VAL, STRING_VAL, STRING_VAL, STRING_VAL}));
 
+  std::vector<ColumnOperation> ops;
+  ColumnOperation op;
+  op.operation = Distinct;
+  op.columnName = "0";
+  ops.push_back(op);
+
+  worker->setColumnOperations(ops);
+
+  ArrayWriter writer;
+  writer.result = new std::vector<std::string>();
+
+  worker->writeResult(writer);
+
+  EXPECT_EQ((*writer.result)[0], "0");
+  for (int i = 1; i < writer.result->size(); ++i) {
+    EXPECT_EQ((*writer.result)[i], test[i - 1][0]);
+  }
 
   delete worker;
 }
