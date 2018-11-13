@@ -83,6 +83,8 @@ void DataWorkers::FINMDataWorker::writeResult(CsvWriter &writer) {
       std::vector<std::string> results;
       for (auto acc : accumulators) {
         results.push_back(acc->getResult());
+
+        acc->reset();
       }
       writer.writeRecord(results);
 
