@@ -12,6 +12,7 @@
 #include "DoubleField.h"
 #include "CurrencyField.h"
 #include "StringField.h"
+#include "SortStructures.h"
 
 namespace DataWorkers {
 

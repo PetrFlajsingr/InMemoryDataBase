@@ -37,7 +37,7 @@ class Async_MemoryDataSet : public MemoryDataSet {
 
   void innerFilter(const FilterOptions &options);
 
-  void innerSort(uint64_t fieldIndex, SortOrder sortOrder);
+  void innerSort(SortOptions &options);
 
   void innerAppendDataProvider(DataProviders::BaseDataProvider *provider);
 
@@ -48,7 +48,7 @@ class Async_MemoryDataSet : public MemoryDataSet {
 
   void filter(const FilterOptions &options) override;
 
-  void sort(uint64_t fieldIndex, SortOrder sortOrder) override;
+  void sort(SortOptions &options) override;
 
   void appendDataProvider(DataProviders::BaseDataProvider *provider) override;
 

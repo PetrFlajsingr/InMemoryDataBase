@@ -99,7 +99,9 @@ TEST_F(AsyncMemoryDataset_tests, sort) {
 
   EXPECT_CALL(observer, onAfterSort(dataset));
 
-  dataset->sort(0, ASCENDING);
+  SortOptions options;
+  options.addOption(0, ASCENDING);
+  dataset->sort(options);
 }
 
 TEST_F(AsyncMemoryDataset_tests, filter) {

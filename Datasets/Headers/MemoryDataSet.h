@@ -119,7 +119,7 @@ class MemoryDataSet : public BaseDataSet {
    * Poradi klicu urcuje jejich prioritu.
    * @param options
    */
-  void sort(uint64_t fieldIndex, SortOrder sortOrder) override;
+  void sort(SortOptions &options) override;
 
   /**
    * Vyhledani zaznamu podle zadanych klicu

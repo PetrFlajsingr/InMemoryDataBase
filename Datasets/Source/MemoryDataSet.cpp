@@ -188,20 +188,36 @@ void DataSets::MemoryDataSet::previous() {
   setFieldValues(currentRecord, false);
 }
 
-void DataSets::MemoryDataSet::sort(uint64_t fieldIndex, SortOrder sortOrder) {
-  if (fieldIndex >= getFieldNames().size()) {
+void DataSets::MemoryDataSet::sort(SortOptions &options) {
+  uint64_t fieldCount = fields.size();
+  bool isInRange = std::all_of(options.options.begin(),
+      options.options.end(),
+      [fieldCount](SortItem &item) {
+        return item.fieldIndex < fieldCount;
+  });
+
+  if (!isInRange) {
     throw InvalidArgumentException("Field index is out of bounds");
   }
 
-  if (sortOrder == ASCENDING) {
-    std::sort(data.begin(),
-              data.end(),
-              fields[fieldIndex]->getCompareFunction(ASCENDING));
-  } else {
-    std::sort(data.begin(),
-              data.end(),
-              fields[fieldIndex]->getCompareFunction(DESCENDING));
+  std::vector<std::function<bool(DataSetRow *, DataSetRow *)>> compareFunctions;
+
+  for (auto &option : options.options) {
+    compareFunctions.push_back(
+        fields[option.fieldIndex]->getCompareFunction(option.order));
   }
+
+  auto compareFunction = [&compareFunctions](DataSetRow *a, DataSetRow *b) {
+    return std::all_of(compareFunctions.begin(),
+        compareFunctions.end(),
+        [a, b](std::function<bool(DataSetRow *, DataSetRow *)> &function) {
+          return function(a, b);
+        });
+  };
+
+  std::sort(data.begin(),
+      data.end(),
+      compareFunction);
 
   first();
 }
@@ -350,7 +366,7 @@ void DataSets::MemoryDataSet::setData(void *data,
 
 void DataSets::MemoryDataSet::append() {
   auto newRecord = new DataSetRowCells();
-  for (size_t i = 0; i < getFieldNames().size(); ++i) {
+  for (size_t i = 0; i < fields.size(); ++i) {
     auto dataContainer = new DataContainer();
 
     switch (fields[i]->getFieldType()) {

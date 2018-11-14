@@ -271,8 +271,11 @@ TEST_F(MemoryDataset_tests, filter_ends_with) {
 TEST_F(MemoryDataset_tests, sort) {
   ASSERT_NO_THROW(dataset->open());
 
+  SortOptions sortOptions0;
+  sortOptions0.addOption(0, DESCENDING);
+
   //
-  dataset->sort(0, DESCENDING);
+  dataset->sort(sortOptions0);
   BaseField *col1 = dataset->fieldByIndex(0);
 
   std::string previous = col1->getAsString();
@@ -285,8 +288,11 @@ TEST_F(MemoryDataset_tests, sort) {
     dataset->next();
   }
   //\
-    //
-  dataset->sort(3, ASCENDING);
+  //
+
+  SortOptions sortOptions3;
+  sortOptions3.addOption(3, ASCENDING);
+  dataset->sort(sortOptions3);
   BaseField *col3 = dataset->fieldByIndex(3);
 
   previous = col3->getAsString();
@@ -353,7 +359,9 @@ TEST_F(MemoryDataset_tests, append_provider) {
 TEST_F(MemoryDataset_tests, exceptions) {
   ASSERT_NO_THROW(dataset->open());
 
-  EXPECT_THROW(dataset->sort(233, ASCENDING), InvalidArgumentException);
+  SortOptions sortOptions;
+  sortOptions.addOption(233, ASCENDING);
+  EXPECT_THROW(dataset->sort(sortOptions), InvalidArgumentException);
 
   EXPECT_THROW(dataset->appendDataProvider(nullptr), InvalidArgumentException);
 }

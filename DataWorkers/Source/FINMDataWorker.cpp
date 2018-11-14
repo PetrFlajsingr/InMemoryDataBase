@@ -17,7 +17,9 @@ std::vector<std::string> DataWorkers::FINMDataWorker::getChoices(std::string cho
     return {};
   }
 
-  dataset->sort(field->getIndex(), SortOrder::ASCENDING);
+  DataSets::SortOptions sortOptions;
+  sortOptions.addOption(field->getIndex(), SortOrder::ASCENDING);
+  dataset->sort(sortOptions);
 
   std::string value;
 
@@ -54,9 +56,11 @@ DataWorkers::FINMDataWorker::FINMDataWorker(
 void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer) {
   writeHeaders(writer);
 
-  dataset->sort(dataset
-    ->fieldByName(columnOperations[0].columnName)->getIndex(),
-    ASCENDING);
+  DataSets::SortOptions sortOptions;
+  sortOptions.addOption(
+      dataset->fieldByName(columnOperations[0].columnName)->getIndex(),
+      SortOrder::ASCENDING);
+  dataset->sort(sortOptions);
 
   std::vector<ResultAccumulator*> accumulators;
 

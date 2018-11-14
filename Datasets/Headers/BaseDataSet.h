@@ -11,6 +11,7 @@
 #include "BaseDataProvider.h"
 #include "Types.h"
 #include "FilterStructures.h"
+#include "SortStructures.h"
 
 namespace DataSets {
 class BaseField;
@@ -117,7 +118,7 @@ class BaseDataSet {
    */
   virtual void append() = 0;
 
-  virtual void sort(uint64_t fieldIndex, SortOrder sortOrder)=0;
+  virtual void sort(SortOptions &options)=0;
 
   virtual void filter(const FilterOptions &options)=0;
 
