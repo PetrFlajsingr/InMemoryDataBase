@@ -119,13 +119,13 @@ class MemoryDataSet : public BaseDataSet {
    * Poradi klicu urcuje jejich prioritu.
    * @param options
    */
-  virtual void sort(uint64_t fieldIndex, SortOrder sortOrder);
+  void sort(uint64_t fieldIndex, SortOrder sortOrder) override;
 
   /**
    * Vyhledani zaznamu podle zadanych klicu
    * @param options
    */
-  virtual void filter(const FilterOptions &options);
+  void filter(const FilterOptions &options) override;
 
   BaseField *fieldByName(const std::string &name) override;
 
