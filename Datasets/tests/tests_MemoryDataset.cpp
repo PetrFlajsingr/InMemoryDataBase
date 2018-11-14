@@ -428,7 +428,7 @@ TEST_F(MemoryDatasetCurrency_tests, read) {
   EXPECT_EQ(row, 5);
 }
 
-TEST_F(MemoryDatasetSort_tests, sortAscending) {
+TEST_F(MemoryDatasetSort_tests, sortAscendingInteger) {
   ASSERT_NO_THROW(dataset->open());
 
   SortOptions options;
@@ -467,7 +467,7 @@ TEST_F(MemoryDatasetSort_tests, sortAscending) {
 }
 
 
-TEST_F(MemoryDatasetSort_tests, sortDescending) {
+TEST_F(MemoryDatasetSort_tests, sortDescendingInteger) {
   ASSERT_NO_THROW(dataset->open());
 
   SortOptions options;
@@ -506,7 +506,7 @@ TEST_F(MemoryDatasetSort_tests, sortDescending) {
 }
 
 
-TEST_F(MemoryDatasetSort_tests, sortCombined) {
+TEST_F(MemoryDatasetSort_tests, sortCombinedInteger) {
   ASSERT_NO_THROW(dataset->open());
 
   SortOrder sortOrders[5] = {ASCENDING,
