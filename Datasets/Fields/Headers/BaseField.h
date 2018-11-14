@@ -26,12 +26,16 @@ class BaseField {
   uint64_t index;  //< Index sloupce
 
  public:
+  /**
+   *
+   * @return Nazev pole
+   */
   const std::string &getFieldName() const {
     return fieldName;
   }
 
  protected:
-  friend class BaseDataSet;
+  friend class BaseDataSet; //< Pro pristup k primemu nastaveni dat
 
   BaseDataSet *dataSet;  //< Rodicovsky dataset
 
@@ -83,6 +87,10 @@ class BaseField {
    */
   virtual std::string getAsString() = 0;
 
+  /**
+   *
+   * @return Index Field v DataSet
+   */
   uint64_t getIndex() {
     return index;
   }

@@ -891,7 +891,7 @@ TEST_F(MemoryDatasetSort_tests, sortDescendingCurrency) {
   ASSERT_NO_THROW(dataset->open());
 
   SortOptions options;
-  for (int i = 0; i < 5;++i) {
+  for (int i = 0; i < 5; ++i) {
     options.addOption(i, DESCENDING);
   }
   //

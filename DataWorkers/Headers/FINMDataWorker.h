@@ -25,6 +25,10 @@ class ResultAccumulator {
     Currency* _currency;
   } data;
 
+  bool firstDone = false;
+
+  bool distinct = false;
+
   uint32_t dataCount = 0;
 
   DataSets::BaseField* field;
@@ -42,6 +46,8 @@ class ResultAccumulator {
   std::string resultSum();
 
   std::string resultAverage();
+
+  std::string resultDistinct();
 
  public:
   ResultAccumulator(DataSets::BaseField *field, Operation op);

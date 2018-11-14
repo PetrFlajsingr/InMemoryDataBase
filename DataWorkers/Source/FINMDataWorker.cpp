@@ -57,9 +57,13 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer) {
   writeHeaders(writer);
 
   DataSets::SortOptions sortOptions;
-  sortOptions.addOption(
-      dataset->fieldByName(columnOperations[0].columnName)->getIndex(),
-      SortOrder::ASCENDING);
+  for (int i = 0; i < dataset->getFieldNames().size(); ++i) {
+    if (columnOperations[i].operation == Distinct) {
+      sortOptions.addOption(
+          dataset->fieldByName(columnOperations[i].columnName)->getIndex(),
+          SortOrder::ASCENDING);
+    }
+  }
   dataset->sort(sortOptions);
 
   std::vector<ResultAccumulator*> accumulators;
@@ -144,9 +148,15 @@ bool DataWorkers::ResultAccumulator::handleDistinct() {
     case INTEGER_VAL: {
       int value = reinterpret_cast<DataSets::IntegerField *>(field)
           ->getAsInteger();
+      if (!firstDone) {
+        firstDone = true;
+        data._int = value;
+        return false;
+      }
       if (value != data._int) {
         result = std::to_string(data._int);
         data._int = value;
+        distinct = true;
         return true;
       }
       break;
@@ -154,16 +164,23 @@ bool DataWorkers::ResultAccumulator::handleDistinct() {
     case DOUBLE_VAL: {
       double value = reinterpret_cast<DataSets::DoubleField *>(field)
           ->getAsDouble();
+      if (!firstDone) {
+        firstDone = true;
+        data._double = value;
+        return false;
+      }
       if (value != data._double) {
         result = std::to_string(data._double);
         data._double = value;
+        distinct = true;
         return true;
       }
       break;
     }
     case STRING_VAL: {
       std::string value = field->getAsString();
-      if (data._string == nullptr) {
+      if (!firstDone) {
+        firstDone = true;
         data._string = strdup(value.c_str());
         return false;
       }
@@ -171,6 +188,7 @@ bool DataWorkers::ResultAccumulator::handleDistinct() {
         result = data._string;
         delete[] data._string;
         data._string = strdup(value.c_str());
+        distinct = true;
         return true;
       }
       break;
@@ -178,9 +196,15 @@ bool DataWorkers::ResultAccumulator::handleDistinct() {
     case CURRENCY: {
       Currency value = reinterpret_cast<DataSets::CurrencyField *>(field)
           ->getAsCurrency();
+      if (!firstDone) {
+        firstDone = true;
+        *data._currency = value;
+        return false;
+      }
       if (value != *data._currency) {
         result = dec::toString(*data._currency);
         *data._currency = value;
+        distinct = true;
         return true;
       }
       break;
@@ -285,10 +309,12 @@ bool DataWorkers::ResultAccumulator::step() {
   }
 }
 
+// nepocital jsem s tim, že to půjde zpětně,
+// je potřeba result překopírovat
 std::string DataWorkers::ResultAccumulator::getResult() {
   switch (operation) {
     case Distinct:
-      return result;
+      return resultDistinct();
     case Sum:
       return resultSum();
     case Average:
@@ -330,4 +356,12 @@ std::string DataWorkers::ResultAccumulator::getResultForce() {
       return data._string;
     }
   }
+}
+
+std::string DataWorkers::ResultAccumulator::resultDistinct() {
+  if (distinct) {
+    distinct = false;
+    return result;
+  }
+  return getResultForce();
 }

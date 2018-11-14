@@ -16,7 +16,7 @@ void ArrayWriter::writeRecord(const std::vector<std::string> &record) {
 void ArrayWriter::print() {
   for (auto &vec : *result) {
     for (auto &str : vec) {
-      std::cout << str << ",";
+      std::cout << str << ",\t";
     }
     std::cout << std::endl;
   }

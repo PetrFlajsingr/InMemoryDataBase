@@ -18,11 +18,34 @@ class DataWorker_tests : public ::testing::Test {
 
   BaseDataProvider *dataProvider = nullptr;
 
-  std::vector<std::vector<std::string>> test{{"COLUMN11", "10", "1", "COLUMN14", "COLUMN15"},
-                                             {"COLUMN21", "10", "1", "COLUMN24", "COLUMN25"},
-                                             {"COLUMN31", "10", "1", "COLUMN34", "COLUMN35"},
-                                             {"COLUMN41", "10", "1", "COLUMN44", "COLUMN45"},
-                                             {"COLUMN51", "10", "1", "COLUMN54", "COLUMN55"}
+  BaseDataProvider *advDataProvider = nullptr;
+
+  std::vector<std::vector<std::string>> test{
+    {"COLUMN11", "10", "1", "COLUMN14", "COLUMN15"},
+    {"COLUMN21", "10", "1", "COLUMN24", "COLUMN25"},
+    {"COLUMN31", "10", "1", "COLUMN34", "COLUMN35"},
+    {"COLUMN41", "10", "1", "COLUMN44", "COLUMN45"},
+    {"COLUMN51", "10", "1", "COLUMN54", "COLUMN55"}
+  };
+
+  std::vector<std::vector<std::string>> advTest{
+      {"prvni", "2839", "10.01", "444.8", "27", "8"},
+      {"special", "33", "90.00", "666.8", "27", "2"},
+      {"special", "44", "90.00", "666.8", "27", "2"},
+      {"druhy", "2422", "200.02", "222.8", "27", "3"},
+      {"prvni", "2839", "3000.03", "333.8", "27", "9"},
+      {"treti", "2331", "40000.04", "444.8", "27", "11"},
+      {"ctvrty", "22222", "90.00", "666.8", "27", "2"},
+      {"druhy", "2839", "500000.05", "555.8", "27", "5"},
+      {"prvni", "2222", "600000.06", "111.8", "27", "6"},
+      {"ctvrty", "2839", "70000.07", "222.8", "27", "1"},
+      {"prvni", "2222", "8000.08", "333.8", "27", "7"},
+      {"treti", "88", "900.09", "555.8", "27", "10"},
+      {"special", "11", "1.00", "666.8", "27", "2"},
+      {"special", "22", "1.00", "666.8", "27", "2"},
+      {"special", "22", "1.00", "666.8", "27", "2"},
+      {"special", "11", "1.00", "666.8", "27", "2"},
+      {"special", "11", "1.00", "666.8", "27", "2"},
   };
 
  public:
@@ -30,6 +53,7 @@ class DataWorker_tests : public ::testing::Test {
 
   void SetUp() override {
     dataProvider = new ArrayDataProvider(test);
+    advDataProvider = new ArrayDataProvider(advTest);
   }
 
   void TearDown() override {
@@ -81,6 +105,47 @@ TEST_F(DataWorker_tests, basicDistinct) {
   EXPECT_EQ((*writer.result)[0][0], "0");
   for (int i = 1; i < writer.result->size(); ++i) {
     EXPECT_EQ((*writer.result)[i][0], test[i - 1][0]);
+  }
+
+  delete worker;
+}
+
+TEST_F(DataWorker_tests, advancedDinstinct) {
+  EXPECT_NO_THROW(worker = new FINMDataWorker(advDataProvider,
+                                              {STRING_VAL, INTEGER_VAL, CURRENCY, CURRENCY, INTEGER_VAL, CURRENCY}));
+
+  std::vector<ColumnOperation> ops;
+  ColumnOperation op;
+  op.operation = Distinct;
+  op.columnName = "0";
+  ops.push_back(op);
+  op.operation = Distinct;
+  op.columnName = "1";
+  ops.push_back(op);
+  op.operation = Sum;
+  op.columnName = "2";
+  ops.push_back(op);
+  op.operation = Sum;
+  op.columnName = "3";
+  ops.push_back(op);
+  op.operation = Sum;
+  op.columnName = "4";
+  ops.push_back(op);
+  op.operation = Sum;
+  op.columnName = "5";
+  ops.push_back(op);
+
+  worker->setColumnOperations(ops);
+
+  ArrayWriter writer;
+  writer.result = new std::vector<std::vector<std::string>>();
+
+  worker->writeResult(writer);
+
+  writer.print();
+
+  for (int i = 0; i < advTest[0].size(); ++i) {
+    EXPECT_EQ((*writer.result)[0][i], std::to_string(i));
   }
 
   delete worker;
