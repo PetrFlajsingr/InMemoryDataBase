@@ -433,7 +433,7 @@ TEST_F(MemoryDatasetSort_tests, sortAscending) {
 
   SortOptions options;
   for (int i = 0; i < 5;++i) {
-    options.addOption(i, DESCENDING);
+    options.addOption(i, ASCENDING);
   }
   //
 
