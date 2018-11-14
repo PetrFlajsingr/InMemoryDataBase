@@ -61,7 +61,7 @@ class MemoryDataset_tests : public ::testing::Test {
                                                   {"2", "8", "3", "2", "1"},
                                                   {"1", "2", "3", "4", "5"},
                                                   {"1", "3", "4", "5", "6"},
-                                                  {"6", "8", "3", "2", "1"},
+                                                  {"6", "8", "3", "2", "3"},
                                                   {"1", "1", "3", "2", "6"},
                                                   {"2", "7", "5", "3", "2"},
                                                   {"9", "6", "4", "2", "1"},
@@ -434,35 +434,37 @@ TEST_F(MemoryDatasetSort_tests, sortAscending) {
   SortOptions options;
   options.addOption(0, ASCENDING);
   options.addOption(1, ASCENDING);
+  options.addOption(2, ASCENDING);
+  options.addOption(3, ASCENDING);
+  options.addOption(4, ASCENDING);
 
   //
 
   dataset->sort(options);
 
-  auto field0 = dynamic_cast<IntegerField*>(dataset->fieldByIndex(0));
-  auto field1 = dynamic_cast<IntegerField*>(dataset->fieldByIndex(1));
-  auto field2 = dynamic_cast<IntegerField*>(dataset->fieldByIndex(2));
-  auto field3 = dynamic_cast<IntegerField*>(dataset->fieldByIndex(3));
-  auto field4 = dynamic_cast<IntegerField*>(dataset->fieldByIndex(4));
+  IntegerField *fields[5];
+  int previous[5];
 
-  int previous0 = field0->getAsInteger();
-  int previous1 = field1->getAsInteger();
-  std::stringstream ss;
-  ss << previous0 << "," << previous1 << std::endl;
-
-  dataset->next();
-  while (!dataset->eof()) {
-    EXPECT_GE(field0->getAsInteger(), previous0);
-    if (previous0 == field0->getAsInteger()) {
-      EXPECT_GE(field1->getAsInteger(), previous1);
-    }
-
-    previous0 = field0->getAsInteger();
-    previous1 = field1->getAsInteger();
-
-    ss << previous0 << "," << previous1 << std::endl;
-    dataset->next();
+  for (int i = 0; i < 5; ++i) {
+    fields[i] = dynamic_cast<IntegerField*>(dataset->fieldByIndex(i));
+    previous[i] = fields[i]->getAsInteger();
   }
 
-  std::cout << ss.str();
+  dataset->next();
+  int cnt = 0;
+  while (!dataset->eof()) {
+    cnt++;
+    for (int i = 0; i < 5; ++i) {
+      EXPECT_GE(fields[i]->getAsInteger(), previous[i]);
+      if (fields[i]->getAsInteger() != previous[i]) {
+        break;
+      }
+    }
+
+    for (int i = 0; i < 5; ++i) {
+      previous[i] = fields[i]->getAsInteger();
+    }
+
+    dataset->next();
+  }
 }
