@@ -2,10 +2,9 @@
 // Created by Petr Flajsingr on 12/11/2018.
 //
 
-#include <MemoryDataSet.h>
+#include <BaseDataSet.h>
 #include <FINMDataWorker.h>
-
-#include "FINMDataWorker.h"
+#include "MemoryDataSet.h"
 
 std::vector<std::string> DataWorkers::FINMDataWorker::getMultiChoiceNames() {
   return columnChoices;
@@ -18,27 +17,25 @@ std::vector<std::string> DataWorkers::FINMDataWorker::getChoices(std::string cho
     return {};
   }
 
-  auto * memoryDataSet = dynamic_cast<DataSets::MemoryDataSet*>(dataset);
-
-  memoryDataSet->sort(field->getIndex(), SortOrder::ASCENDING);
+  dataset->sort(field->getIndex(), SortOrder::ASCENDING);
 
   std::string value;
 
   std::vector<std::string> result;
 
-  while (!memoryDataSet->eof()) {
+  while (!dataset->eof()) {
     if (field->getAsString() != value) {
       value = field->getAsString();
       result.push_back(value);
     }
-    memoryDataSet->next();
+    dataset->next();
   }
 
   return result;
 }
 
 void DataWorkers::FINMDataWorker::filter(DataSets::FilterOptions &filters) {
-  dynamic_cast<DataSets::MemoryDataSet*>(dataset)->filter(filters);
+  dataset->filter(filters);
 }
 
 DataWorkers::FINMDataWorker::FINMDataWorker(
@@ -57,9 +54,7 @@ DataWorkers::FINMDataWorker::FINMDataWorker(
 void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer) {
   writeHeaders(writer);
 
-  auto *memoryDataSet = dynamic_cast<DataSets::MemoryDataSet*>(dataset);
-
-  memoryDataSet->sort(memoryDataSet
+  dataset->sort(dataset
     ->fieldByName(columnOperations[0].columnName)->getIndex(),
     ASCENDING);
 
@@ -67,13 +62,13 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer) {
 
   for (auto &op : columnOperations) {
     accumulators.push_back(
-        new ResultAccumulator(memoryDataSet->fieldByName(op.columnName),
+        new ResultAccumulator(dataset->fieldByName(op.columnName),
         op.operation));
   }
 
   bool savedResults = false;
   std::vector<std::string> results;
-  while (!memoryDataSet->eof()) {
+  while (!dataset->eof()) {
     for (auto acc : accumulators) {
       if (acc->step() && !savedResults) {
         for (auto toSave : accumulators) {
@@ -92,7 +87,7 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer) {
       savedResults = false;
     }
 
-    memoryDataSet->next();
+    dataset->next();
   }
 
   for (auto toSave : accumulators) {
