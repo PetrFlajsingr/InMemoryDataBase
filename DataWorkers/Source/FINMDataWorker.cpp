@@ -57,7 +57,7 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer) {
   writeHeaders(writer);
 
   DataSets::SortOptions sortOptions;
-  for (int i = 0; i < dataset->getFieldNames().size(); ++i) {
+  for (int i = 0; i < dataset->getFieldNames().size() && i < columnOperations.size(); ++i) {
     if (columnOperations[i].operation == Distinct) {
       sortOptions.addOption(
           dataset->fieldByName(columnOperations[i].columnName)->getIndex(),

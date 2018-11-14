@@ -48,6 +48,22 @@ class DataWorker_tests : public ::testing::Test {
       {"special", "11", "1.00", "666.8", "27", "2"},
   };
 
+  std::vector<std::vector<std::string>> advAnswers {
+      {"0", "1", "2", "3", "4", "5"},
+      {"ctvrty", "2839", "70000.07", "222.80", "27", "1.00"},
+      {"ctvrty", "22222", "90.00", "666.80", "27", "2.00"},
+      {"druhy", "2422", "200.02", "222.80", "27", "3.00"},
+      {"druhy", "2839", "500000.05", "555.80", "27", "5.00"},
+      {"prvni", "2222", "608000.14", "445.60", "54", "13.00"},
+      {"prvni", "2839", "3010.04", "778.60", "54", "17.00"},
+      {"special", "11", "3.00", "2000.40", "81", "6.00"},
+      {"special", "22", "2.00", "1333.60", "54", "4.00"},
+      {"special", "33", "90.00", "666.80", "27", "2.00"},
+      {"special", "44", "90.00", "666.80", "27", "2.00"},
+      {"treti", "88", "900.09", "555.80", "27", "10.00"},
+      {"treti", "2331", "40000.04", "444.80", "27", "11.00"},
+  };
+
  public:
   DataWorker_tests() = default;
 
@@ -142,8 +158,6 @@ TEST_F(DataWorker_tests, advancedDinstinct) {
 
   worker->writeResult(writer);
 
-  writer.print();
-
   for (int i = 0; i < advTest[0].size(); ++i) {
     EXPECT_EQ((*writer.result)[0][i], std::to_string(i));
   }
@@ -175,6 +189,47 @@ TEST_F(DataWorker_tests, basicSum) {
   EXPECT_EQ((*writer.result)[0][1], "1");
   for (int i = 1; i < writer.result->size(); ++i) {
     EXPECT_EQ((*writer.result)[i][1], test[i - 1][1]);
+  }
+
+  delete worker;
+}
+
+TEST_F(DataWorker_tests, advancedSum) {
+  EXPECT_NO_THROW(worker = new FINMDataWorker(advDataProvider,
+                                              {STRING_VAL, INTEGER_VAL, CURRENCY, CURRENCY, INTEGER_VAL, CURRENCY}));
+
+  std::vector<ColumnOperation> ops;
+  ColumnOperation op;
+  op.operation = Distinct;
+  op.columnName = "0";
+  ops.push_back(op);
+  op.operation = Distinct;
+  op.columnName = "1";
+  ops.push_back(op);
+  op.operation = Sum;
+  op.columnName = "2";
+  ops.push_back(op);
+  op.operation = Sum;
+  op.columnName = "3";
+  ops.push_back(op);
+  op.operation = Sum;
+  op.columnName = "4";
+  ops.push_back(op);
+  op.operation = Sum;
+  op.columnName = "5";
+  ops.push_back(op);
+
+  worker->setColumnOperations(ops);
+
+  ArrayWriter writer;
+  writer.result = new std::vector<std::vector<std::string>>();
+
+  worker->writeResult(writer);
+
+  for (int i = 0; i < (*writer.result).size(); ++i) {
+    for (int j = 0; j < (*writer.result)[i].size();++j) {
+      EXPECT_STREQ((*writer.result)[i][j].c_str(), advAnswers[i][j].c_str());
+    }
   }
 
   delete worker;
