@@ -850,8 +850,6 @@ TEST_F(MemoryDatasetSort_tests, sortAscendingCurrency) {
   setAsCurrency();
   ASSERT_NO_THROW(dataset->open());
 
-  std::stringstream ss;
-
   SortOptions options;
   for (int i = 0; i < 5;++i) {
     options.addOption(i, ASCENDING);
@@ -866,9 +864,7 @@ TEST_F(MemoryDatasetSort_tests, sortAscendingCurrency) {
   for (int i = 0; i < 5; ++i) {
     fields[i] = dynamic_cast<CurrencyField*>(dataset->fieldByIndex(i));
     previous[i] = fields[i]->getAsCurrency();
-    ss << previous[i] << ", ";
   }
-  ss <<std::endl;
 
   dataset->next();
   int cnt = 0;
@@ -883,14 +879,10 @@ TEST_F(MemoryDatasetSort_tests, sortAscendingCurrency) {
 
     for (int i = 0; i < 5; ++i) {
       previous[i] = fields[i]->getAsCurrency();
-      ss << previous[i] << ", ";
     }
-    ss <<std::endl;
 
     dataset->next();
   }
-
-  std::cout << ss.str();
 }
 
 

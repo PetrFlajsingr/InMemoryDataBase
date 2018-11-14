@@ -26,12 +26,12 @@ std::string DataSets::CurrencyField::getAsString() {
 std::function<int8_t (DataSets::DataSetRow *, DataSets::DataSetRow *)> DataSets::CurrencyField::getCompareFunction() {
   return [this](const DataSetRow *a,
                 const DataSetRow *b) {
-    if ((*a->cells)[index]->_currency
-        == (*b->cells)[index]->_currency) {
+    if (*(*a->cells)[index]->_currency
+        == *(*b->cells)[index]->_currency) {
       return 0;
     }
-    if ((*a->cells)[index]->_currency
-        < (*b->cells)[index]->_currency) {
+    if (*(*a->cells)[index]->_currency
+        < *(*b->cells)[index]->_currency) {
       return -1;
     }
     return 1;
