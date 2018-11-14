@@ -38,6 +38,6 @@ std::function<int8_t (DataSets::DataSetRow *,
     return [this](const DataSetRow *a,
                          const DataSetRow *b) {
       return strcmp((*a->cells)[index]->_string,
-                    (*b->cells)[index]->_string) < 0;
+                    (*b->cells)[index]->_string);
     };
 }
