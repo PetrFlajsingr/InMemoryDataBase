@@ -468,3 +468,45 @@ TEST_F(MemoryDatasetSort_tests, sortAscending) {
     dataset->next();
   }
 }
+
+
+TEST_F(MemoryDatasetSort_tests, sortDescending) {
+  ASSERT_NO_THROW(dataset->open());
+
+  SortOptions options;
+  options.addOption(0, DESCENDING);
+  options.addOption(1, DESCENDING);
+  options.addOption(2, DESCENDING);
+  options.addOption(3, DESCENDING);
+  options.addOption(4, DESCENDING);
+
+  //
+
+  dataset->sort(options);
+
+  IntegerField *fields[5];
+  int previous[5];
+
+  for (int i = 0; i < 5; ++i) {
+    fields[i] = dynamic_cast<IntegerField*>(dataset->fieldByIndex(i));
+    previous[i] = fields[i]->getAsInteger();
+  }
+
+  dataset->next();
+  int cnt = 0;
+  while (!dataset->eof()) {
+    cnt++;
+    for (int i = 0; i < 5; ++i) {
+      EXPECT_LE(fields[i]->getAsInteger(), previous[i]);
+      if (fields[i]->getAsInteger() != previous[i]) {
+        break;
+      }
+    }
+
+    for (int i = 0; i < 5; ++i) {
+      previous[i] = fields[i]->getAsInteger();
+    }
+
+    dataset->next();
+  }
+}
