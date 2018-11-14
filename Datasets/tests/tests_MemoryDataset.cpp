@@ -432,12 +432,9 @@ TEST_F(MemoryDatasetSort_tests, sortAscending) {
   ASSERT_NO_THROW(dataset->open());
 
   SortOptions options;
-  options.addOption(0, ASCENDING);
-  options.addOption(1, ASCENDING);
-  options.addOption(2, ASCENDING);
-  options.addOption(3, ASCENDING);
-  options.addOption(4, ASCENDING);
-
+  for (int i = 0; i < 5;++i) {
+    options.addOption(i, DESCENDING);
+  }
   //
 
   dataset->sort(options);
@@ -474,12 +471,9 @@ TEST_F(MemoryDatasetSort_tests, sortDescending) {
   ASSERT_NO_THROW(dataset->open());
 
   SortOptions options;
-  options.addOption(0, DESCENDING);
-  options.addOption(1, DESCENDING);
-  options.addOption(2, DESCENDING);
-  options.addOption(3, DESCENDING);
-  options.addOption(4, DESCENDING);
-
+  for (int i = 0; i < 5;++i) {
+    options.addOption(i, DESCENDING);
+  }
   //
 
   dataset->sort(options);
@@ -498,6 +492,56 @@ TEST_F(MemoryDatasetSort_tests, sortDescending) {
     cnt++;
     for (int i = 0; i < 5; ++i) {
       EXPECT_LE(fields[i]->getAsInteger(), previous[i]);
+      if (fields[i]->getAsInteger() != previous[i]) {
+        break;
+      }
+    }
+
+    for (int i = 0; i < 5; ++i) {
+      previous[i] = fields[i]->getAsInteger();
+    }
+
+    dataset->next();
+  }
+}
+
+
+TEST_F(MemoryDatasetSort_tests, sortCombined) {
+  ASSERT_NO_THROW(dataset->open());
+
+  SortOrder sortOrders[5] = {ASCENDING,
+                             DESCENDING,
+                             DESCENDING,
+                             ASCENDING,
+                             DESCENDING};
+
+  SortOptions options;
+  for (int i = 0; i < 5;++i) {
+    options.addOption(i, sortOrders[i]);
+  }
+
+  //
+
+  dataset->sort(options);
+
+  IntegerField *fields[5];
+  int previous[5];
+
+  for (int i = 0; i < 5; ++i) {
+    fields[i] = dynamic_cast<IntegerField*>(dataset->fieldByIndex(i));
+    previous[i] = fields[i]->getAsInteger();
+  }
+
+  dataset->next();
+  int cnt = 0;
+  while (!dataset->eof()) {
+    cnt++;
+    for (int i = 0; i < 5; ++i) {
+      if(sortOrders[i] == ASCENDING) {
+        EXPECT_GE(fields[i]->getAsInteger(), previous[i]);
+      } else {
+        EXPECT_LE(fields[i]->getAsInteger(), previous[i]);
+      }
       if (fields[i]->getAsInteger() != previous[i]) {
         break;
       }
