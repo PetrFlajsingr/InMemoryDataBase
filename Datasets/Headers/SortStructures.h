@@ -1,0 +1,8 @@
+//
+// Created by Petr Flajsingr on 14/11/2018.
+//
+
+#ifndef CSV_READER_SORTSTRUCTURES_H
+#define CSV_READER_SORTSTRUCTURES_H
+
+#endif //CSV_READER_SORTSTRUCTURES_H
