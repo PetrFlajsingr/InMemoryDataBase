@@ -26,7 +26,7 @@ class StringField : public BaseField {
   void setAsString(const std::string &value) override;
 
   std::string getAsString() override;
-  std::function<bool(DataSetRow *, DataSetRow *)> getCompareFunction(SortOrder order) override;
+  std::function<int8_t (DataSetRow *, DataSetRow *)> getCompareFunction() override;
 };
 }
 

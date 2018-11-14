@@ -90,9 +90,12 @@ class BaseField {
   /**
    * Funkce pro razeni polozek datasetu podle jejich datoveho typu
    * @param order poradi (ascending nebo descending)
-   * @return porovnavaci funkce
+   * @return porovnavaci funkce, ktera vraci:
+   *    0 pokud se prvky rovnaji
+   *    1 pokud je prvni vetsi
+   *    -1 pokud je prvni mensi
    */
-  virtual std::function<bool(DataSetRow *, DataSetRow *)> getCompareFunction(SortOrder order) = 0;
+  virtual std::function<int8_t (DataSetRow *, DataSetRow *)> getCompareFunction() = 0;
 
 };
 }  // namespace DataSets

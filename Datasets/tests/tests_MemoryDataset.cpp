@@ -51,6 +51,49 @@ class MemoryDataset_tests : public ::testing::Test {
   ~MemoryDataset_tests() override = default;
 };
 
+ class MemoryDatasetSort_tests : public ::testing::Test {
+  protected:
+   MemoryDataSet *dataset{};
+
+   BaseDataProvider *dataProvider{};
+
+   std::vector<std::vector<std::string>> sortTest{{"4", "2", "3", "1", "4"},
+                                                  {"2", "8", "3", "2", "1"},
+                                                  {"1", "2", "3", "4", "5"},
+                                                  {"1", "3", "4", "5", "6"},
+                                                  {"6", "8", "3", "2", "1"},
+                                                  {"1", "1", "3", "2", "6"},
+                                                  {"2", "7", "5", "3", "2"},
+                                                  {"9", "6", "4", "2", "1"},
+                                                  {"9", "6", "4", "2", "1"},
+                                                  {"6", "8", "3", "2", "1"},
+                                                  {"6", "3", "3", "2", "1"},
+                                                  {"2", "2", "3", "2", "1"},
+   };
+  public:
+   MemoryDatasetSort_tests() = default;
+
+   void SetUp() override {
+     dataset = new MemoryDataSet();
+     dataProvider = new ArrayDataProvider(sortTest);
+
+     dataset->setDataProvider(dataProvider);
+
+     std::vector<ValueType> types;
+     for (int iter = 0; iter < dataProvider->getColumnCount(); iter++) {
+       types.push_back(INTEGER_VAL);
+     }
+     dataset->setFieldTypes(types);
+   }
+
+   void TearDown() override {
+     delete dataset;
+     delete dataProvider;
+   }
+
+   ~MemoryDatasetSort_tests() override = default;
+ };
+
 class MemoryDatasetCurrency_tests : public ::testing::Test {
  protected:
   std::vector<std::vector<std::string>> currencyData{{"0.00", "0.01", "0.10", "23.80", "248.99"},
@@ -113,7 +156,7 @@ TEST_F(MemoryDataset_tests, columns) {
   }
 }
 
-TEST_F (MemoryDataset_tests, fields) {
+TEST_F(MemoryDataset_tests, fields) {
   std::vector<BaseField *> fieldVector{};
 
   unsigned int i = 0;
@@ -383,4 +426,43 @@ TEST_F(MemoryDatasetCurrency_tests, read) {
   }
 
   EXPECT_EQ(row, 5);
+}
+
+TEST_F(MemoryDatasetSort_tests, sortAscending) {
+  ASSERT_NO_THROW(dataset->open());
+
+  SortOptions options;
+  options.addOption(0, ASCENDING);
+  options.addOption(1, ASCENDING);
+
+  //
+
+  dataset->sort(options);
+
+  auto field0 = dynamic_cast<IntegerField*>(dataset->fieldByIndex(0));
+  auto field1 = dynamic_cast<IntegerField*>(dataset->fieldByIndex(1));
+  auto field2 = dynamic_cast<IntegerField*>(dataset->fieldByIndex(2));
+  auto field3 = dynamic_cast<IntegerField*>(dataset->fieldByIndex(3));
+  auto field4 = dynamic_cast<IntegerField*>(dataset->fieldByIndex(4));
+
+  int previous0 = field0->getAsInteger();
+  int previous1 = field1->getAsInteger();
+  std::stringstream ss;
+  ss << previous0 << "," << previous1 << std::endl;
+
+  dataset->next();
+  while (!dataset->eof()) {
+    EXPECT_GE(field0->getAsInteger(), previous0);
+    if (previous0 == field0->getAsInteger()) {
+      EXPECT_GE(field1->getAsInteger(), previous1);
+    }
+
+    previous0 = field0->getAsInteger();
+    previous1 = field1->getAsInteger();
+
+    ss << previous0 << "," << previous1 << std::endl;
+    dataset->next();
+  }
+
+  std::cout << ss.str();
 }

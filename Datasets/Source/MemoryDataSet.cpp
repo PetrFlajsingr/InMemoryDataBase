@@ -200,20 +200,53 @@ void DataSets::MemoryDataSet::sort(SortOptions &options) {
     throw InvalidArgumentException("Field index is out of bounds");
   }
 
-  std::vector<std::function<bool(DataSetRow *, DataSetRow *)>> compareFunctions;
+  std::vector<std::function<int8_t (DataSetRow *, DataSetRow *)>> compareFunctions;
 
   for (auto &option : options.options) {
     compareFunctions.push_back(
-        fields[option.fieldIndex]->getCompareFunction(option.order));
+        fields[option.fieldIndex]->getCompareFunction());
   }
 
-  auto compareFunction = [&compareFunctions](DataSetRow *a, DataSetRow *b) {
+  /*auto compareFunction = [&compareFunctions](DataSetRow *a, DataSetRow *b) {
     return std::all_of(compareFunctions.begin(),
         compareFunctions.end(),
         [a, b](std::function<bool(DataSetRow *, DataSetRow *)> &function) {
           return function(a, b);
         });
+  };*/
+
+  auto optionArray = options.options;
+  auto compareFunction = [&optionArray, &compareFunctions](DataSetRow *a, DataSetRow *b) {
+    for (uint8_t i = 0; i < optionArray.size(); ++i) {
+      switch (compareFunctions[i](a,b)) {
+        case 0: break;
+        case -1:
+          if (optionArray[i].order == SortOrder::ASCENDING) {
+            return true;
+          } else {
+            return false;
+          }
+          break;
+        case 1:
+          if (optionArray[i].order == SortOrder::DESCENDING) {
+            return true;
+          } else {
+            return false;
+          }
+          break;
+      }
+    }
+    return false;
   };
+
+  /*auto compareFunction = [&options, &compareFunctions](DataSetRow *a, DataSetRow *b) {
+    for (auto &func : compareFunctions) {
+      if (func(a,b)) {
+        return true;
+      }
+    }
+    return false;
+  };*/
 
   std::sort(data.begin(),
       data.end(),

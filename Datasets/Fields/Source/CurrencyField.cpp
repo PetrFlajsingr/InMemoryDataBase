@@ -23,21 +23,20 @@ std::string DataSets::CurrencyField::getAsString() {
   return dec::toString(data);
 }
 
-std::function<bool(DataSets::DataSetRow *, DataSets::DataSetRow *)> DataSets::CurrencyField::getCompareFunction(
-    SortOrder order) {
-  if (order == SortOrder::ASCENDING) {
-    return [this, order](const DataSetRow *a,
-                         const DataSetRow *b) {
-      return (*a->cells)[index]->_currency
-          < (*b->cells)[index]->_currency;
-    };
-  } else {
-    return [this, order](const DataSetRow *a,
-                         const DataSetRow *b) {
-      return (*a->cells)[index]->_currency
-          > (*b->cells)[index]->_currency;
-    };
-  }
+std::function<int8_t (DataSets::DataSetRow *, DataSets::DataSetRow *)> DataSets::CurrencyField::getCompareFunction() {
+  return [this](const DataSetRow *a,
+                const DataSetRow *b) {
+    if ((*a->cells)[index]->_currency
+        == (*b->cells)[index]->_currency) {
+      return 0;
+    }
+    if ((*a->cells)[index]->_currency
+        < (*b->cells)[index]->_currency) {
+      return -1;
+    }
+    return 1;
+  };
+
 }
 void DataSets::CurrencyField::setAsCurrency(Currency &value) {
   data = value;

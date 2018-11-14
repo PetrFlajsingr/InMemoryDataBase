@@ -36,21 +36,20 @@ double DataSets::DoubleField::getAsDouble() {
   return data;
 }
 
-std::function<bool(DataSets::DataSetRow *,
-                   DataSets::DataSetRow *)> DataSets::DoubleField::getCompareFunction(SortOrder order) {
-  if (order == SortOrder::ASCENDING) {
-    return [this, order](const DataSetRow *a,
-                         const DataSetRow *b) {
-      return (*a->cells)[index]->_double
-          < (*b->cells)[index]->_double;
-    };
-  } else {
-    return [this, order](const DataSetRow *a,
-                         const DataSetRow *b) {
-      return (*a->cells)[index]->_double
-          > (*b->cells)[index]->_double;
-    };
-  }
+std::function<int8_t (DataSets::DataSetRow *,
+                   DataSets::DataSetRow *)> DataSets::DoubleField::getCompareFunction() {
+  return [this](const DataSetRow *a,
+                const DataSetRow *b) {
+    if ((*a->cells)[index]->_double
+        == (*b->cells)[index]->_double) {
+      return 0;
+    }
+    if ((*a->cells)[index]->_double
+        < (*b->cells)[index]->_double) {
+      return -1;
+    }
+    return 1;
+  };
 }
 
 

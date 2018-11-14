@@ -31,7 +31,7 @@ class CurrencyField : public BaseField {
 
   Currency getAsCurrency();
 
-  std::function<bool(DataSetRow *, DataSetRow *)> getCompareFunction(SortOrder order) override;
+  std::function<int8_t (DataSetRow *, DataSetRow *)> getCompareFunction() override;
 };
 }
 
