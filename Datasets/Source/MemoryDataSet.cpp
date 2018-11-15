@@ -213,9 +213,7 @@ void DataSets::MemoryDataSet::sort(SortOptions &options) {
       switch (compareFunctions[i](a, b)) {
         case 0: break;
         case -1:return optionArray[i].order == SortOrder::ASCENDING;
-          break;
         case 1:return optionArray[i].order == SortOrder::DESCENDING;
-          break;
         default:
           throw IllegalStateException("Internal error");
       }

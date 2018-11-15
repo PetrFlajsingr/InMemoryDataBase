@@ -10,13 +10,13 @@
 #include "BaseDataWorker.h"
 #include "FINMDataWorker.h"
 
-const std::string FILEPATH = "/Users/petr/Desktop/MUNI/2010-2017/FINM.csv";
-const std::string DEST_FILEPATH = "/Users/petr/Desktop/output.csv";
+const std::string FILEPATH = "C:\\Users\\dvorak\\OneDrive - MUNI\\FINM201_2017012.csv";
+const std::string DEST_FILEPATH = "C:\\Users\\dvorak\\OneDrive - MUNI\\output";
 
 void printTime(){
     auto t = std::time(nullptr);
     auto tm = *std::localtime(&t);
-    std::cout << std::put_time(&tm, "%d-%m-%Y %H-%M-%S") << std::endl;
+   // std::cout << std::put_time(&tm, "%d-%m-%Y %H-%M-%S") << std::endl;
 }
 
 long getMs() {
@@ -50,11 +50,11 @@ int main(int argc, char** argv) {
 
   std::vector<DataWorkers::ColumnOperation> ops;
 
-  ops.push_back({"ZC_UCJED:ZC_UCJED", DataWorkers::Distinct});
+  //ops.push_back({"ZC_UCJED:ZC_UCJED", DataWorkers::Distinct});
   ops.push_back({"ZC_ICO:ZC_ICO", DataWorkers::Distinct});
   ops.push_back({"ZCMMT_ITM:ZCMMT_ITM", DataWorkers::Distinct});
-  ops.push_back({"ZU_ROZSCH:ZU_ROZSCH", DataWorkers::Sum});
-  ops.push_back({"ZU_ROZPZM:ZU_ROZPZM", DataWorkers::Sum});
+  //ops.push_back({"ZU_ROZSCH:ZU_ROZSCH", DataWorkers::Sum});
+  //ops.push_back({"ZU_ROZPZM:ZU_ROZPZM", DataWorkers::Sum});
   ops.push_back({"ZU_ROZKZ:ZU_ROZKZ", DataWorkers::Sum});
 
 
