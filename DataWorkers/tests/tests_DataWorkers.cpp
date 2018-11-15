@@ -196,3 +196,24 @@ TEST_F(DataWorker_tests, basicAverage) {
 
   delete worker;
 }
+
+TEST_F(DataWorker_tests, selection) {
+  EXPECT_NO_THROW(worker = new FINMDataWorker(advDataProvider,
+                                              {STRING_VAL, INTEGER_VAL, CURRENCY, CURRENCY, INTEGER_VAL, CURRENCY}));
+
+  std::string sql = "SELECT main.0, AVG(main.2) FROM main WHERE main.0 = prvni | druhy";
+
+  ArrayWriter writer;
+  writer.result = new std::vector<std::vector<std::string>>();
+
+  worker->writeResult(writer, sql);
+
+  writer.print();
+
+  EXPECT_EQ((*writer.result)[0][0], "0");
+  for (int i = 1; i < writer.result->size(); ++i) {
+    EXPECT_TRUE((*writer.result)[i][0] == "prvni" or (*writer.result)[i][0] == "druhy");
+  }
+
+  delete worker;
+}
