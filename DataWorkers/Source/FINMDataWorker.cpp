@@ -57,10 +57,10 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer) {
   writeHeaders(writer);
 
   DataSets::SortOptions sortOptions;
-  for (int i = 0; i < dataset->getFieldNames().size() && i < columnOperations.size(); ++i) {
-    if (columnOperations[i].operation == Distinct) {
+  for (int i = 0; i < dataset->getFieldNames().size() && i < selectionOperations.size(); ++i) {
+    if (selectionOperations[i].operation == Distinct) {
       sortOptions.addOption(
-          dataset->fieldByName(columnOperations[i].columnName)->getIndex(),
+          dataset->fieldByName(selectionOperations[i].columnName)->getIndex(),
           SortOrder::ASCENDING);
     }
   }
@@ -68,7 +68,7 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer) {
 
   std::vector<ResultAccumulator*> accumulators;
 
-  for (auto &op : columnOperations) {
+  for (auto &op : selectionOperations) {
     accumulators.push_back(
         new ResultAccumulator(dataset->fieldByName(op.columnName),
         op.operation));
@@ -112,11 +112,11 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer) {
 void DataWorkers::FINMDataWorker::writeHeaders(BaseDataWriter &writer) {
   std::vector<std::string> header;
 
-  std::transform(columnOperations.begin(),
-                 columnOperations.end(),
+  std::transform(selectionOperations.begin(),
+                 selectionOperations.end(),
                  std::back_inserter(header),
-                 [](const ColumnOperation &op) {
-    return op.columnName + OperationString[op.operation];
+                 [](const SelectionOperation &op) {
+    return op.columnName + AggregationString[op.operation];
   });
 
   writer.writeHeader(header);

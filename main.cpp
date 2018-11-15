@@ -48,7 +48,7 @@ int main(int argc, char** argv) {
 
   BaseDataWriter *writer = new CsvWriter(DEST_FILEPATH);
 
-  std::vector<DataWorkers::ColumnOperation> ops;
+  std::vector<DataWorkers::SelectionOperation> ops;
 
   //ops.push_back({"ZC_UCJED:ZC_UCJED", DataWorkers::Distinct});
   ops.push_back({"ZC_ICO:ZC_ICO", DataWorkers::Distinct});

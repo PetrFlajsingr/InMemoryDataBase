@@ -16,13 +16,21 @@ enum Operation {
   Distinct, Sum, Average
 };
 
-const std::string OperationString[] {
+const std::string AggregationString[] {
   "",  "(Sum)", "(Avg)"
 };
 
-struct ColumnOperation {
+struct SelectionOperation {
   std::string columnName;
   Operation operation;
+};
+
+struct JoinOperation {
+  std::string dataSet1Name;
+  std::string column1Name;
+
+  std::string dataSet2Name;
+  std::string column2Name;
 };
 
 class BaseDataWorker {
@@ -31,7 +39,7 @@ class BaseDataWorker {
 
   DataSets::BaseDataSet* dataset = nullptr;
 
-  std::vector<ColumnOperation> columnOperations;
+  std::vector<SelectionOperation> selectionOperations;
 
  public:
   BaseDataWorker() = default;
@@ -46,8 +54,8 @@ class BaseDataWorker {
 
   virtual void filter(DataSets::FilterOptions &filters)=0;
 
-  void setColumnOperations(std::vector<ColumnOperation>& columnOperations) {
-    this->columnOperations = columnOperations;
+  void setColumnOperations(std::vector<SelectionOperation>& selectionOperations) {
+    this->selectionOperations = selectionOperations;
   }
 
   virtual void writeResult(BaseDataWriter& writer) = 0;
