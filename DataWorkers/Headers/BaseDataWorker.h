@@ -27,15 +27,15 @@ struct ProjectionOperation {
 };
 
 struct JoinOperation {
-  std::string dataSet1Name;
+  std::string table1Name;
   std::string column1Name;
 
-  std::string dataSet2Name;
+  std::string table2Name;
   std::string column2Name;
 };
 
 struct SelectionOperation {
-  std::string dataSetName;
+  std::string tableName;
   std::string columnName;
   std::vector<std::string> reqs;
 };

@@ -45,7 +45,7 @@ namespace DataWorkers {
         }
 
         auto colInfo = Utilities::splitStringByDelimiter(splitSql[iter], ".");
-        result.projections.push_back({colInfo[0], colInfo[1], Operation::Distinct});
+        result.projections.push_back({colInfo[1], colInfo[0], Operation::Distinct});
 
         iter++;
       }
@@ -65,7 +65,7 @@ namespace DataWorkers {
         iter++;
 
         JoinOperation op;
-        op.dataSet2Name = splitSql[iter];
+        op.table2Name = splitSql[iter];
 
         iter++;
 
@@ -75,7 +75,7 @@ namespace DataWorkers {
         iter++;
 
         auto colInfo = Utilities::splitStringByDelimiter(splitSql[iter], ".");
-        op.dataSet1Name = colInfo[0];
+        op.table1Name = colInfo[0];
         op.column1Name = colInfo[1];
         iter++;
 
@@ -98,7 +98,7 @@ namespace DataWorkers {
 
         auto colInfo = Utilities::splitStringByDelimiter(splitSql[iter], ".");
         selectionOperation.columnName = colInfo[1];
-        selectionOperation.dataSetName = colInfo[0];
+        selectionOperation.tableName = colInfo[0];
         iter++;
         if (splitSql[iter] != "=") {
           throw SQLException();
