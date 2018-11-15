@@ -49,7 +49,7 @@ class DataWorker_tests : public ::testing::Test {
   };
 
   std::vector<std::vector<std::string>> advAnswers {
-      {"0", "1(sum)", "2(sum)", "3(sum)", "4(sum)", "5(sum)"},
+      {"0", "1", "2(Sum)", "3(Sum)", "4(Sum)", "5(Sum)"},
       {"ctvrty", "2839", "70000.07", "222.80", "27", "1.00"},
       {"ctvrty", "22222", "90.00", "666.80", "27", "2.00"},
       {"druhy", "2422", "200.02", "222.80", "27", "3.00"},
@@ -159,7 +159,7 @@ TEST_F(DataWorker_tests, advancedDinstinct) {
   worker->writeResult(writer);
 
   for (int i = 0; i < advTest[0].size(); ++i) {
-    EXPECT_EQ((*writer.result)[0][i], std::to_string(i));
+    EXPECT_EQ((*writer.result)[0][i], advAnswers[0][i]);
   }
 
   delete worker;
@@ -186,7 +186,7 @@ TEST_F(DataWorker_tests, basicSum) {
 
   worker->writeResult(writer);
 
-  EXPECT_EQ((*writer.result)[0][1], "1");
+  EXPECT_EQ((*writer.result)[0][1], "1(Sum)");
   for (int i = 1; i < writer.result->size(); ++i) {
     EXPECT_EQ((*writer.result)[i][1], test[i - 1][1]);
   }
@@ -256,7 +256,7 @@ TEST_F(DataWorker_tests, basicAverage) {
 
   worker->writeResult(writer);
 
-  EXPECT_EQ((*writer.result)[0][1], "2");
+  EXPECT_EQ((*writer.result)[0][1], "2(Avg)");
   for (int i = 1; i < writer.result->size(); ++i) {
     EXPECT_EQ((*writer.result)[i][1], test[i - 1][2]);
   }
