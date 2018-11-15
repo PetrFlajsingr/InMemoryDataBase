@@ -55,7 +55,7 @@ set(SOURCE_FILES  DataProviders/Source/CsvReader.cpp DataProviders/Headers/CsvRe
         Datasets/Fields/Source/CurrencyField.cpp Datasets/Fields/Headers/CurrencyField.h
         DataWorkers/Headers/BaseDataWorker.h DataWorkers/Source/FINMDataWorker.cpp DataWorkers/Headers/FINMDataWorker.h
         DataWriters/Headers/BaseDataWriter.h DataWriters/Source/ArrayWriter.cpp DataWriters/Headers/ArrayWriter.h
-        Datasets/Headers/SortStructures.h main.cpp)
+        Datasets/Headers/SortStructures.h main.cpp DataWorkers/Headers/SQLParser.h)
 
 set(TEST_SOURCE_FILES DataProviders/Source/CsvReader.cpp DataProviders/Headers/CsvReader.h
         DataProviders/Headers/BaseDataProvider.h Misc/Headers/Exceptions.h Misc/Source/Utilities.cpp
@@ -74,7 +74,7 @@ set(TEST_SOURCE_FILES DataProviders/Source/CsvReader.cpp DataProviders/Headers/C
         FileDownloaders/Headers/FileDownloadObserver.h lib/decimal/Decimal.h
         Datasets/Fields/Source/CurrencyField.cpp Datasets/Fields/Headers/CurrencyField.h
         DataWorkers/Headers/BaseDataWorker.h DataWorkers/Source/FINMDataWorker.cpp DataWorkers/Headers/FINMDataWorker.h
-        DataWorkers/tests/tests_DataWorkers.cpp DataWriters/Headers/BaseDataWriter.h DataWriters/Source/ArrayWriter.cpp DataWriters/Headers/ArrayWriter.h Datasets/Headers/SortStructures.h)
+        DataWorkers/tests/tests_DataWorkers.cpp DataWriters/Headers/BaseDataWriter.h DataWriters/Source/ArrayWriter.cpp DataWriters/Headers/ArrayWriter.h Datasets/Headers/SortStructures.h DataWorkers/Headers/SQLParser.h DataWorkers/tests/tests_SQLParser.cpp DataWorkers/tests/tests_SQLParser.h)
 
 
 add_executable(csv_reader main.cpp ${SOURCE_FILES})

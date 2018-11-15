@@ -105,8 +105,8 @@ TEST_F(DataWorker_tests, basicDistinct) {
   EXPECT_NO_THROW(worker = new FINMDataWorker(dataProvider,
                                               {STRING_VAL, INTEGER_VAL, STRING_VAL, STRING_VAL, STRING_VAL}));
 
-  std::vector<SelectionOperation> ops;
-  SelectionOperation op;
+  std::vector<ProjectionOperation> ops;
+  ProjectionOperation op;
   op.operation = Distinct;
   op.columnName = "0";
   ops.push_back(op);
@@ -130,8 +130,8 @@ TEST_F(DataWorker_tests, advancedDinstinct) {
   EXPECT_NO_THROW(worker = new FINMDataWorker(advDataProvider,
                                               {STRING_VAL, INTEGER_VAL, CURRENCY, CURRENCY, INTEGER_VAL, CURRENCY}));
 
-  std::vector<SelectionOperation> ops;
-  SelectionOperation op;
+  std::vector<ProjectionOperation> ops;
+  ProjectionOperation op;
   op.operation = Distinct;
   op.columnName = "0";
   ops.push_back(op);
@@ -169,12 +169,12 @@ TEST_F(DataWorker_tests, basicSum) {
   EXPECT_NO_THROW(worker = new FINMDataWorker(dataProvider,
                                               {STRING_VAL, INTEGER_VAL, STRING_VAL, STRING_VAL, STRING_VAL}));
 
-  std::vector<SelectionOperation> ops;
-  SelectionOperation op1;
+  std::vector<ProjectionOperation> ops;
+  ProjectionOperation op1;
   op1.operation = Distinct;
   op1.columnName = "0";
   ops.push_back(op1);
-  SelectionOperation op2;
+  ProjectionOperation op2;
   op2.operation = Sum;
   op2.columnName = "1";
   ops.push_back(op2);
@@ -198,8 +198,8 @@ TEST_F(DataWorker_tests, advancedSum) {
   EXPECT_NO_THROW(worker = new FINMDataWorker(advDataProvider,
                                               {STRING_VAL, INTEGER_VAL, CURRENCY, CURRENCY, INTEGER_VAL, CURRENCY}));
 
-  std::vector<SelectionOperation> ops;
-  SelectionOperation op;
+  std::vector<ProjectionOperation> ops;
+  ProjectionOperation op;
   op.operation = Distinct;
   op.columnName = "0";
   ops.push_back(op);
@@ -239,12 +239,12 @@ TEST_F(DataWorker_tests, basicAverage) {
   EXPECT_NO_THROW(worker = new FINMDataWorker(dataProvider,
                                               {STRING_VAL, INTEGER_VAL, INTEGER_VAL, STRING_VAL, STRING_VAL}));
 
-  std::vector<SelectionOperation> ops;
-  SelectionOperation op1;
+  std::vector<ProjectionOperation> ops;
+  ProjectionOperation op1;
   op1.operation = Distinct;
   op1.columnName = "0";
   ops.push_back(op1);
-  SelectionOperation op2;
+  ProjectionOperation op2;
   op2.operation = Average;
   op2.columnName = "2";
   ops.push_back(op2);

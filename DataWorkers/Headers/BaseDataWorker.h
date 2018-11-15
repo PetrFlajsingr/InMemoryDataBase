@@ -20,8 +20,9 @@ const std::string AggregationString[] {
   "",  "(Sum)", "(Avg)"
 };
 
-struct SelectionOperation {
+struct ProjectionOperation {
   std::string columnName;
+  std::string tableName;
   Operation operation;
 };
 
@@ -33,13 +34,19 @@ struct JoinOperation {
   std::string column2Name;
 };
 
+struct SelectionOperation {
+  std::string dataSetName;
+  std::string columnName;
+  std::vector<std::string> reqs;
+};
+
 class BaseDataWorker {
  protected:
   std::vector<std::string> columnChoices;
 
   DataSets::BaseDataSet* dataset = nullptr;
 
-  std::vector<SelectionOperation> selectionOperations;
+  std::vector<ProjectionOperation> selectionOperations;
 
  public:
   BaseDataWorker() = default;
@@ -54,7 +61,7 @@ class BaseDataWorker {
 
   virtual void filter(DataSets::FilterOptions &filters)=0;
 
-  void setColumnOperations(std::vector<SelectionOperation>& selectionOperations) {
+  void setColumnOperations(std::vector<ProjectionOperation>& selectionOperations) {
     this->selectionOperations = selectionOperations;
   }
 

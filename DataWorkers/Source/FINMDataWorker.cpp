@@ -115,7 +115,7 @@ void DataWorkers::FINMDataWorker::writeHeaders(BaseDataWriter &writer) {
   std::transform(selectionOperations.begin(),
                  selectionOperations.end(),
                  std::back_inserter(header),
-                 [](const SelectionOperation &op) {
+                 [](const ProjectionOperation &op) {
     return op.columnName + AggregationString[op.operation];
   });
 
