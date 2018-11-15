@@ -56,6 +56,8 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
 
   writeHeaders(writer);
 
+  bool doJoin = !queryData.joins.empty();
+
   DataSets::SortOptions sortOptions;
   for (int i = 0;
       i < dataset->getFieldNames().size()
@@ -91,16 +93,12 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
 
           toSave->reset();
         }
+        writer.writeRecord(results);
+        results.clear();
         savedResults = true;
       }
     }
-
-    if (savedResults) {
-      writer.writeRecord(results);
-      results.clear();
-
-      savedResults = false;
-    }
+    savedResults = false;
 
     dataset->next();
   }

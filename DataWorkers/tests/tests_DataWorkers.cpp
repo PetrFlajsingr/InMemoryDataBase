@@ -25,7 +25,20 @@ class DataWorker_tests : public ::testing::Test {
     {"COLUMN21", "10", "1", "COLUMN24", "COLUMN25"},
     {"COLUMN31", "10", "1", "COLUMN34", "COLUMN35"},
     {"COLUMN41", "10", "1", "COLUMN44", "COLUMN45"},
-    {"COLUMN51", "10", "1", "COLUMN54", "COLUMN55"}
+    {"COLUMN51", "20", "1", "COLUMN54", "COLUMN55"}
+  };
+
+  std::vector<std::vector<std::string>> joinTest {
+      {"10", "deset"},
+      {"20", "dvacet"},
+  };
+
+  std::vector<std::vector<std::string>> joinAnswers {
+      {"COLUMN11", "10", "1", "COLUMN14", "COLUMN15", "deset"},
+      {"COLUMN21", "10", "1", "COLUMN24", "COLUMN25", "deset"},
+      {"COLUMN31", "10", "1", "COLUMN34", "COLUMN35", "deset"},
+      {"COLUMN41", "10", "1", "COLUMN44", "COLUMN45", "deset"},
+      {"COLUMN51", "20", "1", "COLUMN54", "COLUMN55", "dvacet"},
   };
 
   std::vector<std::vector<std::string>> advTest{
@@ -214,6 +227,35 @@ TEST_F(DataWorker_tests, selection) {
   for (int i = 1; i < writer.result->size(); ++i) {
     EXPECT_TRUE((*writer.result)[i][0] == "prvni" or
       (*writer.result)[i][0] == "druhy");
+  }
+
+  delete worker;
+}
+
+TEST_F(DataWorker_tests, join) {
+  FAIL();
+  EXPECT_NO_THROW(worker = new FINMDataWorker(dataProvider,
+                                              {STRING_VAL, INTEGER_VAL, INTEGER_VAL, STRING_VAL, STRING_VAL}));
+
+  std::string sql = "SELECT main.0, main.1, SUM(main.2), main.3, main.4, joinTest.1 FROM main JOIN joinTest ON main.1 = joinTest.0";
+
+  auto joinProvider = new DataProviders::ArrayDataProvider(joinTest);
+  auto joinDataSet = new DataSets::MemoryDataSet("joinTest");
+  joinDataSet->setDataProvider(joinProvider);
+
+  worker->addDataSet(joinDataSet);
+
+  ArrayWriter writer;
+  writer.result = new std::vector<std::vector<std::string>>();
+
+  worker->writeResult(writer, sql);
+
+  writer.print();
+
+  for (int i = 0; i < (*writer.result).size(); ++i) {
+    for (int j = 0; j < (*writer.result)[i].size(); ++j) {
+      EXPECT_STREQ((*writer.result)[i][j].c_str(), joinAnswers[i][j].c_str());
+    }
   }
 
   delete worker;
