@@ -49,7 +49,7 @@ class DataWorker_tests : public ::testing::Test {
   };
 
   std::vector<std::vector<std::string>> advAnswers {
-      {"0", "1", "2", "3", "4", "5"},
+      {"0", "1(sum)", "2(sum)", "3(sum)", "4(sum)", "5(sum)"},
       {"ctvrty", "2839", "70000.07", "222.80", "27", "1.00"},
       {"ctvrty", "22222", "90.00", "666.80", "27", "2.00"},
       {"druhy", "2422", "200.02", "222.80", "27", "3.00"},
