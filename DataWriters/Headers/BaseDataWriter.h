@@ -13,6 +13,8 @@ class BaseDataWriter {
   virtual void writeHeader(const std::vector<std::string> &header)=0;
 
   virtual void writeRecord(const std::vector<std::string> &record)=0;
+
+  virtual ~BaseDataWriter() {}
 };
 
 #endif //CSV_READER_BASEDATAWRITER_H

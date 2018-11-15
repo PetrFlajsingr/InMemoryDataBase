@@ -16,6 +16,10 @@ enum Operation {
   Distinct, Sum, Average
 };
 
+const std::string OperationString[] {
+  "",  "(Sum)", "(Avg)"
+};
+
 struct ColumnOperation {
   std::string columnName;
   Operation operation;

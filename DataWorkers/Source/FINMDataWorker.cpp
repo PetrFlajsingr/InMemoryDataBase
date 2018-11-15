@@ -116,7 +116,7 @@ void DataWorkers::FINMDataWorker::writeHeaders(BaseDataWriter &writer) {
                  columnOperations.end(),
                  std::back_inserter(header),
                  [](const ColumnOperation &op) {
-    return op.columnName;
+    return op.columnName + OperationString[op.operation];
   });
 
   writer.writeHeader(header);

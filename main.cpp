@@ -7,6 +7,11 @@
 #include "BaseField.h"
 #include "MemoryDataSet.h"
 #include "DataProviders/Headers/CsvReader.h"
+#include "BaseDataWorker.h"
+#include "FINMDataWorker.h"
+
+const std::string FILEPATH = "/Users/petr/Desktop/MUNI/2010-2017/FINM.csv";
+const std::string DEST_FILEPATH = "/Users/petr/Desktop/output.csv";
 
 void printTime(){
     auto t = std::time(nullptr);
@@ -21,60 +26,44 @@ long getMs() {
 }
 
 int main(int argc, char** argv) {
+  DataProviders::BaseDataProvider* provider= new DataProviders::CsvReader(FILEPATH);
+
+  std::vector<ValueType> fieldTypes = {
+      INTEGER_VAL,
+      INTEGER_VAL,
+      INTEGER_VAL,
+      INTEGER_VAL,
+      INTEGER_VAL,
+      STRING_VAL,
+      STRING_VAL,
+      INTEGER_VAL,
+      INTEGER_VAL,
+      INTEGER_VAL,
+      CURRENCY,
+      CURRENCY,
+      CURRENCY
+  };
+  DataWorkers::BaseDataWorker* worker = new DataWorkers::FINMDataWorker(provider,
+      fieldTypes);
+
+  BaseDataWriter *writer = new CsvWriter(DEST_FILEPATH);
+
+  std::vector<DataWorkers::ColumnOperation> ops;
+
+  ops.push_back({"ZC_UCJED:ZC_UCJED", DataWorkers::Distinct});
+  ops.push_back({"ZC_ICO:ZC_ICO", DataWorkers::Distinct});
+  ops.push_back({"ZCMMT_ITM:ZCMMT_ITM", DataWorkers::Distinct});
+  ops.push_back({"ZU_ROZSCH:ZU_ROZSCH", DataWorkers::Sum});
+  ops.push_back({"ZU_ROZPZM:ZU_ROZPZM", DataWorkers::Sum});
+  ops.push_back({"ZU_ROZKZ:ZU_ROZKZ", DataWorkers::Sum});
 
 
-    auto * dataset = new MemoryDataSet();
+  worker->setColumnOperations(ops);
 
-    IDataProvider* dataProvider = new CsvReader(argv[1]);
+  worker->writeResult(*writer);
 
-    dataset->setDataProvider(dataProvider);
-    std::vector<ValueType> types;
-    for(int iter = 0; iter < dataProvider->getColumnCount(); iter++){
-        types.push_back(STRING_VAL);
-    }
-    dataset->setFieldTypes(types);
+  delete writer;
+  delete worker;
 
-    long start = getMs();
-    std::cout << "_____Open()_____" << std::endl;
-    printTime();
-    dataset->open();
-    std::cout << "_____Open() done_____ time: " << getMs() - start << " ms" << std::endl;
-    printTime();
-
-
-    auto field0 = dataset->fieldByIndex(0);
-    auto field1 = dataset->fieldByIndex(4);
-
-    std::cout << "_____sort()_____" << std::endl;
-    start = getMs();
-    dataset->sort(1, ASCENDING);
-    std::cout << "_____sort() end_____ time: " << getMs() - start << " ms" << std::endl;
-    printTime();
-
-
-    FilterOptions options;
-    options.addOption(4, "00231525", STARTS_WITH);
-    start = getMs();
-    std::cout << "_____find()_____" << std::endl;
-    printTime();
-    dataset->filter(options);
-    std::cout << "_____find() end_____ time: " << getMs() - start << " ms" << std::endl;
-    printTime();
-
-
-    std::cout << "_____next()_____" << std::endl;
-    printTime();
-    start = getMs();
-    while(!dataset->eof()) {
-        std::cout << field0->getAsString() << " " << field1->getAsString() << std::endl;
-        dataset->next();
-    }
-    std::cout << "_____next() done_____ time: " << getMs() - start << " ms" << std::endl;
-    printTime();
-
-    dataset->close();
-
-    delete dataset;
-
-    return 0;
+  return 0;
 }
