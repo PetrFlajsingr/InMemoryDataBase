@@ -407,6 +407,7 @@ void DataSets::MemoryDataSet::appendDataProvider(
 
   loadData();
 }
+DataSets::MemoryDataSet::MemoryDataSet(const std::string &dataSetName) : BaseDataSet(dataSetName) {}
 
 
 

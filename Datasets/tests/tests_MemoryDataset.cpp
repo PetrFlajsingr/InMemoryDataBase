@@ -31,7 +31,7 @@ class MemoryDataset_tests : public ::testing::Test {
   MemoryDataset_tests() = default;
 
   void SetUp() override {
-    dataset = new MemoryDataSet();
+    dataset = new MemoryDataSet("main");
     dataProvider = new ArrayDataProvider(test);
 
     dataset->setDataProvider(dataProvider);
@@ -107,7 +107,7 @@ class MemoryDataset_tests : public ::testing::Test {
    MemoryDatasetSort_tests() = default;
 
    void SetUp() override {
-     dataset = new MemoryDataSet();
+     dataset = new MemoryDataSet("main");
      dataProvider = new ArrayDataProvider(sortTest);
 
      dataset->setDataProvider(dataProvider);
@@ -140,7 +140,7 @@ class MemoryDatasetCurrency_tests : public ::testing::Test {
   MemoryDatasetCurrency_tests() = default;
 
   void SetUp() override {
-    dataset = new MemoryDataSet();
+    dataset = new MemoryDataSet("main");
     dataProvider = new ArrayDataProvider(currencyData);
 
     dataset->setDataProvider(dataProvider);

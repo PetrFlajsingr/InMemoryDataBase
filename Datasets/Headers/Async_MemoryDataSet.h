@@ -44,6 +44,8 @@ class Async_MemoryDataSet : public MemoryDataSet {
   void notify(EventType type);
 
  public:
+  Async_MemoryDataSet(const std::string &dataSetName);
+
   void open() override;
 
   void filter(const FilterOptions &options) override;

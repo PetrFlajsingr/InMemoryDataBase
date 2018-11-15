@@ -98,6 +98,8 @@ class MemoryDataSet : public BaseDataSet {
   void setData(void *data, uint64_t index, ValueType type) override;
 
  public:
+  MemoryDataSet(const std::string &dataSetName);
+
   ~MemoryDataSet() override;
 
   void open() override;

@@ -24,6 +24,8 @@ class BaseDataSet {
 
   std::vector<BaseField *> fields;  //< Pole umoznujici pristup k datum
 
+  std::string dataSetName;
+
   /**
    * Nastaveni dat pole.
    *
@@ -44,6 +46,8 @@ class BaseDataSet {
   virtual void setData(void *data, uint64_t index, ValueType type) = 0;
 
  public:
+  BaseDataSet(const std::string &dataSetName) : dataSetName(dataSetName) {};
+
   /**
    * Nacteni dat datasetu z IDataProvider
    */
@@ -121,6 +125,10 @@ class BaseDataSet {
   virtual void sort(SortOptions &options)=0;
 
   virtual void filter(const FilterOptions &options)=0;
+
+  std::string getName() {
+    return dataSetName;
+  }
 
   /**
    * Smazani vsech alokovanych Fields

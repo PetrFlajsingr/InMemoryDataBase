@@ -212,7 +212,8 @@ TEST_F(DataWorker_tests, selection) {
 
   EXPECT_EQ((*writer.result)[0][0], "0");
   for (int i = 1; i < writer.result->size(); ++i) {
-    EXPECT_TRUE((*writer.result)[i][0] == "prvni" or (*writer.result)[i][0] == "druhy");
+    EXPECT_TRUE((*writer.result)[i][0] == "prvni" or
+      (*writer.result)[i][0] == "druhy");
   }
 
   delete worker;

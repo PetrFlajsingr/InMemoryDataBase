@@ -41,7 +41,7 @@ DataWorkers::FINMDataWorker::FINMDataWorker(
     DataProviders::BaseDataProvider *dataProvider,
     std::vector<ValueType> fieldTypes)
     : BaseDataWorker() {
-  dataset = new DataSets::MemoryDataSet();
+  dataset = new DataSets::MemoryDataSet("main");
 
   dataset->setDataProvider(dataProvider);
 

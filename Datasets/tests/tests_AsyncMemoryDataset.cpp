@@ -58,7 +58,7 @@ class AsyncMemoryDataset_tests : public ::testing::Test {
   AsyncMemoryDataset_tests() = default;
 
   void SetUp() override {
-    dataset = new Async_MemoryDataSet();
+    dataset = new Async_MemoryDataSet("main");
     dataProvider = new ArrayDataProvider(test);
 
     dataset->setDataProvider(dataProvider);

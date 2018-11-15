@@ -108,3 +108,4 @@ void DataSets::Async_MemoryDataSet::innerAppendDataProvider(DataProviders::BaseD
   MemoryDataSet::appendDataProvider(provider);
   notify(AFTER_APPEND);
 }
+DataSets::Async_MemoryDataSet::Async_MemoryDataSet(const std::string &dataSetName) : MemoryDataSet(dataSetName) {}
