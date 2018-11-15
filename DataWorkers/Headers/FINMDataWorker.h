@@ -65,6 +65,8 @@ class ResultAccumulator {
 class FINMDataWorker : public BaseDataWorker {
  private:
   void writeHeaders(BaseDataWriter &writer);
+
+  void filterDataSet();
  public:
   FINMDataWorker(DataProviders::BaseDataProvider *dataProvider,
                  std::vector<ValueType> fieldTypes);

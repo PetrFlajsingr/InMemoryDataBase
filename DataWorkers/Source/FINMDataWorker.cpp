@@ -70,7 +70,7 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
   dataset->sort(sortOptions);
 
   if (!queryData.selections.empty()) {
-
+    filterDataSet();
   }
 
   std::vector<ResultAccumulator*> accumulators;
@@ -128,9 +128,20 @@ void DataWorkers::FINMDataWorker::writeHeaders(BaseDataWriter &writer) {
 
   writer.writeHeader(header);
 }
+void DataWorkers::FINMDataWorker::filterDataSet() {
+  DataSets::FilterOptions filterOptions;
 
+  for (auto &selection : queryData.selections) {
+    if (selection.tableName == "main") {
+      filterOptions.addOption(
+          dataset->fieldByName(selection.columnName)->getIndex(),
+          selection.reqs,
+          DataSets::FilterOption::EQUALS);
+    }
+  }
 
-
+  dataset->filter(filterOptions);
+}
 
 DataWorkers::ResultAccumulator::ResultAccumulator(DataSets::BaseField *field,
     Operation op) : field(field), operation(op) {
