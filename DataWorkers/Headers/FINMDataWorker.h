@@ -48,7 +48,6 @@ class ResultAccumulator {
   std::string resultAverage();
 
   std::string resultDistinct();
-
  public:
   ResultAccumulator(DataSets::BaseField *field, Operation op);
 
@@ -73,8 +72,6 @@ class FINMDataWorker : public BaseDataWorker {
   std::vector<std::string> getMultiChoiceNames() override;
 
   std::vector<std::string> getChoices(std::string choiceName) override;
-
-  void filter(DataSets::FilterOptions &filters) override;
 
   void writeResult(BaseDataWriter &writer, std::string &sql) override;
 };

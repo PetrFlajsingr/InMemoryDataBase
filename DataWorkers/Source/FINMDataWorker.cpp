@@ -37,10 +37,6 @@ std::vector<std::string> DataWorkers::FINMDataWorker::getChoices(std::string cho
   return result;
 }
 
-void DataWorkers::FINMDataWorker::filter(DataSets::FilterOptions &filters) {
-  dataset->filter(filters);
-}
-
 DataWorkers::FINMDataWorker::FINMDataWorker(
     DataProviders::BaseDataProvider *dataProvider,
     std::vector<ValueType> fieldTypes)
@@ -72,6 +68,10 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
     }
   }
   dataset->sort(sortOptions);
+
+  if (!queryData.selections.empty()) {
+
+  }
 
   std::vector<ResultAccumulator*> accumulators;
 
