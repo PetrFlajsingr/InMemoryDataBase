@@ -41,10 +41,13 @@ TEST_F(SQLParser_tests, parse) {
   ASSERT_EQ(data.joins.size(), expectedOutput.joins.size());
 
   for (int i = 0; i < data.selections.size(); ++i) {
-    EXPECT_EQ(data.selections[i].tableName, expectedOutput.selections[i].tableName);
-    EXPECT_EQ(data.selections[i].columnName, expectedOutput.selections[i].columnName);
+    EXPECT_EQ(data.selections[i].tableName,
+        expectedOutput.selections[i].tableName);
+    EXPECT_EQ(data.selections[i].columnName,
+        expectedOutput.selections[i].columnName);
     for(int j = 0; j < data.selections[i].reqs.size(); ++j) {
-      EXPECT_EQ(data.selections[i].reqs[j], expectedOutput.selections[i].reqs[j]);
+      EXPECT_EQ(data.selections[i].reqs[j],
+          expectedOutput.selections[i].reqs[j]);
     }
   }
 
@@ -60,4 +63,14 @@ TEST_F(SQLParser_tests, parse) {
     EXPECT_EQ(data.projections[i].tableName, expectedOutput.projections[i].tableName);
     EXPECT_EQ(data.projections[i].operation, expectedOutput.projections[i].operation);
   }
+}
+
+TEST_F(SQLParser_tests, parseAggregation) {
+  DataWorkers::QueryData data = DataWorkers::SQLParser::parse(
+      "SELECT table1.t1, SUM(table1.t2), AVG(table2.t3) FROM table1");
+
+  EXPECT_EQ(data.projections[0].operation, DataWorkers::Distinct);
+  EXPECT_EQ(data.projections[1].operation, DataWorkers::Sum);
+  EXPECT_EQ(data.projections[2].operation, DataWorkers::Average);
+
 }

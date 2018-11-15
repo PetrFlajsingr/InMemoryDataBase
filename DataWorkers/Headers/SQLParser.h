@@ -1,5 +1,3 @@
-#include <utility>
-
 //
 // Created by Petr Flajsingr on 15/11/2018.
 //
@@ -11,10 +9,33 @@
 #include <Utilities.h>
 #include <iostream>
 #include <algorithm>
-#include "BaseDataWorker.h"
 
 namespace DataWorkers {
   class SQLException : public std::exception {};
+
+  enum Operation {
+    Distinct, Sum, Average
+  };
+
+  struct ProjectionOperation {
+    std::string columnName;
+    std::string tableName;
+    Operation operation;
+  };
+
+  struct JoinOperation {
+    std::string table1Name;
+    std::string column1Name;
+
+    std::string table2Name;
+    std::string column2Name;
+  };
+
+  struct SelectionOperation {
+    std::string tableName;
+    std::string columnName;
+    std::vector<std::string> reqs;
+  };
 
   struct QueryData {
     std::vector<ProjectionOperation> projections;
@@ -44,8 +65,27 @@ namespace DataWorkers {
           splitSql[iter] = splitSql[iter].substr(0, splitSql[iter].size() - 1);
         }
 
-        auto colInfo = Utilities::splitStringByDelimiter(splitSql[iter], ".");
-        result.projections.push_back({colInfo[1], colInfo[0], Operation::Distinct});
+        if (splitSql[iter].find("(") != std::string::npos) {
+          auto split = Utilities::splitStringByDelimiter(splitSql[iter], "(");
+          Operation operation;
+          if (split[0] == "AVG") {
+            operation = Average;
+          } else if (split[0] == "SUM") {
+            operation = Sum;
+          } else {
+            throw SQLException();
+          }
+
+          split[1] = split[1].substr(0, split[1].size() - 1);
+          auto colInfo = Utilities::splitStringByDelimiter(split[1], ".");
+
+          result.projections.push_back({colInfo[1], colInfo[0], operation});
+        } else {
+          auto colInfo = Utilities::splitStringByDelimiter(splitSql[iter], ".");
+          result.projections.push_back({colInfo[1], colInfo[0], Operation::Distinct});
+        }
+
+
 
         iter++;
       }
@@ -57,6 +97,9 @@ namespace DataWorkers {
       // join
 
 
+      if(splitSql.size() == iter) {
+        return result;
+      }
 
       while (splitSql[iter] != "WHERE") {
         if (splitSql[iter] != "JOIN") {

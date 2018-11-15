@@ -5,6 +5,7 @@
 #include <BaseDataSet.h>
 #include <FINMDataWorker.h>
 #include "MemoryDataSet.h"
+#include "SQLParser.h"
 
 std::vector<std::string> DataWorkers::FINMDataWorker::getMultiChoiceNames() {
   return columnChoices;
@@ -53,14 +54,20 @@ DataWorkers::FINMDataWorker::FINMDataWorker(
   dataset->open();
 }
 
-void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer) {
+void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
+    std::string &sql) {
+  queryData = SQLParser::parse(sql);
+
   writeHeaders(writer);
 
   DataSets::SortOptions sortOptions;
-  for (int i = 0; i < dataset->getFieldNames().size() && i < selectionOperations.size(); ++i) {
-    if (selectionOperations[i].operation == Distinct) {
+  for (int i = 0;
+      i < dataset->getFieldNames().size()
+        && i < queryData.projections.size();
+      ++i) {
+    if (queryData.projections[i].operation == Distinct) {
       sortOptions.addOption(
-          dataset->fieldByName(selectionOperations[i].columnName)->getIndex(),
+          dataset->fieldByName(queryData.projections[i].columnName)->getIndex(),
           SortOrder::ASCENDING);
     }
   }
@@ -68,7 +75,7 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer) {
 
   std::vector<ResultAccumulator*> accumulators;
 
-  for (auto &op : selectionOperations) {
+  for (auto &op : queryData.projections) {
     accumulators.push_back(
         new ResultAccumulator(dataset->fieldByName(op.columnName),
         op.operation));
@@ -112,8 +119,8 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer) {
 void DataWorkers::FINMDataWorker::writeHeaders(BaseDataWriter &writer) {
   std::vector<std::string> header;
 
-  std::transform(selectionOperations.begin(),
-                 selectionOperations.end(),
+  std::transform(queryData.projections.begin(),
+                 queryData.projections.end(),
                  std::back_inserter(header),
                  [](const ProjectionOperation &op) {
     return op.columnName + AggregationString[op.operation];

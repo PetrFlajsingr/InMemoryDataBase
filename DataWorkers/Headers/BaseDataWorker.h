@@ -2,42 +2,19 @@
 // Created by Petr Flajsingr on 12/11/2018.
 //
 
-#ifndef CSV_READER_BASEDATAWORKER_H
-#define CSV_READER_BASEDATAWORKER_H
+#ifndef DATAWORKERS_HEADERS_BASEDATAWORKER_H_
+#define DATAWORKERS_HEADERS_BASEDATAWORKER_H_
 
 #include <string>
 #include <CsvWriter.h>
 #include <BaseDataSet.h>
 #include <FilterStructures.h>
+#include "SQLParser.h"
 
 namespace DataWorkers {
 
-enum Operation {
-  Distinct, Sum, Average
-};
-
 const std::string AggregationString[] {
   "",  "(Sum)", "(Avg)"
-};
-
-struct ProjectionOperation {
-  std::string columnName;
-  std::string tableName;
-  Operation operation;
-};
-
-struct JoinOperation {
-  std::string table1Name;
-  std::string column1Name;
-
-  std::string table2Name;
-  std::string column2Name;
-};
-
-struct SelectionOperation {
-  std::string tableName;
-  std::string columnName;
-  std::vector<std::string> reqs;
 };
 
 class BaseDataWorker {
@@ -46,7 +23,7 @@ class BaseDataWorker {
 
   DataSets::BaseDataSet* dataset = nullptr;
 
-  std::vector<ProjectionOperation> selectionOperations;
+  QueryData queryData;
 
  public:
   BaseDataWorker() = default;
@@ -61,11 +38,8 @@ class BaseDataWorker {
 
   virtual void filter(DataSets::FilterOptions &filters)=0;
 
-  void setColumnOperations(std::vector<ProjectionOperation>& selectionOperations) {
-    this->selectionOperations = selectionOperations;
-  }
-
-  virtual void writeResult(BaseDataWriter& writer) = 0;
+  virtual void writeResult(BaseDataWriter& writer,
+      std::string &sql) = 0;
 
   void setColumnChoices(std::vector<std::string> &data) {
     columnChoices = data;
@@ -74,4 +48,4 @@ class BaseDataWorker {
 };
 }  // namespace DataWorkers
 
-#endif  //CSV_READER_BASEDATAWORKER_H
+#endif  //DATAWORKERS_HEADERS_BASEDATAWORKER_H_

@@ -105,18 +105,12 @@ TEST_F(DataWorker_tests, basicDistinct) {
   EXPECT_NO_THROW(worker = new FINMDataWorker(dataProvider,
                                               {STRING_VAL, INTEGER_VAL, STRING_VAL, STRING_VAL, STRING_VAL}));
 
-  std::vector<ProjectionOperation> ops;
-  ProjectionOperation op;
-  op.operation = Distinct;
-  op.columnName = "0";
-  ops.push_back(op);
-
-  worker->setColumnOperations(ops);
+  std::string sql = "SELECT main.0 FROM main";
 
   ArrayWriter writer;
   writer.result = new std::vector<std::vector<std::string>>();
 
-  worker->writeResult(writer);
+  worker->writeResult(writer, sql);
 
   EXPECT_EQ((*writer.result)[0][0], "0");
   for (int i = 1; i < writer.result->size(); ++i) {
@@ -130,33 +124,12 @@ TEST_F(DataWorker_tests, advancedDinstinct) {
   EXPECT_NO_THROW(worker = new FINMDataWorker(advDataProvider,
                                               {STRING_VAL, INTEGER_VAL, CURRENCY, CURRENCY, INTEGER_VAL, CURRENCY}));
 
-  std::vector<ProjectionOperation> ops;
-  ProjectionOperation op;
-  op.operation = Distinct;
-  op.columnName = "0";
-  ops.push_back(op);
-  op.operation = Distinct;
-  op.columnName = "1";
-  ops.push_back(op);
-  op.operation = Sum;
-  op.columnName = "2";
-  ops.push_back(op);
-  op.operation = Sum;
-  op.columnName = "3";
-  ops.push_back(op);
-  op.operation = Sum;
-  op.columnName = "4";
-  ops.push_back(op);
-  op.operation = Sum;
-  op.columnName = "5";
-  ops.push_back(op);
-
-  worker->setColumnOperations(ops);
+  std::string sql = "SELECT main.0, main.1, SUM(main.2), SUM(main.3), SUM(main.4), SUM(main.5) FROM main";
 
   ArrayWriter writer;
   writer.result = new std::vector<std::vector<std::string>>();
 
-  worker->writeResult(writer);
+  worker->writeResult(writer, sql);
 
   for (int i = 0; i < advTest[0].size(); ++i) {
     EXPECT_EQ((*writer.result)[0][i], advAnswers[0][i]);
@@ -169,22 +142,12 @@ TEST_F(DataWorker_tests, basicSum) {
   EXPECT_NO_THROW(worker = new FINMDataWorker(dataProvider,
                                               {STRING_VAL, INTEGER_VAL, STRING_VAL, STRING_VAL, STRING_VAL}));
 
-  std::vector<ProjectionOperation> ops;
-  ProjectionOperation op1;
-  op1.operation = Distinct;
-  op1.columnName = "0";
-  ops.push_back(op1);
-  ProjectionOperation op2;
-  op2.operation = Sum;
-  op2.columnName = "1";
-  ops.push_back(op2);
-
-  worker->setColumnOperations(ops);
+  std::string sql = "SELECT main.0, SUM(main.1) FROM main";
 
   ArrayWriter writer;
   writer.result = new std::vector<std::vector<std::string>>();
 
-  worker->writeResult(writer);
+  worker->writeResult(writer, sql);
 
   EXPECT_EQ((*writer.result)[0][1], "1(Sum)");
   for (int i = 1; i < writer.result->size(); ++i) {
@@ -198,33 +161,13 @@ TEST_F(DataWorker_tests, advancedSum) {
   EXPECT_NO_THROW(worker = new FINMDataWorker(advDataProvider,
                                               {STRING_VAL, INTEGER_VAL, CURRENCY, CURRENCY, INTEGER_VAL, CURRENCY}));
 
-  std::vector<ProjectionOperation> ops;
-  ProjectionOperation op;
-  op.operation = Distinct;
-  op.columnName = "0";
-  ops.push_back(op);
-  op.operation = Distinct;
-  op.columnName = "1";
-  ops.push_back(op);
-  op.operation = Sum;
-  op.columnName = "2";
-  ops.push_back(op);
-  op.operation = Sum;
-  op.columnName = "3";
-  ops.push_back(op);
-  op.operation = Sum;
-  op.columnName = "4";
-  ops.push_back(op);
-  op.operation = Sum;
-  op.columnName = "5";
-  ops.push_back(op);
 
-  worker->setColumnOperations(ops);
+  std::string sql = "SELECT main.0, main.1, SUM(main.2), SUM(main.3), SUM(main.4), SUM(main.5) FROM main";
 
   ArrayWriter writer;
   writer.result = new std::vector<std::vector<std::string>>();
 
-  worker->writeResult(writer);
+  worker->writeResult(writer, sql);
 
   for (int i = 0; i < (*writer.result).size(); ++i) {
     for (int j = 0; j < (*writer.result)[i].size();++j) {
@@ -239,22 +182,12 @@ TEST_F(DataWorker_tests, basicAverage) {
   EXPECT_NO_THROW(worker = new FINMDataWorker(dataProvider,
                                               {STRING_VAL, INTEGER_VAL, INTEGER_VAL, STRING_VAL, STRING_VAL}));
 
-  std::vector<ProjectionOperation> ops;
-  ProjectionOperation op1;
-  op1.operation = Distinct;
-  op1.columnName = "0";
-  ops.push_back(op1);
-  ProjectionOperation op2;
-  op2.operation = Average;
-  op2.columnName = "2";
-  ops.push_back(op2);
-
-  worker->setColumnOperations(ops);
+  std::string sql = "SELECT main.0, AVG(main.2) FROM main";
 
   ArrayWriter writer;
   writer.result = new std::vector<std::vector<std::string>>();
 
-  worker->writeResult(writer);
+  worker->writeResult(writer, sql);
 
   EXPECT_EQ((*writer.result)[0][1], "2(Avg)");
   for (int i = 1; i < writer.result->size(); ++i) {

@@ -18,7 +18,7 @@ namespace DataWorkers {
 
 class ResultAccumulator {
  private:
-  union Data{
+  union Data {
     int _int;
     double _double;
     char* _string;
@@ -76,7 +76,7 @@ class FINMDataWorker : public BaseDataWorker {
 
   void filter(DataSets::FilterOptions &filters) override;
 
-  void writeResult(BaseDataWriter &writer) override;
+  void writeResult(BaseDataWriter &writer, std::string &sql) override;
 };
 }  // namespace DataWorkers
 
