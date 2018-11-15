@@ -342,7 +342,7 @@ std::string DataWorkers::ResultAccumulator::getResult() {
 }
 
 void DataWorkers::ResultAccumulator::reset() {
-  if(operation == Distinct) {
+  if (operation == Distinct) {
     return;
   }
   dataCount = 0;

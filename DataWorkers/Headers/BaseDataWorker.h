@@ -25,6 +25,8 @@ class BaseDataWorker {
 
   QueryData queryData;
 
+  std::vector<DataSets::BaseDataSet*> additionalDataSets;
+
  public:
   BaseDataWorker() = default;
 
@@ -43,6 +45,9 @@ class BaseDataWorker {
     columnChoices = data;
   }
 
+  void addDataSet(DataSets::BaseDataSet* dataset) {
+    additionalDataSets.push_back(dataset);
+  }
 };
 }  // namespace DataWorkers
 
