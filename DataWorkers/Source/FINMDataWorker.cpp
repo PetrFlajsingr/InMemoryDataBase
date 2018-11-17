@@ -50,13 +50,6 @@ DataWorkers::FINMDataWorker::FINMDataWorker(
   dataset->open();
 }
 
-struct JoinStructTest {
-  uint64_t indexAddi;
-  uint64_t indexMain;
-
-  std::vector<DataSets::BaseField*> projectFields;
-};
-
 void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
     std::string &sql) {
   queryData = SQLParser::parse(sql);
@@ -64,26 +57,26 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
   writeHeaders(writer);
 
   bool doJoin = !queryData.joins.empty();
-  std::vector<JoinStructTest> joinStruct;
+  std::vector<InnerJoinStructure> joinStructures;
 
   //  seradeni pripojenych datasetu
   if (doJoin) {
     for (int i = 0; i < queryData.joins.size(); ++i) {
-      JoinStructTest test;
-      test.indexAddi = additionalDataSets[i]->fieldByName(queryData.joins[i].column2Name)->getIndex();
-      test.indexMain = dataset->fieldByName(queryData.joins[i].column1Name)->getIndex();
+      InnerJoinStructure joinStructure;
+      joinStructure.indexAddi = additionalDataSets[i]->fieldByName(queryData.joins[i].column2Name)->getIndex();
+      joinStructure.indexMain = dataset->fieldByName(queryData.joins[i].column1Name)->getIndex();
       for (auto & proj : queryData.projections) {
         if (proj.tableName == queryData.joins[i].table2Name) {
-          test.projectFields.push_back(additionalDataSets[i]->fieldByName(proj.columnName));
+          joinStructure.projectFields.push_back(additionalDataSets[i]->fieldByName(proj.columnName));
         }
       }
 
-      if (test.projectFields.empty()) {
+      if (joinStructure.projectFields.empty()) {
         continue;
       }
-      joinStruct.push_back(test);
+      joinStructures.push_back(joinStructure);
       DataSets::SortOptions options;
-      options.addOption(test.indexAddi,
+      options.addOption(joinStructure.indexAddi,
           SortOrder::ASCENDING);
       additionalDataSets[i]->sort(options);
     }
@@ -129,15 +122,15 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
 
         //  pokud je pozadovan join, je nutne hledat v dalsich tabulkach
         if (doJoin) {
-          for (int i = 0; i < joinStruct.size(); ++i) {
+          for (int i = 0; i < joinStructures.size(); ++i) {
             DataSets::FilterItem item {
-                joinStruct[i].indexAddi,
-                {accumulators[joinStruct[i].indexMain]->getResult()},
+                joinStructures[i].indexAddi,
+                {accumulators[joinStructures[i].indexMain]->getResult()},
                 DataSets::FilterOption::EQUALS
             };
             additionalDataSets[i]->findFirst(item);
 
-            for (auto field : joinStruct[i].projectFields) {
+            for (auto field : joinStructures[i].projectFields) {
               results.push_back(field->getAsString());
             }
           }
@@ -161,15 +154,15 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
   }
 
   if (doJoin) {
-    for (int i = 0; i < joinStruct.size(); ++i) {
+    for (int i = 0; i < joinStructures.size(); ++i) {
       DataSets::FilterItem item {
-          joinStruct[i].indexAddi,
-          {dataset->fieldByIndex(joinStruct[i].indexMain)->getAsString()},
+          joinStructures[i].indexAddi,
+          {dataset->fieldByIndex(joinStructures[i].indexMain)->getAsString()},
           DataSets::FilterOption::EQUALS
       };
       additionalDataSets[i]->findFirst(item);
 
-      for (auto field : joinStruct[i].projectFields) {
+      for (auto field : joinStructures[i].projectFields) {
         results.push_back(field->getAsString());
       }
     }
@@ -406,8 +399,6 @@ bool DataWorkers::ResultAccumulator::step() {
   }
 }
 
-// nepocital jsem s tim, že to půjde zpětně,
-// je potřeba result překopírovat
 std::string DataWorkers::ResultAccumulator::getResult() {
   switch (operation) {
     case Distinct:
@@ -426,20 +417,6 @@ void DataWorkers::ResultAccumulator::reset() {
     return;
   }
   dataCount = 1;
-
-  return;
-  //  TODO: vynuluje se hodnota při resetu, působí problém v dalším kroku
-  switch (field->getFieldType()) {
-    case INTEGER_VAL:
-      data._int = 0;
-      break;
-    case DOUBLE_VAL:
-      data._double = 0;
-      break;
-    case CURRENCY:
-      *data._currency = 0;
-      break;
-  }
 }
 std::string DataWorkers::ResultAccumulator::getResultForce() {
   switch (field->getFieldType()) {

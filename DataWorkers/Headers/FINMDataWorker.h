@@ -64,6 +64,13 @@ class ResultAccumulator {
 
 class FINMDataWorker : public BaseDataWorker {
  private:
+  struct InnerJoinStructure {
+    uint64_t indexAddi;
+    uint64_t indexMain;
+
+    std::vector<DataSets::BaseField*> projectFields;
+  };
+
   void writeHeaders(BaseDataWriter &writer);
 
   void filterDataSet();
