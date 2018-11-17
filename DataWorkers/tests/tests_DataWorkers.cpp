@@ -25,7 +25,18 @@ class DataWorker_tests : public ::testing::Test {
     {"COLUMN21", "10", "1", "COLUMN24", "COLUMN25"},
     {"COLUMN31", "10", "1", "COLUMN34", "COLUMN35"},
     {"COLUMN41", "10", "1", "COLUMN44", "COLUMN45"},
-    {"COLUMN51", "20", "1", "COLUMN54", "COLUMN55"}
+    {"COLUMN51", "20", "1", "COLUMN54", "COLUMN55"},
+    {"COLUMN22", "20", "1", "COLUMN54", "COLUMN55"},
+    {"COLUMN22", "20", "1", "COLUMN54", "COLUMN55"},
+    {"COLUMN22", "20", "1", "COLUMN54", "COLUMN55"}
+  };
+
+  std::vector<std::vector<std::string>> basicTest {
+      {"COLUMN11", "10", "1", "COLUMN14", "COLUMN15"},
+      {"COLUMN21", "10", "1", "COLUMN24", "COLUMN25"},
+      {"COLUMN31", "10", "1", "COLUMN34", "COLUMN35"},
+      {"COLUMN41", "10", "1", "COLUMN44", "COLUMN45"},
+      {"COLUMN51", "20", "1", "COLUMN54", "COLUMN55"},
   };
 
   std::vector<std::vector<std::string>> joinTest {
@@ -33,12 +44,24 @@ class DataWorker_tests : public ::testing::Test {
       {"20", "dvacet"},
   };
 
+  std::vector<std::vector<std::string>> mixedTest {
+      {"0", "1", "2(Sum)", "3", "4", "1"},
+      {"COLUMN11", "10", "1", "COLUMN14", "COLUMN15"},
+      {"COLUMN21", "10", "1", "COLUMN24", "COLUMN25"},
+      {"COLUMN22", "20", "3", "COLUMN54", "COLUMN55"},
+      {"COLUMN31", "10", "1", "COLUMN34", "COLUMN35"},
+      {"COLUMN41", "10", "1", "COLUMN44", "COLUMN45"},
+      {"COLUMN51", "20", "1", "COLUMN54", "COLUMN55"}
+  };
+
   std::vector<std::vector<std::string>> joinAnswers {
+      {"0", "1", "2(Sum)", "3", "4", "1"},
       {"COLUMN11", "10", "1", "COLUMN14", "COLUMN15", "deset"},
       {"COLUMN21", "10", "1", "COLUMN24", "COLUMN25", "deset"},
+      {"COLUMN22", "20", "3", "COLUMN54", "COLUMN55", "dvacet"},
       {"COLUMN31", "10", "1", "COLUMN34", "COLUMN35", "deset"},
       {"COLUMN41", "10", "1", "COLUMN44", "COLUMN45", "deset"},
-      {"COLUMN51", "20", "1", "COLUMN54", "COLUMN55", "dvacet"},
+      {"COLUMN51", "20", "1", "COLUMN54", "COLUMN55", "dvacet"}
   };
 
   std::vector<std::vector<std::string>> advTest{
@@ -115,7 +138,9 @@ TEST_F(DataWorker_tests, choices) {
 }
 
 TEST_F(DataWorker_tests, basicDistinct) {
-  EXPECT_NO_THROW(worker = new FINMDataWorker(dataProvider,
+  auto provider = new DataProviders::ArrayDataProvider(basicTest);
+
+  EXPECT_NO_THROW(worker = new FINMDataWorker(provider,
                                               {STRING_VAL, INTEGER_VAL, STRING_VAL, STRING_VAL, STRING_VAL}));
 
   std::string sql = "SELECT main.0 FROM main";
@@ -127,10 +152,11 @@ TEST_F(DataWorker_tests, basicDistinct) {
 
   EXPECT_EQ((*writer.result)[0][0], "0");
   for (int i = 1; i < writer.result->size(); ++i) {
-    EXPECT_EQ((*writer.result)[i][0], test[i - 1][0]);
+    EXPECT_EQ((*writer.result)[i][0], basicTest[i - 1][0]);
   }
 
   delete worker;
+  delete provider;
 }
 
 TEST_F(DataWorker_tests, advancedDinstinct) {
@@ -152,7 +178,9 @@ TEST_F(DataWorker_tests, advancedDinstinct) {
 }
 
 TEST_F(DataWorker_tests, basicSum) {
-  EXPECT_NO_THROW(worker = new FINMDataWorker(dataProvider,
+  auto provider = new DataProviders::ArrayDataProvider(basicTest);
+
+  EXPECT_NO_THROW(worker = new FINMDataWorker(provider,
                                               {STRING_VAL, INTEGER_VAL, STRING_VAL, STRING_VAL, STRING_VAL}));
 
   std::string sql = "SELECT main.0, SUM(main.1) FROM main";
@@ -164,10 +192,11 @@ TEST_F(DataWorker_tests, basicSum) {
 
   EXPECT_EQ((*writer.result)[0][1], "1(Sum)");
   for (int i = 1; i < writer.result->size(); ++i) {
-    EXPECT_EQ((*writer.result)[i][1], test[i - 1][1]);
+    EXPECT_EQ((*writer.result)[i][1], basicTest[i - 1][1]);
   }
 
   delete worker;
+  delete provider;
 }
 
 TEST_F(DataWorker_tests, advancedSum) {
@@ -192,7 +221,9 @@ TEST_F(DataWorker_tests, advancedSum) {
 }
 
 TEST_F(DataWorker_tests, basicAverage) {
-  EXPECT_NO_THROW(worker = new FINMDataWorker(dataProvider,
+  auto provider = new DataProviders::ArrayDataProvider(basicTest);
+
+  EXPECT_NO_THROW(worker = new FINMDataWorker(provider,
                                               {STRING_VAL, INTEGER_VAL, INTEGER_VAL, STRING_VAL, STRING_VAL}));
 
   std::string sql = "SELECT main.0, AVG(main.2) FROM main";
@@ -204,10 +235,11 @@ TEST_F(DataWorker_tests, basicAverage) {
 
   EXPECT_EQ((*writer.result)[0][1], "2(Avg)");
   for (int i = 1; i < writer.result->size(); ++i) {
-    EXPECT_EQ((*writer.result)[i][1], test[i - 1][2]);
+    EXPECT_EQ((*writer.result)[i][1], basicTest[i - 1][2]);
   }
 
   delete worker;
+  delete provider;
 }
 
 TEST_F(DataWorker_tests, selection) {
@@ -221,8 +253,6 @@ TEST_F(DataWorker_tests, selection) {
 
   worker->writeResult(writer, sql);
 
-  writer.print();
-
   EXPECT_EQ((*writer.result)[0][0], "0");
   for (int i = 1; i < writer.result->size(); ++i) {
     EXPECT_TRUE((*writer.result)[i][0] == "prvni" or
@@ -232,8 +262,29 @@ TEST_F(DataWorker_tests, selection) {
   delete worker;
 }
 
+TEST_F(DataWorker_tests, mix) {
+    EXPECT_NO_THROW(worker = new FINMDataWorker(dataProvider,
+                                                {STRING_VAL, INTEGER_VAL, INTEGER_VAL, STRING_VAL, STRING_VAL}));
+
+    std::string sql = "SELECT main.0, main.1, SUM(main.2), main.3, main.4 FROM main";
+
+    auto joinProvider = new DataProviders::ArrayDataProvider(joinTest);
+
+    ArrayWriter writer;
+    writer.result = new std::vector<std::vector<std::string>>();
+
+    worker->writeResult(writer, sql);
+
+    for (int i = 0; i < (*writer.result).size(); ++i) {
+      for (int j = 0; j < (*writer.result)[i].size(); ++j) {
+        EXPECT_STREQ((*writer.result)[i][j].c_str(), mixedTest[i][j].c_str());
+      }
+    }
+
+    delete worker;
+}
+
 TEST_F(DataWorker_tests, join) {
-  FAIL();
   EXPECT_NO_THROW(worker = new FINMDataWorker(dataProvider,
                                               {STRING_VAL, INTEGER_VAL, INTEGER_VAL, STRING_VAL, STRING_VAL}));
 
@@ -242,6 +293,8 @@ TEST_F(DataWorker_tests, join) {
   auto joinProvider = new DataProviders::ArrayDataProvider(joinTest);
   auto joinDataSet = new DataSets::MemoryDataSet("joinTest");
   joinDataSet->setDataProvider(joinProvider);
+  joinDataSet->setFieldTypes({INTEGER_VAL, STRING_VAL});
+  joinDataSet->open();
 
   worker->addDataSet(joinDataSet);
 
@@ -249,8 +302,6 @@ TEST_F(DataWorker_tests, join) {
   writer.result = new std::vector<std::vector<std::string>>();
 
   worker->writeResult(writer, sql);
-
-  writer.print();
 
   for (int i = 0; i < (*writer.result).size(); ++i) {
     for (int j = 0; j < (*writer.result)[i].size(); ++j) {

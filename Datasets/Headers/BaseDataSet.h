@@ -126,9 +126,7 @@ class BaseDataSet {
 
   virtual void filter(const FilterOptions &options)=0;
 
-  virtual void findFirst(uint64_t fieldIndex, const std::string &searchString)=0;
-
-  void findFirst(std::string fieldName, const std::string &searchString);
+  virtual void findFirst(FilterItem &item)=0;
 
   std::string getName() {
     return dataSetName;

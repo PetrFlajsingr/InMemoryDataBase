@@ -50,6 +50,13 @@ DataWorkers::FINMDataWorker::FINMDataWorker(
   dataset->open();
 }
 
+struct JoinStructTest {
+  uint64_t indexAddi;
+  uint64_t indexMain;
+
+  std::vector<DataSets::BaseField*> projectFields;
+};
+
 void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
     std::string &sql) {
   queryData = SQLParser::parse(sql);
@@ -57,7 +64,32 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
   writeHeaders(writer);
 
   bool doJoin = !queryData.joins.empty();
+  std::vector<JoinStructTest> joinStruct;
 
+  //  seradeni pripojenych datasetu
+  if (doJoin) {
+    for (int i = 0; i < queryData.joins.size(); ++i) {
+      JoinStructTest test;
+      test.indexAddi = additionalDataSets[i]->fieldByName(queryData.joins[i].column2Name)->getIndex();
+      test.indexMain = dataset->fieldByName(queryData.joins[i].column1Name)->getIndex();
+      for (auto & proj : queryData.projections) {
+        if (proj.tableName == queryData.joins[i].table2Name) {
+          test.projectFields.push_back(additionalDataSets[i]->fieldByName(proj.columnName));
+        }
+      }
+
+      if (test.projectFields.empty()) {
+        continue;
+      }
+      joinStruct.push_back(test);
+      DataSets::SortOptions options;
+      options.addOption(test.indexAddi,
+          SortOrder::ASCENDING);
+      additionalDataSets[i]->sort(options);
+    }
+  }
+
+  //  rozrazeni podle distinct hodnot
   DataSets::SortOptions sortOptions;
   for (int i = 0;
       i < dataset->getFieldNames().size()
@@ -71,31 +103,52 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
   }
   dataset->sort(sortOptions);
 
+  //  vyfiltrovani nechtenych zaznamu
   if (!queryData.selections.empty()) {
     filterDataSet();
   }
 
+  //  akumulatory pro vysveldky pro kazdy radek
   std::vector<ResultAccumulator*> accumulators;
-
   for (auto &op : queryData.projections) {
-    accumulators.push_back(
-        new ResultAccumulator(dataset->fieldByName(op.columnName),
-        op.operation));
+    if (op.tableName == "main") {
+      accumulators.push_back(
+          new ResultAccumulator(dataset->fieldByName(op.columnName),
+                                op.operation));
+    }
   }
 
   bool savedResults = false;
   std::vector<std::string> results;
   while (!dataset->eof()) {
-    for (auto acc : accumulators) {
-      if (acc->step() && !savedResults) {
+    for (auto accumulator : accumulators) {
+      if (accumulator->step() && !savedResults) {
         for (auto toSave : accumulators) {
           results.push_back(toSave->getResult());
-
-          toSave->reset();
         }
+
+        //  pokud je pozadovan join, je nutne hledat v dalsich tabulkach
+        if (doJoin) {
+          for (int i = 0; i < joinStruct.size(); ++i) {
+            DataSets::FilterItem item {
+                joinStruct[i].indexAddi,
+                {accumulators[joinStruct[i].indexMain]->getResult()},
+                DataSets::FilterOption::EQUALS
+            };
+            additionalDataSets[i]->findFirst(item);
+
+            for (auto field : joinStruct[i].projectFields) {
+              results.push_back(field->getAsString());
+            }
+          }
+        }
+
         writer.writeRecord(results);
         results.clear();
         savedResults = true;
+      }
+      if (savedResults) {
+        accumulator->reset();
       }
     }
     savedResults = false;
@@ -105,6 +158,21 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
 
   for (auto toSave : accumulators) {
     results.push_back(toSave->getResultForce());
+  }
+
+  if (doJoin) {
+    for (int i = 0; i < joinStruct.size(); ++i) {
+      DataSets::FilterItem item {
+          joinStruct[i].indexAddi,
+          {dataset->fieldByIndex(joinStruct[i].indexMain)->getAsString()},
+          DataSets::FilterOption::EQUALS
+      };
+      additionalDataSets[i]->findFirst(item);
+
+      for (auto field : joinStruct[i].projectFields) {
+        results.push_back(field->getAsString());
+      }
+    }
   }
 
   writer.writeRecord(results);
@@ -126,6 +194,7 @@ void DataWorkers::FINMDataWorker::writeHeaders(BaseDataWriter &writer) {
 
   writer.writeHeader(header);
 }
+
 void DataWorkers::FINMDataWorker::filterDataSet() {
   DataSets::FilterOptions filterOptions;
 
@@ -287,13 +356,19 @@ bool DataWorkers::ResultAccumulator::handleAverage() {
 std::string DataWorkers::ResultAccumulator::resultSum() {
   switch (field->getFieldType()) {
     case INTEGER_VAL: {
-      return std::to_string(data._int);
+      std::string result = std::to_string(data._int);
+      data._int = 0;
+      return result;
     }
     case DOUBLE_VAL: {
-      return std::to_string(data._double);
+      std::string result = std::to_string(data._double);
+      data._double = 0;
+      return result;
     }
     case CURRENCY: {
-      return dec::toString(*data._currency);
+      std::string result = dec::toString(*data._currency);
+      *data._currency = 0;
+      return result;
     }
   }
 }
@@ -301,13 +376,19 @@ std::string DataWorkers::ResultAccumulator::resultSum() {
 std::string DataWorkers::ResultAccumulator::resultAverage() {
   switch (field->getFieldType()) {
     case INTEGER_VAL: {
-      return std::to_string(data._int / dataCount);
+      std::string result = std::to_string(data._int / dataCount);
+      data._int = 0;
+      return result;
     }
     case DOUBLE_VAL: {
-      return std::to_string(data._double / dataCount);
+      std::string result = std::to_string(data._double / dataCount);
+      data._double = 0;
+      return result;
     }
     case CURRENCY: {
-      return dec::toString(*data._currency / Currency(dataCount));
+      std::string result = dec::toString(*data._currency / Currency(dataCount));
+      *data._currency = 0;
+      return result;
     }
   }
 }
@@ -341,10 +422,13 @@ std::string DataWorkers::ResultAccumulator::getResult() {
 
 void DataWorkers::ResultAccumulator::reset() {
   if (operation == Distinct) {
+    distinct = false;
     return;
   }
-  dataCount = 0;
+  dataCount = 1;
 
+  return;
+  //  TODO: vynuluje se hodnota při resetu, působí problém v dalším kroku
   switch (field->getFieldType()) {
     case INTEGER_VAL:
       data._int = 0;

@@ -3,6 +3,7 @@
 //
 
 #include "MemoryDataSet.h"
+#include <cstring>
 
 void DataSets::MemoryDataSet::setDataProvider(
     DataProviders::BaseDataProvider *provider) {
@@ -408,6 +409,25 @@ void DataSets::MemoryDataSet::appendDataProvider(
   loadData();
 }
 DataSets::MemoryDataSet::MemoryDataSet(const std::string &dataSetName) : BaseDataSet(dataSetName) {}
+
+void DataSets::MemoryDataSet::findFirst(FilterItem &item) {
+  auto field = fields[item.fieldIndex];
+  std::string valueString;
+
+  while (currentRecord < data.size()) {
+    valueString = field->getAsString();
+    switch (std::strcmp(valueString.c_str(), item.searchString[0].c_str())) {
+      case 0:
+        return;
+      case -1:
+        next();
+        break;
+      case 1:
+        previous();
+        break;
+    }
+  }
+}
 
 
 

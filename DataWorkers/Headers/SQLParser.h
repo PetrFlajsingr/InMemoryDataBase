@@ -101,7 +101,7 @@ namespace DataWorkers {
         return result;
       }
 
-      while (splitSql[iter] != "WHERE") {
+      while (iter < splitSql.size() && splitSql[iter] != "WHERE") {
         if (splitSql[iter] != "JOIN") {
           throw SQLException();
         }

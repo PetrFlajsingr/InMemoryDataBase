@@ -153,6 +153,8 @@ class MemoryDataSet : public BaseDataSet {
   void append() override;
 
   virtual void appendDataProvider(DataProviders::BaseDataProvider *provider);
+
+  void findFirst(FilterItem &item) override;
 };
 }  // namespace DataSets
 

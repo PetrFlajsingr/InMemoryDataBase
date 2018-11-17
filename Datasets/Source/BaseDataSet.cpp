@@ -16,6 +16,3 @@ DataSets::BaseDataSet::~BaseDataSet() {
     delete tmp;
   }
 }
-void DataSets::BaseDataSet::findFirst(std::string fieldName, const std::string &searchString) {
-  findFirst(fieldByName(fieldName)->getIndex(), searchString);
-}
