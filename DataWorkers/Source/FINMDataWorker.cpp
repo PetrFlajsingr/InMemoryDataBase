@@ -29,7 +29,7 @@ std::vector<std::string> DataWorkers::FINMDataWorker::getChoices(std::string cho
   while (!dataset->eof()) {
     if (field->getAsString() != value) {
       value = field->getAsString();
-      result.push_back(value);
+      result.emplace_back(value);
     }
     dataset->next();
   }
@@ -63,7 +63,7 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
   std::vector<ResultAccumulator*> accumulators;
   for (auto &op : queryData.projections) {
     if (op.tableName == "main") {
-      accumulators.push_back(
+      accumulators.emplace_back(
           new ResultAccumulator(dataset->fieldByName(op.columnName),
                                 op.operation));
     }
@@ -85,14 +85,14 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
           //dataset->fieldByName(queryData.joins[i].column1Name)->getIndex();
       for (auto & proj : queryData.projections) {
         if (proj.tableName == queryData.joins[i].table2Name) {
-          joinStructure.projectFields.push_back(additionalDataSets[i]->fieldByName(proj.columnName));
+          joinStructure.projectFields.emplace_back(additionalDataSets[i]->fieldByName(proj.columnName));
         }
       }
 
       if (joinStructure.projectFields.empty()) {
         continue;
       }
-      joinStructures.push_back(joinStructure);
+      joinStructures.emplace_back(joinStructure);
       DataSets::SortOptions options;
       options.addOption(joinStructure.indexAddi,
           SortOrder::ASCENDING);
@@ -123,11 +123,12 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
 
   bool savedResults = false;
   std::vector<std::string> results;
+  results.reserve(queryData.projections.size());
   while (!dataset->eof()) {
     for (auto accumulator : accumulators) {
       if (accumulator->step() && !savedResults) {
         for (auto toSave : accumulators) {
-          results.push_back(toSave->getResult());
+          results.emplace_back(toSave->getResult());
         }
 
         //  pokud je pozadovan join, je nutne hledat v dalsich tabulkach
@@ -144,11 +145,11 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
             };
             if (additionalDataSets[i]->findFirst(item)) {
               for (auto field : joinStructures[i].projectFields) {
-                results.push_back(field->getAsString());
+                results.emplace_back(field->getAsString());
               }
             } else {
               for (auto field : joinStructures[i].projectFields) {
-                results.push_back("(NULL)");
+                results.emplace_back("(NULL)");
               }
             }
           }
@@ -168,7 +169,7 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
   }
 
   for (auto toSave : accumulators) {
-    results.push_back(toSave->getResultForce());
+    results.emplace_back(toSave->getResultForce());
   }
 
   if (doJoin) {
@@ -185,7 +186,7 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
       additionalDataSets[i]->findFirst(item);
 
       for (auto field : joinStructures[i].projectFields) {
-        results.push_back(field->getAsString());
+        results.emplace_back(field->getAsString());
       }
     }
   }
@@ -235,7 +236,7 @@ void DataWorkers::FINMDataWorker::filterDataSet() {
             *container._currency = dec::fromString<Currency>(value);
             break;
         }
-        filterSelection.push_back(container);
+        filterSelection.emplace_back(container);
       }
 
 

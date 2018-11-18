@@ -60,7 +60,7 @@ class CsvReader : public BaseDataProvider {
    * @return rozdeleny zaznamu podle CSV delimiter.
    */
   inline std::vector<std::string> getRow() override {
-    return std::vector<std::string>(currentRecord);
+    return currentRecord;
   }
 
   inline std::string getColumn(unsigned int columnIndex) override {

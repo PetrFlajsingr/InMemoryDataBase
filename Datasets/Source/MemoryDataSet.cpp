@@ -63,7 +63,7 @@ void DataSets::MemoryDataSet::createFields(std::vector<std::string> columns,
       }
       default:throw IllegalStateException("Internal error.");
     }
-    fields.push_back(newField);
+    fields.emplace_back(newField);
     iter++;
   }
 }
@@ -72,6 +72,7 @@ void DataSets::MemoryDataSet::addRecord() {
   auto record = dataProvider->getRow();
 
   auto newRecord = new DataSetRowCells();
+  newRecord->reserve(columnCount);
   size_t iter = 0;
   for (const auto &part : record) {
     auto dataContainer = new DataContainer();
@@ -88,10 +89,10 @@ void DataSets::MemoryDataSet::addRecord() {
     }
     iter++;
 
-    newRecord->push_back(dataContainer);
+    newRecord->emplace_back(dataContainer);
   }
 
-  data.push_back(new DataSetRow{true, newRecord});
+  data.emplace_back(new DataSetRow{true, newRecord});
 }
 
 void DataSets::MemoryDataSet::close() {
@@ -205,7 +206,7 @@ void DataSets::MemoryDataSet::sort(SortOptions &options) {
   std::vector<std::function<int8_t (DataSetRow *, DataSetRow *)>> compareFunctions;
 
   for (auto &option : options.options) {
-    compareFunctions.push_back(
+    compareFunctions.emplace_back(
         fields[option.fieldIndex]->getCompareFunction());
   }
 
@@ -406,10 +407,10 @@ void DataSets::MemoryDataSet::append() {
         break;
       default:throw IllegalStateException("Internal error.");
     }
-    newRecord->push_back(dataContainer);
+    newRecord->emplace_back(dataContainer);
   }
 
-  data.push_back(new DataSetRow{true, newRecord});
+  data.emplace_back(new DataSetRow{true, newRecord});
   last();
 }
 
