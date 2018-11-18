@@ -211,12 +211,11 @@ void DataSets::MemoryDataSet::sort(SortOptions &options) {
   auto optionArray = options.options;
   auto compareFunction = [&optionArray, &compareFunctions](DataSetRow *a, DataSetRow *b) {
     for (uint8_t i = 0; i < optionArray.size(); ++i) {
-      switch (compareFunctions[i](a, b)) {
-        case 0: break;
-        case -1:return optionArray[i].order == SortOrder::ASCENDING;
-        case 1:return optionArray[i].order == SortOrder::DESCENDING;
-        default:
-          throw IllegalStateException("Internal error");
+      int compareResult = compareFunctions[i](a, b);
+      if (compareResult < 0) {
+        return optionArray[i].order == SortOrder::ASCENDING;
+      } else if (compareResult > 0) {
+        return optionArray[i].order == SortOrder::DESCENDING;
       }
     }
     return false;

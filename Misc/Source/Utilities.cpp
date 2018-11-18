@@ -29,26 +29,23 @@ std::vector<std::string> Utilities::splitStringByDelimiter(std::string str,
 }
 
 int Utilities::stringToInt(const std::string &str) {
-  if (str.empty()) {
+  char* p;
+  long converted = strtol(str.c_str(), &p, 10);
+  if (*p) {
     return 0;
+  } else {
+    return converted;
   }
-  std::stringstream stringStream(str);
-  int result;
-
-  stringStream >> result;
-  return result;
 }
 
 double Utilities::stringToDouble(const std::string &str) {
-  if (str.empty()) {
-    return 0.0;
+  char* p;
+  double converted = strtod(str.c_str(), &p);
+  if (*p) {
+    return 0;
+  } else {
+    return converted;
   }
-
-  std::stringstream stringStream(str);
-  double result;
-
-  stringStream >> result;
-  return result;
 }
 
 bool Utilities::isInteger(const std::string &value) {
