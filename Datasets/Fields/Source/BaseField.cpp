@@ -8,6 +8,7 @@
 #include <StringField.h>
 #include "Types.h"
 #include "BaseField.h"
+#include "BaseDataSet.h"
 
 void DataSets::BaseField::setData(void *data, ValueType type) {
   dataSet->setData(data, index, type);

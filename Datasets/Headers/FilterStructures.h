@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <string>
+#include "Types.h"
 
 //TODO: predelat tak, aby podporoval double, integer, currency...
 namespace DataSets {
@@ -22,7 +23,8 @@ enum FilterOption {
 
 struct FilterItem {
   uint64_t fieldIndex;
-  std::vector<std::string> searchString;
+  ValueType type;
+  std::vector<DataContainer> searchData;
   FilterOption filterOption;
 };
 
@@ -30,10 +32,12 @@ struct FilterOptions {
   std::vector<FilterItem> options;
 
   void addOption(const uint64_t fieldIndex,
-                 const std::vector<std::string> &searchString,
+                 const ValueType type,
+                 const std::vector<DataContainer> &searchString,
                  const FilterOption filterOption) {
     FilterItem item{
         fieldIndex,
+        type,
         searchString,
         filterOption
     };

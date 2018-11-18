@@ -18,12 +18,7 @@ namespace DataWorkers {
 
 class ResultAccumulator {
  private:
-  union Data {
-    int _int;
-    double _double;
-    char* _string;
-    Currency* _currency;
-  } data;
+  DataContainer data;
 
   bool firstDone = false;
 
@@ -48,6 +43,7 @@ class ResultAccumulator {
   std::string resultAverage();
 
   std::string resultDistinct();
+
  public:
   ResultAccumulator(DataSets::BaseField *field, Operation op);
 
@@ -59,6 +55,11 @@ class ResultAccumulator {
 
   void reset();
 
+  std::string getName();
+
+  DataContainer getContainer() {
+    return data;
+  }
 };
 
 

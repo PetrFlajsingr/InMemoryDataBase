@@ -126,7 +126,7 @@ class BaseDataSet {
 
   virtual void filter(const FilterOptions &options)=0;
 
-  virtual void findFirst(FilterItem &item)=0;
+  virtual bool findFirst(FilterItem &item)=0;
 
   std::string getName() {
     return dataSetName;

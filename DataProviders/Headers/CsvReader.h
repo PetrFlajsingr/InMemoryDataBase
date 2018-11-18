@@ -19,7 +19,7 @@ namespace DataProviders {
  */
 class CsvReader : public BaseDataProvider {
  private:
-  const uint32_t BUFFER_SIZE = 1024;  //< velikost bufferu pro cteni radku
+  const uint32_t BUFFER_SIZE = 4096;  //< velikost bufferu pro cteni radku
 
   const char DELIMITER = ';';  //< rozdelovac CSV dat
 

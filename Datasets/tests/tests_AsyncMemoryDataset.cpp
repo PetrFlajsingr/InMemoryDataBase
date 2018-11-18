@@ -115,7 +115,9 @@ TEST_F(AsyncMemoryDataset_tests, filter) {
   EXPECT_CALL(observer, onAfterFilter(dataset));
 
   FilterOptions options;
-  options.addOption(0, {"A"}, CONTAINS);
+  DataContainer container;
+  container._string = strdup("A");
+  options.addOption(0, ValueType::STRING_VAL, {container}, CONTAINS);
   dataset->filter(options);
 }
 

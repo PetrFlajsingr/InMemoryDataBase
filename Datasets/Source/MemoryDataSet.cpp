@@ -255,6 +255,7 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
         break;
       }
 
+      /*
       switch (fields[filter.fieldIndex]->getFieldType()) {
         case INTEGER_VAL:
           toCompare = std::to_string(
@@ -272,38 +273,55 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
           break;
         default:throw IllegalStateException("Internal error.");
       }
+       */
 
-      for (const auto &searchString : filter.searchString) {
-        switch (filter.filterOption) {
-          case EQUALS:valid = toCompare == searchString;
-            break;
-          case STARTS_WITH:
-            valid = std::strncmp(toCompare.c_str(),
-                                 searchString.c_str(),
-                                 searchString.size()) == 0;
-            break;
-          case CONTAINS:
-            valid = toCompare.find(searchString)
-                != std::string::npos;
-            break;
-          case ENDS_WITH:valid = Utilities::endsWith(toCompare, searchString);
-            break;
-          case NOT_CONTAINS:
-            valid = toCompare.find(searchString)
-                == std::string::npos;
-            break;
-          case NOT_STARTS_WITH:
-            valid = std::strncmp(toCompare.c_str(),
-                                 searchString.c_str(),
-                                 searchString.size()) != 0;
-            break;
-          case NOT_ENDS_WITH:
-            valid = !Utilities::endsWith(toCompare,
-                                         searchString);
-            break;
+      if (filter.type == ValueType::STRING_VAL) {
+        std::string toCompare = (*iter->cells)[filter.fieldIndex]->_string;
+        for (const auto &search : filter.searchData) {
+          switch (filter.filterOption) {
+            case EQUALS:
+              valid = std::strcmp(toCompare.c_str(), search._string) == 0;
+              break;
+            case STARTS_WITH:
+              valid = std::strncmp(toCompare.c_str(),
+                                   search._string,
+                                   strlen(search._string)) == 0;
+              break;
+            case CONTAINS:
+              valid = toCompare.find(search._string)
+                  != std::string::npos;
+              break;
+            case ENDS_WITH:valid = Utilities::endsWith(toCompare, search._string);
+              break;
+            case NOT_CONTAINS:
+              valid = toCompare.find(search._string)
+                  == std::string::npos;
+              break;
+            case NOT_STARTS_WITH:
+              valid = std::strncmp(toCompare.c_str(),
+                                   search._string,
+                                   strlen(search._string)) != 0;
+              break;
+            case NOT_ENDS_WITH:
+              valid = !Utilities::endsWith(toCompare,
+                                           search._string);
+              break;
+          }
         }
-        if (valid) {
-          break;
+      } else if (filter.type == ValueType::INTEGER_VAL) {
+        int toCompare = (*iter->cells)[filter.fieldIndex]->_integer;
+        for (const auto &search : filter.searchData) {
+          valid = Utilities::compareInt(toCompare, search._integer) == 0;
+        }
+      } else if (filter.type == ValueType::DOUBLE_VAL) {
+        double toCompare = (*iter->cells)[filter.fieldIndex]->_double;
+        for (const auto &search : filter.searchData) {
+          valid = Utilities::compareDouble(toCompare, search._integer) == 0;
+        }
+      } else if (filter.type == ValueType::CURRENCY) {
+        Currency *toCompare = (*iter->cells)[filter.fieldIndex]->_currency;
+        for (const auto &search : filter.searchData) {
+          valid = Utilities::compareCurrency(*toCompare, *search._currency) == 0;
         }
       }
 
@@ -410,24 +428,90 @@ void DataSets::MemoryDataSet::appendDataProvider(
 }
 DataSets::MemoryDataSet::MemoryDataSet(const std::string &dataSetName) : BaseDataSet(dataSetName) {}
 
-void DataSets::MemoryDataSet::findFirst(FilterItem &item) {
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCDFAInspection"
+bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
+  //  TODO: porovnavani stringu neodpovídá porovnání integer...
   auto field = fields[item.fieldIndex];
   std::string valueString;
+  bool foundBigger = false, foundSmaller = false;
 
-  while (currentRecord < data.size()) {
+  do {
     valueString = field->getAsString();
-    switch (std::strcmp(valueString.c_str(), item.searchString[0].c_str())) {
+
+    int8_t comparisonResult;
+    switch (field->getFieldType()) {
+      case STRING_VAL:
+        comparisonResult = std::strcmp(
+            field->getAsString().c_str(),
+            item.searchData[0]._string);
+        break;
+      case INTEGER_VAL:
+        comparisonResult = Utilities::compareInt(
+            reinterpret_cast<IntegerField*>(field)->getAsInteger(),
+            item.searchData[0]._integer);
+        break;
+      case DOUBLE_VAL:
+        comparisonResult = Utilities::compareDouble(
+            reinterpret_cast<DoubleField*>(field)->getAsDouble(),
+            item.searchData[0]._double);
+        break;
+      case CURRENCY:
+        Currency cur = reinterpret_cast<CurrencyField*>(field)->getAsCurrency();
+        comparisonResult = Utilities::compareCurrency(
+            cur,
+            *item.searchData[0]._currency);
+        break;
+    }
+    switch (comparisonResult) {
       case 0:
-        return;
+        return true;
       case -1:
+        foundSmaller = true;
         next();
         break;
       case 1:
+        foundBigger = true;
         previous();
         break;
     }
+    if (foundSmaller && foundBigger) {
+      return false;
+    }
+  }while (currentRecord > 0 && currentRecord < data.size());
+  if (currentRecord == 0) {
+    int8_t comparisonResult;
+    switch (field->getFieldType()) {
+      case STRING_VAL:
+        comparisonResult = std::strcmp(
+            field->getAsString().c_str(),
+            item.searchData[0]._string);
+        break;
+      case INTEGER_VAL:
+        comparisonResult = Utilities::compareInt(
+            reinterpret_cast<IntegerField*>(field)->getAsInteger(),
+            item.searchData[0]._integer);
+        break;
+      case DOUBLE_VAL:
+        comparisonResult = Utilities::compareDouble(
+            reinterpret_cast<DoubleField*>(field)->getAsDouble(),
+            item.searchData[0]._double);
+        break;
+      case CURRENCY:
+        Currency cur = reinterpret_cast<CurrencyField*>(field)->getAsCurrency();
+        comparisonResult = Utilities::compareCurrency(
+            cur,
+            *item.searchData[0]._currency);
+        break;
+    }
+
+    if (comparisonResult == 0) {
+      return true;
+    }
   }
+  return false;
 }
+#pragma clang diagnostic pop
 
 
 

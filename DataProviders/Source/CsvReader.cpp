@@ -2,6 +2,7 @@
 // Created by Petr Flajsingr on 24/08/2018.
 //
 
+#include <iostream>
 #include "CsvReader.h"
 
 DataProviders::CsvReader::CsvReader(std::string filePath) {

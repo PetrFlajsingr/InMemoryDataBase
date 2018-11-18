@@ -9,7 +9,6 @@
 #include <utility>
 #include <functional>
 #include "Types.h"
-#include "BaseDataSet.h"
 #include "Exceptions.h"
 
 namespace DataSets {

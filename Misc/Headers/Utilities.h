@@ -73,6 +73,12 @@ class Utilities {
   static bool endsWith(std::string const &value, std::string const &ending);
 
   static char *copyStringToNewChar(const std::string &str);
+
+  static int8_t compareInt(int a, int b);
+
+  static int8_t compareDouble(double a, double b);
+
+  static int8_t compareCurrency(Currency &a, Currency &b);
 };
 
 #endif //  MISC_HEADERS_UTILITIES_H_

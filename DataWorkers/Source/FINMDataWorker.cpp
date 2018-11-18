@@ -59,12 +59,30 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
   bool doJoin = !queryData.joins.empty();
   std::vector<InnerJoinStructure> joinStructures;
 
+  //  akumulatory pro vysveldky pro kazdy radek
+  std::vector<ResultAccumulator*> accumulators;
+  for (auto &op : queryData.projections) {
+    if (op.tableName == "main") {
+      accumulators.push_back(
+          new ResultAccumulator(dataset->fieldByName(op.columnName),
+                                op.operation));
+    }
+  }
+
   //  seradeni pripojenych datasetu
   if (doJoin) {
     for (int i = 0; i < queryData.joins.size(); ++i) {
       InnerJoinStructure joinStructure;
-      joinStructure.indexAddi = additionalDataSets[i]->fieldByName(queryData.joins[i].column2Name)->getIndex();
-      joinStructure.indexMain = dataset->fieldByName(queryData.joins[i].column1Name)->getIndex();
+      joinStructure.indexAddi =
+          additionalDataSets[i]->fieldByName(queryData.joins[i].column2Name)->getIndex();
+
+      std::string searchedName = queryData.joins[i].column1Name;
+      joinStructure.indexMain = std::find_if(accumulators.begin(),
+          accumulators.end(),
+          [&searchedName] (ResultAccumulator *acc) {
+        return acc->getName() == searchedName;
+      }) - accumulators.begin();
+          //dataset->fieldByName(queryData.joins[i].column1Name)->getIndex();
       for (auto & proj : queryData.projections) {
         if (proj.tableName == queryData.joins[i].table2Name) {
           joinStructure.projectFields.push_back(additionalDataSets[i]->fieldByName(proj.columnName));
@@ -88,7 +106,8 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
       i < dataset->getFieldNames().size()
         && i < queryData.projections.size();
       ++i) {
-    if (queryData.projections[i].operation == Distinct) {
+    if (queryData.projections[i].tableName == "main" &&
+        queryData.projections[i].operation == Distinct) {
       sortOptions.addOption(
           dataset->fieldByName(queryData.projections[i].columnName)->getIndex(),
           SortOrder::ASCENDING);
@@ -101,15 +120,6 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
     filterDataSet();
   }
 
-  //  akumulatory pro vysveldky pro kazdy radek
-  std::vector<ResultAccumulator*> accumulators;
-  for (auto &op : queryData.projections) {
-    if (op.tableName == "main") {
-      accumulators.push_back(
-          new ResultAccumulator(dataset->fieldByName(op.columnName),
-                                op.operation));
-    }
-  }
 
   bool savedResults = false;
   std::vector<std::string> results;
@@ -123,15 +133,23 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
         //  pokud je pozadovan join, je nutne hledat v dalsich tabulkach
         if (doJoin) {
           for (int i = 0; i < joinStructures.size(); ++i) {
+            ValueType type = dataset->fieldByIndex(joinStructures[i].indexMain)->getFieldType();
+            DataContainer container = accumulators[joinStructures[i].indexMain]->getContainer();
+
             DataSets::FilterItem item {
                 joinStructures[i].indexAddi,
-                {accumulators[joinStructures[i].indexMain]->getResult()},
+                type,
+                {container},
                 DataSets::FilterOption::EQUALS
             };
-            additionalDataSets[i]->findFirst(item);
-
-            for (auto field : joinStructures[i].projectFields) {
-              results.push_back(field->getAsString());
+            if (additionalDataSets[i]->findFirst(item)) {
+              for (auto field : joinStructures[i].projectFields) {
+                results.push_back(field->getAsString());
+              }
+            } else {
+              for (auto field : joinStructures[i].projectFields) {
+                results.push_back("(NULL)");
+              }
             }
           }
         }
@@ -155,9 +173,13 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
 
   if (doJoin) {
     for (int i = 0; i < joinStructures.size(); ++i) {
+      ValueType type = dataset->fieldByIndex(joinStructures[i].indexMain)->getFieldType();
+      DataContainer container = accumulators[joinStructures[i].indexMain]->getContainer();
+
       DataSets::FilterItem item {
           joinStructures[i].indexAddi,
-          {dataset->fieldByIndex(joinStructures[i].indexMain)->getAsString()},
+          type,
+          {container},
           DataSets::FilterOption::EQUALS
       };
       additionalDataSets[i]->findFirst(item);
@@ -193,9 +215,34 @@ void DataWorkers::FINMDataWorker::filterDataSet() {
 
   for (auto &selection : queryData.selections) {
     if (selection.tableName == "main") {
+      auto field = dataset->fieldByName(selection.columnName);
+      auto type = field->getFieldType();
+      std::vector<DataContainer> filterSelection;
+
+      DataContainer container;
+      for (std::string &value : selection.reqs) {
+        switch (type) {
+          case STRING_VAL:
+            container._string = strdup(value.c_str());
+            break;
+          case INTEGER_VAL:
+            container._integer = Utilities::stringToInt(value);
+            break;
+          case DOUBLE_VAL:
+            container._double = Utilities::stringToDouble(value);
+            break;
+          case CURRENCY:
+            *container._currency = dec::fromString<Currency>(value);
+            break;
+        }
+        filterSelection.push_back(container);
+      }
+
+
       filterOptions.addOption(
-          dataset->fieldByName(selection.columnName)->getIndex(),
-          selection.reqs,
+          field->getIndex(),
+          type,
+          filterSelection,
           DataSets::FilterOption::EQUALS);
     }
   }
@@ -210,7 +257,7 @@ DataWorkers::ResultAccumulator::ResultAccumulator(DataSets::BaseField *field,
       data._string = nullptr;
       break;
     case INTEGER_VAL:
-      data._int = 0;
+      data._integer = 0;
       break;
     case DOUBLE_VAL:
       data._double = 0.0;
@@ -228,12 +275,12 @@ bool DataWorkers::ResultAccumulator::handleDistinct() {
           ->getAsInteger();
       if (!firstDone) {
         firstDone = true;
-        data._int = value;
+        data._integer = value;
         return false;
       }
-      if (value != data._int) {
-        result = std::to_string(data._int);
-        data._int = value;
+      if (value != data._integer) {
+        result = std::to_string(data._integer);
+        data._integer = value;
         distinct = true;
         return true;
       }
@@ -296,7 +343,7 @@ bool DataWorkers::ResultAccumulator::handleSum() {
     case INTEGER_VAL: {
       int value = reinterpret_cast<DataSets::IntegerField *>(field)
           ->getAsInteger();
-      data._int += value;
+      data._integer += value;
       break;
     }
     case DOUBLE_VAL: {
@@ -324,7 +371,7 @@ bool DataWorkers::ResultAccumulator::handleAverage() {
     case INTEGER_VAL: {
       int value = reinterpret_cast<DataSets::IntegerField *>(field)
           ->getAsInteger();
-      data._int += value;
+      data._integer += value;
       break;
     }
     case DOUBLE_VAL: {
@@ -349,8 +396,8 @@ bool DataWorkers::ResultAccumulator::handleAverage() {
 std::string DataWorkers::ResultAccumulator::resultSum() {
   switch (field->getFieldType()) {
     case INTEGER_VAL: {
-      std::string result = std::to_string(data._int);
-      data._int = 0;
+      std::string result = std::to_string(data._integer);
+      data._integer = 0;
       return result;
     }
     case DOUBLE_VAL: {
@@ -369,8 +416,8 @@ std::string DataWorkers::ResultAccumulator::resultSum() {
 std::string DataWorkers::ResultAccumulator::resultAverage() {
   switch (field->getFieldType()) {
     case INTEGER_VAL: {
-      std::string result = std::to_string(data._int / dataCount);
-      data._int = 0;
+      std::string result = std::to_string(data._integer / dataCount);
+      data._integer = 0;
       return result;
     }
     case DOUBLE_VAL: {
@@ -421,7 +468,7 @@ void DataWorkers::ResultAccumulator::reset() {
 std::string DataWorkers::ResultAccumulator::getResultForce() {
   switch (field->getFieldType()) {
     case INTEGER_VAL: {
-      return std::to_string(data._int);
+      return std::to_string(data._integer);
     }
     case DOUBLE_VAL: {
       return std::to_string(data._double);
@@ -437,8 +484,11 @@ std::string DataWorkers::ResultAccumulator::getResultForce() {
 
 std::string DataWorkers::ResultAccumulator::resultDistinct() {
   if (distinct) {
-    distinct = false;
+    //distinct = false;
     return result;
   }
   return getResultForce();
+}
+std::string DataWorkers::ResultAccumulator::getName() {
+  return field->getFieldName();
 }

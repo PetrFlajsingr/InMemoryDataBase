@@ -5,9 +5,13 @@
 #ifndef DATASETS_HEADERS_MEMORYDATASET_H_
 #define DATASETS_HEADERS_MEMORYDATASET_H_
 
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <iostream>
+
 #include "BaseDataSet.h"
 #include "Types.h"
-#include "BaseField.h"
 #include "FilterStructures.h"
 #include "Exceptions.h"
 #include "IntegerField.h"
@@ -15,23 +19,9 @@
 #include "DoubleField.h"
 #include "Utilities.h"
 #include "CurrencyField.h"
-#include <string>
-#include <vector>
-#include <algorithm>
-#include <iostream>
 #include <BaseDataProvider.h>
 
 namespace DataSets {
-
-/**
- * Union ukladajici data v pameti.
- */
-union DataContainer {
-  char *_string = nullptr;
-  int _integer;
-  double _double;
-  Currency *_currency;
-};
 
 typedef std::vector<DataContainer *> DataSetRowCells;
 
@@ -52,7 +42,6 @@ class MemoryDataSet : public BaseDataSet {
   /**
    * Struktura pro vnitrni reprezentaci dat
    */
-
 
   //\
 
@@ -154,7 +143,7 @@ class MemoryDataSet : public BaseDataSet {
 
   virtual void appendDataProvider(DataProviders::BaseDataProvider *provider);
 
-  void findFirst(FilterItem &item) override;
+  bool findFirst(FilterItem &item) override;
 };
 }  // namespace DataSets
 

@@ -276,7 +276,9 @@ TEST_F(MemoryDataset_tests, filter_equals) {
 
   FilterOptions options;
   for (int i = 0; i < test[0].size(); ++i) {
-    options.addOption(i, {"COLUMN" + std::to_string(i)}, EQUALS);
+    DataContainer container;
+    container._string = strdup(("COLUMN" + std::to_string(i)).c_str());
+    options.addOption(i, ValueType::STRING_VAL, {container}, EQUALS);
     dataset->filter(options);
 
     EXPECT_TRUE(dataset->eof());
@@ -285,7 +287,9 @@ TEST_F(MemoryDataset_tests, filter_equals) {
   }
   for (int i = 0; i < test.size(); ++i) {
     for (int j = 0; j < test[i].size(); ++j) {
-      options.addOption(j, {"COLUMN" + std::to_string(i + 1) + std::to_string(j + 1)}, EQUALS);
+      DataContainer container;
+      container._string = strdup(("COLUMN" + std::to_string(i + 1) + std::to_string(j + 1)).c_str());
+      options.addOption(j, ValueType::STRING_VAL, {container}, EQUALS);
       dataset->filter(options);
 
       ASSERT_FALSE(dataset->eof());
@@ -302,7 +306,9 @@ TEST_F(MemoryDataset_tests, filter_starts_with) {
 
   FilterOptions options;
   for (int i = 0; i < test[0].size(); ++i) {
-    options.addOption(i, {"COL"}, STARTS_WITH);
+    DataContainer container;
+    container._string = strdup("COL");
+    options.addOption(i, ValueType::STRING_VAL, {container}, STARTS_WITH);
     dataset->filter(options);
 
     ASSERT_FALSE(dataset->eof());
@@ -320,7 +326,9 @@ TEST_F(MemoryDataset_tests, filter_ends_with) {
 
   FilterOptions options;
   for (int i = 0; i < test[0].size(); ++i) {
-    options.addOption(i, {"1"}, ENDS_WITH);
+    DataContainer container;
+    container._string = strdup("1");
+    options.addOption(i, ValueType::STRING_VAL, {container}, ENDS_WITH);
     dataset->filter(options);
 
     options.options.clear();

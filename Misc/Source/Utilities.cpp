@@ -29,6 +29,9 @@ std::vector<std::string> Utilities::splitStringByDelimiter(std::string str,
 }
 
 int Utilities::stringToInt(const std::string &str) {
+  if (str.empty()) {
+    return 0;
+  }
   std::stringstream stringStream(str);
   int result;
 
@@ -37,6 +40,10 @@ int Utilities::stringToInt(const std::string &str) {
 }
 
 double Utilities::stringToDouble(const std::string &str) {
+  if (str.empty()) {
+    return 0.0;
+  }
+
   std::stringstream stringStream(str);
   double result;
 
@@ -76,4 +83,31 @@ char *Utilities::copyStringToNewChar(const std::string &str) {
   auto result = new char[str.length() + 1];
   strcpy(result, str.c_str());
   return result;
+}
+int8_t Utilities::compareInt(int a, int b) {
+  if (a == b) {
+    return 0;
+  }
+  if (a < b) {
+    return -1;
+  }
+  return 1;
+}
+int8_t Utilities::compareDouble(double a, double b) {
+  if (a == b) {
+    return 0;
+  }
+  if (a < b) {
+    return -1;
+  }
+  return 1;
+}
+int8_t Utilities::compareCurrency(Currency &a, Currency &b) {
+  if (a == b) {
+    return 0;
+  }
+  if (a < b) {
+    return -1;
+  }
+  return 1;
 }
