@@ -13,7 +13,7 @@ namespace DataSets {
 class IAsyncMemoryDataSetObserver;
 
 /**
- * Modifikace data setu v pameti, pracuje asynchrone.
+ * Modifikace data setu v pameti, pracuje asynchronne.
  * Vyvolava udalosti pred/po dokonceni nejake operace.
  *
  * Udalosti jsou vyvolany ve stejnem vlakne, ve kterem pracuje tento data set.

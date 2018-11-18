@@ -29,10 +29,10 @@ std::vector<std::string> Utilities::splitStringByDelimiterReserve(std::string st
 
   size_t pos = 0;
   while ((pos = str.find(delimiter)) != std::string::npos) {
-    result.emplace_back(std::move(str.substr(0, pos)));
+    result.emplace_back(str.substr(0, pos));
     str.erase(0, pos + delimiter.length());
   }
-  result.emplace_back(std::move(str));
+  result.emplace_back(str);
 
   return result;
 }
