@@ -71,7 +71,7 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
     }
   }
 
-  std::thread mainDataSetSortThread(&FINMDataWorker::threadTest, this, std::ref(sortOptions));
+  std::thread mainDataSetSortThread(&FINMDataWorker::T_ThreadSort, this, std::ref(sortOptions));
 
   bool doJoin = !queryData.joins.empty();
   std::vector<InnerJoinStructure> joinStructures;
@@ -99,7 +99,6 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
           [&searchedName] (ResultAccumulator *acc) {
         return acc->getName() == searchedName;
       }) - accumulators.begin();
-          //dataset->fieldByName(queryData.joins[i].column1Name)->getIndex();
       for (auto & proj : queryData.projections) {
         if (proj.tableName == queryData.joins[i].table2Name) {
           joinStructure.projectFields.emplace_back(additionalDataSets[i]->fieldByName(proj.columnName));
@@ -116,22 +115,6 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
       additionalDataSets[i]->sort(options);
     }
   }
-
-  //  rozrazeni podle distinct hodnot
-  /*DataSets::SortOptions sortOptions;
-  for (int i = 0;
-      i < dataset->getFieldNames().size()
-        && i < queryData.projections.size();
-      ++i) {
-    if (queryData.projections[i].tableName == "main" &&
-        queryData.projections[i].operation == Distinct) {
-      sortOptions.addOption(
-          dataset->fieldByName(queryData.projections[i].columnName)->getIndex(),
-          SortOrder::ASCENDING);
-    }
-  }*/
-
-  //dataset->sort(sortOptions);
 
   mainDataSetSortThread.join();
 
@@ -270,7 +253,7 @@ void DataWorkers::FINMDataWorker::filterDataSet() {
   dataset->filter(filterOptions);
 }
 
-void DataWorkers::FINMDataWorker::threadTest(DataSets::SortOptions &sortOptions) {
+void DataWorkers::FINMDataWorker::T_ThreadSort(DataSets::SortOptions &sortOptions) {
   dataset->sort(sortOptions);
 }
 

@@ -76,7 +76,7 @@ class FINMDataWorker : public BaseDataWorker {
 
   void filterDataSet();
 
-  void threadTest(DataSets::SortOptions &sortOptions);
+  void T_ThreadSort(DataSets::SortOptions &sortOptions);
  public:
   FINMDataWorker(DataProviders::BaseDataProvider *dataProvider,
                  std::vector<ValueType> fieldTypes);
