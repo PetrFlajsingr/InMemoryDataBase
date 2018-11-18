@@ -20,6 +20,8 @@ class ResultAccumulator {
  private:
   DataContainer data;
 
+  DataContainer previousData;
+
   bool firstDone = false;
 
   bool distinct = false;
@@ -57,9 +59,7 @@ class ResultAccumulator {
 
   std::string getName();
 
-  DataContainer getContainer() {
-    return data;
-  }
+  DataContainer getContainer();
 };
 
 

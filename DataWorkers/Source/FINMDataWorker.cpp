@@ -279,6 +279,7 @@ bool DataWorkers::ResultAccumulator::handleDistinct() {
         return false;
       }
       if (value != data._integer) {
+        previousData._integer = data._integer;
         result = std::to_string(data._integer);
         data._integer = value;
         distinct = true;
@@ -295,6 +296,7 @@ bool DataWorkers::ResultAccumulator::handleDistinct() {
         return false;
       }
       if (value != data._double) {
+        previousData._double = data._double;
         result = std::to_string(data._double);
         data._double = value;
         distinct = true;
@@ -310,6 +312,7 @@ bool DataWorkers::ResultAccumulator::handleDistinct() {
         return false;
       }
       if (value != data._string) {
+        previousData._string = strdup(data._string);
         result = data._string;
         delete[] data._string;
         data._string = strdup(value.c_str());
@@ -327,6 +330,7 @@ bool DataWorkers::ResultAccumulator::handleDistinct() {
         return false;
       }
       if (value != *data._currency) {
+        *previousData._currency = *data._currency;
         result = dec::toString(*data._currency);
         *data._currency = value;
         distinct = true;
@@ -491,4 +495,10 @@ std::string DataWorkers::ResultAccumulator::resultDistinct() {
 }
 std::string DataWorkers::ResultAccumulator::getName() {
   return field->getFieldName();
+}
+DataContainer DataWorkers::ResultAccumulator::getContainer() {
+  if (distinct) {
+    return previousData;
+  }
+  return data;
 }

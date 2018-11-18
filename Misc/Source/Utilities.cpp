@@ -6,24 +6,33 @@
 #include <regex>
 #include "Utilities.h"
 #include <cstring>
+#include <string>
+#include <Utilities.h>
 
 std::vector<std::string> Utilities::splitStringByDelimiter(std::string str,
                                                            std::string delimiter) {
-  if (delimiter.empty()) {
-    throw InvalidArgumentException("Delimiter can't be empty.");
-  }
-
   std::vector<std::string> result;
-  std::string toSplit = std::string(std::move(str));
 
   size_t pos = 0;
-  std::string token;
-  while ((pos = toSplit.find(delimiter)) != std::string::npos) {
-    token = toSplit.substr(0, pos);
-    result.push_back(token);
-    toSplit.erase(0, pos + delimiter.length());
+  while ((pos = str.find(delimiter)) != std::string::npos) {
+    result.emplace_back(std::move(str.substr(0, pos)));
+    str.erase(0, pos + delimiter.length());
   }
-  result.push_back(toSplit);
+  result.emplace_back(std::move(str));
+
+  return result;
+}
+
+std::vector<std::string> Utilities::splitStringByDelimiterReserve(std::string str, std::string delimiter, int reserve) {
+  std::vector<std::string> result;
+  result.reserve(reserve);
+
+  size_t pos = 0;
+  while ((pos = str.find(delimiter)) != std::string::npos) {
+    result.emplace_back(std::move(str.substr(0, pos)));
+    str.erase(0, pos + delimiter.length());
+  }
+  result.emplace_back(std::move(str));
 
   return result;
 }

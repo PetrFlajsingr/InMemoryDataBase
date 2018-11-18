@@ -19,6 +19,8 @@ const std::string KODYPATH = "/Users/petr/Desktop/MUNI/popis_kodu.csv";
 
 std::string SQL = "SELECT main.ZC_ICO:ZC_ICO, main.0FUNC_AREA:0FUNC_AREA, SUM(main.ZU_ROZKZ:ZU_ROZKZ), obce.Obec, kody.Polozka_popis FROM main JOIN obce ON main.ZC_ICO:ZC_ICO = obce.ICO_num JOIN kody ON main.0FUNC_AREA:0FUNC_AREA = kody.Polozka_text";
 
+//std::string SQL = "SELECT main.ZC_ICO:ZC_ICO, main.ZCMMT_ITM:ZCMMT_ITM, SUM(main.ZU_ROZKZ:ZU_ROZKZ), obce.Obec, kody.Polozka_popis FROM main JOIN obce ON main.ZC_ICO:ZC_ICO = obce.ICO_num JOIN kody ON main.ZCMMT_ITM:ZCMMT_ITM = kody.Polozka_text";
+
 void printTime(){
     auto t = std::time(nullptr);
     auto tm = *std::localtime(&t);
@@ -33,11 +35,10 @@ long getMs() {
 
 int main(int argc, char** argv) {
 
-  PRINT("create provider");
+  PRINT("START");
   printTime();
+  PRINT("________");
   DataProviders::BaseDataProvider* provider= new DataProviders::CsvReader(FILEPATH);
-  PRINT("create provider done");
-  printTime();
 
   std::vector<ValueType> fieldTypes = {
       INTEGER_VAL,
@@ -54,66 +55,37 @@ int main(int argc, char** argv) {
       CURRENCY,
       CURRENCY
   };
-  PRINT("create worker");
-  printTime();
+
   auto worker = new DataWorkers::FINMDataWorker(provider,
       fieldTypes);
-  PRINT("create worker done");
-  printTime();
 
-  PRINT("create writer");
-  printTime();
+
   BaseDataWriter *writer = new CsvWriter(DEST_FILEPATH);
-  PRINT("create writer done");
-  printTime();
 
-  PRINT("create dataset obce");
-  printTime();
   auto datasetObce = new DataSets::MemoryDataSet("obce");
-  PRINT("create dataset obce done");
-  printTime();
 
-  PRINT("create provider obce");
-  printTime();
   auto providerObce = new DataProviders::CsvReader(OBCEPATH);
-  PRINT("create provider obce done");
-  printTime();
+
   datasetObce->setDataProvider(providerObce);
   datasetObce->setFieldTypes({INTEGER_VAL, INTEGER_VAL, INTEGER_VAL, INTEGER_VAL, STRING_VAL,
                               INTEGER_VAL, STRING_VAL, INTEGER_VAL, STRING_VAL, STRING_VAL,
                               STRING_VAL, STRING_VAL, STRING_VAL, STRING_VAL, STRING_VAL, CURRENCY,
                               CURRENCY, CURRENCY, CURRENCY, CURRENCY, STRING_VAL, STRING_VAL, STRING_VAL, STRING_VAL});
-  PRINT("open dataset obce");
-  printTime();
   datasetObce->open();
-  PRINT("open dataset obce done");
-  printTime();
 
-
-  PRINT("open dataset kody");
-  printTime();
   auto datasetKody = new DataSets::MemoryDataSet("kody");
   auto providerKody = new DataProviders::CsvReader(KODYPATH);
   datasetKody->setDataProvider(providerKody);
   datasetKody->setFieldTypes({INTEGER_VAL, STRING_VAL});
   datasetKody->open();
-  PRINT("open dataset kody done");
-  printTime();
 
-  PRINT("add datasets done");
-  printTime();
   worker->addDataSet(datasetObce);
   worker->addDataSet(datasetKody);
-  PRINT("add datasets done");
-  printTime();
 
-  std::vector<DataWorkers::ProjectionOperation> ops;
-
-  PRINT("write");
-  printTime();
   worker->writeResult(*writer, SQL);
-  PRINT("write done");
+  PRINT("STOP");
   printTime();
+  PRINT("________");
 
   delete writer;
   delete worker;

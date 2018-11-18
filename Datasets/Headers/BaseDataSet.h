@@ -26,6 +26,8 @@ class BaseDataSet {
 
   std::string dataSetName;
 
+  uint32_t columnCount;
+
   /**
    * Nastaveni dat pole.
    *
@@ -116,6 +118,8 @@ class BaseDataSet {
    * @return
    */
   virtual std::vector<std::string> getFieldNames() = 0;
+
+  uint32_t getColumnCount();
 
   /**
    * Vytvoreni noveho zaznamu v datasetu

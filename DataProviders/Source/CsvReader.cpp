@@ -44,8 +44,9 @@ void DataProviders::CsvReader::parseRecord() {
   char buffer[BUFFER_SIZE];
 
   file.getline(buffer, BUFFER_SIZE);
-  currentRecord = Utilities::splitStringByDelimiter(std::string(buffer),
-                                                    std::string(1, DELIMITER));
+  currentRecord = Utilities::splitStringByDelimiterReserve(std::string(buffer),
+                                                    std::string(1, DELIMITER),
+                                                    getColumnCount());
 }
 
 void DataProviders::CsvReader::first() {

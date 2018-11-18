@@ -20,6 +20,7 @@ void DataSets::MemoryDataSet::open() {
   }
 
   loadData();
+  data.shrink_to_fit();
 
   isOpen = true;
 
@@ -359,6 +360,7 @@ DataSets::MemoryDataSet::~MemoryDataSet() {
 
 void DataSets::MemoryDataSet::setFieldTypes(std::vector<ValueType> types) {
   createFields(dataProvider->getColumnNames(), types);
+  columnCount = fields.size();
 }
 
 void DataSets::MemoryDataSet::setData(void *data,
@@ -424,13 +426,13 @@ void DataSets::MemoryDataSet::appendDataProvider(
   dataProvider = provider;
 
   loadData();
+  data.shrink_to_fit();
 }
 DataSets::MemoryDataSet::MemoryDataSet(const std::string &dataSetName) : BaseDataSet(dataSetName) {}
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCDFAInspection"
 bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
-  //  TODO: porovnavani stringu neodpovídá porovnání integer...
   auto field = fields[item.fieldIndex];
   std::string valueString;
   bool foundBigger = false, foundSmaller = false;

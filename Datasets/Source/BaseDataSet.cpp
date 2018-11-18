@@ -16,3 +16,6 @@ DataSets::BaseDataSet::~BaseDataSet() {
     delete tmp;
   }
 }
+uint32_t DataSets::BaseDataSet::getColumnCount() {
+  return columnCount;
+}

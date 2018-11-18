@@ -26,6 +26,17 @@ class Utilities {
                                                          std::string delimiter);
 
   /**
+   * Rozdeleni stringu pomoci urceneho delimiteru.
+   * Delimiter neni v rozdelenych retezcich obsazen.
+   * @param str string pro rozdeleni
+   * @param delimiter rozdelovac
+   * @return vector casti
+   */
+  static std::vector<std::string> splitStringByDelimiterReserve(std::string str,
+                                                         std::string delimiter,
+                                                         int reserve);
+
+  /**
    * Prevod string do int.
    *
    * Nedefinovane pro neplatne vstupy.
