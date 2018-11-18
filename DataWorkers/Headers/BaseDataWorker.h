@@ -48,6 +48,10 @@ class BaseDataWorker {
   void addDataSet(DataSets::BaseDataSet* dataset) {
     additionalDataSets.push_back(dataset);
   }
+
+  void clearDataSets() {
+    additionalDataSets.clear();
+  }
 };
 }  // namespace DataWorkers
 

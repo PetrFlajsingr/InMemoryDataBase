@@ -13,13 +13,15 @@
 #define PRINT(x) std::cout << x << std::endl;
 
 const std::string FILEPATH = "/Users/petr/Desktop/MUNI/2010-2017/FINM201_2017012.csv";
-const std::string DEST_FILEPATH = "/Users/Petr/Desktop/output.csv";
+const std::string DEST_DRUHOVE_FILEPATH = "/Users/Petr/Desktop/output_druhove.csv";
+const std::string DEST_ODVETVOVE_FILEPATH = "/Users/Petr/Desktop/output_odvetvove.csv";
 const std::string OBCEPATH = "/Users/petr/Desktop/MUNI/CSU_UIR_OBCE.csv";
-const std::string KODYPATH = "/Users/petr/Desktop/MUNI/popis_kodu.csv";
+const std::string KODY_DRUHOVE_PATH = "/Users/petr/Desktop/MUNI/popis_kodu_druhove.csv";
+const std::string KODY_ODVETVOVE_PATH = "/Users/petr/Desktop/MUNI/popis_kodu_odvetvove.csv";
 
-std::string SQL = "SELECT main.ZC_ICO:ZC_ICO, main.0FUNC_AREA:0FUNC_AREA, SUM(main.ZU_ROZKZ:ZU_ROZKZ), obce.Obec, kody.Polozka_popis FROM main JOIN obce ON main.ZC_ICO:ZC_ICO = obce.ICO_num JOIN kody ON main.0FUNC_AREA:0FUNC_AREA = kody.Polozka_text";
+std::string SQLODVETVOVE = "SELECT main.ZC_ICO:ZC_ICO, main.0FUNC_AREA:0FUNC_AREA, SUM(main.ZU_ROZKZ:ZU_ROZKZ), obce.Obec, kody.Par_popis FROM main JOIN obce ON main.ZC_ICO:ZC_ICO = obce.ICO_num JOIN kody ON main.0FUNC_AREA:0FUNC_AREA = kody.Par_text";
 
-//std::string SQL = "SELECT main.ZC_ICO:ZC_ICO, main.ZCMMT_ITM:ZCMMT_ITM, SUM(main.ZU_ROZKZ:ZU_ROZKZ), obce.Obec, kody.Polozka_popis FROM main JOIN obce ON main.ZC_ICO:ZC_ICO = obce.ICO_num JOIN kody ON main.ZCMMT_ITM:ZCMMT_ITM = kody.Polozka_text";
+std::string SQLDRUHOVE = "SELECT main.ZC_ICO:ZC_ICO, main.ZCMMT_ITM:ZCMMT_ITM, SUM(main.ZU_ROZKZ:ZU_ROZKZ), obce.Obec, kody.Polozka_popis FROM main JOIN obce ON main.ZC_ICO:ZC_ICO = obce.ICO_num JOIN kody ON main.ZCMMT_ITM:ZCMMT_ITM = kody.Polozka_text";
 
 void printTime(){
     auto t = std::time(nullptr);
@@ -60,7 +62,7 @@ int main(int argc, char** argv) {
       fieldTypes);
 
 
-  BaseDataWriter *writer = new CsvWriter(DEST_FILEPATH);
+  BaseDataWriter *writer = new CsvWriter(DEST_DRUHOVE_FILEPATH);
 
   auto datasetObce = new DataSets::MemoryDataSet("obce");
 
@@ -73,21 +75,36 @@ int main(int argc, char** argv) {
                               CURRENCY, CURRENCY, CURRENCY, CURRENCY, STRING_VAL, STRING_VAL, STRING_VAL, STRING_VAL});
   datasetObce->open();
 
-  auto datasetKody = new DataSets::MemoryDataSet("kody");
-  auto providerKody = new DataProviders::CsvReader(KODYPATH);
-  datasetKody->setDataProvider(providerKody);
-  datasetKody->setFieldTypes({INTEGER_VAL, STRING_VAL});
-  datasetKody->open();
+  auto datasetKodyDruhove = new DataSets::MemoryDataSet("kody");
+  auto providerKody = new DataProviders::CsvReader(KODY_DRUHOVE_PATH);
+  datasetKodyDruhove->setDataProvider(providerKody);
+  datasetKodyDruhove->setFieldTypes({INTEGER_VAL, STRING_VAL});
+  datasetKodyDruhove->open();
 
   worker->addDataSet(datasetObce);
-  worker->addDataSet(datasetKody);
+  worker->addDataSet(datasetKodyDruhove);
 
-  worker->writeResult(*writer, SQL);
+  worker->writeResult(*writer, SQLDRUHOVE);
+  delete writer;
+
+  auto datasetKodyOdvetvove = new DataSets::MemoryDataSet("kody");
+  auto providerKodyOdvetvove = new DataProviders::CsvReader(KODY_ODVETVOVE_PATH);
+  datasetKodyOdvetvove->setDataProvider(providerKodyOdvetvove);
+  datasetKodyOdvetvove->setFieldTypes({INTEGER_VAL, STRING_VAL});
+  datasetKodyOdvetvove->open();
+
+  writer = new CsvWriter(DEST_ODVETVOVE_FILEPATH);
+  worker->clearDataSets();
+  worker->addDataSet(datasetObce);
+  worker->addDataSet(datasetKodyOdvetvove);
+
+  worker->writeResult(*writer, SQLODVETVOVE);
+
   PRINT("STOP");
   printTime();
   PRINT("________");
 
-  delete writer;
+
   delete worker;
 
   return 0;

@@ -178,6 +178,10 @@ void DataSets::MemoryDataSet::last() {
 
 void DataSets::MemoryDataSet::next() {
   currentRecord++;
+
+  if (currentRecord > data.size()) {
+    currentRecord = data.size();
+  }
   if (!eof()) {
     setFieldValues(currentRecord, true);
   }
