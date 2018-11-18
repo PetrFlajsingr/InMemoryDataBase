@@ -440,7 +440,8 @@ DataSets::MemoryDataSet::MemoryDataSet(const std::string &dataSetName) : BaseDat
 bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
   auto field = fields[item.fieldIndex];
   std::string valueString;
-  bool foundBigger = false, foundSmaller = false;
+
+  uint32_t min = 0, max = data.size();
 
   do {
     valueString = field->getAsString();
@@ -473,15 +474,17 @@ bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
       case 0:
         return true;
       case -1:
-        foundSmaller = true;
-        next();
+        min = currentRecord;
+        currentRecord = (min + max) >> 1;
+        setFieldValues(currentRecord, true);
         break;
       case 1:
-        foundBigger = true;
-        previous();
+        max = currentRecord;
+        currentRecord = (min + max) >> 1;
+        setFieldValues(currentRecord, true);
         break;
     }
-    if (foundSmaller && foundBigger) {
+    if(max - min < 2) {
       return false;
     }
   }while (currentRecord > 0 && currentRecord < data.size());

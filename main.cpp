@@ -19,7 +19,7 @@ const std::string OBCEPATH = "/Users/petr/Desktop/MUNI/CSU_UIR_OBCE.csv";
 const std::string KODY_DRUHOVE_PATH = "/Users/petr/Desktop/MUNI/popis_kodu_druhove.csv";
 const std::string KODY_ODVETVOVE_PATH = "/Users/petr/Desktop/MUNI/popis_kodu_odvetvove.csv";
 
-std::string SQLODVETVOVE = "SELECT main.ZC_ICO:ZC_ICO, main.0FUNC_AREA:0FUNC_AREA, SUM(main.ZU_ROZKZ:ZU_ROZKZ), obce.Obec, kody.Par_popis FROM main JOIN obce ON main.ZC_ICO:ZC_ICO = obce.ICO_num JOIN kody ON main.0FUNC_AREA:0FUNC_AREA = kody.Par_text";
+std::string SQLODVETVOVE = "SELECT main.ZC_ICO:ZC_ICO, main.0FUNC_AREA:0FUNC_AREA, SUM(main.ZU_ROZKZ:ZU_ROZKZ), obce.Obec, kody.Par_popis FROM main JOIN obce ON main.ZC_ICO:ZC_ICO = obce.ICO_num JOIN kody ON main.0FUNC_AREA:0FUNC_AREA = kody.Par_num";
 
 std::string SQLDRUHOVE = "SELECT main.ZC_ICO:ZC_ICO, main.ZCMMT_ITM:ZCMMT_ITM, SUM(main.ZU_ROZKZ:ZU_ROZKZ), obce.Obec, kody.Polozka_popis FROM main JOIN obce ON main.ZC_ICO:ZC_ICO = obce.ICO_num JOIN kody ON main.ZCMMT_ITM:ZCMMT_ITM = kody.Polozka_text";
 
