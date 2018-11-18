@@ -75,21 +75,22 @@ void DataSets::MemoryDataSet::addRecord() {
   newRecord->reserve(columnCount);
   size_t iter = 0;
   for (const auto &part : record) {
-    auto dataContainer = new DataContainer();
     switch (fields[iter]->getFieldType()) {
-      case INTEGER_VAL:dataContainer->_integer = Utilities::stringToInt(part);
+      case INTEGER_VAL:
+        newRecord->emplace_back(new DataContainer({._integer = Utilities::stringToInt(part)}));
         break;
-      case DOUBLE_VAL:dataContainer->_double = Utilities::stringToDouble(part);
+      case DOUBLE_VAL:
+        newRecord->emplace_back(new DataContainer({._double = Utilities::stringToDouble(part)}));
         break;
-      case STRING_VAL:dataContainer->_string = strdup(part.c_str());
+      case STRING_VAL:
+        newRecord->emplace_back(new DataContainer({._string = strdup(part.c_str())}));
         break;
-      case CURRENCY:dataContainer->_currency = new Currency(part);
+      case CURRENCY:
+        newRecord->emplace_back(new DataContainer({._currency = new Currency(part)}));
         break;
       default:throw IllegalStateException("Internal error.");
     }
     iter++;
-
-    newRecord->emplace_back(dataContainer);
   }
 
   data.emplace_back(new DataSetRow{true, newRecord});
@@ -260,26 +261,6 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
         break;
       }
 
-      /*
-      switch (fields[filter.fieldIndex]->getFieldType()) {
-        case INTEGER_VAL:
-          toCompare = std::to_string(
-              (*iter->cells)[filter.fieldIndex]->_integer);
-          break;
-        case DOUBLE_VAL:
-          toCompare = std::to_string(
-              (*iter->cells)[filter.fieldIndex]->_double);
-          break;
-        case STRING_VAL:
-          toCompare = (*iter->cells)[filter.fieldIndex]->_string;
-          break;
-        case CURRENCY:
-          toCompare = dec::toString(*(*iter->cells)[filter.fieldIndex]->_currency);
-          break;
-        default:throw IllegalStateException("Internal error.");
-      }
-       */
-
       if (filter.type == ValueType::STRING_VAL) {
         std::string toCompare = (*iter->cells)[filter.fieldIndex]->_string;
         for (const auto &search : filter.searchData) {
@@ -439,13 +420,12 @@ DataSets::MemoryDataSet::MemoryDataSet(const std::string &dataSetName) : BaseDat
 #pragma ide diagnostic ignored "OCDFAInspection"
 bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
   auto field = fields[item.fieldIndex];
-  std::string valueString;
 
   uint32_t min = 0, max = data.size();
 
-  do {
-    valueString = field->getAsString();
+  bool breakLoop = false;
 
+  do {
     int8_t comparisonResult;
     switch (field->getFieldType()) {
       case STRING_VAL:
@@ -484,8 +464,11 @@ bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
         setFieldValues(currentRecord, true);
         break;
     }
-    if(max - min < 1) {
-      return false;
+    if(max - min < 2) {
+      if (breakLoop) {
+        return false;
+      }
+      breakLoop = true;
     }
   }while (currentRecord > 0 && currentRecord < data.size());
   if (currentRecord == 0) {

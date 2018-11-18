@@ -2,6 +2,7 @@
 // Created by Petr Flajsingr on 12/11/2018.
 //
 
+#include <thread>
 #include <BaseDataSet.h>
 #include <FINMDataWorker.h>
 #include "MemoryDataSet.h"
@@ -56,6 +57,22 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
 
   writeHeaders(writer);
 
+  //  rozrazeni podle distinct hodnot
+  DataSets::SortOptions sortOptions;
+  for (int i = 0;
+       i < dataset->getFieldNames().size()
+           && i < queryData.projections.size();
+       ++i) {
+    if (queryData.projections[i].tableName == "main" &&
+        queryData.projections[i].operation == Distinct) {
+      sortOptions.addOption(
+          dataset->fieldByName(queryData.projections[i].columnName)->getIndex(),
+          SortOrder::ASCENDING);
+    }
+  }
+
+  std::thread mainDataSetSortThread(&FINMDataWorker::threadTest, this, std::ref(sortOptions));
+
   bool doJoin = !queryData.joins.empty();
   std::vector<InnerJoinStructure> joinStructures;
 
@@ -101,7 +118,7 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
   }
 
   //  rozrazeni podle distinct hodnot
-  DataSets::SortOptions sortOptions;
+  /*DataSets::SortOptions sortOptions;
   for (int i = 0;
       i < dataset->getFieldNames().size()
         && i < queryData.projections.size();
@@ -112,14 +129,16 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
           dataset->fieldByName(queryData.projections[i].columnName)->getIndex(),
           SortOrder::ASCENDING);
     }
-  }
-  dataset->sort(sortOptions);
+  }*/
+
+  //dataset->sort(sortOptions);
+
+  mainDataSetSortThread.join();
 
   //  vyfiltrovani nechtenych zaznamu
   if (!queryData.selections.empty()) {
     filterDataSet();
   }
-
 
   bool savedResults = false;
   std::vector<std::string> results;
@@ -249,6 +268,10 @@ void DataWorkers::FINMDataWorker::filterDataSet() {
   }
 
   dataset->filter(filterOptions);
+}
+
+void DataWorkers::FINMDataWorker::threadTest(DataSets::SortOptions &sortOptions) {
+  dataset->sort(sortOptions);
 }
 
 DataWorkers::ResultAccumulator::ResultAccumulator(DataSets::BaseField *field,
