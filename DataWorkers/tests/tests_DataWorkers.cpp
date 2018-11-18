@@ -324,6 +324,8 @@ TEST_F(DataWorker_tests, join) {
 
   worker->writeResult(writer, sql);
 
+  writer.print();
+
   for (int i = 0; i < (*writer.result).size(); ++i) {
     for (int j = 0; j < (*writer.result)[i].size(); ++j) {
       EXPECT_STREQ((*writer.result)[i][j].c_str(), joinAnswers[i][j].c_str());

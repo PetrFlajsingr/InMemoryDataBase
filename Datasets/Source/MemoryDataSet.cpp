@@ -484,7 +484,7 @@ bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
         setFieldValues(currentRecord, true);
         break;
     }
-    if(max - min < 2) {
+    if(max - min < 1) {
       return false;
     }
   }while (currentRecord > 0 && currentRecord < data.size());
