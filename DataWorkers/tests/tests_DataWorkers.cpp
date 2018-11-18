@@ -84,6 +84,27 @@ class DataWorker_tests : public ::testing::Test {
       {"special", "11", "1.00", "666.8", "27", "2"},
   };
 
+  std::vector<std::string> advUnique0 {
+      "ctvrty",
+      "druhy",
+      "prvni",
+      "special",
+      "treti",
+  };
+
+  std::vector<std::string> advUnique1 {
+      "11",
+      "22",
+      "33",
+      "44",
+      "88",
+      "2222",
+      "2331",
+      "2422",
+      "2839",
+      "22222",
+  };
+
   std::vector<std::vector<std::string>> advAnswers {
       {"0", "1", "2(Sum)", "3(Sum)", "4(Sum)", "5(Sum)"},
       {"ctvrty", "2839", "70000.07", "222.80", "27", "1.00"},
@@ -307,6 +328,29 @@ TEST_F(DataWorker_tests, join) {
     for (int j = 0; j < (*writer.result)[i].size(); ++j) {
       EXPECT_STREQ((*writer.result)[i][j].c_str(), joinAnswers[i][j].c_str());
     }
+  }
+
+  delete worker;
+}
+
+TEST_F(DataWorker_tests, uniqueValues) {
+  EXPECT_NO_THROW(worker = new FINMDataWorker(advDataProvider,
+                                              {STRING_VAL, INTEGER_VAL, CURRENCY, CURRENCY, INTEGER_VAL, CURRENCY}));
+
+  std::vector<std::string> cols = {"0", "1"};
+  worker->setColumnChoices(cols);
+
+  auto unique0 = worker->getChoices("0");
+  auto unique1 = worker->getChoices("1");
+
+  EXPECT_EQ(unique0.size(), advUnique0.size());
+  for (int i = 0; i < advUnique0.size(); i++) {
+    EXPECT_STREQ(advUnique0[i].c_str(), unique0[i].c_str());
+  }
+
+  EXPECT_EQ(unique1.size(), advUnique1.size());
+  for (int i = 0; i < advUnique1.size(); i++) {
+    EXPECT_STREQ(advUnique1[i].c_str(), unique1[i].c_str());
   }
 
   delete worker;
