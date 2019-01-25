@@ -56,6 +56,11 @@ class BaseDataSet {
   virtual void open() = 0;
 
   /**
+   * Otevreni prazdneho datasetu
+   */
+  virtual void openEmpty() = 0;
+
+  /**
    * Nastaveni IDataProvider dodavajici data
    * @param provider
    */
@@ -107,11 +112,19 @@ class BaseDataSet {
   virtual BaseField *fieldByIndex(uint64_t index) = 0;
 
   /**
+   * Vsechny fields
+   * @return
+   */
+  virtual std::vector<BaseField *> getFields() = 0;
+
+  /**
    * Nastaveni typu Fields.
    * Vytvori objekty IFields.
    * @param types
    */
   virtual void setFieldTypes(std::vector<ValueType> types) = 0;
+
+  virtual void setFieldTypes(std::vector<std::string> fieldNames, std::vector<ValueType> types) = 0;
 
   /**
    * Nazvy vsech sloupcu v datasetu

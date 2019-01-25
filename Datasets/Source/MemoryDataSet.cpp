@@ -3,7 +3,6 @@
 //
 
 #include "MemoryDataSet.h"
-#include <cstring>
 
 void DataSets::MemoryDataSet::setDataProvider(
     DataProviders::BaseDataProvider *provider) {
@@ -25,6 +24,14 @@ void DataSets::MemoryDataSet::open() {
   isOpen = true;
 
   setFieldValues(0, true);
+}
+
+void DataSets::MemoryDataSet::openEmpty() {
+  if (isOpen) {
+    throw IllegalStateException("Dataset is already open.");
+  }
+
+  isOpen = true;
 }
 
 void DataSets::MemoryDataSet::loadData() {
@@ -349,6 +356,11 @@ void DataSets::MemoryDataSet::setFieldTypes(std::vector<ValueType> types) {
   columnCount = fields.size();
 }
 
+void DataSets::MemoryDataSet::setFieldTypes(std::vector<std::string> fieldNames, std::vector<ValueType> types) {
+  createFields(fieldNames, types);
+  columnCount = fields.size();
+}
+
 void DataSets::MemoryDataSet::setData(void *data,
                                       uint64_t index,
                                       ValueType type) {
@@ -503,6 +515,10 @@ bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
   }
   return false;
 }
+std::vector<DataSets::BaseField *> DataSets::MemoryDataSet::getFields() {
+  return fields;
+}
+
 #pragma clang diagnostic pop
 
 

@@ -93,6 +93,8 @@ class MemoryDataSet : public BaseDataSet {
 
   void open() override;
 
+  void openEmpty() override;
+
   void setDataProvider(DataProviders::BaseDataProvider *provider) override;
 
   void close() override;
@@ -122,6 +124,8 @@ class MemoryDataSet : public BaseDataSet {
 
   BaseField *fieldByIndex(uint64_t index) override;
 
+  std::vector<BaseField *> getFields();
+
   bool eof() override;
 
   std::vector<std::string> getFieldNames() override {
@@ -135,6 +139,8 @@ class MemoryDataSet : public BaseDataSet {
   }
 
   void setFieldTypes(std::vector<ValueType> types) override;
+
+  void setFieldTypes(std::vector<std::string> fieldNames, std::vector<ValueType> types) override;
 
   /**
    * Pridani prazdneho zaznamu na konec data setu.

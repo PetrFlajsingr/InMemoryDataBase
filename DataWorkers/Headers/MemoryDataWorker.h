@@ -62,8 +62,7 @@ class ResultAccumulator {
   DataContainer getContainer();
 };
 
-
-class FINMDataWorker : public BaseDataWorker {
+class MemoryDataWorker : public BaseDataWorker {
  private:
   struct InnerJoinStructure {
     uint64_t indexAddi;
@@ -78,8 +77,8 @@ class FINMDataWorker : public BaseDataWorker {
 
   void T_ThreadSort(DataSets::SortOptions &sortOptions);
  public:
-  FINMDataWorker(DataProviders::BaseDataProvider *dataProvider,
-                 std::vector<ValueType> fieldTypes);
+  MemoryDataWorker(DataProviders::BaseDataProvider *dataProvider,
+                   std::vector<ValueType> fieldTypes);
 
   std::vector<std::string> getMultiChoiceNames() override;
 

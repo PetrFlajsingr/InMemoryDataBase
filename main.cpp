@@ -8,7 +8,7 @@
 #include "MemoryDataSet.h"
 #include "DataProviders/Headers/CsvReader.h"
 #include "BaseDataWorker.h"
-#include "FINMDataWorker.h"
+#include "MemoryDataWorker.h"
 
 #define PRINT(x) std::cout << x << std::endl;
 
@@ -58,8 +58,8 @@ int main(int argc, char** argv) {
       CURRENCY
   };
 
-  auto worker = new DataWorkers::FINMDataWorker(provider,
-      fieldTypes);
+  auto worker = new DataWorkers::MemoryDataWorker(provider,
+                                                  fieldTypes);
 
 
   BaseDataWriter *writer = new CsvWriter(DEST_DRUHOVE_FILEPATH);

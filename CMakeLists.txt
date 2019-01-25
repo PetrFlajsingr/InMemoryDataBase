@@ -54,11 +54,11 @@ set(SOURCE_FILES  DataProviders/Source/CsvReader.cpp DataProviders/Headers/CsvRe
         DataWriters/Source/CsvWriter.cpp DataWriters/Headers/CsvWriter.h FileDownloaders/Headers/BaseFileDownloader.h
         FileDownloaders/Headers/FileDownloadObserver.h lib/decimal/Decimal.h
         Datasets/Fields/Source/CurrencyField.cpp Datasets/Fields/Headers/CurrencyField.h
-        DataWorkers/Headers/BaseDataWorker.h DataWorkers/Source/FINMDataWorker.cpp DataWorkers/Headers/FINMDataWorker.h
+        DataWorkers/Headers/BaseDataWorker.h DataWorkers/Source/MemoryDataWorker.cpp DataWorkers/Headers/MemoryDataWorker.h
         DataWriters/Headers/BaseDataWriter.h DataWriters/Source/ArrayWriter.cpp DataWriters/Headers/ArrayWriter.h
         Datasets/Headers/SortStructures.h main.cpp)
 
-set(TEST_SOURCE_FILES DataProviders/Source/CsvReader.cpp DataProviders/Headers/CsvReader.h
+set(TEST_SOURCE_FILES DataWorkers/tests/tests_DataSetMerger.cpp DataWorkers/Source/DataSetMerger.cpp DataWorkers/Headers/DataSetMerger.h DataProviders/Source/CsvReader.cpp DataProviders/Headers/CsvReader.h
         DataProviders/Headers/BaseDataProvider.h Misc/Headers/Exceptions.h Misc/Source/Utilities.cpp
         Misc/Headers/Utilities.h Datasets/Headers/BaseDataSet.h Datasets/Source/MemoryDataSet.cpp
         Datasets/Headers/MemoryDataSet.h Misc/Headers/Types.h Datasets/Fields/Headers/BaseField.h
@@ -74,7 +74,7 @@ set(TEST_SOURCE_FILES DataProviders/Source/CsvReader.cpp DataProviders/Headers/C
         DataWriters/Source/CsvWriter.cpp DataWriters/Headers/CsvWriter.h FileDownloaders/Headers/BaseFileDownloader.h
         FileDownloaders/Headers/FileDownloadObserver.h lib/decimal/Decimal.h
         Datasets/Fields/Source/CurrencyField.cpp Datasets/Fields/Headers/CurrencyField.h
-        DataWorkers/Headers/BaseDataWorker.h DataWorkers/Source/FINMDataWorker.cpp DataWorkers/Headers/FINMDataWorker.h
+        DataWorkers/Headers/BaseDataWorker.h DataWorkers/Source/MemoryDataWorker.cpp DataWorkers/Headers/MemoryDataWorker.h
         DataWorkers/tests/tests_DataWorkers.cpp DataWriters/Headers/BaseDataWriter.h DataWriters/Source/ArrayWriter.cpp
         DataWriters/Headers/ArrayWriter.h Datasets/Headers/SortStructures.h
         DataWorkers/tests/tests_SQLParser.cpp)

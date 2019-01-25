@@ -4,15 +4,14 @@
 
 #include <thread>
 #include <BaseDataSet.h>
-#include <FINMDataWorker.h>
+#include <MemoryDataWorker.h>
 #include "MemoryDataSet.h"
-#include "SQLParser.h"
 
-std::vector<std::string> DataWorkers::FINMDataWorker::getMultiChoiceNames() {
+std::vector<std::string> DataWorkers::MemoryDataWorker::getMultiChoiceNames() {
   return columnChoices;
 }
 
-std::vector<std::string> DataWorkers::FINMDataWorker::getChoices(std::string choiceName) {
+std::vector<std::string> DataWorkers::MemoryDataWorker::getChoices(std::string choiceName) {
   DataSets::BaseField* field = dataset->fieldByName(choiceName);
 
   if (field == nullptr) {
@@ -38,7 +37,7 @@ std::vector<std::string> DataWorkers::FINMDataWorker::getChoices(std::string cho
   return result;
 }
 
-DataWorkers::FINMDataWorker::FINMDataWorker(
+DataWorkers::MemoryDataWorker::MemoryDataWorker(
     DataProviders::BaseDataProvider *dataProvider,
     std::vector<ValueType> fieldTypes)
     : BaseDataWorker() {
@@ -51,8 +50,8 @@ DataWorkers::FINMDataWorker::FINMDataWorker(
   dataset->open();
 }
 
-void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
-    std::string &sql) {
+void DataWorkers::MemoryDataWorker::writeResult(BaseDataWriter &writer,
+                                                std::string &sql) {
   queryData = SQLParser::parse(sql);
 
   writeHeaders(writer);
@@ -71,7 +70,7 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
     }
   }
 
-  std::thread mainDataSetSortThread(&FINMDataWorker::T_ThreadSort, this, std::ref(sortOptions));
+  std::thread mainDataSetSortThread(&MemoryDataWorker::T_ThreadSort, this, std::ref(sortOptions));
 
   bool doJoin = !queryData.joins.empty();
   std::vector<InnerJoinStructure> joinStructures;
@@ -200,7 +199,7 @@ void DataWorkers::FINMDataWorker::writeResult(BaseDataWriter &writer,
   }
 }
 
-void DataWorkers::FINMDataWorker::writeHeaders(BaseDataWriter &writer) {
+void DataWorkers::MemoryDataWorker::writeHeaders(BaseDataWriter &writer) {
   std::vector<std::string> header;
 
   std::transform(queryData.projections.begin(),
@@ -213,7 +212,7 @@ void DataWorkers::FINMDataWorker::writeHeaders(BaseDataWriter &writer) {
   writer.writeHeader(header);
 }
 
-void DataWorkers::FINMDataWorker::filterDataSet() {
+void DataWorkers::MemoryDataWorker::filterDataSet() {
   DataSets::FilterOptions filterOptions;
 
   for (auto &selection : queryData.selections) {
@@ -253,7 +252,7 @@ void DataWorkers::FINMDataWorker::filterDataSet() {
   dataset->filter(filterOptions);
 }
 
-void DataWorkers::FINMDataWorker::T_ThreadSort(DataSets::SortOptions &sortOptions) {
+void DataWorkers::MemoryDataWorker::T_ThreadSort(DataSets::SortOptions &sortOptions) {
   dataset->sort(sortOptions);
 }
 
