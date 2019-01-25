@@ -8,7 +8,6 @@ cmake_minimum_required(VERSION 3.8)
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 include_directories(${gmock_SOURCE_DIR}/include ${gmock_SOURCE_DIR})
 
-
 add_subdirectory(lib/google_test)
 
 include_directories(lib/google_test/googletest/include)
@@ -30,6 +29,8 @@ include_directories(FileDownloaders/Headers)
 include_directories(lib/Decimal)
 
 include_directories(DataWorkers/Headers)
+
+include_directories(lib/xlsxio/include)
 
 project(csv_reader)
 
@@ -58,7 +59,7 @@ set(SOURCE_FILES DataWorkers/Source/DataSetMerger.cpp DataWorkers/Headers/DataSe
         DataWriters/Headers/BaseDataWriter.h DataWriters/Source/ArrayWriter.cpp
         DataWriters/Headers/ArrayWriter.h Datasets/Headers/SortStructures.h Misc/Headers/Logger.h cedr.cpp)
 
-set(TEST_SOURCE_FILES DataWorkers/tests/tests_DataSetMerger.cpp DataWorkers/Source/DataSetMerger.cpp DataWorkers/Headers/DataSetMerger.h DataProviders/Source/CsvReader.cpp DataProviders/Headers/CsvReader.h
+set(TEST_SOURCE_FILES lib/xlsxio/include/xlsxio_read.h lib/xlsxio/include/xlsxio_write.h lib/xlsxio/include/xlsxio_version.h DataWriters/tests/tests_XslxWriter.cpp DataWriters/Headers/XlsxWriter.h DataWriters/Source/XlsxWriter.cpp DataWorkers/tests/tests_DataSetMerger.cpp DataWorkers/Source/DataSetMerger.cpp DataWorkers/Headers/DataSetMerger.h DataProviders/Source/CsvReader.cpp DataProviders/Headers/CsvReader.h
         DataProviders/Headers/BaseDataProvider.h Misc/Headers/Exceptions.h Misc/Source/Utilities.cpp
         Misc/Headers/Utilities.h Datasets/Headers/BaseDataSet.h Datasets/Source/MemoryDataSet.cpp
         Datasets/Headers/MemoryDataSet.h Misc/Headers/Types.h Datasets/Fields/Headers/BaseField.h
@@ -84,5 +85,7 @@ add_executable(cedr cedr.cpp ${SOURCE_FILES})
 add_executable(csv_reader_test ${TEST_SOURCE_FILES})
 
 target_link_libraries(csv_reader_test gmock_main)
+target_link_libraries(csv_reader_test xlsxio_read)
+target_link_libraries(csv_reader_test xlsxio_write)
 
 
