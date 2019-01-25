@@ -8,8 +8,8 @@
 #include <MemoryDataWorker.h>
 #include "DataProviders/Headers/CsvReader.h"
 
-const std::string csvPath = "/Users/petr/Desktop/MUNI/cedr/";
-const std::string dotaceCSVName = "dotace-2.csv";
+const std::string csvPath = "/Users/petr/Desktop/csvs/";
+const std::string dotaceCSVName = "dotace.csv";
 const std::string rozhodnutiCSVName = "rozhodnuti.csv";
 const std::string obdobiCSVName = "rozpoctoveObdobi.csv";
 const std::string outputCSVName = "cedr_output.csv";
@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
 
   auto rozhodnutiDataSet = new DataSets::MemoryDataSet("rozhodnuti");
   rozhodnutiDataSet->setDataProvider(rozhodnutiProvider);
-  rozhodnutiDataSet->setFieldTypes({STRING_VAL, STRING_VAL, STRING_VAL, INTEGER_VAL});
+  rozhodnutiDataSet->setFieldTypes({STRING_VAL, STRING_VAL, STRING_VAL, STRING_VAL, INTEGER_VAL});
   rozhodnutiDataSet->open();
   Logger::log(Debug, "Rozhodnuti loaded", true);
 
