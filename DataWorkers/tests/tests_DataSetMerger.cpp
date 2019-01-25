@@ -42,14 +42,14 @@ class DataSetMerger_tests : public ::testing::Test {
   };
 
   std::vector<std::vector<std::string>> test1Result{
-      {"1", "A", "B", "C", "D", "1", "20", "1", "COLUMN54", "COLUMN55"},
-      {"2", "10", "1", "COLUMN24", "COLUMN25", "2", "10", "1", "COLUMN44", "COLUMN45"},
-      {"3", "10", "1", "COLUMN34", "COLUMN35", "3", "20", "1", "COLUMN54", "COLUMN55"},
-      {"4", "10", "1", "COLUMN44", "COLUMN45", "4", "10", "1", "COLUMN34", "COLUMN35"},
-      {"5", "20", "1", "COLUMN54", "COLUMN55", "5", "20", "1", "COLUMN54", "COLUMN55"},
-      {"6", "20", "1", "COLUMN54", "COLUMN55", "6", "10", "1", "COLUMN24", "COLUMN25"},
-      {"7", "20", "1", "COLUMN54", "COLUMN55", "7", "20", "1", "COLUMN54", "COLUMN55"},
-      {"8", "20", "1", "COLUMN54", "COLUMN55", "8", "10", "1", "COLUMN14", "COLUMN15"}
+      {"1", "A", "B", "C", "D", "20", "1", "COLUMN54", "COLUMN55"},
+      {"2", "10", "1", "COLUMN24", "COLUMN25", "10", "1", "COLUMN44", "COLUMN45"},
+      {"3", "10", "1", "COLUMN34", "COLUMN35", "20", "1", "COLUMN54", "COLUMN55"},
+      {"4", "10", "1", "COLUMN44", "COLUMN45", "10", "1", "COLUMN34", "COLUMN35"},
+      {"5", "20", "1", "COLUMN54", "COLUMN55", "20", "1", "COLUMN54", "COLUMN55"},
+      {"6", "20", "1", "COLUMN54", "COLUMN55", "10", "1", "COLUMN24", "COLUMN25"},
+      {"7", "20", "1", "COLUMN54", "COLUMN55", "20", "1", "COLUMN54", "COLUMN55"},
+      {"8", "20", "1", "COLUMN54", "COLUMN55", "10", "1", "COLUMN14", "COLUMN15"}
   };
 
  public:
@@ -70,6 +70,8 @@ class DataSetMerger_tests : public ::testing::Test {
   }
 
   void TearDown() override {
+    delete dataSet1A;
+    delete dataSet1B;
   }
 
   ~DataSetMerger_tests() override = default;
@@ -87,8 +89,10 @@ TEST_F(DataSetMerger_tests, merge_test) {
 
   for (auto i = 0; i < test1Result.size(); ++i) {
     for (auto j = 0; j < test1Result[i].size(); ++j) {
+      //std::cout << fields[j]->getAsString() << ", ";
       EXPECT_EQ(fields[j]->getAsString(), test1Result[i][j]);
     }
+    //std::cout << std::endl;
     mergeResult->next();
   }
 }

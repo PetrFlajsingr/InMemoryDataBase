@@ -61,6 +61,9 @@ DataSets::BaseDataSet *DataWorkers::DataSetMerger::mergeDataSets(const std::stri
     sourceFields.emplace_back(field);
   }
   for (auto field : dataSet2->getFields()) {
+    if (field->getFieldName() == columnName2) {
+      continue;
+    }
     fieldTypes.emplace_back(field->getFieldType());
     fieldNames.emplace_back(field->getFieldName());
     sourceFields.emplace_back(field);
