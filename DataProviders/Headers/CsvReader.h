@@ -15,6 +15,19 @@ namespace DataProviders {
 /**
  * Trida implementujici metody IReader.
  * Slouzi ke cteni CSV formatu sekvencne ze souboru.
+ *
+ * Ukazka pouziti:
+    auto csvReader = new DataProviders::CsvReader(PATH_TO_FILE, DELIMITER);
+
+    auto header = csvReader->getHeader();
+
+    while (!csvReader->eof()) {
+        auto currentRow = csvReader->getRow();
+
+        csvReader->next();
+    }
+
+    delete csvReader;
  */
 class CsvReader : public BaseDataProvider {
  private:

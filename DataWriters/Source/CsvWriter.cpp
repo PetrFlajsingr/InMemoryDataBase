@@ -6,7 +6,8 @@
 #include <vector>
 #include "CsvWriter.h"
 
-CsvWriter::CsvWriter(std::string filePath) {
+CsvWriter::CsvWriter(std::string filePath, std::string delimiter) {
+  this->delimiter = delimiter;
   outputStream = new std::ofstream();
   outputStream->open(filePath, std::ofstream::out);
 }
@@ -33,7 +34,7 @@ void CsvWriter::writeRecord(const std::vector<std::string> &record) {
 }
 void CsvWriter::writeRow(const std::vector<std::string> &data) {
   for (auto i = 0; i < columnCount - 1; ++i) {
-    *outputStream << data[i] << DELIMITER;
+    *outputStream << data[i] << delimiter;
   }
   *outputStream << data[columnCount - 1] << "\n";
 }

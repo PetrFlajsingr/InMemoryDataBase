@@ -15,11 +15,11 @@ class CsvWriter : public BaseDataWriter {
 
   uint64_t columnCount = 0;
 
-  const std::string DELIMITER = ";";
+  std::string delimiter;
 
   void writeRow(const std::vector<std::string> &data);
  public:
-  explicit CsvWriter(std::string filePath);
+  CsvWriter(std::string filePath, std::string delimiter = ";");
 
   virtual ~CsvWriter();
 
