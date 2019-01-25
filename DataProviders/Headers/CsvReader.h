@@ -31,6 +31,7 @@ namespace DataProviders {
  */
 class CsvReader : public BaseDataProvider {
  private:
+  enum TokeniserStates { Read, QuotMark1, QuotMark2 };
   const uint32_t BUFFER_SIZE = 4096;  //< velikost bufferu pro cteni radku
 
   std::string delimiter;  //< rozdelovac CSV dat

@@ -77,15 +77,15 @@ void DataProviders::CsvReader::setDelimiter(char delimiter) {
 std::vector<std::string> DataProviders::CsvReader::tokenize(std::string &line, int vectorReserve) {
   char buffer[BUFFER_SIZE];
   uint8_t bufferIter = 0;
-  uint8_t state = 0; //0 - normal read, 1 - read inside "", 2 - found " inside ""
+  TokeniserStates state = Read; //0 - normal read, 1 - read inside "", 2 - found " inside ""
 
   std::vector<std::string> result;
   result.reserve(vectorReserve);
   for (auto character : line) {
     switch (state) {
-      case 0:  // normal read
+      case Read:  // normal read
         if (character == '\"') {
-          state = 1;
+          state = QuotMark1;
         } else if (character == delimiter[0]) {
           buffer[bufferIter] = '\0';
           result.emplace_back(std::string(buffer));
@@ -95,24 +95,24 @@ std::vector<std::string> DataProviders::CsvReader::tokenize(std::string &line, i
         buffer[bufferIter] = character;
         bufferIter++;
         break;
-      case 1:  // read inside " "
+      case QuotMark1:  // read inside " "
         if (character == '\"') {
-          state = 2;
+          state = QuotMark2;
         }
         buffer[bufferIter] = character;
         bufferIter++;
         break;
-      case 2:
+      case QuotMark2:
         if (character == '\"') {
-          state = 1;
+          state = QuotMark1;
         } else if (character == delimiter[0]) {
           buffer[bufferIter] = '\0';
           result.emplace_back(std::string(buffer));
           bufferIter = 0;
-          state = 0;
+          state = Read;
           break;
         } else {
-          state = 0;
+          state = Read;
         }
         buffer[bufferIter] = character;
         bufferIter++;
