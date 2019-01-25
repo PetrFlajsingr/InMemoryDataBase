@@ -7,6 +7,10 @@
 #include <MemoryDataWorker.h>
 #include "MemoryDataSet.h"
 
+DataWorkers::MemoryDataWorker::MemoryDataWorker(DataSets::BaseDataSet *dataSet) {
+  this->dataset = dataSet;
+}
+
 std::vector<std::string> DataWorkers::MemoryDataWorker::getMultiChoiceNames() {
   return columnChoices;
 }
@@ -233,7 +237,7 @@ void DataWorkers::MemoryDataWorker::filterDataSet() {
           case DOUBLE_VAL:
             container._double = Utilities::stringToDouble(value);
             break;
-          case CURRENCY:
+          case CURRENCY_VAL:
             *container._currency = dec::fromString<Currency>(value);
             break;
         }
@@ -268,7 +272,7 @@ DataWorkers::ResultAccumulator::ResultAccumulator(DataSets::BaseField *field,
     case DOUBLE_VAL:
       data._double = 0.0;
       break;
-    case CURRENCY:
+    case CURRENCY_VAL:
       data._currency = new Currency();
       break;
   }
@@ -327,7 +331,7 @@ bool DataWorkers::ResultAccumulator::handleDistinct() {
       }
       break;
     }
-    case CURRENCY: {
+    case CURRENCY_VAL: {
       Currency value = reinterpret_cast<DataSets::CurrencyField *>(field)
           ->getAsCurrency();
       if (!firstDone) {
@@ -365,7 +369,7 @@ bool DataWorkers::ResultAccumulator::handleSum() {
     case STRING_VAL: {
       throw IllegalStateException("Internal error.");
     }
-    case CURRENCY: {
+    case CURRENCY_VAL: {
       Currency value = reinterpret_cast<DataSets::CurrencyField *>(field)
           ->getAsCurrency();
       *data._currency += value;
@@ -393,7 +397,7 @@ bool DataWorkers::ResultAccumulator::handleAverage() {
     case STRING_VAL: {
       throw IllegalStateException("Internal error.");
     }
-    case CURRENCY: {
+    case CURRENCY_VAL: {
       Currency value = reinterpret_cast<DataSets::CurrencyField *>(field)
           ->getAsCurrency();
       *data._currency += value;
@@ -415,7 +419,7 @@ std::string DataWorkers::ResultAccumulator::resultSum() {
       data._double = 0;
       return result;
     }
-    case CURRENCY: {
+    case CURRENCY_VAL: {
       std::string result = dec::toString(*data._currency);
       *data._currency = 0;
       return result;
@@ -435,7 +439,7 @@ std::string DataWorkers::ResultAccumulator::resultAverage() {
       data._double = 0;
       return result;
     }
-    case CURRENCY: {
+    case CURRENCY_VAL: {
       std::string result = dec::toString(*data._currency / Currency(dataCount));
       *data._currency = 0;
       return result;
@@ -483,7 +487,7 @@ std::string DataWorkers::ResultAccumulator::getResultForce() {
     case DOUBLE_VAL: {
       return std::to_string(data._double);
     }
-    case CURRENCY: {
+    case CURRENCY_VAL: {
       return dec::toString(*data._currency);
     }
     case STRING_VAL: {

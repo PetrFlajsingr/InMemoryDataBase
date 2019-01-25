@@ -136,6 +136,16 @@ void DataWorkers::DataSetMerger::appendData(std::vector<DataSets::BaseField *> f
         reinterpret_cast<DataSets::IntegerField *>(dataSetFields[i])
             ->setAsInteger(reinterpret_cast<DataSets::IntegerField *>(fields[i])->getAsInteger());
         break;
+      case DOUBLE_VAL:
+        reinterpret_cast<DataSets::DoubleField *>(dataSetFields[i])
+            ->setAsDouble(reinterpret_cast<DataSets::DoubleField *>(fields[i])->getAsDouble());
+        break;
+      case CURRENCY_VAL: {
+        auto value = reinterpret_cast<DataSets::CurrencyField *>(fields[i])->getAsCurrency();
+        reinterpret_cast<DataSets::CurrencyField *>(dataSetFields[i])
+            ->setAsCurrency(value);
+      }
+        break;
       case STRING_VAL:dataSetFields[i]->setAsString(fields[i]->getAsString());
         break;
       default:throw IllegalStateException("Internal error, DataWorkers::DataSetMerger::appendData(...)");

@@ -11,7 +11,7 @@ void DataSets::CurrencyField::setValue(void *data) {
 }
 
 ValueType DataSets::CurrencyField::getFieldType() {
-  return CURRENCY;
+  return CURRENCY_VAL;
 }
 
 void DataSets::CurrencyField::setAsString(const std::string &value) {

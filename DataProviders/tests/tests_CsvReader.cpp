@@ -19,7 +19,14 @@ class CsvReader_tests : public ::testing::Test {
       {"RECORD31", "RECORD32", "RECORD33", "RECORD34", "RECORD35"}
   };
 
+  std::string advancedTest[3][3]{
+      {"\"Ah, oj\"", "B", "C"},
+      {"\"Ah, oj\"", "B", R"("test man"", jojo")"},
+  };
+
   void prepareReaderSmall();
+
+  void prepareReaderAdv();
 
  public:
   CsvReader_tests() = default;
@@ -37,6 +44,10 @@ class CsvReader_tests : public ::testing::Test {
 
 void CsvReader_tests::prepareReaderSmall() {
   reader = new DataProviders::CsvReader("../DataProviders/tests/Files/small.csv");
+}
+
+void CsvReader_tests::prepareReaderAdv() {
+  reader = new DataProviders::CsvReader("../DataProviders/tests/Files/adv.csv", ",");
 }
 
 TEST_F (CsvReader_tests, columns_small) {
@@ -58,6 +69,22 @@ TEST_F(CsvReader_tests, records_small) {
     EXPECT_EQ(reader->getCurrentRecordNumber(), x);
     for (int i = 0; i < 3; ++i) {
       EXPECT_EQ(value[i], recordsSmall[x][i]);
+    }
+    x++;
+    reader->next();
+    EXPECT_EQ(reader->getCurrentRecordNumber(), x);
+  }
+}
+
+TEST_F(CsvReader_tests, advanced) {
+  prepareReaderAdv();
+
+  int x = 0;
+  while (!reader->eof()) {
+    auto value = reader->getRow();
+    EXPECT_EQ(reader->getCurrentRecordNumber(), x);
+    for (int i = 0; i < 3; ++i) {
+      EXPECT_EQ(value[i], advancedTest[x][i]);
     }
     x++;
     reader->next();

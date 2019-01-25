@@ -99,7 +99,7 @@ class MemoryDataset_tests : public ::testing::Test {
    void setAsCurrency() {
      std::vector<ValueType> types;
      for (int iter = 0; iter < dataProvider->getColumnCount(); iter++) {
-       types.push_back(CURRENCY);
+       types.push_back(CURRENCY_VAL);
      }
      dataset->setFieldTypes(types);
    }
@@ -147,7 +147,7 @@ class MemoryDatasetCurrency_tests : public ::testing::Test {
 
     std::vector<ValueType> types;
     for (int iter = 0; iter < dataProvider->getColumnCount(); iter++) {
-      types.push_back(CURRENCY);
+      types.push_back(CURRENCY_VAL);
     }
     dataset->setFieldTypes(types);
   }

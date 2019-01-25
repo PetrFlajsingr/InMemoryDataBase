@@ -64,7 +64,7 @@ void DataSets::MemoryDataSet::createFields(std::vector<std::string> columns,
         newField = new StringField(col, this, iter);
         break;
       }
-      case CURRENCY: {
+      case CURRENCY_VAL: {
         newField = new CurrencyField(col, this, iter);
         break;
       }
@@ -92,7 +92,7 @@ void DataSets::MemoryDataSet::addRecord() {
       case STRING_VAL:
         newRecord->emplace_back(new DataContainer({._string = strdup(part.c_str())}));
         break;
-      case CURRENCY:
+      case CURRENCY_VAL:
         newRecord->emplace_back(new DataContainer({._currency = new Currency(part)}));
         break;
       default:throw IllegalStateException("Internal error.");
@@ -165,7 +165,7 @@ bool DataSets::MemoryDataSet::setFieldValues(uint64_t index,
         break;
       case STRING_VAL:setFieldData(fields[i], (*value)[i]->_string);
         break;
-      case CURRENCY:setFieldData(fields[i], (*value)[i]->_currency);
+      case CURRENCY_VAL:setFieldData(fields[i], (*value)[i]->_currency);
         break;
       default:throw IllegalStateException("Internal error.");
     }
@@ -311,7 +311,7 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
         for (const auto &search : filter.searchData) {
           valid = Utilities::compareDouble(toCompare, search._integer) == 0;
         }
-      } else if (filter.type == ValueType::CURRENCY) {
+      } else if (filter.type == ValueType::CURRENCY_VAL) {
         Currency *toCompare = (*iter->cells)[filter.fieldIndex]->_currency;
         for (const auto &search : filter.searchData) {
           valid = Utilities::compareCurrency(*toCompare, *search._currency) == 0;
@@ -378,7 +378,7 @@ void DataSets::MemoryDataSet::setData(void *data,
       (*this->data[currentRecord]->cells)[index]->_string
           = reinterpret_cast<char *>(data);
       break;
-    case CURRENCY:
+    case CURRENCY_VAL:
       delete (*this->data[currentRecord]->cells)[index]->_currency;
       (*this->data[currentRecord]->cells)[index]->_currency
           = reinterpret_cast<Currency *>(data);
@@ -400,9 +400,9 @@ void DataSets::MemoryDataSet::append() {
         break;
       case STRING_VAL:dataContainer->_string = nullptr;
         break;
-      case CURRENCY:dataContainer->_currency = nullptr;
+      case CURRENCY_VAL:dataContainer->_currency = new Currency();
         break;
-      default:throw IllegalStateException("Internal error.");
+      default:throw IllegalStateException("Internal error DataSets::MemoryDataSet::append().");
     }
     newRecord->emplace_back(dataContainer);
   }
@@ -455,7 +455,7 @@ bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
             reinterpret_cast<DoubleField*>(field)->getAsDouble(),
             item.searchData[0]._double);
         break;
-      case CURRENCY:
+      case CURRENCY_VAL:
         Currency cur = reinterpret_cast<CurrencyField*>(field)->getAsCurrency();
         comparisonResult = Utilities::compareCurrency(
             cur,
@@ -501,7 +501,7 @@ bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
             reinterpret_cast<DoubleField*>(field)->getAsDouble(),
             item.searchData[0]._double);
         break;
-      case CURRENCY:
+      case CURRENCY_VAL:
         Currency cur = reinterpret_cast<CurrencyField*>(field)->getAsCurrency();
         comparisonResult = Utilities::compareCurrency(
             cur,

@@ -21,7 +21,7 @@ class CsvReader : public BaseDataProvider {
  private:
   const uint32_t BUFFER_SIZE = 4096;  //< velikost bufferu pro cteni radku
 
-  const char DELIMITER = ';';  //< rozdelovac CSV dat
+  std::string delimiter;  //< rozdelovac CSV dat
 
   std::ifstream file;  //< vstupni soubor
 
@@ -41,6 +41,8 @@ class CsvReader : public BaseDataProvider {
    */
   void parseRecord();
 
+  std::vector<std::string> tokenize(std::string &line, int vectorReserve);
+
  public:
   /**
    * Vytvori ctecku nad zadanym souborem.
@@ -48,7 +50,7 @@ class CsvReader : public BaseDataProvider {
    * Pokud se soubor nepodari otevrit je vyhozena IOException.
    * @param filePath Cesta k souboru
    */
-  explicit CsvReader(std::string filePath);
+  explicit CsvReader(std::string filePath, std::string delimiter = ";");
 
   /**
    * Uzavreni souboru pri dealokaci objektu.
@@ -100,6 +102,8 @@ class CsvReader : public BaseDataProvider {
   }
 
   bool eof() override;
+
+  void setDelimiter(char delimiter);
 };
 }  // namespace DataProviders
 

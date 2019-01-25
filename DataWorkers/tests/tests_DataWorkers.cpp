@@ -182,7 +182,8 @@ TEST_F(DataWorker_tests, basicDistinct) {
 
 TEST_F(DataWorker_tests, advancedDinstinct) {
   EXPECT_NO_THROW(worker = new MemoryDataWorker(advDataProvider,
-                                                {STRING_VAL, INTEGER_VAL, CURRENCY, CURRENCY, INTEGER_VAL, CURRENCY}));
+                                                {STRING_VAL, INTEGER_VAL, CURRENCY_VAL, CURRENCY_VAL, INTEGER_VAL,
+                                                 CURRENCY_VAL}));
 
   std::string sql = "SELECT main.0, main.1, SUM(main.2), SUM(main.3), SUM(main.4), SUM(main.5) FROM main";
 
@@ -222,7 +223,8 @@ TEST_F(DataWorker_tests, basicSum) {
 
 TEST_F(DataWorker_tests, advancedSum) {
   EXPECT_NO_THROW(worker = new MemoryDataWorker(advDataProvider,
-                                                {STRING_VAL, INTEGER_VAL, CURRENCY, CURRENCY, INTEGER_VAL, CURRENCY}));
+                                                {STRING_VAL, INTEGER_VAL, CURRENCY_VAL, CURRENCY_VAL, INTEGER_VAL,
+                                                 CURRENCY_VAL}));
 
 
   std::string sql = "SELECT main.0, main.1, SUM(main.2), SUM(main.3), SUM(main.4), SUM(main.5) FROM main";
@@ -265,7 +267,8 @@ TEST_F(DataWorker_tests, basicAverage) {
 
 TEST_F(DataWorker_tests, selection) {
   EXPECT_NO_THROW(worker = new MemoryDataWorker(advDataProvider,
-                                                {STRING_VAL, INTEGER_VAL, CURRENCY, CURRENCY, INTEGER_VAL, CURRENCY}));
+                                                {STRING_VAL, INTEGER_VAL, CURRENCY_VAL, CURRENCY_VAL, INTEGER_VAL,
+                                                 CURRENCY_VAL}));
 
   std::string sql = "SELECT main.0, AVG(main.2) FROM main WHERE main.0 = prvni | druhy";
 
@@ -337,7 +340,8 @@ TEST_F(DataWorker_tests, join) {
 
 TEST_F(DataWorker_tests, uniqueValues) {
   EXPECT_NO_THROW(worker = new MemoryDataWorker(advDataProvider,
-                                                {STRING_VAL, INTEGER_VAL, CURRENCY, CURRENCY, INTEGER_VAL, CURRENCY}));
+                                                {STRING_VAL, INTEGER_VAL, CURRENCY_VAL, CURRENCY_VAL, INTEGER_VAL,
+                                                 CURRENCY_VAL}));
 
   std::vector<std::string> cols = {"0", "1"};
   worker->setColumnChoices(cols);

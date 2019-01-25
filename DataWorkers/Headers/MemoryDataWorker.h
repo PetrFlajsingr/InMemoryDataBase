@@ -80,6 +80,8 @@ class MemoryDataWorker : public BaseDataWorker {
   MemoryDataWorker(DataProviders::BaseDataProvider *dataProvider,
                    std::vector<ValueType> fieldTypes);
 
+  MemoryDataWorker(DataSets::BaseDataSet *dataSet);
+
   std::vector<std::string> getMultiChoiceNames() override;
 
   std::vector<std::string> getChoices(std::string choiceName) override;

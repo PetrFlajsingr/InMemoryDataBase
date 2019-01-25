@@ -39,9 +39,9 @@ project(csv_reader)
 #endif (APPLE)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -O3")
+set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 
-set(SOURCE_FILES  DataProviders/Source/CsvReader.cpp DataProviders/Headers/CsvReader.h
+set(SOURCE_FILES DataWorkers/Source/DataSetMerger.cpp DataWorkers/Headers/DataSetMerger.h DataProviders/Source/CsvReader.cpp DataProviders/Headers/CsvReader.h
         DataProviders/Headers/BaseDataProvider.h Misc/Headers/Exceptions.h Misc/Source/Utilities.cpp
         Misc/Headers/Utilities.h Datasets/Headers/BaseDataSet.h Datasets/Source/MemoryDataSet.cpp
         Datasets/Headers/MemoryDataSet.h Misc/Headers/Types.h Datasets/Fields/Headers/BaseField.h
@@ -55,8 +55,8 @@ set(SOURCE_FILES  DataProviders/Source/CsvReader.cpp DataProviders/Headers/CsvRe
         FileDownloaders/Headers/FileDownloadObserver.h lib/decimal/Decimal.h
         Datasets/Fields/Source/CurrencyField.cpp Datasets/Fields/Headers/CurrencyField.h
         DataWorkers/Headers/BaseDataWorker.h DataWorkers/Source/MemoryDataWorker.cpp DataWorkers/Headers/MemoryDataWorker.h
-        DataWriters/Headers/BaseDataWriter.h DataWriters/Source/ArrayWriter.cpp DataWriters/Headers/ArrayWriter.h
-        Datasets/Headers/SortStructures.h main.cpp)
+        DataWriters/Headers/BaseDataWriter.h DataWriters/Source/ArrayWriter.cpp
+        DataWriters/Headers/ArrayWriter.h Datasets/Headers/SortStructures.h Misc/Headers/Logger.h cedr.cpp)
 
 set(TEST_SOURCE_FILES DataWorkers/tests/tests_DataSetMerger.cpp DataWorkers/Source/DataSetMerger.cpp DataWorkers/Headers/DataSetMerger.h DataProviders/Source/CsvReader.cpp DataProviders/Headers/CsvReader.h
         DataProviders/Headers/BaseDataProvider.h Misc/Headers/Exceptions.h Misc/Source/Utilities.cpp
@@ -77,10 +77,10 @@ set(TEST_SOURCE_FILES DataWorkers/tests/tests_DataSetMerger.cpp DataWorkers/Sour
         DataWorkers/Headers/BaseDataWorker.h DataWorkers/Source/MemoryDataWorker.cpp DataWorkers/Headers/MemoryDataWorker.h
         DataWorkers/tests/tests_DataWorkers.cpp DataWriters/Headers/BaseDataWriter.h DataWriters/Source/ArrayWriter.cpp
         DataWriters/Headers/ArrayWriter.h Datasets/Headers/SortStructures.h
-        DataWorkers/tests/tests_SQLParser.cpp)
+        DataWorkers/tests/tests_SQLParser.cpp Misc/Headers/Logger.h)
 
 
-add_executable(csv_reader main.cpp ${SOURCE_FILES})
+add_executable(cedr cedr.cpp ${SOURCE_FILES})
 add_executable(csv_reader_test ${TEST_SOURCE_FILES})
 
 target_link_libraries(csv_reader_test gmock_main)
