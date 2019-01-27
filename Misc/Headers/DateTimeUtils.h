@@ -11,10 +11,9 @@
 #include <ostream>
 #include "Utilities.h"
 
-class DateTime {
- public:
-  enum DateTimeMode { DateTime_s, Date_s, Time_s };
+enum DateTimeMode { DateTime_s, Date_s, Time_s };
 
+class DateTime {
  private:
   int32_t year = 0;
   uint8_t month = 1;

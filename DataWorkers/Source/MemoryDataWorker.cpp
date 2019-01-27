@@ -6,6 +6,8 @@
 #include <BaseDataSet.h>
 #include <MemoryDataWorker.h>
 #include "MemoryDataSet.h"
+#include <DateTimeUtils.h>
+#include <DateTimeField.h>
 
 DataWorkers::MemoryDataWorker::MemoryDataWorker(DataSets::BaseDataSet *dataSet) {
   this->dataset = dataSet;
@@ -256,6 +258,9 @@ void DataWorkers::MemoryDataWorker::filterDataSet() {
           case CURRENCY_VAL:
             *container._currency = dec::fromString<Currency>(value);
             break;
+          case DATE_TIME_VAL:container._dateTime = new DateTime(DateTime_s);
+            container._dateTime->fromString(value);
+            break;
         }
         filterSelection.emplace_back(container);
       }
@@ -291,6 +296,9 @@ DataWorkers::ResultAccumulator::ResultAccumulator(DataSets::BaseField *field,
     case CURRENCY_VAL:
       data._currency = new Currency();
       previousData._currency = new Currency();
+      break;
+    case DATE_TIME_VAL:data._dateTime = new DateTime(DateTime_s);
+      previousData._dateTime = new DateTime(DateTime_s);
       break;
   }
 }
@@ -365,6 +373,23 @@ bool DataWorkers::ResultAccumulator::handleDistinct() {
       }
       break;
     }
+    case DATE_TIME_VAL: {
+      DateTime value = reinterpret_cast<DataSets::DateTimeField *>(field)
+          ->getAsDateTime();
+      if (!firstDone) {
+        firstDone = true;
+        *data._dateTime = value;
+        return false;
+      }
+      if (value != *data._dateTime) {
+        *previousData._currency = *data._currency;
+        result = dec::toString(*data._currency);
+        *data._dateTime = value;
+        distinct = true;
+        return true;
+      }
+      break;
+    }
   }
   return false;
 }
@@ -384,7 +409,7 @@ bool DataWorkers::ResultAccumulator::handleSum() {
       break;
     }
     case STRING_VAL: {
-      throw IllegalStateException("Internal error.");
+      throw IllegalStateException("Internal error. DataWorkers::ResultAccumulator::handleSum() on string");
     }
     case CURRENCY_VAL: {
       Currency value = reinterpret_cast<DataSets::CurrencyField *>(field)
@@ -392,6 +417,8 @@ bool DataWorkers::ResultAccumulator::handleSum() {
       *data._currency += value;
       break;
     }
+    case DATE_TIME_VAL:
+      throw IllegalStateException("Internal error. DataWorkers::ResultAccumulator::handleSum() on DateTime");
   }
   return false;
 }
@@ -412,13 +439,16 @@ bool DataWorkers::ResultAccumulator::handleAverage() {
       break;
     }
     case STRING_VAL: {
-      throw IllegalStateException("Internal error.");
+      throw IllegalStateException("Internal error. DataWorkers::ResultAccumulator::handleAverage() on string");
     }
     case CURRENCY_VAL: {
       Currency value = reinterpret_cast<DataSets::CurrencyField *>(field)
           ->getAsCurrency();
       *data._currency += value;
       break;
+    }
+    case DATE_TIME_VAL: {
+      throw IllegalStateException("Internal error. DataWorkers::ResultAccumulator::handleAverage() on DateTime");
     }
   }
   return false;
@@ -509,6 +539,9 @@ std::string DataWorkers::ResultAccumulator::getResultForce() {
     }
     case STRING_VAL: {
       return data._string;
+    }
+    case DATE_TIME_VAL: {
+      return data._dateTime->toString();
     }
   }
 }

@@ -18,6 +18,8 @@ class DateTimeField : public BaseField {
   DateTime data;
 
  public:
+  DateTimeField(const std::string &fieldName, BaseDataSet *dataset, uint64_t index);
+
   ValueType getFieldType() override;
 
   void setAsString(const std::string &value) override;

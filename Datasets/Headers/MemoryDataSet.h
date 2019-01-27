@@ -124,7 +124,7 @@ class MemoryDataSet : public BaseDataSet {
 
   BaseField *fieldByIndex(uint64_t index) override;
 
-  std::vector<BaseField *> getFields();
+  std::vector<BaseField *> getFields() override;
 
   bool eof() override;
 

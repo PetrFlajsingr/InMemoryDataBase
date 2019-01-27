@@ -42,3 +42,5 @@ void DataSets::DateTimeField::setAsDateTime(const DateTime &dateTime) {
 DateTime DataSets::DateTimeField::getAsDateTime() {
   return data;
 }
+DataSets::DateTimeField::DateTimeField(const std::string &fieldName, DataSets::BaseDataSet *dataset, uint64_t index)
+    : BaseField(fieldName, dataset, index), data(DateTime(DateTime_s)) {}

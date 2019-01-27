@@ -3,6 +3,7 @@
 //
 
 #include <DataSetMerger.h>
+#include <DateTimeField.h>
 
 DataWorkers::DataSetMerger::DataSetMerger() {}
 
@@ -150,6 +151,12 @@ void DataWorkers::DataSetMerger::appendData(std::vector<DataSets::BaseField *> f
       }
         break;
       case STRING_VAL:dataSetFields[i]->setAsString(fields[i]->getAsString());
+        break;
+      case DATE_TIME_VAL: {
+        auto value = reinterpret_cast<DataSets::DateTimeField *>(fields[i])->getAsDateTime();
+        reinterpret_cast<DataSets::DateTimeField *>(dataSetFields[i])
+            ->setAsDateTime(value);
+      }
         break;
       default:throw IllegalStateException("Internal error, DataWorkers::DataSetMerger::appendData(...)");
     }
