@@ -80,7 +80,7 @@ void DataProviders::CsvReader::setDelimiter(char delimiter) {
 std::vector<std::string> DataProviders::CsvReader::tokenize(std::string &line, int vectorReserve) {
   char buffer[BUFFER_SIZE];
   uint64_t bufferIter = 0;
-  TokeniserStates state = Read; //0 - normal read, 1 - read inside "", 2 - found " inside ""
+  TokeniserStates state = Read;
 
   std::vector<std::string> result;
   result.reserve(vectorReserve);

@@ -443,6 +443,7 @@ void DataSets::MemoryDataSet::appendDataProvider(
   loadData();
   data.shrink_to_fit();
 }
+
 DataSets::MemoryDataSet::MemoryDataSet(const std::string &dataSetName) : BaseDataSet(dataSetName) {}
 
 #pragma clang diagnostic push

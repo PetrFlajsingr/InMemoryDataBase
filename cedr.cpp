@@ -19,23 +19,22 @@ const std::string subjektyCSVName = "NNO_subjekty.csv";
 
 const std::string QUERY = "SELECT main.idDotace, main.idPrijemce, main.projektNazev, main.iriOperacniProgram, "
                           "main.iriGrantoveSchema, main.idRozhodnuti, main.castkaCerpana, main.castkaUvolnena, "
-                          "main.iriDotacniTitul, main.iriPoskytovatelDotace, main.rokRozhodnuti "
+                          "main.iriDotacniTitul, main.iriPoskytovatelDotace, main.rozpoctoveObdobi, "
                           "prijemce_subjekty.idPrijemce, prijemce_subjekty.ico, prijemce_subjekty.obchodniJmeno, "
-                          "prijemce_subjekty.jmeno, prijemce_subjekty.prijmeni, prijemce_subjekty.rokNarozeni, "
-                          "prijemce_subjekty.dPlatnost, "
-                          "prijemce_subjekty.dtAktualizace, prijemce_subjekty.Id_GIS, prijemce_subjekty.SouradniceA, "
-                          "prijemce_subjekty.SouradniceB "
+                          "prijemce_subjekty.obchodniForma, "
+                          "prijemce_subjekty.Id_GIS, prijemce_subjekty.SouradniceA, "
+                          "prijemce_subjekty.SouradniceB, prijemce_subjekty.X, prijemce_subjekty.Y "
                           "FROM main JOIN prijemce_subjekty ON main.idPrijemce = prijemce_subjekty.idPrijemce "
-                          "WHERE main.rokRozhodnuti = 2017";
+                          "WHERE main.rozpoctoveObdobi = 2017";
 
 const std::string QUERY_AGR = "SELECT main.idPrijemce, SUM(main.castkaCerpana), SUM(main.castkaUvolnena), "
-                              "main.rokRozhodnuti, "
+                              "main.rozpoctoveObdobi, "
                               "prijemce_subjekty.idPrijemce, prijemce_subjekty.ico, prijemce_subjekty.obchodniJmeno, "
                               "prijemce_subjekty.jmeno, prijemce_subjekty.prijmeni, prijemce_subjekty.rokNarozeni, "
-                              "prijemce_subjekty.dPlatnost, "
-                              "prijemce_subjekty.dtAktualizace "
+                              "prijemce_subjekty.Id_GIS, prijemce_subjekty.SouradniceA, "
+                              "prijemce_subjekty.SouradniceB, prijemce_subjekty.X, prijemce_subjekty.Y "
                               "FROM main JOIN prijemce_subjekty ON main.idPrijemce = prijemce_subjekty.idPrijemce "
-                              "WHERE main.rokRozhodnuti = 2017";
+                              "WHERE main.rozpoctoveObdobi = 2017";
 
 void countIntersection() {
   auto prijemceProvider = new DataProviders::CsvReader(csvPath + prijemceCSVName, ",");
