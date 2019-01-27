@@ -6,8 +6,6 @@
 #include <BaseDataSet.h>
 #include <MemoryDataWorker.h>
 #include "MemoryDataSet.h"
-#include <DateTimeUtils.h>
-#include <DateTimeField.h>
 
 DataWorkers::MemoryDataWorker::MemoryDataWorker(DataSets::BaseDataSet *dataSet) {
   this->dataset = dataSet;
@@ -156,7 +154,9 @@ void DataWorkers::MemoryDataWorker::writeResult(BaseDataWriter &writer,
                 results.emplace_back(field->getAsString());
               }
             } else if (queryData.joins[i].joinType == NormalJoin) {
+              // zrus vypisovani zaznamu pokud k nemu neni nalezen zaznam k napojeni
               writeResults = false;
+              break;
             } else {
               writeResults = true;
               for (auto field : joinStructures[i].projectFields) {
@@ -202,7 +202,9 @@ void DataWorkers::MemoryDataWorker::writeResult(BaseDataWriter &writer,
           results.emplace_back(field->getAsString());
         }
       } else if (queryData.joins[i].joinType == NormalJoin) {
+        // zrus vypisovani zaznamu pokud k nemu neni nalezen zaznam k napojeni
         writeResults = false;
+        break;
       } else {
         writeResults = true;
         for (auto field : joinStructures[i].projectFields) {

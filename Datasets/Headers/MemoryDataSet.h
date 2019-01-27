@@ -20,6 +20,7 @@
 #include "Utilities.h"
 #include "CurrencyField.h"
 #include <BaseDataProvider.h>
+#include <DateTimeField.h>
 
 namespace DataSets {
 

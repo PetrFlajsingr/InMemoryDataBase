@@ -9,7 +9,8 @@ DataProviders::CsvReader::CsvReader(std::string filePath, std::string delimiter)
   this->delimiter = delimiter;
   file.open(filePath);
   if (!file.is_open()) {
-    throw IOException("File could not be open.");
+    std::string errMsg = "File could not be open: " + filePath;
+    throw IOException(errMsg.c_str());
   }
 
   readHeader();

@@ -2,7 +2,7 @@
 // Created by Petr Flajsingr on 25/08/2018.
 //
 
-#include <DateTimeField.h>
+#include <MemoryDataSet.h>
 
 void DataSets::MemoryDataSet::setDataProvider(
     DataProviders::BaseDataProvider *provider) {
@@ -86,17 +86,13 @@ void DataSets::MemoryDataSet::addRecord() {
   size_t iter = 0;
   for (const auto &part : record) {
     switch (fields[iter]->getFieldType()) {
-      case INTEGER_VAL:
-        newRecord->emplace_back(new DataContainer({._integer = Utilities::stringToInt(part)}));
+      case INTEGER_VAL:newRecord->emplace_back(new DataContainer({._integer = Utilities::stringToInt(part)}));
         break;
-      case DOUBLE_VAL:
-        newRecord->emplace_back(new DataContainer({._double = Utilities::stringToDouble(part)}));
+      case DOUBLE_VAL:newRecord->emplace_back(new DataContainer({._double = Utilities::stringToDouble(part)}));
         break;
-      case STRING_VAL:
-        newRecord->emplace_back(new DataContainer({._string = strdup(part.c_str())}));
+      case STRING_VAL:newRecord->emplace_back(new DataContainer({._string = strdup(part.c_str())}));
         break;
-      case CURRENCY_VAL:
-        newRecord->emplace_back(new DataContainer({._currency = new Currency(part)}));
+      case CURRENCY_VAL:newRecord->emplace_back(new DataContainer({._currency = new Currency(part)}));
         break;
       case DATE_TIME_VAL:newRecord->emplace_back(new DataContainer({._dateTime = new DateTime(DateTime_s)}));
         break;
@@ -213,16 +209,16 @@ void DataSets::MemoryDataSet::previous() {
 void DataSets::MemoryDataSet::sort(SortOptions &options) {
   uint64_t fieldCount = fields.size();
   bool isInRange = std::all_of(options.options.begin(),
-      options.options.end(),
-      [fieldCount](SortItem &item) {
-        return item.fieldIndex < fieldCount;
-  });
+                               options.options.end(),
+                               [fieldCount](SortItem &item) {
+                                 return item.fieldIndex < fieldCount;
+                               });
 
   if (!isInRange) {
     throw InvalidArgumentException("Field index is out of bounds");
   }
 
-  std::vector<std::function<int8_t (DataSetRow *, DataSetRow *)>> compareFunctions;
+  std::vector<std::function<int8_t(DataSetRow *, DataSetRow *)>> compareFunctions;
 
   for (auto &option : options.options) {
     compareFunctions.emplace_back(
@@ -243,8 +239,8 @@ void DataSets::MemoryDataSet::sort(SortOptions &options) {
   };
 
   std::sort(data.begin(),
-      data.end(),
-      compareFunction);
+            data.end(),
+            compareFunction);
 
   first();
 }
@@ -279,8 +275,7 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
         std::string toCompare = (*iter->cells)[filter.fieldIndex]->_string;
         for (const auto &search : filter.searchData) {
           switch (filter.filterOption) {
-            case EQUALS:
-              valid = std::strcmp(toCompare.c_str(), search._string) == 0;
+            case EQUALS:valid = std::strcmp(toCompare.c_str(), search._string) == 0;
               break;
             case STARTS_WITH:
               valid = std::strncmp(toCompare.c_str(),
@@ -347,8 +342,8 @@ DataSets::BaseField *DataSets::MemoryDataSet::fieldByName(
       return field;
     }
   }
-
-  return nullptr;
+  std::string errMsg = "Field named \"" + name + "\" not found. DataSets::MemoryDataSet::fieldByName";
+  throw InvalidArgumentException(errMsg.c_str());
 }
 
 DataSets::BaseField *DataSets::MemoryDataSet::fieldByIndex(uint64_t index) {
@@ -385,8 +380,7 @@ void DataSets::MemoryDataSet::setData(void *data,
       (*this->data[currentRecord]->cells)[index]->_double
           = *reinterpret_cast<int *>(data);
       break;
-    case STRING_VAL:
-      delete[] (*this->data[currentRecord]->cells)[index]->_string;
+    case STRING_VAL:delete[] (*this->data[currentRecord]->cells)[index]->_string;
       (*this->data[currentRecord]->cells)[index]->_string
           = reinterpret_cast<char *>(data);
       break;
@@ -465,46 +459,43 @@ bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
         break;
       case INTEGER_VAL:
         comparisonResult = Utilities::compareInt(
-            reinterpret_cast<IntegerField*>(field)->getAsInteger(),
+            reinterpret_cast<IntegerField *>(field)->getAsInteger(),
             item.searchData[0]._integer);
         break;
       case DOUBLE_VAL:
         comparisonResult = Utilities::compareDouble(
-            reinterpret_cast<DoubleField*>(field)->getAsDouble(),
+            reinterpret_cast<DoubleField *>(field)->getAsDouble(),
             item.searchData[0]._double);
         break;
       case CURRENCY_VAL: {
-        Currency cur = reinterpret_cast<CurrencyField *>(field)->getAsCurrency();
+        auto cur = reinterpret_cast<CurrencyField *>(field)->getAsCurrency();
         comparisonResult = Utilities::compareCurrency(
             cur,
             *item.searchData[0]._currency);
       }
         break;
-      case DATE_TIME_VAL:DateTime dateTime = reinterpret_cast<DateTimeField *>(field)->getAsDateTime();
+      case DATE_TIME_VAL:auto dateTime = reinterpret_cast<DateTimeField *>(field)->getAsDateTime();
         comparisonResult = Utilities::compareDateTime(dateTime, *item.searchData[0]._dateTime);
         break;
     }
     switch (comparisonResult) {
-      case 0:
-        return true;
-      case -1:
-        min = currentRecord;
+      case 0:return true;
+      case -1:min = currentRecord;
         currentRecord = (min + max) >> 1;
         setFieldValues(currentRecord, true);
         break;
-      case 1:
-        max = currentRecord;
+      case 1:max = currentRecord;
         currentRecord = (min + max) >> 1;
         setFieldValues(currentRecord, true);
         break;
     }
-    if(max - min < 2) {
+    if (max - min < 2) {
       if (breakLoop) {
         return false;
       }
       breakLoop = true;
     }
-  }while (currentRecord > 0 && currentRecord < data.size());
+  } while (currentRecord > 0 && currentRecord < data.size());
   if (currentRecord == 0) {
     int8_t comparisonResult;
     switch (field->getFieldType()) {
@@ -515,12 +506,12 @@ bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
         break;
       case INTEGER_VAL:
         comparisonResult = Utilities::compareInt(
-            reinterpret_cast<IntegerField*>(field)->getAsInteger(),
+            reinterpret_cast<IntegerField *>(field)->getAsInteger(),
             item.searchData[0]._integer);
         break;
       case DOUBLE_VAL:
         comparisonResult = Utilities::compareDouble(
-            reinterpret_cast<DoubleField*>(field)->getAsDouble(),
+            reinterpret_cast<DoubleField *>(field)->getAsDouble(),
             item.searchData[0]._double);
         break;
       case CURRENCY_VAL: {

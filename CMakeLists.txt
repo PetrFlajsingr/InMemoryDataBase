@@ -40,9 +40,9 @@ project(csv_reader)
 #endif (APPLE)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -o3")
 
-set(SOURCE_FILES DataWorkers/Source/DataSetMerger.cpp DataWorkers/Headers/DataSetMerger.h DataProviders/Source/CsvReader.cpp DataProviders/Headers/CsvReader.h
+set(SOURCE_FILES Misc/Headers/DateTimeUtils.h Datasets/Fields/Headers/DateTimeField.h Datasets/Fields/Source/DateTimeField.cpp DataWorkers/Source/DataSetMerger.cpp DataWorkers/Headers/DataSetMerger.h DataProviders/Source/CsvReader.cpp DataProviders/Headers/CsvReader.h
         DataProviders/Headers/BaseDataProvider.h Misc/Headers/Exceptions.h Misc/Source/Utilities.cpp
         Misc/Headers/Utilities.h Datasets/Headers/BaseDataSet.h Datasets/Source/MemoryDataSet.cpp
         Datasets/Headers/MemoryDataSet.h Misc/Headers/Types.h Datasets/Fields/Headers/BaseField.h
