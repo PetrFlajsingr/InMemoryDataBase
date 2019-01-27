@@ -5,6 +5,7 @@
 #include <sstream>
 #include <regex>
 #include <Utilities.h>
+#include "DateTimeUtils.h"
 
 std::vector<std::string> Utilities::splitStringByDelimiter(std::string str,
                                                            std::string delimiter) {

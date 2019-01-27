@@ -9,7 +9,7 @@
 #include <vector>
 #include "Types.h"
 #include "Exceptions.h"
-#include "DateTimeUtils.h"
+class DateTime;
 
 /**
  * Obecne metody pro

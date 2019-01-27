@@ -7,6 +7,7 @@
 
 #include "decimal.h"
 
+class DateTime;
 /**
  * Typy ulozenych dat
  */
@@ -24,6 +25,7 @@ typedef union {
   int _integer;
   double _double;
   Currency *_currency;
+  DateTime *_dateTime;
 } DataContainer;
 
 #endif  // MISC_HEADERS_TYPES_H_

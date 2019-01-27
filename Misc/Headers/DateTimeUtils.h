@@ -100,6 +100,8 @@ class DateTime {
     DateTime::millisecond = millisecond;
   }
 
+  DateTime &operator=(const DateTime &rhs) = default;
+
   // operator overloads
   bool operator==(const DateTime &rhs) const {
     return year == rhs.year &&
