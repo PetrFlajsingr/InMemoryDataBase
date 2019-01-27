@@ -10,7 +10,7 @@
 /**
  * Typy ulozenych dat
  */
-enum ValueType { NONE, INTEGER_VAL, DOUBLE_VAL, STRING_VAL, CURRENCY_VAL };
+enum ValueType { NONE, INTEGER_VAL, DOUBLE_VAL, STRING_VAL, CURRENCY_VAL, DATE_TIME_VAL };
 
 enum SortOrder { ASCENDING, DESCENDING };
 

@@ -36,14 +36,16 @@ std::function<int8_t (DataSets::DataSetRow *, DataSets::DataSetRow *)> DataSets:
     }
     return 1;
   };
-
 }
+
 void DataSets::CurrencyField::setAsCurrency(Currency &value) {
   data = value;
   BaseField::setData(&data, getFieldType());
 }
+
 Currency DataSets::CurrencyField::getAsCurrency() {
   return data;
 }
+
 DataSets::CurrencyField::CurrencyField(const std::string &fieldName, DataSets::BaseDataSet *dataset, uint64_t index)
     : BaseField(fieldName, dataset, index) {}

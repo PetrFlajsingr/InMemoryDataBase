@@ -9,6 +9,7 @@
 #include <vector>
 #include "Types.h"
 #include "Exceptions.h"
+#include "DateTimeUtils.h"
 
 /**
  * Obecne metody pro
@@ -92,6 +93,8 @@ class Utilities {
   static int8_t compareCurrency(Currency &a, Currency &b);
 
   static int8_t compareString(std::string a, std::string b);
+
+  static int8_t compareDateTime(const DateTime &a, const DateTime &b);
 };
 
 #endif //  MISC_HEADERS_UTILITIES_H_

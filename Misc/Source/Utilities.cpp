@@ -4,7 +4,7 @@
 
 #include <sstream>
 #include <regex>
-#include "Utilities.h"
+#include <Utilities.h>
 
 std::vector<std::string> Utilities::splitStringByDelimiter(std::string str,
                                                            std::string delimiter) {
@@ -87,6 +87,7 @@ char *Utilities::copyStringToNewChar(const std::string &str) {
   strcpy(result, str.c_str());
   return result;
 }
+
 int8_t Utilities::compareInt(int a, int b) {
   if (a == b) {
     return 0;
@@ -96,6 +97,7 @@ int8_t Utilities::compareInt(int a, int b) {
   }
   return 1;
 }
+
 int8_t Utilities::compareDouble(double a, double b) {
   if (a == b) {
     return 0;
@@ -105,6 +107,7 @@ int8_t Utilities::compareDouble(double a, double b) {
   }
   return 1;
 }
+
 int8_t Utilities::compareCurrency(Currency &a, Currency &b) {
   if (a == b) {
     return 0;
@@ -114,6 +117,7 @@ int8_t Utilities::compareCurrency(Currency &a, Currency &b) {
   }
   return 1;
 }
+
 int8_t Utilities::compareString(std::string a, std::string b) {
   auto cmpResult = a.compare(b);
   if (cmpResult < 0) {
@@ -122,4 +126,14 @@ int8_t Utilities::compareString(std::string a, std::string b) {
     return 1;
   }
   return 0;
+}
+
+int8_t Utilities::compareDateTime(const DateTime &a, const DateTime &b) {
+  if (a == b) {
+    return 0;
+  }
+  if (a < b) {
+    return -1;
+  }
+  return 1;
 }
