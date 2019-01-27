@@ -90,6 +90,8 @@ class Utilities {
   static int8_t compareDouble(double a, double b);
 
   static int8_t compareCurrency(Currency &a, Currency &b);
+
+  static int8_t compareString(std::string a, std::string b);
 };
 
 #endif //  MISC_HEADERS_UTILITIES_H_

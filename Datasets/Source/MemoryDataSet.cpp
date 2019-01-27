@@ -331,7 +331,7 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
 DataSets::BaseField *DataSets::MemoryDataSet::fieldByName(
     const std::string &name) {
   for (auto &field : fields) {
-    if (field->getFieldName() == name) {
+    if (Utilities::compareString(field->getFieldName(), name) == 0) {
       return field;
     }
   }
@@ -379,9 +379,9 @@ void DataSets::MemoryDataSet::setData(void *data,
           = reinterpret_cast<char *>(data);
       break;
     case CURRENCY_VAL:
-      delete (*this->data[currentRecord]->cells)[index]->_currency;
-      (*this->data[currentRecord]->cells)[index]->_currency
-          = reinterpret_cast<Currency *>(data);
+      //delete (*this->data[currentRecord]->cells)[index]->_currency;
+      *((*this->data[currentRecord]->cells)[index]->_currency)
+          = *(reinterpret_cast<Currency *>(data));
       break;
     default:throw IllegalStateException("Invalid value type.");
   }
@@ -441,8 +441,8 @@ bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
     int8_t comparisonResult;
     switch (field->getFieldType()) {
       case STRING_VAL:
-        comparisonResult = std::strcmp(
-            field->getAsString().c_str(),
+        comparisonResult = Utilities::compareString(
+            field->getAsString(),
             item.searchData[0]._string);
         break;
       case INTEGER_VAL:
@@ -520,11 +520,3 @@ std::vector<DataSets::BaseField *> DataSets::MemoryDataSet::getFields() {
 }
 
 #pragma clang diagnostic pop
-
-
-
-
-
-
-
-

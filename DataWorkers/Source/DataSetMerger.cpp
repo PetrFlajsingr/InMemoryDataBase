@@ -96,23 +96,26 @@ DataSets::BaseDataSet *DataWorkers::DataSetMerger::mergeDataSets(const std::stri
   options2.addOption(mergeField2->getIndex(), ASCENDING);
   dataSet2->sort(options2);
 
+  int8_t cmpResult;
   while (!dataSet1->eof()) {
 
     while (!dataSet2->eof()) {
       if (isIntegerField) {
-        if (reinterpret_cast<DataSets::IntegerField *>(mergeField1)->getAsInteger()
-            == reinterpret_cast<DataSets::IntegerField *>(mergeField2)->getAsInteger()) {
-          appendData(sourceFields, result);
-          break;
-        }
+        cmpResult = Utilities::compareInt(reinterpret_cast<DataSets::IntegerField *>(mergeField1)->getAsInteger(),
+                                          reinterpret_cast<DataSets::IntegerField *>(mergeField2)->getAsInteger());
       } else {
-        if (mergeField1->getAsString()
-            == mergeField2->getAsString()) {
-          appendData(sourceFields, result);
-          break;
-        }
+        cmpResult = Utilities::compareString(mergeField1->getAsString(),
+                                             mergeField2->getAsString());
       }
-      dataSet2->next();
+      if (cmpResult == 0) {
+        appendData(sourceFields, result);
+        //dataSet2->next();
+        break;
+      } else if (cmpResult < 0) {
+        break;
+      } else if (cmpResult > 0) {
+        dataSet2->next();
+      }
     }
     if (dataSet2->eof()) {
       break;

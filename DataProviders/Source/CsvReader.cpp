@@ -27,6 +27,9 @@ void DataProviders::CsvReader::readHeader() {
 
   file.getline(buffer, BUFFER_SIZE);
   auto line = std::string(buffer);
+  while (!isalnum(line[0])) {
+    line = line.substr(1);
+  }
   if (!line.empty() && line[line.length() - 1] == '\r') {
     line = line.substr(0, line.length() - 1);
   }

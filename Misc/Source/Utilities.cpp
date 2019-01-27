@@ -5,9 +5,6 @@
 #include <sstream>
 #include <regex>
 #include "Utilities.h"
-#include <cstring>
-#include <string>
-#include <Utilities.h>
 
 std::vector<std::string> Utilities::splitStringByDelimiter(std::string str,
                                                            std::string delimiter) {
@@ -116,4 +113,13 @@ int8_t Utilities::compareCurrency(Currency &a, Currency &b) {
     return -1;
   }
   return 1;
+}
+int8_t Utilities::compareString(std::string a, std::string b) {
+  auto cmpResult = a.compare(b);
+  if (cmpResult < 0) {
+    return -1;
+  } else if (cmpResult > 0) {
+    return 1;
+  }
+  return 0;
 }

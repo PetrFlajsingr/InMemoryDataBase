@@ -23,7 +23,12 @@ namespace DataWorkers {
     Operation operation;
   };
 
+enum JoinType {
+  LeftJoin, NormalJoin
+};
+
   struct JoinOperation {
+    JoinType joinType;
     std::string table1Name;
     std::string column1Name;
 
@@ -102,12 +107,21 @@ namespace DataWorkers {
       }
 
       while (iter < splitSql.size() && splitSql[iter] != "WHERE") {
+        JoinOperation op;
         if (splitSql[iter] != "JOIN") {
-          throw SQLException();
+          if (splitSql[iter] != "LEFT") {
+            throw SQLException();
+          }
+          op.joinType = LeftJoin;
+          iter++;
+          if (splitSql[iter] != "JOIN") {
+            throw SQLException();
+          }
+        } else {
+          op.joinType = NormalJoin;
         }
         iter++;
 
-        JoinOperation op;
         op.table2Name = splitSql[iter];
 
         iter++;

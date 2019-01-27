@@ -126,7 +126,7 @@ void DataWorkers::MemoryDataWorker::writeResult(BaseDataWriter &writer,
     filterDataSet();
   }
 
-  bool savedResults = false;
+  bool savedResults = false, writeResults = false;
   std::vector<std::string> results;
   results.reserve(queryData.projections.size());
   while (!dataset->eof()) {
@@ -149,10 +149,14 @@ void DataWorkers::MemoryDataWorker::writeResult(BaseDataWriter &writer,
                 DataSets::FilterOption::EQUALS
             };
             if (additionalDataSets[i]->findFirst(item)) {
+              writeResults = true;
               for (auto field : joinStructures[i].projectFields) {
                 results.emplace_back(field->getAsString());
               }
+            } else if (queryData.joins[i].joinType == NormalJoin) {
+              writeResults = false;
             } else {
+              writeResults = true;
               for (auto field : joinStructures[i].projectFields) {
                 results.emplace_back("(NULL)");
               }
@@ -160,7 +164,9 @@ void DataWorkers::MemoryDataWorker::writeResult(BaseDataWriter &writer,
           }
         }
 
-        writer.writeRecord(results);
+        if (writeResults) {
+          writer.writeRecord(results);
+        }
         results.clear();
         savedResults = true;
       }
@@ -188,15 +194,25 @@ void DataWorkers::MemoryDataWorker::writeResult(BaseDataWriter &writer,
           {container},
           DataSets::FilterOption::EQUALS
       };
-      additionalDataSets[i]->findFirst(item);
-
-      for (auto field : joinStructures[i].projectFields) {
-        results.emplace_back(field->getAsString());
+      if (additionalDataSets[i]->findFirst(item)) {
+        writeResults = true;
+        for (auto field : joinStructures[i].projectFields) {
+          results.emplace_back(field->getAsString());
+        }
+      } else if (queryData.joins[i].joinType == NormalJoin) {
+        writeResults = false;
+      } else {
+        writeResults = true;
+        for (auto field : joinStructures[i].projectFields) {
+          results.emplace_back("(NULL)");
+        }
       }
     }
   }
 
-  writer.writeRecord(results);
+  if (writeResults) {
+    writer.writeRecord(results);
+  }
 
   for (auto *acc : accumulators) {
     delete acc;
@@ -274,6 +290,7 @@ DataWorkers::ResultAccumulator::ResultAccumulator(DataSets::BaseField *field,
       break;
     case CURRENCY_VAL:
       data._currency = new Currency();
+      previousData._currency = new Currency();
       break;
   }
 }

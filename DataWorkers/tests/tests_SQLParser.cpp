@@ -6,6 +6,7 @@
 #include "SQLParser.h"
 
 
+
 class SQLParser_tests : public ::testing::Test {
  protected:
   DataWorkers::QueryData expectedOutput;
@@ -19,8 +20,8 @@ class SQLParser_tests : public ::testing::Test {
     expectedOutput.projections.push_back({"krava", "table2", DataWorkers::Operation::Distinct});
     expectedOutput.projections.push_back({"id", "table3", DataWorkers::Operation::Distinct});
 
-    expectedOutput.joins.push_back({"table1", "uganda", "table2", "id"});
-    expectedOutput.joins.push_back({"table2", "id", "table3", "id"});
+    expectedOutput.joins.push_back({DataWorkers::LeftJoin, "table1", "uganda", "table2", "id"});
+    expectedOutput.joins.push_back({DataWorkers::LeftJoin, "table2", "id", "table3", "id"});
 
     expectedOutput.selections.push_back({"table1", "uganda", {"10", "5", "8"}});
     expectedOutput.selections.push_back({"table1", "letadlo", {"22", "23"}});

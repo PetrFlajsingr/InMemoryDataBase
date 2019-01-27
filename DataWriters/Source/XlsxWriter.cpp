@@ -9,9 +9,7 @@ void XlsxWriter::writeHeader(const std::vector<std::string> &header) {
   for (auto &name : header) {
     xlsxiowrite_add_column(xlsxWriterHandle, name.c_str(), 0);
   }
-
   xlsxiowrite_next_row(xlsxWriterHandle);
-
 }
 
 void XlsxWriter::writeRecord(const std::vector<std::string> &record) {
