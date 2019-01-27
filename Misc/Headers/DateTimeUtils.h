@@ -13,6 +13,9 @@
 
 enum DateTimeMode { DateTime_s, Date_s, Time_s };
 
+/**
+ * Trida pro repreztenaci casu a data
+ */
 class DateTime {
  private:
   int32_t year = 0;
@@ -29,14 +32,26 @@ class DateTime {
 
  public:
 
+  /**
+   *
+   * @param mode Urcuje typ ukladane hodnoty
+   */
   DateTime(DateTimeMode mode) : mode(mode) {}
 
+  /**
+   * Prevod ze string ve formatu YYYY-MM-DD HH-MM-SS
+   * @param value
+   */
   void fromString(const std::string &value) {
     std::stringstream ss;
     ss << value;
     ss >> *this;
   }
 
+  /**
+   * Prevod do string ve formatu YYYY-MM-DD HH-MM-SS
+   * @return Casova hodnota ve formatu YYYY-MM-DD HH-MM-SS
+   */
   std::string toString() {
     std::stringstream ss;
     ss << *this;
@@ -97,6 +112,10 @@ class DateTime {
 
   void setMillisecond(uint16_t millisecond) {
     DateTime::millisecond = millisecond;
+  }
+
+  DateTimeMode getMode() const {
+    return mode;
   }
 
   DateTime &operator=(const DateTime &rhs) = default;
@@ -160,14 +179,14 @@ class DateTime {
     switch (dateTime.mode) {
       case DateTime_s:
         os << dateTime.year << "-" << dateTime.month << "-" << dateTime.day << " "
-           << dateTime.hour << "-" << dateTime.minute << "-" << dateTime.second << " "
-           << dateTime.millisecond;
+            << dateTime.hour << "-" << dateTime.minute << "-" << dateTime.second << " "
+            << dateTime.millisecond;
         break;
       case Date_s:os << dateTime.year << "-" << dateTime.month << "-" << dateTime.day;
         break;
       case Time_s:
         os << dateTime.hour << "-" << dateTime.minute << "-" << dateTime.second << "-"
-           << dateTime.millisecond;
+            << dateTime.millisecond;
         break;
     }
 
