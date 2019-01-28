@@ -45,8 +45,8 @@ void DataSets::MemoryDataSet::loadData() {
 void DataSets::MemoryDataSet::createFields(std::vector<std::string> columns,
                                            std::vector<ValueType> types) {
   if (columns.size() != types.size()) {
-    throw InvalidArgumentException(
-        "Amount of columns and types must match.");
+    std::string errMsg = "Amount of columns and types must match. Data set: " + this->getName();
+    throw InvalidArgumentException(errMsg.c_str());
   }
   size_t iter = 0;
   for (const auto &col : columns) {
@@ -113,8 +113,13 @@ void DataSets::MemoryDataSet::close() {
     for (auto level1 : data) {
       size_t iter = 0;
       for (auto level2 : *level1->cells) {
-        if (fields[iter])
-          delete level2;
+        if (fields[iter]->getFieldType() == STRING_VAL)
+          delete level2->_string;
+        else if (fields[iter]->getFieldType() == CURRENCY_VAL)
+          delete level2->_currency;
+        else if (fields[iter]->getFieldType() == DATE_TIME_VAL)
+          delete level2->_dateTime;
+        delete level2;
         iter++;
       }
       level1->cells->clear();
