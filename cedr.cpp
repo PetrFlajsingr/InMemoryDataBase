@@ -221,7 +221,23 @@ void dominikKontrola() {
   //printf("%d \n", counter);
 }
 
+void writerTest() {
+  auto prov = new DataProviders::CsvReader(
+      csvPath + "dotaceTitul_rozpoctovaSkladbaPolozka.csv", ",");
+
+  auto writer = new DataWriters::CsvWriter("/Users/petr/Desktop/output.csv");
+  auto iter = writer->begin();
+  writer->writeHeader(prov->getHeader());
+  auto test = *iter;
+  for (const auto &row : *prov) {
+    *iter++ = row;
+  }
+  delete writer;
+  delete prov;
+}
+
 int main(int argc, char **argv) {
+  //writerTest();
   for (auto i = 0; i < 1; ++i) {
     Logger::startTime();
     //iterExample();
