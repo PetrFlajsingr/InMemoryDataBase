@@ -61,7 +61,9 @@ set(SOURCE_FILES Misc/Headers/DateTimeUtils.h Datasets/Fields/Headers/DateTimeFi
         DataWriters/Headers/BaseDataWriter.h DataWriters/Source/ArrayWriter.cpp
         DataWriters/Headers/ArrayWriter.h Datasets/Headers/SortStructures.h Misc/Headers/Logger.h cedr.cpp)
 
-set(TEST_SOURCE_FILES RelationLayer/Source/RelationBuilder.cpp RelationLayer/Source/RelationManager.cpp
+set(TEST_SOURCE_FILES
+        DataProviders/Source/DataProviderIterator.cpp DataProviders/Headers/DataProviderIterator.h
+        RelationLayer/Source/RelationBuilder.cpp RelationLayer/Source/RelationManager.cpp
         RelationLayer/Headers/RelationBuilder.h RelationLayer/Headers/RelationManager.h
         RelationLayer/Headers/Relation.h RelationLayer/Source/Relation.cpp DataProviders/tests/tests_XlsReader.cpp
         DataProviders/Headers/XlsReader.h DataProviders/Source/XlsReader.cpp Misc/Headers/DateTimeUtils.h

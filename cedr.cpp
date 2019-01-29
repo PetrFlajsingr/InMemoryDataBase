@@ -68,6 +68,7 @@ const std::string QUERY_AGR = "SELECT main.idPrijemce, SUM(main.castkaCerpana), 
 
 const std::string QUERY_AGR_2017 = QUERY_AGR + " WHERE main.rozpoctoveObdobi = 2017";
 
+
 void printMemoryUsageMacOS() {
   return;
   vm_size_t page_size;
@@ -223,7 +224,8 @@ void dominikKontrola() {
 int main(int argc, char **argv) {
   for (auto i = 0; i < 1; ++i) {
     Logger::startTime();
-    checkDupl();
+    //iterExample();
+    //checkDupl();
     //dominikKontrola();
     //countIntersection();
     Logger::endTime();

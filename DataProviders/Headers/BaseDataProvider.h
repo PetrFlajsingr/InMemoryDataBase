@@ -9,11 +9,68 @@
 #include <vector>
 
 namespace DataProviders {
+
 /**
  * Jednoduche rozhrani pro cteni a pohyb v zaznamech
  */
 class BaseDataProvider {
  public:
+  /**
+   * Iterator pro velmi snadnou iteraci zaznamy za pouziti for each konstrukce.
+   */
+  class iterator : public std::iterator<std::input_iterator_tag,
+                                        std::vector<std::string>> {
+   private:
+    BaseDataProvider *provider;
+
+   public:
+    explicit iterator(BaseDataProvider *provider)
+        : provider(provider) {}
+
+    /**
+     * Posun na dalsi zaznam.
+     * @return
+     */
+    iterator &operator++() {
+      provider->next();
+      return *this;
+    }
+
+    /**
+     * Posun na dalsi zaznam
+     * @return
+     */
+    const iterator operator++(int) {
+      iterator result = *this;
+      ++(*this);
+      return result;
+    }
+
+    /**
+     * Zneuziti porovnani begin() == end() pro kontrolu eof()
+     * @return
+     */
+    bool operator==(iterator) const {
+      return provider->eof();
+    }
+
+    /**
+     * Zneuziti porovnani begin() == end() pro kontrolu eof()
+     * @return
+     */
+    bool operator!=(iterator other) const {
+      return !(*this == other);
+    }
+
+    /**
+     * Dereference na aktualni zaznam
+     * @return
+     */
+    std::vector<std::string> operator*() const {
+      return provider->getRow();
+    }
+  };
+
   /**
    * Zaznam rozdeleny na sloupce
    * @return
@@ -73,8 +130,17 @@ class BaseDataProvider {
    */
   inline virtual bool eof() = 0;
 
+  iterator begin() {
+    return iterator(this);
+  }
+
+  iterator end() {
+    return iterator(this);
+  }
+
   virtual ~BaseDataProvider() = default;
 };
+
 }  // namespace DataProviders
 
 #endif //  DATAPROVIDERS_HEADERS_BASEDATAPROVIDER_H_
