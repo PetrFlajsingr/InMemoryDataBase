@@ -493,6 +493,7 @@ bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
         currentRecord = (min + max) >> 1;
         setFieldValues(currentRecord, true);
         break;
+      default:throw IllegalStateException("Internal error DataSets::MemoryDataSet::findFirst");
     }
     if (max - min < 2) {
       if (breakLoop) {
@@ -505,7 +506,7 @@ bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
     int8_t comparisonResult;
     switch (field->getFieldType()) {
       case StringValue:
-        comparisonResult = std::strcmp(
+        comparisonResult = Utilities::compareString(
             field->getAsString().c_str(),
             item.searchData[0]._string);
         break;
@@ -539,8 +540,19 @@ bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
   }
   return false;
 }
+
 std::vector<DataSets::BaseField *> DataSets::MemoryDataSet::getFields() {
   return fields;
+}
+
+std::vector<std::string> DataSets::MemoryDataSet::getFieldNames() {
+  std::vector<std::string> result;
+
+  for (const auto &field : fields) {
+    result.push_back(field->getFieldName());
+  }
+
+  return result;
 }
 
 #pragma clang diagnostic pop

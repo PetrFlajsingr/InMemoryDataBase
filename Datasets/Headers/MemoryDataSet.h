@@ -30,13 +30,48 @@ typedef std::vector<DataContainer *> DataSetRowCells;
  * Struktura pro jeden zaznam v data setu.
  */
 struct DataSetRow {
-  bool valid;
-  DataSetRowCells *cells;
+  bool valid;  //< true pokud vyhovuje filtru/neni filtrovat, jinak false
+  DataSetRowCells *cells;  //< data v pameti
 };
 
 typedef std::vector<DataSetRow *> DataSetData;
 /**
  * Dataset ukladajici data primo v operacni pameti.
+ *
+ *
+ * Ukazka pouziti:
+    auto dataSet = new DataSets::MemoryDataSet("dataSetName");
+    dataSet->setDataProvider(dataProvider);
+    dataSet->setFieldTypes({ValueType::IntegerValue, ValueType::CurrencyValue});
+    dataSet->open();
+
+    auto fieldID = dynamic_cast<DataSets::IntegerField *>(dataSet->fieldByName("ID"));
+    auto fieldWage = dynamic_cast<DataSets::CurrencyField *>(dataSet->fieldByName("wage"));
+
+    DataSets::SortOptions sortOptions;
+    sortOptions.addOption(fieldID->getIndex(), SortOrder::Ascending);
+    sortOptions.addOption(fieldWage->getIndex(), SortOrder::Descending);
+    dataSet->sort(sortOptions);
+
+    DataSets::FilterOptions filterOptions;
+    filterOptions.addOption(fieldID->getIndex(),
+                            ValueType::IntegerValue,
+                            {{._integer=10}},
+                            DataSets::FilterOption::EQUALS);
+    dataSet->filter(filterOptions);
+
+    while (dataSet->eof()) {
+      auto id = fieldID->getAsInteger();
+      auto wage = fieldWage->getAsCurrency();
+
+      auto newWage = wage + dec::decimal_cast<2>(10);
+      fieldWage->setAsCurrency(newWage);
+
+      dataSet->next();
+    }
+
+    dataSet->close();
+    delete dataSet;
  */
 class MemoryDataSet : public BaseDataSet {
  private:
@@ -88,7 +123,7 @@ class MemoryDataSet : public BaseDataSet {
   void setData(void *data, uint64_t index, ValueType type) override;
 
  public:
-  MemoryDataSet(const std::string &dataSetName);
+  explicit MemoryDataSet(const std::string &dataSetName);
 
   ~MemoryDataSet() override;
 
@@ -108,17 +143,8 @@ class MemoryDataSet : public BaseDataSet {
 
   void previous() override;
 
-  /**
-   * Serazeni hodnot datasetu podle zadanych klicu.
-   * Poradi klicu urcuje jejich prioritu.
-   * @param options
-   */
   void sort(SortOptions &options) override;
 
-  /**
-   * Vyhledani zaznamu podle zadanych klicu
-   * @param options
-   */
   void filter(const FilterOptions &options) override;
 
   BaseField *fieldByName(const std::string &name) override;
@@ -129,23 +155,13 @@ class MemoryDataSet : public BaseDataSet {
 
   bool eof() override;
 
-  std::vector<std::string> getFieldNames() override {
-    std::vector<std::string> result;
-
-    for (const auto &field : fields) {
-      result.push_back(field->getFieldName());
-    }
-
-    return result;
-  }
+  std::vector<std::string> getFieldNames() override;
 
   void setFieldTypes(std::vector<ValueType> types) override;
 
-  void setFieldTypes(std::vector<std::string> fieldNames, std::vector<ValueType> types) override;
+  void setFieldTypes(std::vector<std::string> fieldNames,
+                     std::vector<ValueType> types) override;
 
-  /**
-   * Pridani prazdneho zaznamu na konec data setu.
-   */
   void append() override;
 
   virtual void appendDataProvider(DataProviders::BaseDataProvider *provider);

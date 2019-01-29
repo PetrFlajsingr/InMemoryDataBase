@@ -9,7 +9,9 @@
 #include <string>
 #include "Types.h"
 
-//TODO: predelat tak, aby podporoval double, integer, currency...
+// TODO: predelat tak, aby podporoval double, integer, currency...
+// TODO: predelat pro prehlednost - vytvorit DataContainer for FilterOptions uvnitr automaticky
+//  - pretizena funkce pro vsechny mozne hodnoty?
 namespace DataSets {
 enum FilterOption {
   EQUALS,
