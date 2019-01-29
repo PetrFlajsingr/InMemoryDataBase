@@ -13,8 +13,14 @@ class DateTime;
  */
 enum ValueType { NoneValue, IntegerValue, DoubleValue, StringValue, CurrencyValue, DateTimeValue };
 
+/**
+ * Poradi pro razeni
+ */
 enum SortOrder { Ascending, Descending };
 
+/**
+ * Mena reprezentovana jako fixed point hodnota se dvemi desetinnymi misty
+ */
 typedef dec::decimal<2> Currency;
 
 /**

@@ -36,7 +36,7 @@ class DateTime {
    *
    * @param mode Urcuje typ ukladane hodnoty
    */
-  DateTime(DateTimeMode mode) : mode(mode) {}
+  explicit DateTime(DateTimeMode mode) : mode(mode) {}
 
   /**
    * Prevod ze string ve formatu YYYY-MM-DD HH-MM-SS
@@ -193,6 +193,8 @@ class DateTime {
     return os;
   }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wconversion"
   friend std::istream &operator>>(std::istream &is, DateTime &dateTime) {
     std::string temp;
 
@@ -215,6 +217,7 @@ class DateTime {
 
     return is;
   }
+#pragma clang diagnostic pop
 };
 
 #endif //CSV_READER_DATETIMEUTILS_H

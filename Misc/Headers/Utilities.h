@@ -84,16 +84,52 @@ class Utilities {
    */
   static bool endsWith(std::string const &value, std::string const &ending);
 
+  /**
+   * Zkopirovani std::string do nove alokovane char*.
+   * Vyuziva strdup()
+   * @param str string pro zkopirovani
+   * @return nove alokovany char* obsahujici str.data()
+   */
   static char *copyStringToNewChar(const std::string &str);
 
+  /**
+   * Srovnani integer hodnot
+   * @param a
+   * @param b
+   * @return -1 pokud a < b, 0 pokud a == b, 1 pokud a > b
+   */
   static int8_t compareInt(int a, int b);
 
+  /**
+   * Srovnani double hodnot
+   * @param a
+   * @param b
+   * @return -1 pokud a < b, 0 pokud a == b, 1 pokud a > b
+   */
   static int8_t compareDouble(double a, double b);
 
+  /**
+   * Srovnani Currency hodnot
+   * @param a
+   * @param b
+   * @return -1 pokud a < b, 0 pokud a == b, 1 pokud a > b
+   */
   static int8_t compareCurrency(Currency &a, Currency &b);
 
+  /**
+   * Srovnani string hodnot
+   * @param a
+   * @param b
+   * @return -1 pokud a < b, 0 pokud a == b, 1 pokud a > b
+   */
   static int8_t compareString(std::string a, std::string b);
 
+  /**
+   * Srovnani DateTime hodnot
+   * @param a
+   * @param b
+   * @return -1 pokud a < b, 0 pokud a == b, 1 pokud a > b
+   */
   static int8_t compareDateTime(const DateTime &a, const DateTime &b);
 };
 
