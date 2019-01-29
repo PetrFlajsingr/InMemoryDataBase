@@ -28,25 +28,46 @@ class BaseDataWriter {
    private:
     BaseDataWriter *dataWriter;
    public:
+    /**
+     * Vytvoreni iteratoru pro dany data writer
+     * @param dataWriter vystup nad kterym se iteruje
+     */
     explicit iterator(BaseDataWriter *dataWriter) : dataWriter(dataWriter) {}
 
     iterator(const iterator &other) {
       dataWriter = other.dataWriter;
     }
 
+    /**
+     * Zapis data z vector
+     * @param rhs
+     * @return
+     */
     iterator &operator=(const std::vector<std::string> &rhs) {
       dataWriter->writeRecord(rhs);
       return *this;
     }
 
+    /**
+     * Nebylo nutne implementovat jinak
+     * @return
+     */
     iterator &operator*() {
       return *this;
     }
 
+    /**
+     * Nebylo nutne implementovat jinak
+     * @return
+     */
     iterator &operator++() {
       return *this;
     }
 
+    /**
+     * Nebylo nutne implementovat jinak
+     * @return
+     */
     const iterator operator++(int) {
       return *this;
     }
