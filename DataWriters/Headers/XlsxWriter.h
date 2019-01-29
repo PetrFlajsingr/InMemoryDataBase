@@ -14,7 +14,7 @@ class XlsxWriter : public BaseDataWriter {
   xlsxiowriter xlsxWriterHandle;
 
  public:
-  XlsxWriter(const std::string &fileName, const std::string &sheetName);
+  XlsxWriter(const std::string &fileName, const std::string &sheetName = "");
 
   ~XlsxWriter() override;
 

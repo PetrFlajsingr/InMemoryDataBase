@@ -15,6 +15,7 @@
 
 #include <set>
 #include <unordered_set>
+#include <XlsxWriter.h>
 
 const std::string csvPath = "/Users/petr/Desktop/csvs/";
 const std::string outPath = csvPath + "out/";
@@ -494,8 +495,43 @@ void demoDataProvider() {
   delete dataProvider;
 }
 
+void demoDataWriters() {
+  auto dataProvider = new DataProviders::CsvReader("path.csv", ",");
 
+  auto pathToFile = "path_to_file.xlsx";
+  // otevre soubor pro cteni - v tomto pripade xlsx, mame CsvWriter, ArraWriter, lze udelat dalsi vytvorenim
+  // potomka z BaseDataWriter
+  auto dataWriter = new DataWriters::XlsxWriter(pathToFile);
 
+  // zapis hlavicky
+  dataWriter->writeHeader(dataProvider->getHeader());
+
+  // pro demonstraci precteni kazdeho druheho radku z data provider
+  int cnt = 0;
+  while (!dataProvider->eof()) {
+    if (cnt & 0b1) {
+      dataWriter->writeRecord(dataProvider->getRow());
+    }
+    cnt++;
+
+    dataProvider->next();
+  }
+
+  delete dataWriter;
+  delete dataProvider;
+}
+
+void demologger() {
+  Logger::log(Status, "Starting demoLogger()", /*vypis casu*/ true);
+  Logger::startTime();  //< ulozeni pocatecniho casu
+
+  Logger::log(Debug, "Debug print");
+  /*
+   * ... nejaka prace ...
+   */
+  Logger::endTime();  //< ulozeni konecneho casu
+  Logger::printElapsedTime();  //< vypis rozdilu endTime a startTime
+}
 
 
 
