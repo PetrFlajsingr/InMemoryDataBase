@@ -351,7 +351,7 @@ int main(int argc, char **argv) {
   Logger::log(Debug, "Add datasets to data worker", true);
   printMemoryUsageMacOS();
 
-  auto dataWriter = new CsvWriter(outPath + "all.csv", ",");
+  auto dataWriter = new DataWriters::CsvWriter(outPath + "all.csv", ",");
   std::string query = QUERY;
   dataWorker->writeResult(*dataWriter,
                           query);
@@ -360,7 +360,7 @@ int main(int argc, char **argv) {
   printMemoryUsageMacOS();
 
   delete dataWriter;
-  dataWriter = new CsvWriter(outPath + "all_agr.csv", ",");
+  dataWriter = new DataWriters::CsvWriter(outPath + "all_agr.csv", ",");
   query = QUERY_AGR;
   dataWorker->writeResult(*dataWriter,
                           query);
@@ -368,7 +368,7 @@ int main(int argc, char **argv) {
   printMemoryUsageMacOS();
   delete dataWriter;
 
-  dataWriter = new CsvWriter(outPath + "2017.csv", ",");
+  dataWriter = new DataWriters::CsvWriter(outPath + "2017.csv", ",");
   query = QUERY_2017;
   dataWorker->writeResult(*dataWriter,
                           query);
@@ -376,7 +376,7 @@ int main(int argc, char **argv) {
   printMemoryUsageMacOS();
   delete dataWriter;
 
-  dataWriter = new CsvWriter(outPath + "2017_agr.csv", ",");
+  dataWriter = new DataWriters::CsvWriter(outPath + "2017_agr.csv", ",");
   query = QUERY_AGR_2017;
   dataWorker->writeResult(*dataWriter,
                           query);

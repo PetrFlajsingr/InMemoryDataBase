@@ -8,6 +8,7 @@
 #include "BaseDataWriter.h"
 #include <xlsxio_write.h>
 
+namespace DataWriters {
 class XlsxWriter : public BaseDataWriter {
  private:
   xlsxiowriter xlsxWriterHandle;
@@ -15,10 +16,12 @@ class XlsxWriter : public BaseDataWriter {
  public:
   XlsxWriter(std::string &fileName, std::string &sheetName);
 
-  virtual ~XlsxWriter();
+  ~XlsxWriter() override;
 
   void writeHeader(const std::vector<std::string> &header) override;
   void writeRecord(const std::vector<std::string> &record) override;
 };
+
+}  // namespace DataWriters
 
 #endif //CSV_READER_XLSXWRITER_H

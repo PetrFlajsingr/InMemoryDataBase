@@ -54,7 +54,7 @@ DataWorkers::MemoryDataWorker::MemoryDataWorker(
   dataset->open();
 }
 
-void DataWorkers::MemoryDataWorker::writeResult(BaseDataWriter &writer,
+void DataWorkers::MemoryDataWorker::writeResult(DataWriters::BaseDataWriter &writer,
                                                 std::string &sql) {
   queryData = SQLParser::parse(sql);
 
@@ -223,7 +223,7 @@ void DataWorkers::MemoryDataWorker::writeResult(BaseDataWriter &writer,
   }
 }
 
-void DataWorkers::MemoryDataWorker::writeHeaders(BaseDataWriter &writer) {
+void DataWorkers::MemoryDataWorker::writeHeaders(DataWriters::BaseDataWriter &writer) {
   std::vector<std::string> header;
 
   std::transform(queryData.projections.begin(),

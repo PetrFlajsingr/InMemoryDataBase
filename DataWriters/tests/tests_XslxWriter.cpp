@@ -7,7 +7,7 @@
 
 class XlsxWriter_tests : public ::testing::Test {
  protected:
-  XlsxWriter *writer;
+  DataWriters::XlsxWriter *writer;
   std::string path = "../DataWriters/tests/out/test.xlsx";
   std::string sheetName = "test";
 
@@ -15,7 +15,7 @@ class XlsxWriter_tests : public ::testing::Test {
   XlsxWriter_tests() = default;
 
   void SetUp() override {
-    writer = new XlsxWriter(path, sheetName);
+    writer = new DataWriters::XlsxWriter(path, sheetName);
   }
 
   void TearDown() override {

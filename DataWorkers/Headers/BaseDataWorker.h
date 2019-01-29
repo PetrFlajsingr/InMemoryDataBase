@@ -37,8 +37,8 @@ class BaseDataWorker {
 
   virtual std::vector<std::string> getChoices(std::string choiceName) = 0;
 
-  virtual void writeResult(BaseDataWriter& writer,
-      std::string &sql) = 0;
+  virtual void writeResult(DataWriters::BaseDataWriter &writer,
+                           std::string &sql) = 0;
 
   void setColumnChoices(std::vector<std::string> &data) {
     columnChoices = data;

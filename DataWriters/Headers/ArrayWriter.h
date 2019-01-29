@@ -6,6 +6,9 @@
 #define CSV_READER_ARRAYWRITER_H
 
 #include <BaseDataWriter.h>
+
+namespace DataWriters {
+
 class ArrayWriter : public BaseDataWriter {
  public:
   std::vector<std::vector<std::string>> *result;
@@ -13,7 +16,14 @@ class ArrayWriter : public BaseDataWriter {
   void writeHeader(const std::vector<std::string> &header) override;
   void writeRecord(const std::vector<std::string> &record) override;
 
+  /**
+   * Vytiskne obsah zapsanych dat na stdout.
+   */
   void print();
+
+  std::vector<std::vector<std::string>> *getArray();
 };
+
+}  // namespace DataWriters
 
 #endif //CSV_READER_ARRAYWRITER_H

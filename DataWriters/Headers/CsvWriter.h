@@ -9,6 +9,8 @@
 #include <fstream>
 #include "BaseDataWriter.h"
 
+namespace DataWriters {
+
 class CsvWriter : public BaseDataWriter {
  private:
   std::ofstream *outputStream;
@@ -19,13 +21,15 @@ class CsvWriter : public BaseDataWriter {
 
   void writeRow(const std::vector<std::string> &data);
  public:
-  CsvWriter(std::string filePath, std::string delimiter = ";");
+  explicit CsvWriter(std::string filePath, std::string delimiter = ";");
 
-  virtual ~CsvWriter();
+  ~CsvWriter() override;
 
   void writeHeader(const std::vector<std::string> &header) override;
 
   void writeRecord(const std::vector<std::string> &record) override;
 };
+
+}  // namespace DataWriters
 
 #endif  //DATAWRITERS_HEADERS_CSVWRITER_H_

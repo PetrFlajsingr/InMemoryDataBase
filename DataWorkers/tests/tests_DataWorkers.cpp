@@ -166,7 +166,7 @@ TEST_F(DataWorker_tests, basicDistinct) {
 
   std::string sql = "SELECT main.0 FROM main";
 
-  ArrayWriter writer;
+  DataWriters::ArrayWriter writer;
   writer.result = new std::vector<std::vector<std::string>>();
 
   worker->writeResult(writer, sql);
@@ -187,7 +187,7 @@ TEST_F(DataWorker_tests, advancedDinstinct) {
 
   std::string sql = "SELECT main.0, main.1, SUM(main.2), SUM(main.3), SUM(main.4), SUM(main.5) FROM main";
 
-  ArrayWriter writer;
+  DataWriters::ArrayWriter writer;
   writer.result = new std::vector<std::vector<std::string>>();
 
   worker->writeResult(writer, sql);
@@ -207,7 +207,7 @@ TEST_F(DataWorker_tests, basicSum) {
 
   std::string sql = "SELECT main.0, SUM(main.1) FROM main";
 
-  ArrayWriter writer;
+  DataWriters::ArrayWriter writer;
   writer.result = new std::vector<std::vector<std::string>>();
 
   worker->writeResult(writer, sql);
@@ -229,7 +229,7 @@ TEST_F(DataWorker_tests, advancedSum) {
 
   std::string sql = "SELECT main.0, main.1, SUM(main.2), SUM(main.3), SUM(main.4), SUM(main.5) FROM main";
 
-  ArrayWriter writer;
+  DataWriters::ArrayWriter writer;
   writer.result = new std::vector<std::vector<std::string>>();
 
   worker->writeResult(writer, sql);
@@ -251,7 +251,7 @@ TEST_F(DataWorker_tests, basicAverage) {
 
   std::string sql = "SELECT main.0, AVG(main.2) FROM main";
 
-  ArrayWriter writer;
+  DataWriters::ArrayWriter writer;
   writer.result = new std::vector<std::vector<std::string>>();
 
   worker->writeResult(writer, sql);
@@ -272,7 +272,7 @@ TEST_F(DataWorker_tests, selection) {
 
   std::string sql = "SELECT main.0, AVG(main.2) FROM main WHERE main.0 = prvni | druhy";
 
-  ArrayWriter writer;
+  DataWriters::ArrayWriter writer;
   writer.result = new std::vector<std::vector<std::string>>();
 
   worker->writeResult(writer, sql);
@@ -294,7 +294,7 @@ TEST_F(DataWorker_tests, mix) {
 
     auto joinProvider = new DataProviders::ArrayDataProvider(joinTest);
 
-    ArrayWriter writer;
+  DataWriters::ArrayWriter writer;
     writer.result = new std::vector<std::vector<std::string>>();
 
     worker->writeResult(writer, sql);
@@ -322,7 +322,7 @@ TEST_F(DataWorker_tests, join) {
 
   worker->addDataSet(joinDataSet);
 
-  ArrayWriter writer;
+  DataWriters::ArrayWriter writer;
   writer.result = new std::vector<std::vector<std::string>>();
 
   worker->writeResult(writer, sql);

@@ -71,7 +71,7 @@ class MemoryDataWorker : public BaseDataWorker {
     std::vector<DataSets::BaseField*> projectFields;
   };
 
-  void writeHeaders(BaseDataWriter &writer);
+  void writeHeaders(DataWriters::BaseDataWriter &writer);
 
   void filterDataSet();
 
@@ -86,7 +86,7 @@ class MemoryDataWorker : public BaseDataWorker {
 
   std::vector<std::string> getChoices(std::string choiceName) override;
 
-  void writeResult(BaseDataWriter &writer, std::string &sql) override;
+  void writeResult(DataWriters::BaseDataWriter &writer, std::string &sql) override;
 };
 }  // namespace DataWorkers
 
