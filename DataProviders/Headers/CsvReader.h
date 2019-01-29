@@ -16,6 +16,9 @@ namespace DataProviders {
  * Trida implementujici metody IReader.
  * Slouzi ke cteni CSV formatu sekvencne ze souboru.
  *
+ * Podporuje libovolny delimiter, predpoklada \n nebo \r\n pro konec zaznamu.
+ * Podporuje uvozovky " pro pouziti delimiteru v v zaznamu.
+ *
  * Ukazka pouziti:
     auto csvReader = new DataProviders::CsvReader(PATH_TO_FILE, DELIMITER);
 
@@ -116,6 +119,10 @@ class CsvReader : public BaseDataProvider {
 
   bool eof() override;
 
+  /**
+   * Nataveni delimiteru pro rozdelovani csv souboru
+   * @param delimiter
+   */
   void setDelimiter(char delimiter);
 };
 }  // namespace DataProviders

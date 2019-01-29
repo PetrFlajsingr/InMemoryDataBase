@@ -31,9 +31,6 @@ class ArrayDataProvider : public BaseDataProvider {
 
   ~ArrayDataProvider() override = default;
 
-  /**
-   * @return Momentalni pozice v datech
-   */
   std::vector<std::string> getRow() override {
     std::vector<std::string> result;
 

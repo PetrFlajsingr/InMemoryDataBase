@@ -10,21 +10,30 @@
 
 namespace DataProviders {
 
+/**
+ * Trida pro cteni dat z xlsx souboru.
+ *
+ * Podporuje pouze cteni jako string.
+ */
 class XlsReader : BaseDataProvider {
  private:
-  xlsxioreader xlsxioReader;
+  xlsxioreader xlsxioReader;  //< Handle na xlsxio reader
 
-  xlsxioreadersheet xlsxioSheet;
+  xlsxioreadersheet xlsxioSheet;  //< Handle na sheet (pouziva se pouze prvni)
 
-  std::vector<std::string> currentRecord;
+  std::vector<std::string> currentRecord;  //< Posledni rpecteny zaznam
 
-  std::vector<std::string> header;
+  std::vector<std::string> header;  //< Nazvy sloupcu
 
   uint64_t currentRecordNumber = 0;
 
   bool _eof = false;
 
  public:
+  /**
+   * Otevri xlsx soubor fileName pro cteni
+   * @param fileName
+   */
   XlsReader(const std::string &fileName);
 
   virtual ~XlsReader();
