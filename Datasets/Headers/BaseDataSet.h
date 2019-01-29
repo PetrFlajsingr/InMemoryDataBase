@@ -51,7 +51,106 @@ class BaseDataSet {
   virtual void setData(void *data, uint64_t index, ValueType type) = 0;
 
  public:
-  explicit BaseDataSet(const std::string &dataSetName) : dataSetName(dataSetName) {};
+  class iterator : public std::iterator<std::random_access_iterator_tag, void> {
+   private:
+    BaseDataSet *dataSet;
+
+   public:
+    iterator() = default;
+
+    explicit iterator(BaseDataSet *dataSet) : dataSet(dataSet) {}
+
+    iterator(const iterator &other) {
+      dataSet = other.dataSet;
+    }
+
+    iterator &operator=(const std::vector<std::string> &rhs) {
+      // TODO dataSet->writeRecord(rhs);
+      return *this;
+    }
+
+    iterator &operator++() {
+      // TODO provider->next();
+      return *this;
+    }
+
+    const iterator operator++(int) {
+      iterator result = *this;
+      ++(*this);
+      return result;
+    }
+
+    bool operator==(iterator &rhs) {
+      // TODO
+      return true;
+    }
+
+    bool operator!=(iterator &other) {
+      return !(*this == other);
+    }
+
+    iterator &operator*() {
+      return *this;
+    }
+
+    iterator operator*(int) {
+      // TODO
+    }
+
+    iterator &operator--() {
+      // TODO provider->next();
+      return *this;
+    }
+
+    const iterator operator--(int) {
+      iterator result = *this;
+      --(*this);
+      return result;
+    }
+
+    iterator operator+(const int rhs) {
+      // TODO n + a vs a + n
+    }
+
+    iterator operator-(const int rhs) {
+      // TODO
+    }
+
+    iterator operator-(const iterator &rhs) {
+      // TODO
+    }
+
+    iterator operator<(const iterator &rhs) {
+      // TODO
+    }
+
+    iterator operator>(const iterator &rhs) {
+      // TODO
+    }
+
+    iterator operator<=(const iterator &rhs) {
+      // TODO
+    }
+
+    iterator operator>=(const iterator &rhs) {
+      // TODO
+    }
+
+    iterator operator+=(const int rhs) {
+      // TODO
+    }
+
+    iterator operator-=(const int rhs) {
+      // TODO
+    }
+
+    void operator[](const int index) {
+      // TODO
+    }
+
+  };
+  explicit BaseDataSet(const std::string &dataSetName)
+      : dataSetName(dataSetName) {};
 
   /**
    * Nacteni dat datasetu z IDataProvider
@@ -133,7 +232,8 @@ class BaseDataSet {
    * @param fieldNames nazvy sloupcu
    * @param types datove typy v jednotlivych sloupcich
    */
-  virtual void setFieldTypes(std::vector<std::string> fieldNames, std::vector<ValueType> types) = 0;
+  virtual void setFieldTypes(std::vector<std::string> fieldNames,
+                             std::vector<ValueType> types) = 0;
 
   /**
    * Nazvy vsech sloupcu v datasetu
@@ -158,7 +258,7 @@ class BaseDataSet {
    *
    * @param options
    */
-  virtual void sort(SortOptions &options)=0;
+  virtual void sort(SortOptions &options) = 0;
 
   /**
    * Filtruje data podle dodaneho nastaveni.
@@ -166,7 +266,7 @@ class BaseDataSet {
    *
    * @param options
    */
-  virtual void filter(const FilterOptions &options)=0;
+  virtual void filter(const FilterOptions &options) = 0;
 
   /**
    * Najde prvni zaznam odpovidajici zadane polozce.
@@ -176,7 +276,7 @@ class BaseDataSet {
    * @param item polozka, ktera se ma vyhledam
    * @return true pokud byl zazna nalezen, jinak false
    */
-  virtual bool findFirst(FilterItem &item)=0;
+  virtual bool findFirst(FilterItem &item) = 0;
 
   std::string getName() {
     return dataSetName;

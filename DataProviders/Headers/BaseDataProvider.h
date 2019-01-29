@@ -27,6 +27,10 @@ class BaseDataProvider {
     explicit iterator(BaseDataProvider *provider)
         : provider(provider) {}
 
+    iterator(const iterator &other) {
+      provider = other.provider;
+    }
+
     /**
      * Posun na dalsi zaznam.
      * @return
@@ -50,7 +54,7 @@ class BaseDataProvider {
      * Zneuziti porovnani begin() == end() pro kontrolu eof()
      * @return
      */
-    bool operator==(iterator) const {
+    bool operator==(const iterator &) const {
       return provider->eof();
     }
 
@@ -58,7 +62,7 @@ class BaseDataProvider {
      * Zneuziti porovnani begin() == end() pro kontrolu eof()
      * @return
      */
-    bool operator!=(iterator other) const {
+    bool operator!=(const iterator &other) const {
       return !(*this == other);
     }
 
