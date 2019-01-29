@@ -26,7 +26,7 @@ class BaseDataSet {
 
   std::string dataSetName;
 
-  uint32_t columnCount;
+  uint32_t columnCount = 0;
 
   /**
    * Nastaveni dat pole.
@@ -119,11 +119,17 @@ class BaseDataSet {
 
   /**
    * Nastaveni typu Fields.
-   * Vytvori objekty IFields.
+   * Vytvori objekty BaseField.
    * @param types
    */
   virtual void setFieldTypes(std::vector<ValueType> types) = 0;
 
+  /**
+   * Nastaveni typu Field a jejich nazvu.
+   * Pouzito pro otevreni data setu bez data provider
+   * @param fieldNames nazvy sloupcu
+   * @param types datove typy v jednotlivych sloupcich
+   */
   virtual void setFieldTypes(std::vector<std::string> fieldNames, std::vector<ValueType> types) = 0;
 
   /**
@@ -132,6 +138,10 @@ class BaseDataSet {
    */
   virtual std::vector<std::string> getFieldNames() = 0;
 
+  /**
+   *
+   * @return pocet sloupcu v data setu
+   */
   uint32_t getColumnCount();
 
   /**
@@ -139,10 +149,30 @@ class BaseDataSet {
    */
   virtual void append() = 0;
 
+  /**
+   * Seradi data set podle dodaneho nastaveni.
+   * Umoznuje razeni podle vice klicu - priorita podle poradi v options.
+   *
+   * @param options
+   */
   virtual void sort(SortOptions &options)=0;
 
+  /**
+   * Filtruje data podle dodaneho nastaveni.
+   * Lze filtrovat podle vice klicu i podle vice hodnot v ramci jednoho klice.
+   *
+   * @param options
+   */
   virtual void filter(const FilterOptions &options)=0;
 
+  /**
+   * Najde prvni zaznam odpovidajici zadane polozce.
+   * Predpoklada serazeni data setu podle sloupce, ve kterem se vyhledava.
+   * Nalezena hodnota je dostupna pres Fields v momentalnim zaznamu.
+   *
+   * @param item polozka, ktera se ma vyhledam
+   * @return true pokud byl zazna nalezen, jinak false
+   */
   virtual bool findFirst(FilterItem &item)=0;
 
   std::string getName() {
