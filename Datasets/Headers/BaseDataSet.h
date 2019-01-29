@@ -48,7 +48,7 @@ class BaseDataSet {
   virtual void setData(void *data, uint64_t index, ValueType type) = 0;
 
  public:
-  BaseDataSet(const std::string &dataSetName) : dataSetName(dataSetName) {};
+  explicit BaseDataSet(const std::string &dataSetName) : dataSetName(dataSetName) {};
 
   /**
    * Nacteni dat datasetu z IDataProvider
