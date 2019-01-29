@@ -13,6 +13,9 @@
 #include "FilterStructures.h"
 #include "SortStructures.h"
 
+// TODO: manager na data sety?
+// TODO: relace mezi data sety?
+
 namespace DataSets {
 class BaseField;
 /**

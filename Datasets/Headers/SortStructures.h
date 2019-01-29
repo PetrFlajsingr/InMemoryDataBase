@@ -11,8 +11,8 @@
 namespace DataSets {
 
 struct SortItem {
-  uint64_t fieldIndex;
-  SortOrder order;
+  uint64_t fieldIndex;  //< index field v data set
+  SortOrder order;  //< Ascending/Descending
 };
 
 struct SortOptions {
