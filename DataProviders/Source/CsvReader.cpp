@@ -82,6 +82,12 @@ std::vector<std::string> DataProviders::CsvReader::tokenize(std::string &line, i
   char buffer[BUFFER_SIZE];
   uint64_t bufferIter = 0;
   TokeniserStates state = Read;
+  /*
+   * Popis stavu:
+   *  - Read: Bezne cteni bunky, preruseno pri nalezeni delimiteru
+   *  - QuotMark1: Uvnitr uvozovek, vynechava delimiter
+   *  - QuatMark2: Pri nalezeni druhe uvozovky, kontroluje, jestli neni v zaznamu '""' reprezentujici uvozovku
+   */
 
   std::vector<std::string> result;
   result.reserve(vectorReserve);
