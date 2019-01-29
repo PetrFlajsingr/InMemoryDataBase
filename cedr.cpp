@@ -16,6 +16,7 @@
 #include <set>
 #include <unordered_set>
 #include <XlsxWriter.h>
+#include <array>
 
 const std::string csvPath = "/Users/petr/Desktop/csvs/";
 const std::string outPath = csvPath + "out/";
@@ -33,41 +34,43 @@ const std::string dotacniTitulCSVName = "dotaceTitul.csv";
 const std::string poskytovatelDotaceCSVName = "poskytovatelDotace.csv";
 
 const std::string
-    QUERY = "SELECT main.idDotace, main.projektKod, main.idPrijemce, main.projektNazev, main.iriOperacniProgram, "
-            "main.iriGrantoveSchema, main.idRozhodnuti, main.castkaCerpana, main.castkaUvolnena, "
-            "main.iriDotacniTitul, main.iriPoskytovatelDotace, main.rozpoctoveObdobi, "
-            "prijemce_subjekty.idPrijemce, prijemce_subjekty.ico, prijemce_subjekty.obchodniJmeno, "
-            "prijemce_subjekty.Id_GIS, prijemce_subjekty.Y, prijemce_subjekty.X, "
-            "operacniProgram.operacniProgramNazev, "
-            "grantoveSchema.grantoveSchemaNazev, "
-            "dotaceTitul.dotaceTitulNazev "
-            "poskytovatelDotace.dotacePoskytovatelNazev "
-            "FROM main "
-            "JOIN prijemce_subjekty ON main.idPrijemce = prijemce_subjekty.idPrijemce "
-            "LEFT JOIN operacniProgram ON main.iriOperacniProgram = operacniProgram.idOperacniProgram "
-            "LEFT JOIN grantoveSchema ON main.iriGrantoveSchema = grantoveSchema.idGrantoveSchema "
-            "LEFT JOIN dotaceTitul ON main.iriDotacniTitul = dotaceTitul.idDotaceTitul "
-            "LEFT JOIN poskytovatelDotace ON main.iriPoskytovatelDotace = poskytovatelDotace.id";
+    QUERY =
+    "SELECT main.idDotace, main.projektKod, main.idPrijemce, main.projektNazev, main.iriOperacniProgram, "
+    "main.iriGrantoveSchema, main.idRozhodnuti, main.castkaCerpana, main.castkaUvolnena, "
+    "main.iriDotacniTitul, main.iriPoskytovatelDotace, main.rozpoctoveObdobi, "
+    "prijemce_subjekty.idPrijemce, prijemce_subjekty.ico, prijemce_subjekty.obchodniJmeno, "
+    "prijemce_subjekty.Id_GIS, prijemce_subjekty.Y, prijemce_subjekty.X, "
+    "operacniProgram.operacniProgramNazev, "
+    "grantoveSchema.grantoveSchemaNazev, "
+    "dotaceTitul.dotaceTitulNazev "
+    "poskytovatelDotace.dotacePoskytovatelNazev "
+    "FROM main "
+    "JOIN prijemce_subjekty ON main.idPrijemce = prijemce_subjekty.idPrijemce "
+    "LEFT JOIN operacniProgram ON main.iriOperacniProgram = operacniProgram.idOperacniProgram "
+    "LEFT JOIN grantoveSchema ON main.iriGrantoveSchema = grantoveSchema.idGrantoveSchema "
+    "LEFT JOIN dotaceTitul ON main.iriDotacniTitul = dotaceTitul.idDotaceTitul "
+    "LEFT JOIN poskytovatelDotace ON main.iriPoskytovatelDotace = poskytovatelDotace.id";
 
 const std::string QUERY_2017 = QUERY + " WHERE main.rozpoctoveObdobi = 2017";
 
-const std::string QUERY_AGR = "SELECT main.idPrijemce, SUM(main.castkaCerpana), SUM(main.castkaUvolnena), "
-                              "main.rozpoctoveObdobi, "
-                              "prijemce_subjekty.idPrijemce, prijemce_subjekty.ico, prijemce_subjekty.obchodniJmeno, "
-                              "prijemce_subjekty.Id_GIS, prijemce_subjekty.Y, prijemce_subjekty.X "
-                              //"operacniProgram.operacniProgramNazev, "
-                              //"grantoveSchema.grantoveSchemaNazev, "
-                              //"dotaceTitul.dotaceTitulNazev, "
-                              //"poskytovatelDotace.dotacePoskytovatelNazev "
-                              "FROM main "
-                              "JOIN prijemce_subjekty ON main.idPrijemce = prijemce_subjekty.idPrijemce";
+const std::string QUERY_AGR =
+    "SELECT main.idPrijemce, SUM(main.castkaCerpana), SUM(main.castkaUvolnena), "
+    "main.rozpoctoveObdobi, "
+    "prijemce_subjekty.idPrijemce, prijemce_subjekty.ico, prijemce_subjekty.obchodniJmeno, "
+    "prijemce_subjekty.Id_GIS, prijemce_subjekty.Y, prijemce_subjekty.X "
+    //"operacniProgram.operacniProgramNazev, "
+    //"grantoveSchema.grantoveSchemaNazev, "
+    //"dotaceTitul.dotaceTitulNazev, "
+    //"poskytovatelDotace.dotacePoskytovatelNazev "
+    "FROM main "
+    "JOIN prijemce_subjekty ON main.idPrijemce = prijemce_subjekty.idPrijemce";
 //"LEFT JOIN operacniProgram ON main.iriOperacniProgram = operacniProgram.idOperacniProgram "
 //"LEFT JOIN grantoveSchema ON main.iriGrantoveSchema = grantoveSchema.idGrantoveSchema "
 //"LEFT JOIN dotaceTitul ON main.iriDotacniTitul = dotaceTitul.idDotaceTitul "
 //"LEFT JOIN poskytovatelDotace ON main.iriPoskytovatelDotace = poskytovatelDotace.id";
 
-const std::string QUERY_AGR_2017 = QUERY_AGR + " WHERE main.rozpoctoveObdobi = 2017";
-
+const std::string
+    QUERY_AGR_2017 = QUERY_AGR + " WHERE main.rozpoctoveObdobi = 2017";
 
 void printMemoryUsageMacOS() {
   return;
@@ -91,21 +94,26 @@ void printMemoryUsageMacOS() {
 }
 
 void countIntersection() {
-  auto prijemceProvider = new DataProviders::CsvReader(csvPath + "2017_no_filter.csv", ",");
-  auto subjektyProvider = new DataProviders::CsvReader(csvPath + subjektyCSVName, ";");
+  auto prijemceProvider =
+      new DataProviders::CsvReader(csvPath + "2017_no_filter.csv", ",");
+  auto subjektyProvider =
+      new DataProviders::CsvReader(csvPath + subjektyCSVName, ";");
 
   auto prijemceDataSet = new DataSets::MemoryDataSet("prijemce");
   prijemceDataSet->setDataProvider(prijemceProvider);
-  prijemceDataSet->setFieldTypes({StringValue, StringValue, StringValue, StringValue, StringValue, StringValue,
+  prijemceDataSet->setFieldTypes({StringValue, StringValue, StringValue,
+                                  StringValue, StringValue, StringValue,
                                   StringValue,
-                                  StringValue, StringValue, StringValue, StringValue, StringValue, IntegerValue,
+                                  StringValue, StringValue, StringValue,
+                                  StringValue, StringValue, IntegerValue,
                                   StringValue});
   prijemceDataSet->open();
   Logger::log(Debug, "Prijemce loaded", true);
 
   auto subjektyDataSet = new DataSets::MemoryDataSet("subjekty");
   subjektyDataSet->setDataProvider(subjektyProvider);
-  subjektyDataSet->setFieldTypes({IntegerValue, IntegerValue, IntegerValue, StringValue, StringValue, StringValue,
+  subjektyDataSet->setFieldTypes({IntegerValue, IntegerValue, IntegerValue,
+                                  StringValue, StringValue, StringValue,
                                   StringValue,
                                   StringValue, StringValue});
   subjektyDataSet->open();
@@ -116,20 +124,25 @@ void countIntersection() {
   prijemceDataSet->sort(options);
 
   DataSets::SortOptions options2;
-  options2.addOption(subjektyDataSet->fieldByName("IČO_num")->getIndex(), Ascending);
+  options2.addOption(subjektyDataSet->fieldByName("IČO_num")->getIndex(),
+                     Ascending);
   subjektyDataSet->sort(options2);
 
   Logger::log(Debug, "Sorted", true);
 
-  auto fieldPrijemce = dynamic_cast<DataSets::IntegerField *>(prijemceDataSet->fieldByName("ico"));
-  auto fieldSubjekty = dynamic_cast<DataSets::IntegerField *>(subjektyDataSet->fieldByName("IČO_num"));
+  auto fieldPrijemce =
+      dynamic_cast<DataSets::IntegerField *>(prijemceDataSet->fieldByName("ico"));
+  auto fieldSubjekty =
+      dynamic_cast<DataSets::IntegerField *>(subjektyDataSet->fieldByName(
+          "IČO_num"));
   int cnt = 0;
   int lastFound = 0;
   while (!prijemceDataSet->eof()) {
 
     while (!subjektyDataSet->eof()) {
 
-      switch (Utilities::compareInt(fieldPrijemce->getAsInteger(), fieldSubjekty->getAsInteger())) {
+      switch (Utilities::compareInt(fieldPrijemce->getAsInteger(),
+                                    fieldSubjekty->getAsInteger())) {
         case 0:
           if (lastFound != fieldPrijemce->getAsInteger()) {
             cnt++;
@@ -155,7 +168,8 @@ void countIntersection() {
 }
 
 void checkDupl() {
-  auto prov = new DataProviders::CsvReader(csvPath + "dotaceTitul_rozpoctovaSkladbaPolozka.csv", ",");
+  auto prov = new DataProviders::CsvReader(
+      csvPath + "dotaceTitul_rozpoctovaSkladbaPolozka.csv", ",");
   auto dataset = new DataSets::MemoryDataSet("tmp");
   dataset->setDataProvider(prov);
   dataset->setFieldTypes({StringValue, StringValue});
@@ -226,18 +240,26 @@ void writerTest() {
       csvPath + "dotaceTitul_rozpoctovaSkladbaPolozka.csv", ",");
 
   auto writer = new DataWriters::CsvWriter("/Users/petr/Desktop/output.csv");
-  auto iter = writer->begin();
-  writer->writeHeader(prov->getHeader());
-  auto test = *iter;
-  for (const auto &row : *prov) {
-    *iter++ = row;
-  }
+  writer->writeHeader({"jemen"});
+
+  std::array<int, 1> colIndices = {0};
+  std::transform(prov->begin(),
+                 prov->end(),
+                 writer->begin(),
+                 [&colIndices](std::vector<std::string> row) -> std::vector<std::string> {
+                   std::vector<std::string> subSet;
+                   subSet.reserve(colIndices.size());
+                   for (auto index : colIndices) {
+                     subSet.emplace_back(row[index]);
+                   }
+                   return subSet;
+                 });
   delete writer;
   delete prov;
 }
 
 int main(int argc, char **argv) {
-  //writerTest();
+  writerTest();
   for (auto i = 0; i < 1; ++i) {
     Logger::startTime();
     //iterExample();
@@ -250,18 +272,24 @@ int main(int argc, char **argv) {
   return 0;
   Logger::startTime();
   // open input files
-  auto dotaceProvider = new DataProviders::CsvReader(csvPath + dotaceCSVName, ",");
-  auto rozhodnutiProvider = new DataProviders::CsvReader(csvPath + rozhodnutiCSVName, ",");
-  auto obdobiProvider = new DataProviders::CsvReader(csvPath + obdobiCSVName, ",");
-  auto prijemceProvider = new DataProviders::CsvReader(csvPath + prijemceCSVName, ",");
-  auto subjektyProvider = new DataProviders::CsvReader(csvPath + subjektyCSVName, ";");
+  auto dotaceProvider =
+      new DataProviders::CsvReader(csvPath + dotaceCSVName, ",");
+  auto rozhodnutiProvider =
+      new DataProviders::CsvReader(csvPath + rozhodnutiCSVName, ",");
+  auto obdobiProvider =
+      new DataProviders::CsvReader(csvPath + obdobiCSVName, ",");
+  auto prijemceProvider =
+      new DataProviders::CsvReader(csvPath + prijemceCSVName, ",");
+  auto subjektyProvider =
+      new DataProviders::CsvReader(csvPath + subjektyCSVName, ";");
 
   Logger::log(Debug, "Providers prepared", true);
   printMemoryUsageMacOS();
 
   auto dotaceDataSet = new DataSets::MemoryDataSet("dotace");
   dotaceDataSet->setDataProvider(dotaceProvider);
-  dotaceDataSet->setFieldTypes({StringValue, StringValue, StringValue, StringValue, StringValue, StringValue});
+  dotaceDataSet->setFieldTypes({StringValue, StringValue, StringValue,
+                                StringValue, StringValue, StringValue});
   dotaceDataSet->open();
   Logger::log(Debug, "Dotace loaded", true);
   printMemoryUsageMacOS();
@@ -277,7 +305,8 @@ int main(int argc, char **argv) {
   merger.addDataSet(dotaceDataSet);
   merger.addDataSet(rozhodnutiDataSet);
 
-  auto dotace_rozhodnutiDataSet = merger.mergeDataSets("dotace", "rozhodnuti", "idDotace", "idDotace");
+  auto dotace_rozhodnutiDataSet =
+      merger.mergeDataSets("dotace", "rozhodnuti", "idDotace", "idDotace");
   Logger::log(Debug, "Merged dotace, rozhodnuti", true);
   printMemoryUsageMacOS();
 
@@ -288,7 +317,8 @@ int main(int argc, char **argv) {
 
   auto obdobiDataSet = new DataSets::MemoryDataSet("obdobi");
   obdobiDataSet->setDataProvider(obdobiProvider);
-  obdobiDataSet->setFieldTypes({StringValue, StringValue, CurrencyValue, CurrencyValue, StringValue, StringValue});
+  obdobiDataSet->setFieldTypes({StringValue, StringValue, CurrencyValue,
+                                CurrencyValue, StringValue, StringValue});
   obdobiDataSet->open();
   Logger::log(Debug, "Obdobi loaded", true);
   printMemoryUsageMacOS();
@@ -297,7 +327,10 @@ int main(int argc, char **argv) {
   merger.addDataSet(obdobiDataSet);
 
   auto dotace_rozhodnuti_obdobiDataSet =
-      merger.mergeDataSets("dotace_rozhodnuti", "obdobi", "idRozhodnuti", "idRozhodnuti");
+      merger.mergeDataSets("dotace_rozhodnuti",
+                           "obdobi",
+                           "idRozhodnuti",
+                           "idRozhodnuti");
   Logger::log(Debug, "Merged dotace_rozhodnuti, obdobi", true);
   printMemoryUsageMacOS();
 
@@ -306,7 +339,8 @@ int main(int argc, char **argv) {
   delete obdobiDataSet;
   delete dotace_rozhodnutiDataSet;
 
-  auto dataWorker = new DataWorkers::MemoryDataWorker(dotace_rozhodnuti_obdobiDataSet);
+  auto dataWorker =
+      new DataWorkers::MemoryDataWorker(dotace_rozhodnuti_obdobiDataSet);
 
   auto prijemceDataSet = new DataSets::MemoryDataSet("prijemce");
   prijemceDataSet->setDataProvider(prijemceProvider);
@@ -317,7 +351,8 @@ int main(int argc, char **argv) {
 
   auto subjektyDataSet = new DataSets::MemoryDataSet("subjekty");
   subjektyDataSet->setDataProvider(subjektyProvider);
-  subjektyDataSet->setFieldTypes({IntegerValue, IntegerValue, IntegerValue, StringValue, StringValue, StringValue,
+  subjektyDataSet->setFieldTypes({IntegerValue, IntegerValue, IntegerValue,
+                                  StringValue, StringValue, StringValue,
                                   StringValue});
   subjektyDataSet->open();
   Logger::log(Debug, "Subjekty loaded", true);
@@ -325,14 +360,16 @@ int main(int argc, char **argv) {
 
   merger.addDataSet(subjektyDataSet);
   merger.addDataSet(prijemceDataSet);
-  auto prijemce_subjektyDataSet = merger.mergeDataSets("prijemce", "subjekty", "ico", "IČO_num");
+  auto prijemce_subjektyDataSet =
+      merger.mergeDataSets("prijemce", "subjekty", "ico", "IČO_num");
   Logger::log(Debug, "Merged prijemce, subjekty", true);
   printMemoryUsageMacOS();
 
   delete subjektyDataSet;
   delete prijemceDataSet;
 
-  auto operacniProgramProvider = new DataProviders::CsvReader(csvPath + operacniProgramCSVName, ",");
+  auto operacniProgramProvider =
+      new DataProviders::CsvReader(csvPath + operacniProgramCSVName, ",");
   auto operacniProgramDataSet = new DataSets::MemoryDataSet("operacniProgram");
   operacniProgramDataSet->setDataProvider(operacniProgramProvider);
   operacniProgramDataSet->setFieldTypes({StringValue, StringValue});
@@ -340,7 +377,8 @@ int main(int argc, char **argv) {
   Logger::log(Debug, "operacniProgram loaded", true);
   printMemoryUsageMacOS();
 
-  auto grantoveSchemaProvider = new DataProviders::CsvReader(csvPath + grantoveSchemaCSVName, ",");
+  auto grantoveSchemaProvider =
+      new DataProviders::CsvReader(csvPath + grantoveSchemaCSVName, ",");
   auto grantoveSchemaDataSet = new DataSets::MemoryDataSet("grantoveSchema");
   grantoveSchemaDataSet->setDataProvider(grantoveSchemaProvider);
   grantoveSchemaDataSet->setFieldTypes({StringValue, StringValue});
@@ -348,7 +386,8 @@ int main(int argc, char **argv) {
   Logger::log(Debug, "grantoveSchema loaded", true);
   printMemoryUsageMacOS();
 
-  auto dotaceTitulProvider = new DataProviders::CsvReader(csvPath + dotacniTitulCSVName, ",");
+  auto dotaceTitulProvider =
+      new DataProviders::CsvReader(csvPath + dotacniTitulCSVName, ",");
   auto dotaceTitulDataSet = new DataSets::MemoryDataSet("dotaceTitul");
   dotaceTitulDataSet->setDataProvider(dotaceTitulProvider);
   dotaceTitulDataSet->setFieldTypes({StringValue, StringValue});
@@ -356,8 +395,10 @@ int main(int argc, char **argv) {
   Logger::log(Debug, "dotaceTitul loaded", true);
   printMemoryUsageMacOS();
 
-  auto poskytovatelDotaceProvider = new DataProviders::CsvReader(csvPath + poskytovatelDotaceCSVName, ",");
-  auto poskytovatelDotaceDataSet = new DataSets::MemoryDataSet("poskytovatelDotace");
+  auto poskytovatelDotaceProvider =
+      new DataProviders::CsvReader(csvPath + poskytovatelDotaceCSVName, ",");
+  auto poskytovatelDotaceDataSet =
+      new DataSets::MemoryDataSet("poskytovatelDotace");
   poskytovatelDotaceDataSet->setDataProvider(poskytovatelDotaceProvider);
   poskytovatelDotaceDataSet->setFieldTypes({StringValue, StringValue});
   poskytovatelDotaceDataSet->open();

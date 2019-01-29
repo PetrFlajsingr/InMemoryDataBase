@@ -15,6 +15,14 @@ namespace DataWriters {
  */
 class BaseDataWriter {
  public:
+  /**
+   * Iterator pro jednoduchy zapis. Pouziti:
+   * DataProviders::BaseDataProvider provider;
+   * auto iter = dataWriter->begin();
+   * for (auto row : provider) {
+   *    *iter++ = row;
+   * }
+   */
   class iterator : public std::iterator<std::output_iterator_tag,
                                         std::vector<std::string>> {
    private:
@@ -35,7 +43,11 @@ class BaseDataWriter {
       return *this;
     }
 
-    iterator operator++(int) {
+    iterator &operator++() {
+      return *this;
+    }
+
+    const iterator operator++(int) {
       return *this;
     }
 
