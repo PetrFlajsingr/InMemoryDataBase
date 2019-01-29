@@ -48,6 +48,8 @@ class Logger {
     return "";
   }
 
+  static bool isAllowedDebug;
+
   /**
    * Pro logovani casu
    */
@@ -63,6 +65,9 @@ class Logger {
    * @param printTime pokud true, vypise cas, jinak nic
    */
   static void log(LogLevel logLevel, std::string message, bool printTime = false) {
+    if (isAllowedDebug && logLevel == LogLevel::Debug) {
+      return;
+    }
     if (logLevel != Verbose) {
       if (printTime) {
         message = levelToString(logLevel) + " " + getTime() + ": " + message;
@@ -80,6 +85,9 @@ class Logger {
    * @param printTime pokud true, vypise cas, jinak nic
    */
   static void log(LogLevel logLevel, const std::exception &exception, bool printTime = false) {
+    if (isAllowedDebug && logLevel == LogLevel::Debug) {
+      return;
+    }
     std::string message = exception.what();
     if (logLevel != Verbose) {
       if (printTime) {
@@ -114,6 +122,12 @@ class Logger {
     auto tmp = Logger::endTimeMs - Logger::startTimeMs;
     Logger::log(Verbose, "Time elapsed: " + std::to_string(tmp.count()) + " ms");
   }
+
+  static void allowDebug() {
+    isAllowedDebug = true;
+  }
 };
+
+bool Logger::isAllowedDebug = false;
 
 #endif //CSV_READER_LOGGER_H

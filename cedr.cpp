@@ -186,11 +186,13 @@ void checkDupl() {
     dataset->next();
   }
 
-  //Logger::log(Warning, "Record count: " + std::to_string(total));
-  //Logger::log(Warning, "Duplicate count: " + std::to_string(cnt2));
-  //Logger::log(Warning, "Unique duplicate count: " + std::to_string(cnt));
-  //Logger::log(Warning, "Avg on duplicates: " + std::to_string(cnt2 / (double) cnt));
+  Logger::log(Warning, "Record count: " + std::to_string(total));
+  Logger::log(Warning, "Duplicate count: " + std::to_string(cnt2));
+  Logger::log(Warning, "Unique duplicate count: " + std::to_string(cnt));
+  Logger::log(Warning,
+              "Avg on duplicates: " + std::to_string(cnt2 / (double) cnt));
 
+  delete prov;
   delete dataset;
 }
 
@@ -219,7 +221,7 @@ void dominikKontrola() {
 }
 
 int main(int argc, char **argv) {
-  for (auto i = 0; i < 10; ++i) {
+  for (auto i = 0; i < 1; ++i) {
     Logger::startTime();
     checkDupl();
     //dominikKontrola();
@@ -400,166 +402,3 @@ int main(int argc, char **argv) {
   Logger::printElapsedTime();
   return 0;
 }
-
-void printVector(std::vector<std::string> &toPrint) {}
-
-void demoDataSets() {
-  // otevreni souboru se vstupnimi daty
-  // predpokladejme dva sloupce: ID,wage
-  auto pathToFile = "path_to_file.csv";
-  auto dataProvider = new DataProviders::CsvReader(pathToFile, /*delimiter: */ ",");
-  //\
-
-  auto dataSet = new DataSets::MemoryDataSet(/*nazev datasetu: */ "demo");
-  // nastaveni zdroje dat
-  dataSet->setDataProvider(dataProvider);
-  // sloupce urcujici typ dat v danem sloupci
-  // pocet musi souhlasit poctu sloupce ve zdroji
-  dataSet->setFieldTypes({ValueType::IntegerValue, ValueType::CurrencyValue});
-  dataSet->open();
-
-  // Fields pro pristup k datum
-  auto fieldID = dynamic_cast<DataSets::IntegerField *>(dataSet->fieldByName("ID"));
-  auto fieldWage = dynamic_cast<DataSets::CurrencyField *>(dataSet->fieldByName("wage"));
-
-  DataSets::SortOptions sortOptions;
-  // rad primarne podle id, vzestupne
-  sortOptions.addOption(fieldID->getIndex(), SortOrder::Ascending);
-  // sekundarne podle wage, sestupne
-  sortOptions.addOption(fieldWage->getIndex(), SortOrder::Descending);
-  // proved sort
-  dataSet->sort(sortOptions);
-
-  DataSets::FilterOptions filterOptions;
-  // filtrovani podle wage - rozhrani funkce asi budu menit trochu (zjednodusovat)
-  filterOptions.addOption(fieldID->getIndex(),
-                          ValueType::IntegerValue, // typ hodnoty
-                          {{._integer=10}}, // hodnota nesikovne v DataContainer (vector)
-                          DataSets::FilterOption::EQUALS); // musi se rovnat
-  // proved filter
-  dataSet->filter(filterOptions);
-
-  while (dataSet->eof()) {
-    auto id = fieldID->getAsInteger();
-    auto wage = fieldWage->getAsCurrency();
-    /*
-     * ... nejaka prace s hodnotami ...
-     */
-
-    auto newWage = wage + dec::decimal_cast<2>(10);
-    fieldWage->setAsCurrency(newWage);
-
-    // posun na dalsi zaznam...
-    dataSet->next();
-    /*
-     * lze se posouvat dopredu, dozadum na zacatek, konec...
-     */
-  }
-
-  // uzavreni dataset = uvolneni pameti pro data
-  dataSet->close();
-  delete dataProvider;
-  delete dataSet;
-}
-
-void demoDataProvider() {
-  auto pathToFile = "path_to_file.csv";
-  // otevre CSV soubor k sekvencnimu cteni
-  // muze byt pouzito pro XLS s XlsReader, data z pole s ArrayDataProvider
-  // nebo muze byt vytvoren potomek BaseDataProvider pro libovolny potrebny vstup
-  auto dataProvider = new DataProviders::CsvReader(pathToFile, /*delimiter: */ ",");
-
-  // hlavicka souboru - napr. nazvy sloupcu
-  auto header = dataProvider->getHeader();
-  // ... nejake operace s header ...
-  printVector(header);
-
-  // vector pro data
-  std::vector<std::string> dataRow;
-  dataRow.reserve(dataProvider->getColumnCount());
-
-  // dokud je co cist
-  while (!dataProvider->eof()) {
-    // posledni nacteny radek ze souboru
-    dataRow = dataProvider->getRow();
-    // ... nejake operace s daty ...
-    printVector(dataRow);
-
-    //precteni dalsiho radku
-    dataProvider->next();
-    // vymazani vectoru pouzivaneho pro cteni
-    dataRow.clear();
-  }
-
-  // uvolneni pameti - zavira soubor
-  delete dataProvider;
-}
-
-void demoDataWriters() {
-  auto dataProvider = new DataProviders::CsvReader("path.csv", ",");
-
-  auto pathToFile = "path_to_file.xlsx";
-  // otevre soubor pro cteni - v tomto pripade xlsx, mame CsvWriter, ArraWriter, lze udelat dalsi vytvorenim
-  // potomka z BaseDataWriter
-  auto dataWriter = new DataWriters::XlsxWriter(pathToFile);
-
-  // zapis hlavicky
-  dataWriter->writeHeader(dataProvider->getHeader());
-
-  // pro demonstraci precteni kazdeho druheho radku z data provider
-  int cnt = 0;
-  while (!dataProvider->eof()) {
-    if (cnt & 0b1) {
-      dataWriter->writeRecord(dataProvider->getRow());
-    }
-    cnt++;
-
-    dataProvider->next();
-  }
-
-  delete dataWriter;
-  delete dataProvider;
-}
-
-void demologger() {
-  Logger::log(Status, "Starting demoLogger()", /*vypis casu*/ true);
-  Logger::startTime();  //< ulozeni pocatecniho casu
-
-  Logger::log(Debug, "Debug print");
-  /*
-   * ... nejaka prace ...
-   */
-  Logger::endTime();  //< ulozeni konecneho casu
-  Logger::printElapsedTime();  //< vypis rozdilu endTime a startTime
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
