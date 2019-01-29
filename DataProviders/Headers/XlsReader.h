@@ -10,6 +10,8 @@
 
 namespace DataProviders {
 
+// TODO: napsat testy
+
 /**
  * Trida pro cteni dat z xlsx souboru.
  *

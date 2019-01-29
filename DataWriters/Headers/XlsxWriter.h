@@ -14,11 +14,12 @@ class XlsxWriter : public BaseDataWriter {
   xlsxiowriter xlsxWriterHandle;
 
  public:
-  XlsxWriter(std::string &fileName, std::string &sheetName);
+  XlsxWriter(const std::string &fileName, const std::string &sheetName);
 
   ~XlsxWriter() override;
 
   void writeHeader(const std::vector<std::string> &header) override;
+
   void writeRecord(const std::vector<std::string> &record) override;
 };
 
