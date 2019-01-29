@@ -9,6 +9,7 @@
 #include <vector>
 #include <algorithm>
 
+// TODO: implementovat dalsi udalosti, vytvořit zamky, frontu pozadavku?
 namespace DataSets {
 class IAsyncMemoryDataSetObserver;
 
@@ -17,6 +18,8 @@ class IAsyncMemoryDataSetObserver;
  * Vyvolava udalosti pred/po dokonceni nejake operace.
  *
  * Udalosti jsou vyvolany ve stejnem vlakne, ve kterem pracuje tento data set.
+ *
+ * Pouziti obdobne jako MemoryDataSet, krom vyvolanych udalosti
  */
 class Async_MemoryDataSet : public MemoryDataSet {
  protected:
@@ -33,18 +36,38 @@ class Async_MemoryDataSet : public MemoryDataSet {
     AFTER_APPEND
   };
 
+  /**
+   * Pro otevreni data setu v dalsim vlakne (std::async)
+   */
   void innerOpen();
 
+  /**
+   * Pro filtrovani dat v dalsim vlakne (std::async)
+   * @param options
+   */
   void innerFilter(const FilterOptions &options);
 
+  /**
+   * Pro razeni dat v dalsim vlakne (std::async)
+   * @param options
+   */
   void innerSort(SortOptions &options);
 
+  /**
+   * Pro pridani dat z dalsiho provideru ve vlakne (std::async)
+   * @param provider
+   */
   void innerAppendDataProvider(DataProviders::BaseDataProvider *provider);
 
+  /**
+   * Notifikuj posluchace o udalosti daneho typu.
+   * TODO: pridat parametr pro preadni posluchacum (uspesne otevreni atp...)
+   * @param type
+   */
   void notify(EventType type);
 
  public:
-  Async_MemoryDataSet(const std::string &dataSetName);
+  explicit Async_MemoryDataSet(const std::string &dataSetName);
 
   void open() override;
 
@@ -61,20 +84,52 @@ class Async_MemoryDataSet : public MemoryDataSet {
 
 class IAsyncMemoryDataSetObserver {
  public:
+  /**
+   * Pred otevrenim data setu.
+   * @param sender
+   */
   virtual void onBeforeOpen(Async_MemoryDataSet *sender) = 0;
 
+  /**
+   * Po otevreni data setu.
+   * @param sender
+   */
   virtual void onAfterOpen(Async_MemoryDataSet *sender) = 0;
 
+  /**
+   * Pred razenim data setu.
+   * @param sender
+   */
   virtual void onBeforeSort(Async_MemoryDataSet *sender) = 0;
 
+  /**
+   * Po dokonceni razeni data setu.
+   * @param sender
+   */
   virtual void onAfterSort(Async_MemoryDataSet *sender) = 0;
 
+  /**
+   * Pred filtrovani data setu.
+   * @param sender
+   */
   virtual void onBeforeFilter(Async_MemoryDataSet *sender) = 0;
 
+  /**
+   * Po dokonceni filtrovani data setu.
+   * @param sender
+   */
   virtual void onAfterFilter(Async_MemoryDataSet *sender) = 0;
 
+  /**
+   * Pred nacteni data provider.
+   * @param sender
+   */
   virtual void onBeforeAppendDataProvider(Async_MemoryDataSet *sender) = 0;
 
+  /**
+   * Po nacteni data provider.
+   * @param sender
+   */
   virtual void onAfterAppendDataProvider(Async_MemoryDataSet *sender) = 0;
 
   virtual ~IAsyncMemoryDataSetObserver() = default;
