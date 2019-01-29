@@ -106,3 +106,14 @@ TEST_F(CsvReader_tests, first_small) {
   }
 
 }
+
+TEST_F(CsvReader_tests, iterator) {
+  prepareReaderSmall();
+  int testIter = 0;
+  for (auto row : *reader) {
+    for (int i = 0; i < 5; ++i) {
+      EXPECT_EQ(row[i], recordsSmall[testIter][i]);
+    }
+    testIter++;
+  }
+}
