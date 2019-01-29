@@ -51,7 +51,7 @@ class BaseDataSet {
   virtual void setData(void *data, uint64_t index, ValueType type) = 0;
 
  public:
-  class iterator : public std::iterator<std::random_access_iterator_tag, void> {
+  class iterator : public std::iterator<std::random_access_iterator_tag, int> {
    private:
     BaseDataSet *dataSet;
 
