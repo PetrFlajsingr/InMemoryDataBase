@@ -5,6 +5,8 @@
 #ifndef CSV_READER_ARRAYWRITER_H
 #define CSV_READER_ARRAYWRITER_H
 
+#include <string>
+#include <vector>
 #include <BaseDataWriter.h>
 
 namespace DataWriters {

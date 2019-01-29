@@ -6,11 +6,15 @@
 #define DATAWRITERS_HEADERS_CSVWRITER_H_
 
 #include <string>
+#include <vector>
 #include <fstream>
 #include "BaseDataWriter.h"
 
 namespace DataWriters {
 
+/**
+ * Zapsani dat ve formatu csv na disk.
+ */
 class CsvWriter : public BaseDataWriter {
  private:
   std::ofstream *outputStream;

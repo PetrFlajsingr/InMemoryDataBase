@@ -7,7 +7,8 @@
 #include <iostream>
 #include <CsvReader.h>
 
-DataProviders::CsvReader::CsvReader(std::string filePath, std::string delimiter) {
+DataProviders::CsvReader::CsvReader(std::string filePath,
+                                    std::string delimiter) {
   this->delimiter = std::move(delimiter);
   file.open(filePath);
   if (!file.is_open()) {
@@ -80,7 +81,8 @@ void DataProviders::CsvReader::setDelimiter(char delimiter) {
   this->delimiter = delimiter;
 }
 
-std::vector<std::string> DataProviders::CsvReader::tokenize(std::string &line, int vectorReserve) {
+std::vector<std::string> DataProviders::CsvReader::tokenize(std::string &line,
+                                                            int vectorReserve) {
   char buffer[BUFFER_SIZE];
   uint64_t bufferIter = 0;
   TokeniserStates state = Read;
@@ -129,7 +131,9 @@ std::vector<std::string> DataProviders::CsvReader::tokenize(std::string &line, i
         buffer[bufferIter] = character;
         bufferIter++;
         break;
-      default:throw IllegalStateException("Internal error. DataProviders::CsvReader::tokenize");
+      default:
+        throw IllegalStateException(
+            "Internal error. DataProviders::CsvReader::tokenize");
     }
   }
   buffer[bufferIter] = '\0';

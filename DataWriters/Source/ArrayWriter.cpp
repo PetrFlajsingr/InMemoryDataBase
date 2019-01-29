@@ -5,7 +5,6 @@
 #include <ArrayWriter.h>
 #include <iostream>
 
-#include "ArrayWriter.h"
 void DataWriters::ArrayWriter::writeHeader(const std::vector<std::string> &header) {
   result->push_back(header);
 }

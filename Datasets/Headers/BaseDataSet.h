@@ -97,6 +97,10 @@ class BaseDataSet {
       // TODO
     }
 
+    void operator->() {
+      // TODO
+    }
+
     iterator &operator--() {
       // TODO provider->next();
       return *this;

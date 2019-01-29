@@ -7,7 +7,7 @@
 
 class CsvReader_tests : public ::testing::Test {
  protected:
-  DataProviders::CsvReader *reader;
+  DataProviders::CsvReader *reader = nullptr;
 
   std::string columnNamesSmall[5]{
       "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4", "COLUMN5"
@@ -43,11 +43,13 @@ class CsvReader_tests : public ::testing::Test {
 };
 
 void CsvReader_tests::prepareReaderSmall() {
-  reader = new DataProviders::CsvReader("../DataProviders/tests/Files/small.csv");
+  reader =
+      new DataProviders::CsvReader("../DataProviders/tests/Files/small.csv");
 }
 
 void CsvReader_tests::prepareReaderAdv() {
-  reader = new DataProviders::CsvReader("../DataProviders/tests/Files/adv.csv", ",");
+  reader =
+      new DataProviders::CsvReader("../DataProviders/tests/Files/adv.csv", ",");
 }
 
 TEST_F (CsvReader_tests, columns_small) {

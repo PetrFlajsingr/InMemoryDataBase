@@ -5,16 +5,21 @@
 #ifndef CSV_READER_XLSXWRITER_H
 #define CSV_READER_XLSXWRITER_H
 
-#include "BaseDataWriter.h"
 #include <xlsxio_write.h>
+#include <vector>
+#include <string>
+#include "BaseDataWriter.h"
+
 
 namespace DataWriters {
+
 class XlsxWriter : public BaseDataWriter {
  private:
   xlsxiowriter xlsxWriterHandle;
 
  public:
-  XlsxWriter(const std::string &fileName, const std::string &sheetName = "");
+  explicit XlsxWriter(const std::string &fileName,
+                      const std::string &sheetName = "");
 
   ~XlsxWriter() override;
 

@@ -12,7 +12,8 @@ DataProviders::XlsReader::XlsReader(const std::string &fileName) {
     throw IOException(errMsg.c_str());
   }
 
-  xlsxioSheet = xlsxioread_sheet_open(xlsxioReader, nullptr, XLSXIOREAD_SKIP_EMPTY_ROWS);
+  xlsxioSheet =
+      xlsxioread_sheet_open(xlsxioReader, nullptr, XLSXIOREAD_SKIP_EMPTY_ROWS);
 
   if (xlsxioSheet == nullptr) {
     auto errMsg = "Error while opening xls file: " + fileName;

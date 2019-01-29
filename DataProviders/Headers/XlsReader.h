@@ -38,7 +38,7 @@ class XlsReader : BaseDataProvider {
    * Otevri xlsx soubor fileName pro cteni
    * @param fileName
    */
-  XlsReader(const std::string &fileName);
+  explicit XlsReader(const std::string &fileName);
 
   ~XlsReader() override;
 

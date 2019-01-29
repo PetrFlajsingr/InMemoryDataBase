@@ -7,7 +7,7 @@
 
 class XlsxWriter_tests : public ::testing::Test {
  protected:
-  DataWriters::XlsxWriter *writer;
+  DataWriters::XlsxWriter *writer = nullptr;
   std::string path = "../DataWriters/tests/out/test.xlsx";
   std::string sheetName = "test";
 
@@ -26,10 +26,16 @@ class XlsxWriter_tests : public ::testing::Test {
 };
 
 TEST_F(XlsxWriter_tests, write_test) {
-  writer->writeHeader({"Column 1", "Sloupec 2", "732864327846", "ěščšřžýžřčřč", "jes man taco man"});
-  writer->writeRecord({"první", "druhý", "třetí", "čtvrtý", "něco, někdy ůůůůě+"});
-  writer->writeRecord({"první", "druhý", "třetí", "čtvrtý", "něco, někdy ůůůůě+"});
-  writer->writeRecord({"první", "druhý", "třetí", "čtvrtý", "něco, někdy ůůůůě+"});
-  writer->writeRecord({"první", "druhý", "třetí", "čtvrtý", "něco, někdy ůůůůě+"});
-  writer->writeRecord({"první", "druhý", "třetí", "čtvrtý", "něco, někdy ůůůůě+"});
+  writer->writeHeader({"Column 1", "Sloupec 2", "732864327846", "ěščšřžýžřčřč",
+                       "jes man taco man"});
+  writer->writeRecord({"první", "druhý", "třetí", "čtvrtý",
+                       "něco, někdy ůůůůě+"});
+  writer->writeRecord({"první", "druhý", "třetí", "čtvrtý",
+                       "něco, někdy ůůůůě+"});
+  writer->writeRecord({"první", "druhý", "třetí", "čtvrtý",
+                       "něco, někdy ůůůůě+"});
+  writer->writeRecord({"první", "druhý", "třetí", "čtvrtý",
+                       "něco, někdy ůůůůě+"});
+  writer->writeRecord({"první", "druhý", "třetí", "čtvrtý",
+                       "něco, někdy ůůůůě+"});
 }

@@ -29,7 +29,8 @@ void DataWriters::CsvWriter::writeHeader(const std::vector<std::string> &header)
 
 void DataWriters::CsvWriter::writeRecord(const std::vector<std::string> &record) {
   if (record.size() != columnCount) {
-    throw InvalidArgumentException("Length of record doesn't match length of header.");
+    throw InvalidArgumentException(
+        "Length of record doesn't match length of header.");
   }
 
   writeRow(record);
