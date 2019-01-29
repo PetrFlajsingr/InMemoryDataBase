@@ -10,10 +10,16 @@
 
 namespace RelationLayer {
 
+/**
+ * Typy relaci, podobne jako v SQL databazich
+ */
 enum RelationType {
   OneToOne, OneToN, NTom
 };
 
+/**
+ * Kontejner obsahujici odkazy na propojena data
+ */
 struct RelationContainer {
   void *data_FirstDataSet;
   void *data_SecondDataSet;
