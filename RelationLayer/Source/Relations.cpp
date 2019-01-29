@@ -5,8 +5,11 @@
 #include <Relations.h>
 #include <Exceptions.h>
 
+RelationLayer::RelationContainer::RelationContainer(void *data_FirstDataSet, void *data_SecondDataSet)
+    : data_FirstDataSet(data_FirstDataSet), data_SecondDataSet(data_SecondDataSet) {}
+
 void RelationLayer::OneToOneRelation::addRelation(void *dataFirstDataSet, void *dataSecondDataSet) {
-  throw NotImplementedException();
+  relations.emplace_back(dataFirstDataSet, dataSecondDataSet);
 }
 
 void RelationLayer::OneToOneRelation::removeRelation(void *dataFirstDataSet, void *dataSecondDataSet) {
@@ -18,7 +21,7 @@ const std::vector<RelationLayer::RelationContainer> &RelationLayer::OneToOneRela
 }
 
 void RelationLayer::OneToNRelation::addRelation(void *dataFirstDataSet, void *dataSecondDataSet) {
-  throw NotImplementedException();
+  relations.emplace_back(dataFirstDataSet, dataSecondDataSet);
 }
 
 void RelationLayer::OneToNRelation::removeRelation(void *dataFirstDataSet, void *dataSecondDataSet) {
@@ -30,7 +33,7 @@ const std::vector<RelationLayer::RelationContainer> &RelationLayer::OneToNRelati
 }
 
 void RelationLayer::NToNRelation::addRelation(void *dataFirstDataSet, void *dataSecondDataSet) {
-  throw NotImplementedException();
+  relations.emplace_back(dataFirstDataSet, dataSecondDataSet);
 }
 
 void RelationLayer::NToNRelation::removeRelation(void *dataFirstDataSet, void *dataSecondDataSet) {

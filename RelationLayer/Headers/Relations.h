@@ -13,6 +13,8 @@ namespace RelationLayer {
 struct RelationContainer {
   void *data_FirstDataSet;
   void *data_SecondDataSet;
+
+  RelationContainer(void *data_FirstDataSet, void *data_SecondDataSet);
 };
 
 class BaseRelation {
