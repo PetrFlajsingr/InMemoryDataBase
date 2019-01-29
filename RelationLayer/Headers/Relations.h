@@ -5,6 +5,7 @@
 #ifndef CSV_READER_BASERELATION_H
 #define CSV_READER_BASERELATION_H
 
+#include <vector>
 #include <Types.h>
 
 namespace RelationLayer {
@@ -16,7 +17,7 @@ struct RelationContainer {
 
 class BaseRelation {
  protected:
-
+  std::vector<RelationContainer> relations;
  public:
 
 };
