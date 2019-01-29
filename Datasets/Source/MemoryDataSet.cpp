@@ -45,7 +45,8 @@ void DataSets::MemoryDataSet::loadData() {
 void DataSets::MemoryDataSet::createFields(std::vector<std::string> columns,
                                            std::vector<ValueType> types) {
   if (columns.size() != types.size()) {
-    std::string errMsg = "Amount of columns and types must match. Data set: " + this->getName();
+    std::string errMsg =
+        "Amount of columns and types must match. Data set: " + this->getName();
     throw InvalidArgumentException(errMsg.c_str());
   }
   size_t iter = 0;
@@ -86,15 +87,24 @@ void DataSets::MemoryDataSet::addRecord() {
   size_t iter = 0;
   for (const auto &part : record) {
     switch (fields[iter]->getFieldType()) {
-      case IntegerValue:newRecord->emplace_back(new DataContainer({._integer = Utilities::stringToInt(part)}));
+      case IntegerValue:
+        newRecord->emplace_back(new DataContainer({._integer = Utilities::stringToInt(
+            part)}));
         break;
-      case DoubleValue:newRecord->emplace_back(new DataContainer({._double = Utilities::stringToDouble(part)}));
+      case DoubleValue:
+        newRecord->emplace_back(new DataContainer({._double = Utilities::stringToDouble(
+            part)}));
         break;
-      case StringValue:newRecord->emplace_back(new DataContainer({._string = strdup(part.c_str())}));
+      case StringValue:
+        newRecord->emplace_back(new DataContainer({._string = strdup(part.c_str())}));
         break;
-      case CurrencyValue:newRecord->emplace_back(new DataContainer({._currency = new Currency(part)}));
+      case CurrencyValue:
+        newRecord->emplace_back(new DataContainer({._currency = new Currency(
+            part)}));
         break;
-      case DateTimeValue:newRecord->emplace_back(new DataContainer({._dateTime = new DateTime(DateTime_s)}));
+      case DateTimeValue:
+        newRecord->emplace_back(new DataContainer({._dateTime = new DateTime(
+            DateTime_s)}));
         break;
       default:throw IllegalStateException("Internal error.");
     }
@@ -223,7 +233,8 @@ void DataSets::MemoryDataSet::sort(SortOptions &options) {
     throw InvalidArgumentException("Field index is out of bounds");
   }
 
-  std::vector<std::function<int8_t(DataSetRow *, DataSetRow *)>> compareFunctions;
+  std::vector<std::function<int8_t(DataSetRow *, DataSetRow *)>>
+      compareFunctions;
 
   for (auto &option : options.options) {
     compareFunctions.emplace_back(
@@ -231,17 +242,18 @@ void DataSets::MemoryDataSet::sort(SortOptions &options) {
   }
 
   auto optionArray = options.options;
-  auto compareFunction = [&optionArray, &compareFunctions](DataSetRow *a, DataSetRow *b) {
-    for (uint8_t i = 0; i < optionArray.size(); ++i) {
-      int compareResult = compareFunctions[i](a, b);
-      if (compareResult < 0) {
-        return optionArray[i].order == SortOrder::Ascending;
-      } else if (compareResult > 0) {
-        return optionArray[i].order == SortOrder::Descending;
-      }
-    }
-    return false;
-  };
+  auto compareFunction =
+      [&optionArray, &compareFunctions](DataSetRow *a, DataSetRow *b) {
+        for (uint8_t i = 0; i < optionArray.size(); ++i) {
+          int compareResult = compareFunctions[i](a, b);
+          if (compareResult < 0) {
+            return optionArray[i].order == SortOrder::Ascending;
+          } else if (compareResult > 0) {
+            return optionArray[i].order == SortOrder::Descending;
+          }
+        }
+        return false;
+      };
 
   std::sort(data.begin(),
             data.end(),
@@ -280,7 +292,8 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
         std::string toCompare = (*iter->cells)[filter.fieldIndex]->_string;
         for (const auto &search : filter.searchData) {
           switch (filter.filterOption) {
-            case EQUALS:valid = std::strcmp(toCompare.c_str(), search._string) == 0;
+            case EQUALS:
+              valid = std::strcmp(toCompare.c_str(), search._string) == 0;
               break;
             case STARTS_WITH:
               valid = std::strncmp(toCompare.c_str(),
@@ -291,7 +304,8 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
               valid = toCompare.find(search._string)
                   != std::string::npos;
               break;
-            case ENDS_WITH:valid = Utilities::endsWith(toCompare, search._string);
+            case ENDS_WITH:
+              valid = Utilities::endsWith(toCompare, search._string);
               break;
             case NOT_CONTAINS:
               valid = toCompare.find(search._string)
@@ -321,12 +335,14 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
       } else if (filter.type == ValueType::CurrencyValue) {
         Currency *toCompare = (*iter->cells)[filter.fieldIndex]->_currency;
         for (const auto &search : filter.searchData) {
-          valid = Utilities::compareCurrency(*toCompare, *search._currency) == 0;
+          valid =
+              Utilities::compareCurrency(*toCompare, *search._currency) == 0;
         }
       } else if (filter.type == ValueType::DateTimeValue) {
         DateTime *toCompare = (*iter->cells)[filter.fieldIndex]->_dateTime;
         for (const auto &search : filter.searchData) {
-          valid = Utilities::compareDateTime(*toCompare, *search._dateTime) == 0;
+          valid =
+              Utilities::compareDateTime(*toCompare, *search._dateTime) == 0;
         }
       }
 
@@ -347,7 +363,8 @@ DataSets::BaseField *DataSets::MemoryDataSet::fieldByName(
       return field;
     }
   }
-  std::string errMsg = "Field named \"" + name + "\" not found. DataSets::MemoryDataSet::fieldByName";
+  std::string errMsg = "Field named \"" + name
+      + "\" not found. DataSets::MemoryDataSet::fieldByName";
   throw InvalidArgumentException(errMsg.c_str());
 }
 
@@ -368,7 +385,8 @@ void DataSets::MemoryDataSet::setFieldTypes(std::vector<ValueType> types) {
   columnCount = fields.size();
 }
 
-void DataSets::MemoryDataSet::setFieldTypes(std::vector<std::string> fieldNames, std::vector<ValueType> types) {
+void DataSets::MemoryDataSet::setFieldTypes(std::vector<std::string> fieldNames,
+                                            std::vector<ValueType> types) {
   createFields(fieldNames, types);
   columnCount = fields.size();
 }
@@ -418,7 +436,9 @@ void DataSets::MemoryDataSet::append() {
         break;
       case DateTimeValue:dataContainer->_dateTime = new DateTime(DateTime_s);
         break;
-      default:throw IllegalStateException("Internal error DataSets::MemoryDataSet::append().");
+      default:
+        throw IllegalStateException(
+            "Internal error DataSets::MemoryDataSet::append().");
     }
     newRecord->emplace_back(dataContainer);
   }
@@ -443,7 +463,8 @@ void DataSets::MemoryDataSet::appendDataProvider(
   data.shrink_to_fit();
 }
 
-DataSets::MemoryDataSet::MemoryDataSet(const std::string &dataSetName) : BaseDataSet(dataSetName) {}
+DataSets::MemoryDataSet::MemoryDataSet(const std::string &dataSetName)
+    : BaseDataSet(dataSetName) {}
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCDFAInspection"
@@ -479,8 +500,11 @@ bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
             *item.searchData[0]._currency);
       }
         break;
-      case DateTimeValue:auto dateTime = reinterpret_cast<DateTimeField *>(field)->getAsDateTime();
-        comparisonResult = Utilities::compareDateTime(dateTime, *item.searchData[0]._dateTime);
+      case DateTimeValue:
+        auto dateTime =
+            reinterpret_cast<DateTimeField *>(field)->getAsDateTime();
+        comparisonResult =
+            Utilities::compareDateTime(dateTime, *item.searchData[0]._dateTime);
         break;
     }
     switch (comparisonResult) {
@@ -493,7 +517,9 @@ bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
         currentRecord = (min + max) >> 1;
         setFieldValues(currentRecord, true);
         break;
-      default:throw IllegalStateException("Internal error DataSets::MemoryDataSet::findFirst");
+      default:
+        throw IllegalStateException(
+            "Internal error DataSets::MemoryDataSet::findFirst");
     }
     if (max - min < 2) {
       if (breakLoop) {
@@ -521,13 +547,16 @@ bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
             item.searchData[0]._double);
         break;
       case CurrencyValue: {
-        Currency cur = reinterpret_cast<CurrencyField *>(field)->getAsCurrency();
+        Currency
+            cur = reinterpret_cast<CurrencyField *>(field)->getAsCurrency();
         comparisonResult = Utilities::compareCurrency(
             cur,
             *item.searchData[0]._currency);
       }
         break;
-      case DateTimeValue:DateTime dateTime = reinterpret_cast<DateTimeField *>(field)->getAsDateTime();
+      case DateTimeValue:
+        DateTime dateTime =
+            reinterpret_cast<DateTimeField *>(field)->getAsDateTime();
         comparisonResult = Utilities::compareDateTime(
             dateTime,
             *item.searchData[0]._dateTime);

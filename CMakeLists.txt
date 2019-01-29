@@ -63,7 +63,7 @@ set(SOURCE_FILES Misc/Headers/DateTimeUtils.h Datasets/Fields/Headers/DateTimeFi
 
 set(TEST_SOURCE_FILES RelationLayer/Source/RelationBuilder.cpp RelationLayer/Source/RelationManager.cpp
         RelationLayer/Headers/RelationBuilder.h RelationLayer/Headers/RelationManager.h
-        RelationLayer/Headers/Relations.h RelationLayer/Source/Relations.cpp DataProviders/tests/tests_XlsReader.cpp
+        RelationLayer/Headers/Relation.h RelationLayer/Source/Relation.cpp DataProviders/tests/tests_XlsReader.cpp
         DataProviders/Headers/XlsReader.h DataProviders/Source/XlsReader.cpp Misc/Headers/DateTimeUtils.h
         Datasets/Fields/Headers/DateTimeField.h Datasets/Fields/Source/DateTimeField.cpp
         lib/xlsxio/include/xlsxio_read.h lib/xlsxio/include/xlsxio_write.h lib/xlsxio/include/xlsxio_version.h
