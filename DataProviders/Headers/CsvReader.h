@@ -91,19 +91,7 @@ class CsvReader : public BaseDataProvider {
    */
   bool next() override;
 
-  /**
-   * Neimplementovana metoda - pouze sekvencni cteni
-   * @return
-   */
-  bool previous() override {
-    throw NotImplementedException();
-  }
-
   void first() override;
-
-  void last() override {
-    throw NotImplementedException();
-  }
 
   uint64_t getCurrentRecordNumber() override {
     return currentRecordNumber;

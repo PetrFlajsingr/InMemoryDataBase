@@ -44,7 +44,10 @@ project(csv_reader)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "-Wall -Wextra -o3")
 
-set(SOURCE_FILES Misc/Headers/DateTimeUtils.h Datasets/Fields/Headers/DateTimeField.h Datasets/Fields/Source/DateTimeField.cpp DataWorkers/Source/DataSetMerger.cpp DataWorkers/Headers/DataSetMerger.h DataProviders/Source/CsvReader.cpp DataProviders/Headers/CsvReader.h
+set(SOURCE_FILES
+        Misc/Headers/DateTimeUtils.h Datasets/Fields/Headers/DateTimeField.h
+        Datasets/Fields/Source/DateTimeField.cpp DataWorkers/Source/DataSetMerger.cpp
+        DataWorkers/Headers/DataSetMerger.h DataProviders/Source/CsvReader.cpp DataProviders/Headers/CsvReader.h
         DataProviders/Headers/BaseDataProvider.h Misc/Headers/Exceptions.h Misc/Source/Utilities.cpp
         Misc/Headers/Utilities.h Datasets/Headers/BaseDataSet.h Datasets/Source/MemoryDataSet.cpp
         Datasets/Headers/MemoryDataSet.h Misc/Headers/Types.h Datasets/Fields/Headers/BaseField.h
@@ -62,7 +65,6 @@ set(SOURCE_FILES Misc/Headers/DateTimeUtils.h Datasets/Fields/Headers/DateTimeFi
         DataWriters/Headers/ArrayWriter.h Datasets/Headers/SortStructures.h Misc/Headers/Logger.h cedr.cpp)
 
 set(TEST_SOURCE_FILES
-        DataProviders/Source/DataProviderIterator.cpp DataProviders/Headers/DataProviderIterator.h
         RelationLayer/Source/RelationBuilder.cpp RelationLayer/Source/RelationManager.cpp
         RelationLayer/Headers/RelationBuilder.h RelationLayer/Headers/RelationManager.h
         RelationLayer/Headers/Relation.h RelationLayer/Source/Relation.cpp DataProviders/tests/tests_XlsReader.cpp

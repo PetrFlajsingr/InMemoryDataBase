@@ -109,20 +109,9 @@ class BaseDataProvider {
   virtual bool next() = 0;
 
   /**
-   * Presun na predchozi zaznam
-   * @return
-   */
-  virtual bool previous() = 0;
-
-  /**
    * Presun na prvni zaznam
    */
   virtual void first() = 0;
-
-  /**
-   * Presun na posledni zaznam
-   */
-  virtual void last() = 0;
 
   /**
    * Kontrola dostupnosti zaznamu

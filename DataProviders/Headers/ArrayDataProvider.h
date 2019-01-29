@@ -70,20 +70,8 @@ class ArrayDataProvider : public BaseDataProvider {
     return false;
   }
 
-  bool previous() override {
-    if (row > 0) {
-      row--;
-      return true;
-    }
-    return false;
-  }
-
   void first() override {
     row = 0;
-  }
-
-  void last() override {
-    row = data.size() - 1;
   }
 
   bool eof() override {

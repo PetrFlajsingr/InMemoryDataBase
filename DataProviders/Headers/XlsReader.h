@@ -5,6 +5,8 @@
 #ifndef CSV_READER_XLSREADER_H
 #define CSV_READER_XLSREADER_H
 
+#include <string>
+#include <vector>
 #include <xlsxio_read.h>
 #include "BaseDataProvider.h"
 
@@ -38,7 +40,7 @@ class XlsReader : BaseDataProvider {
    */
   XlsReader(const std::string &fileName);
 
-  virtual ~XlsReader();
+  ~XlsReader() override;
 
   std::vector<std::string> getRow() override;
 
@@ -52,11 +54,7 @@ class XlsReader : BaseDataProvider {
 
   bool next() override;
 
-  bool previous() override;
-
   void first() override;
-
-  void last() override;
 
   bool eof() override;
 };

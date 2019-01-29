@@ -39,7 +39,7 @@ const std::vector<RelationLayer::RelationContainer> *RelationLayer::Relation::fi
   auto result = new std::vector<RelationContainer>();
   std::copy_if(relations.begin(),
                relations.end(),
-               result,
+               std::back_inserter(*result),
                [pointerToData](RelationContainer &container) {
                  return container.data_SecondDataSet == pointerToData
                      || container.data_FirstDataSet == pointerToData;

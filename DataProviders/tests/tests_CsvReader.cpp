@@ -106,12 +106,3 @@ TEST_F(CsvReader_tests, first_small) {
   }
 
 }
-
-TEST_F(CsvReader_tests, exceptions) {
-  EXPECT_THROW(new DataProviders::CsvReader("nonexistantfile.ihopenot"), IOException);
-
-  prepareReaderSmall();
-  EXPECT_THROW(reader->last(), NotImplementedException);
-  EXPECT_THROW(reader->previous(), NotImplementedException);
-
-}

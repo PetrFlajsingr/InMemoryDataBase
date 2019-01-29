@@ -5,8 +5,9 @@
 #include <Exceptions.h>
 #include "XlsxWriter.h"
 
-DataWriters::XlsxWriter::XlsxWriter(const std::string &fileName, const std::string &sheetName) {
-  xlsxWriterHandle = xlsxiowrite_open(fileName.c_str(), sheetName.c_str())
+DataWriters::XlsxWriter::XlsxWriter(const std::string &fileName,
+                                    const std::string &sheetName) {
+  xlsxWriterHandle = xlsxiowrite_open(fileName.c_str(), sheetName.c_str());
 
   if (xlsxWriterHandle == nullptr) {
     throw IOException("Error creating .xlsx file");

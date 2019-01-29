@@ -63,15 +63,7 @@ bool DataProviders::XlsReader::next() {
   return true;
 }
 
-bool DataProviders::XlsReader::previous() {
-  throw NotImplementedException();
-}
-
 void DataProviders::XlsReader::first() {
-  throw NotImplementedException();
-}
-
-void DataProviders::XlsReader::last() {
   throw NotImplementedException();
 }
 

@@ -1,3 +1,5 @@
+#include <utility>
+
 //
 // Created by Petr Flajsingr on 24/08/2018.
 //
@@ -6,7 +8,7 @@
 #include <CsvReader.h>
 
 DataProviders::CsvReader::CsvReader(std::string filePath, std::string delimiter) {
-  this->delimiter = delimiter;
+  this->delimiter = std::move(delimiter);
   file.open(filePath);
   if (!file.is_open()) {
     std::string errMsg = "File could not be open: " + filePath;
