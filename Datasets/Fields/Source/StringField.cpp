@@ -12,7 +12,7 @@ DataSets::StringField::StringField(const std::string &fieldName,
                                                                index) {}
 
 ValueType DataSets::StringField::getFieldType() {
-  return STRING_VAL;
+  return StringValue;
 }
 
 void DataSets::StringField::setAsString(const std::string &value) {

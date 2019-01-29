@@ -5,7 +5,7 @@
 #include <DateTimeField.h>
 
 ValueType DataSets::DateTimeField::getFieldType() {
-  return DATE_TIME_VAL;
+  return DateTimeValue;
 }
 
 void DataSets::DateTimeField::setAsString(const std::string &value) {

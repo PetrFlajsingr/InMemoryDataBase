@@ -59,13 +59,13 @@ class DataSetMerger_tests : public ::testing::Test {
     dataProvider1A = new ArrayDataProvider(test1A);
     dataSet1A = new MemoryDataSet("A");
     dataSet1A->setDataProvider(dataProvider1A);
-    dataSet1A->setFieldTypes({STRING_VAL, STRING_VAL, STRING_VAL, STRING_VAL, STRING_VAL});
+    dataSet1A->setFieldTypes({StringValue, StringValue, StringValue, StringValue, StringValue});
     dataSet1A->open();
 
     dataProvider1B = new ArrayDataProvider(test1B);
     dataSet1B = new MemoryDataSet("B");
     dataSet1B->setDataProvider(dataProvider1B);
-    dataSet1B->setFieldTypes({STRING_VAL, STRING_VAL, STRING_VAL, STRING_VAL, STRING_VAL});
+    dataSet1B->setFieldTypes({StringValue, StringValue, StringValue, StringValue, StringValue});
     dataSet1B->open();
   }
 

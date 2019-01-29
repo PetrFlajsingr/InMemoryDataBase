@@ -38,7 +38,7 @@ class MemoryDataset_tests : public ::testing::Test {
 
     std::vector<ValueType> types;
     for (int iter = 0; iter < dataProvider->getColumnCount(); iter++) {
-      types.push_back(STRING_VAL);
+      types.push_back(StringValue);
     }
     dataset->setFieldTypes(types);
   }
@@ -75,7 +75,7 @@ class MemoryDataset_tests : public ::testing::Test {
    void setAsInteger() {
      std::vector<ValueType> types;
      for (int iter = 0; iter < dataProvider->getColumnCount(); iter++) {
-       types.push_back(INTEGER_VAL);
+       types.push_back(IntegerValue);
      }
      dataset->setFieldTypes(types);
    }
@@ -83,7 +83,7 @@ class MemoryDataset_tests : public ::testing::Test {
    void setAsDouble() {
      std::vector<ValueType> types;
      for (int iter = 0; iter < dataProvider->getColumnCount(); iter++) {
-       types.push_back(DOUBLE_VAL);
+       types.push_back(DoubleValue);
      }
      dataset->setFieldTypes(types);
    }
@@ -91,7 +91,7 @@ class MemoryDataset_tests : public ::testing::Test {
    void setAsString() {
      std::vector<ValueType> types;
      for (int iter = 0; iter < dataProvider->getColumnCount(); iter++) {
-       types.push_back(STRING_VAL);
+       types.push_back(StringValue);
      }
      dataset->setFieldTypes(types);
    }
@@ -99,7 +99,7 @@ class MemoryDataset_tests : public ::testing::Test {
    void setAsCurrency() {
      std::vector<ValueType> types;
      for (int iter = 0; iter < dataProvider->getColumnCount(); iter++) {
-       types.push_back(CURRENCY_VAL);
+       types.push_back(CurrencyValue);
      }
      dataset->setFieldTypes(types);
    }
@@ -147,7 +147,7 @@ class MemoryDatasetCurrency_tests : public ::testing::Test {
 
     std::vector<ValueType> types;
     for (int iter = 0; iter < dataProvider->getColumnCount(); iter++) {
-      types.push_back(CURRENCY_VAL);
+      types.push_back(CurrencyValue);
     }
     dataset->setFieldTypes(types);
   }
@@ -278,7 +278,7 @@ TEST_F(MemoryDataset_tests, filter_equals) {
   for (int i = 0; i < test[0].size(); ++i) {
     DataContainer container;
     container._string = strdup(("COLUMN" + std::to_string(i)).c_str());
-    options.addOption(i, ValueType::STRING_VAL, {container}, EQUALS);
+    options.addOption(i, ValueType::StringValue, {container}, EQUALS);
     dataset->filter(options);
 
     EXPECT_TRUE(dataset->eof());
@@ -289,7 +289,7 @@ TEST_F(MemoryDataset_tests, filter_equals) {
     for (int j = 0; j < test[i].size(); ++j) {
       DataContainer container;
       container._string = strdup(("COLUMN" + std::to_string(i + 1) + std::to_string(j + 1)).c_str());
-      options.addOption(j, ValueType::STRING_VAL, {container}, EQUALS);
+      options.addOption(j, ValueType::StringValue, {container}, EQUALS);
       dataset->filter(options);
 
       ASSERT_FALSE(dataset->eof());
@@ -308,7 +308,7 @@ TEST_F(MemoryDataset_tests, filter_starts_with) {
   for (int i = 0; i < test[0].size(); ++i) {
     DataContainer container;
     container._string = strdup("COL");
-    options.addOption(i, ValueType::STRING_VAL, {container}, STARTS_WITH);
+    options.addOption(i, ValueType::StringValue, {container}, STARTS_WITH);
     dataset->filter(options);
 
     ASSERT_FALSE(dataset->eof());
@@ -328,7 +328,7 @@ TEST_F(MemoryDataset_tests, filter_ends_with) {
   for (int i = 0; i < test[0].size(); ++i) {
     DataContainer container;
     container._string = strdup("1");
-    options.addOption(i, ValueType::STRING_VAL, {container}, ENDS_WITH);
+    options.addOption(i, ValueType::StringValue, {container}, ENDS_WITH);
     dataset->filter(options);
 
     options.options.clear();
@@ -350,7 +350,7 @@ TEST_F(MemoryDataset_tests, sort) {
   ASSERT_NO_THROW(dataset->open());
 
   SortOptions sortOptions0;
-  sortOptions0.addOption(0, DESCENDING);
+  sortOptions0.addOption(0, Descending);
 
   //
   dataset->sort(sortOptions0);
@@ -369,7 +369,7 @@ TEST_F(MemoryDataset_tests, sort) {
   //
 
   SortOptions sortOptions3;
-  sortOptions3.addOption(3, ASCENDING);
+  sortOptions3.addOption(3, Ascending);
   dataset->sort(sortOptions3);
   BaseField *col3 = dataset->fieldByIndex(3);
 
@@ -438,7 +438,7 @@ TEST_F(MemoryDataset_tests, exceptions) {
   ASSERT_NO_THROW(dataset->open());
 
   SortOptions sortOptions;
-  sortOptions.addOption(233, ASCENDING);
+  sortOptions.addOption(233, Ascending);
   EXPECT_THROW(dataset->sort(sortOptions), InvalidArgumentException);
 
   EXPECT_THROW(dataset->appendDataProvider(nullptr), InvalidArgumentException);
@@ -469,7 +469,7 @@ TEST_F(MemoryDatasetSort_tests, sortAscendingInteger) {
 
   SortOptions options;
   for (int i = 0; i < 5;++i) {
-    options.addOption(i, ASCENDING);
+    options.addOption(i, Ascending);
   }
   //
 
@@ -509,7 +509,7 @@ TEST_F(MemoryDatasetSort_tests, sortDescendingInteger) {
 
   SortOptions options;
   for (int i = 0; i < 5;++i) {
-    options.addOption(i, DESCENDING);
+    options.addOption(i, Descending);
   }
   //
 
@@ -547,11 +547,11 @@ TEST_F(MemoryDatasetSort_tests, sortCombinedInteger) {
   setAsInteger();
   ASSERT_NO_THROW(dataset->open());
 
-  SortOrder sortOrders[5] = {ASCENDING,
-                             DESCENDING,
-                             DESCENDING,
-                             ASCENDING,
-                             DESCENDING};
+  SortOrder sortOrders[5] = {Ascending,
+                             Descending,
+                             Descending,
+                             Ascending,
+                             Descending};
 
   SortOptions options;
   for (int i = 0; i < 5;++i) {
@@ -575,7 +575,7 @@ TEST_F(MemoryDatasetSort_tests, sortCombinedInteger) {
   while (!dataset->eof()) {
     cnt++;
     for (int i = 0; i < 5; ++i) {
-      if(sortOrders[i] == ASCENDING) {
+      if (sortOrders[i] == Ascending) {
         EXPECT_GE(fields[i]->getAsInteger(), previous[i]);
       } else {
         EXPECT_LE(fields[i]->getAsInteger(), previous[i]);
@@ -599,7 +599,7 @@ TEST_F(MemoryDatasetSort_tests, sortAscendingDouble) {
 
   SortOptions options;
   for (int i = 0; i < 5;++i) {
-    options.addOption(i, ASCENDING);
+    options.addOption(i, Ascending);
   }
   //
 
@@ -639,7 +639,7 @@ TEST_F(MemoryDatasetSort_tests, sortDescendingDouble) {
 
   SortOptions options;
   for (int i = 0; i < 5;++i) {
-    options.addOption(i, DESCENDING);
+    options.addOption(i, Descending);
   }
   //
 
@@ -677,11 +677,11 @@ TEST_F(MemoryDatasetSort_tests, sortCombinedDouble) {
   setAsDouble();
   ASSERT_NO_THROW(dataset->open());
 
-  SortOrder sortOrders[5] = {ASCENDING,
-                             DESCENDING,
-                             DESCENDING,
-                             ASCENDING,
-                             DESCENDING};
+  SortOrder sortOrders[5] = {Ascending,
+                             Descending,
+                             Descending,
+                             Ascending,
+                             Descending};
 
   SortOptions options;
   for (int i = 0; i < 5;++i) {
@@ -705,7 +705,7 @@ TEST_F(MemoryDatasetSort_tests, sortCombinedDouble) {
   while (!dataset->eof()) {
     cnt++;
     for (int i = 0; i < 5; ++i) {
-      if(sortOrders[i] == ASCENDING) {
+      if (sortOrders[i] == Ascending) {
         EXPECT_GE(fields[i]->getAsDouble(), previous[i]);
       } else {
         EXPECT_LE(fields[i]->getAsDouble(), previous[i]);
@@ -729,7 +729,7 @@ TEST_F(MemoryDatasetSort_tests, sortAscendingString) {
 
   SortOptions options;
   for (int i = 0; i < 5;++i) {
-    options.addOption(i, ASCENDING);
+    options.addOption(i, Ascending);
   }
   //
 
@@ -769,7 +769,7 @@ TEST_F(MemoryDatasetSort_tests, sortDescendingString) {
 
   SortOptions options;
   for (int i = 0; i < 5;++i) {
-    options.addOption(i, DESCENDING);
+    options.addOption(i, Descending);
   }
   //
 
@@ -807,11 +807,11 @@ TEST_F(MemoryDatasetSort_tests, sortCombinedString) {
   setAsString();
   ASSERT_NO_THROW(dataset->open());
 
-  SortOrder sortOrders[5] = {ASCENDING,
-                             DESCENDING,
-                             DESCENDING,
-                             ASCENDING,
-                             DESCENDING};
+  SortOrder sortOrders[5] = {Ascending,
+                             Descending,
+                             Descending,
+                             Ascending,
+                             Descending};
 
   SortOptions options;
   for (int i = 0; i < 5;++i) {
@@ -835,7 +835,7 @@ TEST_F(MemoryDatasetSort_tests, sortCombinedString) {
   while (!dataset->eof()) {
     cnt++;
     for (int i = 0; i < 5; ++i) {
-      if(sortOrders[i] == ASCENDING) {
+      if (sortOrders[i] == Ascending) {
         EXPECT_GE(fields[i]->getAsString(), previous[i]);
       } else {
         EXPECT_LE(fields[i]->getAsString(), previous[i]);
@@ -860,7 +860,7 @@ TEST_F(MemoryDatasetSort_tests, sortAscendingCurrency) {
 
   SortOptions options;
   for (int i = 0; i < 5;++i) {
-    options.addOption(i, ASCENDING);
+    options.addOption(i, Ascending);
   }
   //
 
@@ -900,7 +900,7 @@ TEST_F(MemoryDatasetSort_tests, sortDescendingCurrency) {
 
   SortOptions options;
   for (int i = 0; i < 5; ++i) {
-    options.addOption(i, DESCENDING);
+    options.addOption(i, Descending);
   }
   //
 
@@ -938,11 +938,11 @@ TEST_F(MemoryDatasetSort_tests, sortCombinedCurrency) {
   setAsCurrency();
   ASSERT_NO_THROW(dataset->open());
 
-  SortOrder sortOrders[5] = {ASCENDING,
-                             DESCENDING,
-                             DESCENDING,
-                             ASCENDING,
-                             DESCENDING};
+  SortOrder sortOrders[5] = {Ascending,
+                             Descending,
+                             Descending,
+                             Ascending,
+                             Descending};
 
   SortOptions options;
   for (int i = 0; i < 5;++i) {
@@ -966,7 +966,7 @@ TEST_F(MemoryDatasetSort_tests, sortCombinedCurrency) {
   while (!dataset->eof()) {
     cnt++;
     for (int i = 0; i < 5; ++i) {
-      if(sortOrders[i] == ASCENDING) {
+      if (sortOrders[i] == Ascending) {
         EXPECT_GE(fields[i]->getAsCurrency(), previous[i]);
       } else {
         EXPECT_LE(fields[i]->getAsCurrency(), previous[i]);

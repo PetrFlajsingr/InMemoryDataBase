@@ -137,14 +137,14 @@ class DataWorker_tests : public ::testing::Test {
 
 TEST_F(DataWorker_tests, basicCreate) {
   EXPECT_NO_THROW(worker = new MemoryDataWorker(dataProvider,
-                                                {STRING_VAL, INTEGER_VAL, STRING_VAL, STRING_VAL, STRING_VAL}));
+                                                {StringValue, IntegerValue, StringValue, StringValue, StringValue}));
 
   delete worker;
 }
 
 TEST_F(DataWorker_tests, choices) {
   EXPECT_NO_THROW(worker = new MemoryDataWorker(dataProvider,
-                                                {STRING_VAL, INTEGER_VAL, STRING_VAL, STRING_VAL, STRING_VAL}));
+                                                {StringValue, IntegerValue, StringValue, StringValue, StringValue}));
 
   std::vector<std::string> choices {"COLUMN11", "COLUMN13"};
   worker->setColumnChoices(choices);
@@ -162,7 +162,7 @@ TEST_F(DataWorker_tests, basicDistinct) {
   auto provider = new DataProviders::ArrayDataProvider(basicTest);
 
   EXPECT_NO_THROW(worker = new MemoryDataWorker(provider,
-                                                {STRING_VAL, INTEGER_VAL, STRING_VAL, STRING_VAL, STRING_VAL}));
+                                                {StringValue, IntegerValue, StringValue, StringValue, StringValue}));
 
   std::string sql = "SELECT main.0 FROM main";
 
@@ -182,8 +182,8 @@ TEST_F(DataWorker_tests, basicDistinct) {
 
 TEST_F(DataWorker_tests, advancedDinstinct) {
   EXPECT_NO_THROW(worker = new MemoryDataWorker(advDataProvider,
-                                                {STRING_VAL, INTEGER_VAL, CURRENCY_VAL, CURRENCY_VAL, INTEGER_VAL,
-                                                 CURRENCY_VAL}));
+                                                {StringValue, IntegerValue, CurrencyValue, CurrencyValue, IntegerValue,
+                                                 CurrencyValue}));
 
   std::string sql = "SELECT main.0, main.1, SUM(main.2), SUM(main.3), SUM(main.4), SUM(main.5) FROM main";
 
@@ -203,7 +203,7 @@ TEST_F(DataWorker_tests, basicSum) {
   auto provider = new DataProviders::ArrayDataProvider(basicTest);
 
   EXPECT_NO_THROW(worker = new MemoryDataWorker(provider,
-                                                {STRING_VAL, INTEGER_VAL, STRING_VAL, STRING_VAL, STRING_VAL}));
+                                                {StringValue, IntegerValue, StringValue, StringValue, StringValue}));
 
   std::string sql = "SELECT main.0, SUM(main.1) FROM main";
 
@@ -223,8 +223,8 @@ TEST_F(DataWorker_tests, basicSum) {
 
 TEST_F(DataWorker_tests, advancedSum) {
   EXPECT_NO_THROW(worker = new MemoryDataWorker(advDataProvider,
-                                                {STRING_VAL, INTEGER_VAL, CURRENCY_VAL, CURRENCY_VAL, INTEGER_VAL,
-                                                 CURRENCY_VAL}));
+                                                {StringValue, IntegerValue, CurrencyValue, CurrencyValue, IntegerValue,
+                                                 CurrencyValue}));
 
 
   std::string sql = "SELECT main.0, main.1, SUM(main.2), SUM(main.3), SUM(main.4), SUM(main.5) FROM main";
@@ -247,7 +247,7 @@ TEST_F(DataWorker_tests, basicAverage) {
   auto provider = new DataProviders::ArrayDataProvider(basicTest);
 
   EXPECT_NO_THROW(worker = new MemoryDataWorker(provider,
-                                                {STRING_VAL, INTEGER_VAL, INTEGER_VAL, STRING_VAL, STRING_VAL}));
+                                                {StringValue, IntegerValue, IntegerValue, StringValue, StringValue}));
 
   std::string sql = "SELECT main.0, AVG(main.2) FROM main";
 
@@ -267,8 +267,8 @@ TEST_F(DataWorker_tests, basicAverage) {
 
 TEST_F(DataWorker_tests, selection) {
   EXPECT_NO_THROW(worker = new MemoryDataWorker(advDataProvider,
-                                                {STRING_VAL, INTEGER_VAL, CURRENCY_VAL, CURRENCY_VAL, INTEGER_VAL,
-                                                 CURRENCY_VAL}));
+                                                {StringValue, IntegerValue, CurrencyValue, CurrencyValue, IntegerValue,
+                                                 CurrencyValue}));
 
   std::string sql = "SELECT main.0, AVG(main.2) FROM main WHERE main.0 = prvni | druhy";
 
@@ -288,7 +288,7 @@ TEST_F(DataWorker_tests, selection) {
 
 TEST_F(DataWorker_tests, mix) {
   EXPECT_NO_THROW(worker = new MemoryDataWorker(dataProvider,
-                                                {STRING_VAL, INTEGER_VAL, INTEGER_VAL, STRING_VAL, STRING_VAL}));
+                                                {StringValue, IntegerValue, IntegerValue, StringValue, StringValue}));
 
     std::string sql = "SELECT main.0, main.1, SUM(main.2), main.3, main.4 FROM main";
 
@@ -310,14 +310,14 @@ TEST_F(DataWorker_tests, mix) {
 
 TEST_F(DataWorker_tests, join) {
   EXPECT_NO_THROW(worker = new MemoryDataWorker(dataProvider,
-                                                {STRING_VAL, INTEGER_VAL, INTEGER_VAL, STRING_VAL, STRING_VAL}));
+                                                {StringValue, IntegerValue, IntegerValue, StringValue, StringValue}));
 
   std::string sql = "SELECT main.0, main.1, SUM(main.2), main.3, main.4, joinTest.1 FROM main JOIN joinTest ON main.1 = joinTest.0";
 
   auto joinProvider = new DataProviders::ArrayDataProvider(joinTest);
   auto joinDataSet = new DataSets::MemoryDataSet("joinTest");
   joinDataSet->setDataProvider(joinProvider);
-  joinDataSet->setFieldTypes({INTEGER_VAL, STRING_VAL});
+  joinDataSet->setFieldTypes({IntegerValue, StringValue});
   joinDataSet->open();
 
   worker->addDataSet(joinDataSet);
@@ -340,8 +340,8 @@ TEST_F(DataWorker_tests, join) {
 
 TEST_F(DataWorker_tests, uniqueValues) {
   EXPECT_NO_THROW(worker = new MemoryDataWorker(advDataProvider,
-                                                {STRING_VAL, INTEGER_VAL, CURRENCY_VAL, CURRENCY_VAL, INTEGER_VAL,
-                                                 CURRENCY_VAL}));
+                                                {StringValue, IntegerValue, CurrencyValue, CurrencyValue, IntegerValue,
+                                                 CurrencyValue}));
 
   std::vector<std::string> cols = {"0", "1"};
   worker->setColumnChoices(cols);

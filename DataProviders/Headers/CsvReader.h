@@ -106,7 +106,7 @@ class CsvReader : public BaseDataProvider {
     return currentRecordNumber;
   }
 
-  inline std::vector<std::string> getColumnNames() override {
+  inline std::vector<std::string> getHeader() override {
     return std::vector<std::string>(header);
   }
 

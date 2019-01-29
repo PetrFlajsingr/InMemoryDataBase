@@ -11,7 +11,7 @@ DataSets::DoubleField::DoubleField(const std::string &fieldName,
                                                                index) {}
 
 ValueType DataSets::DoubleField::getFieldType() {
-  return DOUBLE_VAL;
+  return DoubleValue;
 }
 
 void DataSets::DoubleField::setAsString(const std::string &value) {

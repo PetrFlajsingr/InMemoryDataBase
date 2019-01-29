@@ -11,9 +11,9 @@ class DateTime;
 /**
  * Typy ulozenych dat
  */
-enum ValueType { NONE, INTEGER_VAL, DOUBLE_VAL, STRING_VAL, CURRENCY_VAL, DATE_TIME_VAL };
+enum ValueType { NoneValue, IntegerValue, DoubleValue, StringValue, CurrencyValue, DateTimeValue };
 
-enum SortOrder { ASCENDING, DESCENDING };
+enum SortOrder { Ascending, Descending };
 
 typedef dec::decimal<2> Currency;
 

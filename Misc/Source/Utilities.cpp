@@ -69,11 +69,11 @@ bool Utilities::isDouble(const std::string &value) {
 
 ValueType Utilities::getType(const std::string &value) {
   if (isInteger(value)) {
-    return INTEGER_VAL;
+    return IntegerValue;
   } else if (isDouble(value)) {
-    return DOUBLE_VAL;
+    return DoubleValue;
   } else {
-    return STRING_VAL;
+    return StringValue;
   }
 }
 

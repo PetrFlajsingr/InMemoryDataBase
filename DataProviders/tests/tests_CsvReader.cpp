@@ -55,7 +55,7 @@ TEST_F (CsvReader_tests, columns_small) {
 
   ASSERT_EQ(reader->getColumnCount(), 5);
   for (int i = 0; i < 5; ++i) {
-    EXPECT_EQ(reader->getColumnNames()[i], columnNamesSmall[i]);
+    EXPECT_EQ(reader->getHeader()[i], columnNamesSmall[i]);
     EXPECT_EQ(reader->getColumn(i), columnNamesSmall[i]);
   }
 }

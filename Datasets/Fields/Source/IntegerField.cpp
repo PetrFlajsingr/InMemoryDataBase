@@ -12,7 +12,7 @@ DataSets::IntegerField::IntegerField(const std::string &fieldName,
                                                                  index) {}
 
 ValueType DataSets::IntegerField::getFieldType() {
-  return INTEGER_VAL;
+  return IntegerValue;
 }
 
 void DataSets::IntegerField::setAsString(const std::string &value) {

@@ -52,7 +52,7 @@ class ArrayDataProvider : public BaseDataProvider {
     return data[0].size();
   }
 
-  std::vector<std::string> getColumnNames() override {
+  std::vector<std::string> getHeader() override {
     std::vector<std::string> result;
     for (uint64_t i = 0; i < data[0].size(); ++i) {
       result.push_back(std::to_string(i));

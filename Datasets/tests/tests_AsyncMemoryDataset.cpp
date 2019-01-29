@@ -65,7 +65,7 @@ class AsyncMemoryDataset_tests : public ::testing::Test {
 
     std::vector<ValueType> types;
     for (int iter = 0; iter < dataProvider->getColumnCount(); iter++) {
-      types.push_back(STRING_VAL);
+      types.push_back(StringValue);
     }
     dataset->setFieldTypes(types);
   }
@@ -100,7 +100,7 @@ TEST_F(AsyncMemoryDataset_tests, sort) {
   EXPECT_CALL(observer, onAfterSort(dataset));
 
   SortOptions options;
-  options.addOption(0, ASCENDING);
+  options.addOption(0, Ascending);
   dataset->sort(options);
 }
 
@@ -117,7 +117,7 @@ TEST_F(AsyncMemoryDataset_tests, filter) {
   FilterOptions options;
   DataContainer container;
   container._string = strdup("A");
-  options.addOption(0, ValueType::STRING_VAL, {container}, CONTAINS);
+  options.addOption(0, ValueType::StringValue, {container}, CONTAINS);
   dataset->filter(options);
 }
 

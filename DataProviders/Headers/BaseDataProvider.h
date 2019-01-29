@@ -37,7 +37,7 @@ class BaseDataProvider {
    * Nazvy sloupcu
    * @return
    */
-  virtual std::vector<std::string> getColumnNames() = 0;
+  virtual std::vector<std::string> getHeader() = 0;
 
   /**
    * Pocet prozatim prectenych zaznamu

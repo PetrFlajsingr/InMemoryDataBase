@@ -23,7 +23,7 @@ std::vector<std::string> DataWorkers::MemoryDataWorker::getChoices(std::string c
   }
 
   DataSets::SortOptions sortOptions;
-  sortOptions.addOption(field->getIndex(), SortOrder::ASCENDING);
+  sortOptions.addOption(field->getIndex(), SortOrder::Ascending);
   dataset->sort(sortOptions);
 
   std::string value;
@@ -70,7 +70,7 @@ void DataWorkers::MemoryDataWorker::writeResult(BaseDataWriter &writer,
         queryData.projections[i].operation == Distinct) {
       sortOptions.addOption(
           dataset->fieldByName(queryData.projections[i].columnName)->getIndex(),
-          SortOrder::ASCENDING);
+          SortOrder::Ascending);
     }
   }
 
@@ -114,7 +114,7 @@ void DataWorkers::MemoryDataWorker::writeResult(BaseDataWriter &writer,
       joinStructures.emplace_back(joinStructure);
       DataSets::SortOptions options;
       options.addOption(joinStructure.indexAddi,
-          SortOrder::ASCENDING);
+                        SortOrder::Ascending);
       additionalDataSets[i]->sort(options);
     }
   }
@@ -248,19 +248,19 @@ void DataWorkers::MemoryDataWorker::filterDataSet() {
       DataContainer container;
       for (std::string &value : selection.reqs) {
         switch (type) {
-          case STRING_VAL:
+          case StringValue:
             container._string = strdup(value.c_str());
             break;
-          case INTEGER_VAL:
+          case IntegerValue:
             container._integer = Utilities::stringToInt(value);
             break;
-          case DOUBLE_VAL:
+          case DoubleValue:
             container._double = Utilities::stringToDouble(value);
             break;
-          case CURRENCY_VAL:
+          case CurrencyValue:
             *container._currency = dec::fromString<Currency>(value);
             break;
-          case DATE_TIME_VAL:container._dateTime = new DateTime(DateTime_s);
+          case DateTimeValue:container._dateTime = new DateTime(DateTime_s);
             container._dateTime->fromString(value);
             break;
         }
@@ -286,20 +286,20 @@ void DataWorkers::MemoryDataWorker::T_ThreadSort(DataSets::SortOptions &sortOpti
 DataWorkers::ResultAccumulator::ResultAccumulator(DataSets::BaseField *field,
     Operation op) : field(field), operation(op) {
   switch (field->getFieldType()) {
-    case STRING_VAL:
+    case StringValue:
       data._string = nullptr;
       break;
-    case INTEGER_VAL:
+    case IntegerValue:
       data._integer = 0;
       break;
-    case DOUBLE_VAL:
+    case DoubleValue:
       data._double = 0.0;
       break;
-    case CURRENCY_VAL:
+    case CurrencyValue:
       data._currency = new Currency();
       previousData._currency = new Currency();
       break;
-    case DATE_TIME_VAL:data._dateTime = new DateTime(DateTime_s);
+    case DateTimeValue:data._dateTime = new DateTime(DateTime_s);
       previousData._dateTime = new DateTime(DateTime_s);
       break;
   }
@@ -307,7 +307,7 @@ DataWorkers::ResultAccumulator::ResultAccumulator(DataSets::BaseField *field,
 
 bool DataWorkers::ResultAccumulator::handleDistinct() {
   switch (field->getFieldType()) {
-    case INTEGER_VAL: {
+    case IntegerValue: {
       int value = reinterpret_cast<DataSets::IntegerField *>(field)
           ->getAsInteger();
       if (!firstDone) {
@@ -324,7 +324,7 @@ bool DataWorkers::ResultAccumulator::handleDistinct() {
       }
       break;
     }
-    case DOUBLE_VAL: {
+    case DoubleValue: {
       double value = reinterpret_cast<DataSets::DoubleField *>(field)
           ->getAsDouble();
       if (!firstDone) {
@@ -341,7 +341,7 @@ bool DataWorkers::ResultAccumulator::handleDistinct() {
       }
       break;
     }
-    case STRING_VAL: {
+    case StringValue: {
       std::string value = field->getAsString();
       if (!firstDone) {
         firstDone = true;
@@ -358,7 +358,7 @@ bool DataWorkers::ResultAccumulator::handleDistinct() {
       }
       break;
     }
-    case CURRENCY_VAL: {
+    case CurrencyValue: {
       Currency value = reinterpret_cast<DataSets::CurrencyField *>(field)
           ->getAsCurrency();
       if (!firstDone) {
@@ -375,7 +375,7 @@ bool DataWorkers::ResultAccumulator::handleDistinct() {
       }
       break;
     }
-    case DATE_TIME_VAL: {
+    case DateTimeValue: {
       DateTime value = reinterpret_cast<DataSets::DateTimeField *>(field)
           ->getAsDateTime();
       if (!firstDone) {
@@ -398,28 +398,28 @@ bool DataWorkers::ResultAccumulator::handleDistinct() {
 
 bool DataWorkers::ResultAccumulator::handleSum() {
   switch (field->getFieldType()) {
-    case INTEGER_VAL: {
+    case IntegerValue: {
       int value = reinterpret_cast<DataSets::IntegerField *>(field)
           ->getAsInteger();
       data._integer += value;
       break;
     }
-    case DOUBLE_VAL: {
+    case DoubleValue: {
       double value = reinterpret_cast<DataSets::DoubleField *>(field)
           ->getAsDouble();
       data._double += value;
       break;
     }
-    case STRING_VAL: {
+    case StringValue: {
       throw IllegalStateException("Internal error. DataWorkers::ResultAccumulator::handleSum() on string");
     }
-    case CURRENCY_VAL: {
+    case CurrencyValue: {
       Currency value = reinterpret_cast<DataSets::CurrencyField *>(field)
           ->getAsCurrency();
       *data._currency += value;
       break;
     }
-    case DATE_TIME_VAL:
+    case DateTimeValue:
       throw IllegalStateException("Internal error. DataWorkers::ResultAccumulator::handleSum() on DateTime");
   }
   return false;
@@ -428,28 +428,28 @@ bool DataWorkers::ResultAccumulator::handleSum() {
 bool DataWorkers::ResultAccumulator::handleAverage() {
   dataCount++;
   switch (field->getFieldType()) {
-    case INTEGER_VAL: {
+    case IntegerValue: {
       int value = reinterpret_cast<DataSets::IntegerField *>(field)
           ->getAsInteger();
       data._integer += value;
       break;
     }
-    case DOUBLE_VAL: {
+    case DoubleValue: {
       double value = reinterpret_cast<DataSets::DoubleField *>(field)
           ->getAsDouble();
       data._double += value;
       break;
     }
-    case STRING_VAL: {
+    case StringValue: {
       throw IllegalStateException("Internal error. DataWorkers::ResultAccumulator::handleAverage() on string");
     }
-    case CURRENCY_VAL: {
+    case CurrencyValue: {
       Currency value = reinterpret_cast<DataSets::CurrencyField *>(field)
           ->getAsCurrency();
       *data._currency += value;
       break;
     }
-    case DATE_TIME_VAL: {
+    case DateTimeValue: {
       throw IllegalStateException("Internal error. DataWorkers::ResultAccumulator::handleAverage() on DateTime");
     }
   }
@@ -458,17 +458,17 @@ bool DataWorkers::ResultAccumulator::handleAverage() {
 
 std::string DataWorkers::ResultAccumulator::resultSum() {
   switch (field->getFieldType()) {
-    case INTEGER_VAL: {
+    case IntegerValue: {
       std::string result = std::to_string(data._integer);
       data._integer = 0;
       return result;
     }
-    case DOUBLE_VAL: {
+    case DoubleValue: {
       std::string result = std::to_string(data._double);
       data._double = 0;
       return result;
     }
-    case CURRENCY_VAL: {
+    case CurrencyValue: {
       std::string result = dec::toString(*data._currency);
       *data._currency = 0;
       return result;
@@ -478,17 +478,17 @@ std::string DataWorkers::ResultAccumulator::resultSum() {
 
 std::string DataWorkers::ResultAccumulator::resultAverage() {
   switch (field->getFieldType()) {
-    case INTEGER_VAL: {
+    case IntegerValue: {
       std::string result = std::to_string(data._integer / dataCount);
       data._integer = 0;
       return result;
     }
-    case DOUBLE_VAL: {
+    case DoubleValue: {
       std::string result = std::to_string(data._double / dataCount);
       data._double = 0;
       return result;
     }
-    case CURRENCY_VAL: {
+    case CurrencyValue: {
       std::string result = dec::toString(*data._currency / Currency(dataCount));
       *data._currency = 0;
       return result;
@@ -530,19 +530,19 @@ void DataWorkers::ResultAccumulator::reset() {
 }
 std::string DataWorkers::ResultAccumulator::getResultForce() {
   switch (field->getFieldType()) {
-    case INTEGER_VAL: {
+    case IntegerValue: {
       return std::to_string(data._integer);
     }
-    case DOUBLE_VAL: {
+    case DoubleValue: {
       return std::to_string(data._double);
     }
-    case CURRENCY_VAL: {
+    case CurrencyValue: {
       return dec::toString(*data._currency);
     }
-    case STRING_VAL: {
+    case StringValue: {
       return data._string;
     }
-    case DATE_TIME_VAL: {
+    case DateTimeValue: {
       return data._dateTime->toString();
     }
   }

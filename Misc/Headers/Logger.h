@@ -9,6 +9,7 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+#include <chrono>
 
 enum LogLevel { Verbose, Info, Status, Debug, Warning, Error };
 
@@ -35,13 +36,18 @@ class Logger {
     return "";
   }
 
+  inline static std::chrono::milliseconds startTimeMs;
+  inline static std::chrono::milliseconds endTimeMs;
+
  public:
 
   static void log(LogLevel logLevel, std::string message, bool printTime = false) {
-    if (printTime) {
-      message = levelToString(logLevel) + " " + getTime() + ": " + message;
-    } else {
-      message = levelToString(logLevel) + ": " + message;
+    if (logLevel != Verbose) {
+      if (printTime) {
+        message = levelToString(logLevel) + " " + getTime() + ": " + message;
+      } else {
+        message = levelToString(logLevel) + ": " + message;
+      }
     }
 
     std::cout << message << std::endl;
@@ -49,13 +55,30 @@ class Logger {
 
   static void log(LogLevel logLevel, const std::exception &exception, bool printTime = false) {
     std::string message = exception.what();
-    if (printTime) {
-      message = levelToString(logLevel) + " " + getTime() + ": " + message;
-    } else {
-      message = levelToString(logLevel) + ": " + message;
+    if (logLevel != Verbose) {
+      if (printTime) {
+        message = levelToString(logLevel) + " " + getTime() + ": " + message;
+      } else {
+        message = levelToString(logLevel) + ": " + message;
+      }
     }
 
     std::cout << message << std::endl;
+  }
+
+  static void startTime() {
+    Logger::startTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch());
+  }
+
+  static void endTime() {
+    Logger::endTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch());
+  }
+
+  static void printElapsedTime() {
+    auto tmp = Logger::endTimeMs - Logger::startTimeMs;
+    Logger::log(Verbose, "Time elapsed: " + std::to_string(tmp.count()) + " ms");
   }
 };
 

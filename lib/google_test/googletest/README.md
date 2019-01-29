@@ -117,7 +117,7 @@ New file `CMakeLists.txt.in`:
 
     cmake_minimum_required(VERSION 2.8.2)
 
-    project(googletest-download NONE)
+    project(googletest-download None)
 
     include(ExternalProject)
     ExternalProject_Add(googletest
