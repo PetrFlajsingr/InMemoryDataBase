@@ -10,6 +10,10 @@
 #include <string>
 
 namespace DataSets {
+
+/**
+ * Field zpristupnujici hodnoty typu std::string ulozene v data setu
+ */
 class StringField : public BaseField {
  protected:
   std::string data;
@@ -21,11 +25,12 @@ class StringField : public BaseField {
               BaseDataSet *dataset,
               uint64_t index);
 
-  ValueType getFieldType() override;
+  ValueType getFieldType() const override;
 
   void setAsString(const std::string &value) override;
 
-  std::string getAsString() override;
+  std::string getAsString() const override;
+
   std::function<int8_t (DataSetRow *, DataSetRow *)> getCompareFunction() override;
 };
 }

@@ -1,10 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
 
-#if (APPLE)
-#    add_definitions(-DGTEST_USE_OWN_TR1_TUPLE)
-#    add_definitions(-D__GLIBCXX__)
-#endif (APPLE)
-
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 include_directories(${gmock_SOURCE_DIR}/include ${gmock_SOURCE_DIR})
 
@@ -36,11 +31,6 @@ include_directories(third_party/xlsxio/include)
 
 project(csv_reader)
 
-#if (APPLE)
-#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -g ")
-#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=undefined -g ")
-#endif (APPLE)
-
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "-Wall -Wextra -o3")
 
@@ -53,16 +43,19 @@ set(SOURCE_FILES
         Datasets/Headers/MemoryDataSet.h Misc/Headers/Types.h Datasets/Fields/Headers/BaseField.h
         Datasets/Fields/Source/StringField.cpp Datasets/Fields/Headers/StringField.h
         Datasets/Fields/Source/IntegerField.cpp Datasets/Fields/Headers/IntegerField.h
-        Datasets/Fields/Source/DoubleField.cpp Datasets/Fields/Headers/DoubleField.h Datasets/Source/BaseDataSet.cpp
-        Datasets/Fields/Source/BaseField.cpp Datasets/Headers/FilterStructures.h
-        DataProviders/Headers/ArrayDataProvider.h
+        Datasets/Fields/Source/DoubleField.cpp Datasets/Fields/Headers/DoubleField.h
+        Datasets/Source/BaseDataSet.cpp
+        Datasets/Headers/FilterStructures.h DataProviders/Headers/ArrayDataProvider.h
         Datasets/Source/Async_MemoryDataSet.cpp Datasets/Headers/Async_MemoryDataSet.h
-        DataWriters/Source/CsvWriter.cpp DataWriters/Headers/CsvWriter.h FileDownloaders/Headers/BaseFileDownloader.h
+        DataWriters/Source/CsvWriter.cpp DataWriters/Headers/CsvWriter.h
+        FileDownloaders/Headers/BaseFileDownloader.h
         FileDownloaders/Headers/FileDownloadObserver.h third_party/decimal/Decimal.h
         Datasets/Fields/Source/CurrencyField.cpp Datasets/Fields/Headers/CurrencyField.h
-        DataWorkers/Headers/BaseDataWorker.h DataWorkers/Source/MemoryDataWorker.cpp DataWorkers/Headers/MemoryDataWorker.h
+        DataWorkers/Headers/BaseDataWorker.h DataWorkers/Source/MemoryDataWorker.cpp
+        DataWorkers/Headers/MemoryDataWorker.h
         DataWriters/Headers/BaseDataWriter.h DataWriters/Source/ArrayWriter.cpp
-        DataWriters/Headers/ArrayWriter.h Datasets/Headers/SortStructures.h Misc/Headers/Logger.h cedr.cpp)
+        DataWriters/Headers/ArrayWriter.h Datasets/Headers/SortStructures.h
+        Misc/Headers/Logger.h cedr.cpp)
 
 set(TEST_SOURCE_FILES
         RelationLayer/Source/RelationBuilder.cpp RelationLayer/Source/RelationManager.cpp
@@ -80,7 +73,7 @@ set(TEST_SOURCE_FILES
         Datasets/Fields/Source/StringField.cpp Datasets/Fields/Headers/StringField.h
         Datasets/Fields/Source/IntegerField.cpp Datasets/Fields/Headers/IntegerField.h
         Datasets/Fields/Source/DoubleField.cpp Datasets/Fields/Headers/DoubleField.h Datasets/Source/BaseDataSet.cpp
-        Datasets/Fields/Source/BaseField.cpp Datasets/Headers/FilterStructures.h
+        Datasets/Headers/FilterStructures.h Datasets/Fields/Source/BaseField.cpp
         Misc/tests/tests_isDouble_isInteger.cpp Misc/tests/tests_stringToInt_Double.cpp
         DataProviders/tests/tests_CsvReader.cpp Datasets/tests/tests_MemoryDataset.cpp
         DataProviders/Headers/ArrayDataProvider.h

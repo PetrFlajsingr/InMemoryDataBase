@@ -11,6 +11,10 @@
 #include "decimal.h"
 
 namespace DataSets {
+
+/**
+ * Field zpristupnujici hodnoty typu Currency v data setu.
+ */
 class CurrencyField : public BaseField {
  protected:
   void setValue(void *data) override;
@@ -21,17 +25,18 @@ class CurrencyField : public BaseField {
                 BaseDataSet *dataset,
                 uint64_t index);
 
-  ValueType getFieldType() override;
+  ValueType getFieldType() const override;
 
   void setAsString(const std::string &value) override;
 
-  std::string getAsString() override;
+  std::string getAsString() const override;
 
   void setAsCurrency(Currency &value);
 
-  Currency getAsCurrency();
+  Currency getAsCurrency() const;
 
-  std::function<int8_t (DataSetRow *, DataSetRow *)> getCompareFunction() override;
+  std::function<int8_t(DataSetRow *,
+                       DataSetRow *)> getCompareFunction() override;
 };
 }
 

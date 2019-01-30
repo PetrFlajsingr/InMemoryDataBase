@@ -52,7 +52,7 @@ class DateTime {
    * Prevod do string ve formatu YYYY-MM-DD HH-MM-SS
    * @return Casova hodnota ve formatu YYYY-MM-DD HH-MM-SS
    */
-  std::string toString() {
+  std::string toString() const {
     std::stringstream ss;
     ss << *this;
     return ss.str();

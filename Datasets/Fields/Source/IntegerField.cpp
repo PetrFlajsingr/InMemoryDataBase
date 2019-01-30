@@ -11,7 +11,7 @@ DataSets::IntegerField::IntegerField(const std::string &fieldName,
                                                                  dataset,
                                                                  index) {}
 
-ValueType DataSets::IntegerField::getFieldType() {
+ValueType DataSets::IntegerField::getFieldType() const {
   return IntegerValue;
 }
 
@@ -20,7 +20,7 @@ void DataSets::IntegerField::setAsString(const std::string &value) {
   BaseField::setData(&data, getFieldType());
 }
 
-std::string DataSets::IntegerField::getAsString() {
+std::string DataSets::IntegerField::getAsString() const {
   return std::to_string(data);
 }
 
@@ -33,22 +33,22 @@ void DataSets::IntegerField::setAsInteger(int value) {
   BaseField::setData(&data, getFieldType());
 }
 
-int DataSets::IntegerField::getAsInteger() {
+int DataSets::IntegerField::getAsInteger() const {
   return data;
 }
 
-std::function<int8_t (DataSets::DataSetRow *,
-                   DataSets::DataSetRow *)> DataSets::IntegerField::getCompareFunction() {
-    return [this](const DataSetRow *a,
-                         const DataSetRow *b) {
-      if ((*a->cells)[index]->_integer
+std::function<int8_t(DataSets::DataSetRow *,
+                     DataSets::DataSetRow *)> DataSets::IntegerField::getCompareFunction() {
+  return [this](const DataSetRow *a,
+                const DataSetRow *b) {
+    if ((*a->cells)[index]->_integer
         == (*b->cells)[index]->_integer) {
-        return 0;
-      }
-      if ((*a->cells)[index]->_integer
-          < (*b->cells)[index]->_integer) {
-        return -1;
-      }
-      return 1;
-    };
+      return 0;
+    }
+    if ((*a->cells)[index]->_integer
+        < (*b->cells)[index]->_integer) {
+      return -1;
+    }
+    return 1;
+  };
 }

@@ -4,7 +4,7 @@
 
 #include <DateTimeField.h>
 
-ValueType DataSets::DateTimeField::getFieldType() {
+ValueType DataSets::DateTimeField::getFieldType() const {
   return DateTimeValue;
 }
 
@@ -12,7 +12,7 @@ void DataSets::DateTimeField::setAsString(const std::string &value) {
   data.fromString(value);
 }
 
-std::string DataSets::DateTimeField::getAsString() {
+std::string DataSets::DateTimeField::getAsString() const {
   return data.toString();
 }
 
@@ -39,7 +39,7 @@ void DataSets::DateTimeField::setAsDateTime(const DateTime &dateTime) {
   data = dateTime;
 }
 
-DateTime DataSets::DateTimeField::getAsDateTime() {
+DateTime DataSets::DateTimeField::getAsDateTime() const {
   return data;
 }
 

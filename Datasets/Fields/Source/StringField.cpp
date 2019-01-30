@@ -11,7 +11,7 @@ DataSets::StringField::StringField(const std::string &fieldName,
                                                                dataset,
                                                                index) {}
 
-ValueType DataSets::StringField::getFieldType() {
+ValueType DataSets::StringField::getFieldType() const {
   return StringValue;
 }
 
@@ -21,7 +21,7 @@ void DataSets::StringField::setAsString(const std::string &value) {
                      getFieldType());
 }
 
-std::string DataSets::StringField::getAsString() {
+std::string DataSets::StringField::getAsString() const {
   return data;
 }
 
@@ -33,11 +33,11 @@ void DataSets::StringField::setValue(void *data) {
   this->data = std::string(reinterpret_cast<char *>(data));
 }
 
-std::function<int8_t (DataSets::DataSetRow *,
-                   DataSets::DataSetRow *)> DataSets::StringField::getCompareFunction() {
-    return [this](const DataSetRow *a,
-                         const DataSetRow *b) {
-      return strcmp((*a->cells)[index]->_string,
-                    (*b->cells)[index]->_string);
-    };
+std::function<int8_t(DataSets::DataSetRow *,
+                     DataSets::DataSetRow *)> DataSets::StringField::getCompareFunction() {
+  return [this](const DataSetRow *a,
+                const DataSetRow *b) {
+    return strcmp((*a->cells)[index]->_string,
+                  (*b->cells)[index]->_string);
+  };
 }

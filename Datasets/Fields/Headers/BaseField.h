@@ -24,19 +24,9 @@ class BaseField {
 
   uint64_t index;  //< Index sloupce
 
- public:
-  /**
-   *
-   * @return Nazev pole
-   */
-  const std::string &getFieldName() const {
-    return fieldName;
-  }
+  friend class BaseDataSet;  //< Pro pristup k primemu nastaveni dat
 
- protected:
-  friend class BaseDataSet; //< Pro pristup k primemu nastaveni dat
-
-  BaseDataSet *dataSet;  //< Rodicovsky dataset
+  BaseDataSet *dataSet;  //< Vlastnik
 
   /**
    * Nastaveni hodnoty field.
@@ -72,7 +62,7 @@ class BaseField {
    * Typ dat ulozenych ve Field
    * @return
    */
-  virtual ValueType getFieldType() = 0;
+  virtual ValueType getFieldType() const = 0;
 
   /**
    * Nastaveni hodnoty pole pomoci string
@@ -84,14 +74,22 @@ class BaseField {
    * Navrat hodnoty v poli jako string
    * @return
    */
-  virtual std::string getAsString() = 0;
+  virtual std::string getAsString() const = 0;
 
   /**
    *
    * @return Index Field v DataSet
    */
-  uint64_t getIndex() {
+  uint64_t getIndex() const {
     return index;
+  }
+
+  /**
+   *
+   * @return Nazev pole
+   */
+  const std::string &getFieldName() const {
+    return fieldName;
   }
 
   /**
@@ -102,7 +100,8 @@ class BaseField {
    *    1 pokud je prvni vetsi
    *    -1 pokud je prvni mensi
    */
-  virtual std::function<int8_t (DataSetRow *, DataSetRow *)> getCompareFunction() = 0;
+  virtual std::function<int8_t(DataSetRow *,
+                               DataSetRow *)> getCompareFunction() = 0;
 
 };
 }  // namespace DataSets

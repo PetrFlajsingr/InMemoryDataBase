@@ -44,7 +44,8 @@ class CsvReader_tests : public ::testing::Test {
 
 void CsvReader_tests::prepareReaderSmall() {
   reader =
-      new DataProviders::CsvReader("../DataProviders/tests/Files/small.csv");
+      new DataProviders::CsvReader("../DataProviders/tests/Files/small.csv",
+                                   ";");
 }
 
 void CsvReader_tests::prepareReaderAdv() {

@@ -10,7 +10,7 @@ DataSets::DoubleField::DoubleField(const std::string &fieldName,
                                                                dataset,
                                                                index) {}
 
-ValueType DataSets::DoubleField::getFieldType() {
+ValueType DataSets::DoubleField::getFieldType() const {
   return DoubleValue;
 }
 
@@ -19,7 +19,7 @@ void DataSets::DoubleField::setAsString(const std::string &value) {
   setData(&data, getFieldType());
 }
 
-std::string DataSets::DoubleField::getAsString() {
+std::string DataSets::DoubleField::getAsString() const {
   return std::to_string(data);
 }
 
@@ -32,12 +32,12 @@ void DataSets::DoubleField::setAsDouble(double value) {
   setData(&data, getFieldType());
 }
 
-double DataSets::DoubleField::getAsDouble() {
+double DataSets::DoubleField::getAsDouble() const {
   return data;
 }
 
-std::function<int8_t (DataSets::DataSetRow *,
-                   DataSets::DataSetRow *)> DataSets::DoubleField::getCompareFunction() {
+std::function<int8_t(DataSets::DataSetRow *,
+                     DataSets::DataSetRow *)> DataSets::DoubleField::getCompareFunction() {
   return [this](const DataSetRow *a,
                 const DataSetRow *b) {
     if ((*a->cells)[index]->_double

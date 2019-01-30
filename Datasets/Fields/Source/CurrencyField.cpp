@@ -10,7 +10,7 @@ void DataSets::CurrencyField::setValue(void *data) {
   this->data = *reinterpret_cast<Currency *>(data);
 }
 
-ValueType DataSets::CurrencyField::getFieldType() {
+ValueType DataSets::CurrencyField::getFieldType() const {
   return CurrencyValue;
 }
 
@@ -19,11 +19,12 @@ void DataSets::CurrencyField::setAsString(const std::string &value) {
   setData(&data, getFieldType());
 }
 
-std::string DataSets::CurrencyField::getAsString() {
+std::string DataSets::CurrencyField::getAsString() const {
   return dec::toString(data);
 }
 
-std::function<int8_t (DataSets::DataSetRow *, DataSets::DataSetRow *)> DataSets::CurrencyField::getCompareFunction() {
+std::function<int8_t(DataSets::DataSetRow *,
+                     DataSets::DataSetRow *)> DataSets::CurrencyField::getCompareFunction() {
   return [this](const DataSetRow *a,
                 const DataSetRow *b) {
     if (*(*a->cells)[index]->_currency
@@ -43,9 +44,11 @@ void DataSets::CurrencyField::setAsCurrency(Currency &value) {
   BaseField::setData(&data, getFieldType());
 }
 
-Currency DataSets::CurrencyField::getAsCurrency() {
+Currency DataSets::CurrencyField::getAsCurrency() const {
   return data;
 }
 
-DataSets::CurrencyField::CurrencyField(const std::string &fieldName, DataSets::BaseDataSet *dataset, uint64_t index)
+DataSets::CurrencyField::CurrencyField(const std::string &fieldName,
+                                       DataSets::BaseDataSet *dataset,
+                                       uint64_t index)
     : BaseField(fieldName, dataset, index) {}
