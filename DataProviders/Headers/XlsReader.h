@@ -44,7 +44,7 @@ class XlsReader : BaseDataProvider {
 
   const std::vector<std::string> &getRow() const override;
 
-  std::string getColumn(unsigned int columnIndex) const override;
+  std::string getColumnName(unsigned int columnIndex) const override;
 
   uint64_t getColumnCount() const override;
 

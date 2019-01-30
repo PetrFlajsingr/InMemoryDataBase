@@ -43,7 +43,7 @@ class ArrayDataProvider : public BaseDataProvider {
     return data[currentRow];
   }
 
-  std::string getColumn(unsigned int columnIndex) const override {
+  std::string getColumnName(unsigned int columnIndex) const override {
     return std::to_string(columnIndex);
   }
 

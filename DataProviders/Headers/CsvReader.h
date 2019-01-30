@@ -91,7 +91,7 @@ class CsvReader : public BaseDataProvider {
     return currentRecord;
   }
 
-  inline std::string getColumn(unsigned int columnIndex) const override {
+  inline std::string getColumnName(unsigned int columnIndex) const override {
     return header.at(columnIndex);
   }
 

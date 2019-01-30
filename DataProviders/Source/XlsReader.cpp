@@ -33,7 +33,7 @@ const std::vector<std::string> &DataProviders::XlsReader::getRow() const {
   return currentRecord;
 }
 
-std::string DataProviders::XlsReader::getColumn(unsigned int columnIndex) const {
+std::string DataProviders::XlsReader::getColumnName(unsigned int columnIndex) const {
   return currentRecord.at(columnIndex);
 }
 

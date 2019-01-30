@@ -99,7 +99,7 @@ class BaseDataProvider {
    * @param columnIndex Index sloupce
    * @return
    */
-  virtual std::string getColumn(unsigned int columnIndex) const = 0;
+  virtual std::string getColumnName(unsigned int columnIndex) const = 0;
 
   /**
    * Pocet sloupcu zaznamu
