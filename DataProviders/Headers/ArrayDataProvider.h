@@ -8,6 +8,7 @@
 #include <utility>
 #include <vector>
 #include <string>
+#include <algorithm>
 #include "BaseDataProvider.h"
 
 namespace DataProviders {
@@ -20,62 +21,58 @@ class ArrayDataProvider : public BaseDataProvider {
  private:
   std::vector<std::vector<std::string>> data;
 
-  uint64_t row = 0;
+  std::vector<std::string> header;
+
+  uint64_t currentRow = 0;
 
  public:
   /**
-   * Kopiruje predana data
+   * Priprava header jakozt index sloupce.
    */
   explicit ArrayDataProvider(const std::vector<std::vector<std::string>> &data)
-      : data(data) {}
+      : data(data) {
+    header.reserve(data[0].size());
+    for (auto i = 0; i < data[0].size(); ++i) {
+      header.emplace_back(std::to_string(i));
+    }
+  }
 
   ~ArrayDataProvider() override = default;
 
-  std::vector<std::string> getRow() override {
-    std::vector<std::string> result;
-
-    for (uint64_t i = 0; i < data[0].size(); ++i) {
-      result.push_back(data[row][i]);
-    }
-
-    return result;
+  const std::vector<std::string> &getRow() const override {
+    return data[currentRow];
   }
 
-  std::string getColumn(unsigned int columnIndex) override {
+  std::string getColumn(unsigned int columnIndex) const override {
     return std::to_string(columnIndex);
   }
 
-  uint64_t getColumnCount() override {
+  uint64_t getColumnCount() const override {
     return data[0].size();
   }
 
-  std::vector<std::string> getHeader() override {
-    std::vector<std::string> result;
-    for (uint64_t i = 0; i < data[0].size(); ++i) {
-      result.push_back(std::to_string(i));
-    }
-
-    return result;
+  const std::vector<std::string> &getHeader() const override {
+    return header;
   }
 
-  uint64_t getCurrentRecordNumber() override {
-    return row;
+  uint64_t getCurrentRecordNumber() const override {
+    return currentRow;
   }
 
   bool next() override {
-    if (row < data.size()) {
-      row++;
+    if (currentRow < data.size()) {
+      currentRow++;
       return true;
     }
     return false;
   }
 
   void first() override {
-    row = 0;
+    currentRow = 0;
   }
 
-  bool eof() override {
-    return row == data.size();
+  bool eof() const override {
+    return currentRow == data.size();
   }
 };
 }  // namespace DataProviders

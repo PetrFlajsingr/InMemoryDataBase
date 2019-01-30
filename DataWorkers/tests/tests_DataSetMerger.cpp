@@ -89,10 +89,8 @@ TEST_F(DataSetMerger_tests, merge_test) {
 
   for (auto i = 0; i < test1Result.size(); ++i) {
     for (auto j = 0; j < test1Result[i].size(); ++j) {
-      //std::cout << fields[j]->getAsString() << ", ";
       EXPECT_EQ(fields[j]->getAsString(), test1Result[i][j]);
     }
-    //std::cout << std::endl;
     mergeResult->next();
   }
 }

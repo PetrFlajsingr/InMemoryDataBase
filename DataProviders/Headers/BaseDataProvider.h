@@ -92,32 +92,32 @@ class BaseDataProvider {
    * Zaznam rozdeleny na sloupce
    * @return
    */
-  virtual std::vector<std::string> getRow() = 0;
+  virtual const std::vector<std::string> &getRow() const = 0;
 
   /**
    * Hodnota ve vybranem sloupci
    * @param columnIndex Index sloupce
    * @return
    */
-  virtual std::string getColumn(unsigned int columnIndex) = 0;
+  virtual std::string getColumn(unsigned int columnIndex) const = 0;
 
   /**
    * Pocet sloupcu zaznamu
    * @return
    */
-  virtual uint64_t getColumnCount() = 0;
+  virtual uint64_t getColumnCount() const = 0;
 
   /**
    * Nazvy sloupcu
    * @return
    */
-  virtual std::vector<std::string> getHeader() = 0;
+  virtual const std::vector<std::string> &getHeader() const = 0;
 
   /**
    * Pocet prozatim prectenych zaznamu
    * @return
    */
-  virtual uint64_t getCurrentRecordNumber() = 0;
+  virtual uint64_t getCurrentRecordNumber() const = 0;
 
   /**
    * Presun na nasledujici zaznam
@@ -134,7 +134,7 @@ class BaseDataProvider {
    * Kontrola dostupnosti zaznamu
    * @return false pokud neni dostupny dalsi zaznam, jinak true
    */
-  inline virtual bool eof() = 0;
+  inline virtual bool eof() const = 0;
 
   iterator begin() {
     return iterator(this);

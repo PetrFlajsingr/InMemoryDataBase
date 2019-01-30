@@ -73,7 +73,7 @@ void DataProviders::CsvReader::first() {
   currentRecordNumber = 0;
 }
 
-bool DataProviders::CsvReader::eof() {
+bool DataProviders::CsvReader::eof() const {
   return file.eof();
 }
 
@@ -81,8 +81,8 @@ void DataProviders::CsvReader::setDelimiter(char delimiter) {
   this->delimiter = delimiter;
 }
 
-std::vector<std::string> DataProviders::CsvReader::tokenize(std::string &line,
-                                                            int vectorReserve) {
+std::vector<std::string> DataProviders::CsvReader::tokenize(const std::string &line,
+                                                            int vectorReserve) const {
   char buffer[BUFFER_SIZE];
   uint64_t bufferIter = 0;
   TokeniserStates state = Read;

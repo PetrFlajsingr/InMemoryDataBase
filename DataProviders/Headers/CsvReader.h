@@ -20,17 +20,26 @@ namespace DataProviders {
  * Podporuje uvozovky " pro pouziti delimiteru v v zaznamu.
  *
  * Ukazka pouziti:
-    auto csvReader = new DataProviders::CsvReader(PATH_TO_FILE, DELIMITER);
-
-    auto header = csvReader->getHeader();
-
-    while (!csvReader->eof()) {
-        auto currentRow = csvReader->getRow();
-
-        csvReader->next();
-    }
-
-    delete csvReader;
+ *  auto csvReader = new DataProviders::CsvReader(PATH_TO_FILE, DELIMITER);
+ *
+ *  auto header = csvReader->getHeader();
+ *
+ *  while (!csvReader->eof()) {
+ *      auto currentRow = csvReader->getRow();
+ *
+ *      csvReader->next();
+ *  }
+ *
+ *  delete csvReader;
+ * Pouziti s iterator:
+ *  auto csvReader = new DataProvider::CsvReader(PATH_TO_FILe, DELIMITER);
+ *
+ *  auto header = csvReader->getHeader();
+ *
+ *  for (auto row : *header) {
+ *      //delej neco se zaznamem
+ *  }
+ *
  */
 class CsvReader : public BaseDataProvider {
  private:
@@ -57,7 +66,8 @@ class CsvReader : public BaseDataProvider {
    */
   void parseRecord();
 
-  std::vector<std::string> tokenize(std::string &line, int vectorReserve);
+  std::vector<std::string> tokenize(const std::string &line,
+                                    int vectorReserve) const;
 
  public:
   /**
@@ -77,12 +87,12 @@ class CsvReader : public BaseDataProvider {
    * Vraci zaznam souboru, ktery je na rade.
    * @return rozdeleny zaznamu podle CSV delimiter.
    */
-  inline std::vector<std::string> getRow() override {
+  inline const std::vector<std::string> &getRow() const override {
     return currentRecord;
   }
 
-  inline std::string getColumn(unsigned int columnIndex) override {
-    return this->header.at(columnIndex);
+  inline std::string getColumn(unsigned int columnIndex) const override {
+    return header.at(columnIndex);
   }
 
   /**
@@ -93,19 +103,19 @@ class CsvReader : public BaseDataProvider {
 
   void first() override;
 
-  uint64_t getCurrentRecordNumber() override {
+  uint64_t getCurrentRecordNumber() const override {
     return currentRecordNumber;
   }
 
-  inline std::vector<std::string> getHeader() override {
-    return std::vector<std::string>(header);
+  inline const std::vector<std::string> &getHeader() const override {
+    return header;
   }
 
-  inline uint64_t getColumnCount() override {
+  inline uint64_t getColumnCount() const override {
     return header.size();
   }
 
-  bool eof() override;
+  bool eof() const override;
 
   /**
    * Nataveni delimiteru pro rozdelovani csv souboru

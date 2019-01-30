@@ -42,21 +42,21 @@ class XlsReader : BaseDataProvider {
 
   ~XlsReader() override;
 
-  std::vector<std::string> getRow() override;
+  const std::vector<std::string> &getRow() const override;
 
-  std::string getColumn(unsigned int columnIndex) override;
+  std::string getColumn(unsigned int columnIndex) const override;
 
-  uint64_t getColumnCount() override;
+  uint64_t getColumnCount() const override;
 
-  std::vector<std::string> getHeader() override;
+  const std::vector<std::string> &getHeader() const override;
 
-  uint64_t getCurrentRecordNumber() override;
+  uint64_t getCurrentRecordNumber() const override;
 
   bool next() override;
 
   void first() override;
 
-  bool eof() override;
+  bool eof() const override;
 };
 
 }  // namespace DataProviders

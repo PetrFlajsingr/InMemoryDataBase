@@ -29,23 +29,23 @@ DataProviders::XlsReader::XlsReader(const std::string &fileName) {
   }
 }
 
-std::vector<std::string> DataProviders::XlsReader::getRow() {
+const std::vector<std::string> &DataProviders::XlsReader::getRow() const {
   return currentRecord;
 }
 
-std::string DataProviders::XlsReader::getColumn(unsigned int columnIndex) {
+std::string DataProviders::XlsReader::getColumn(unsigned int columnIndex) const {
   return currentRecord.at(columnIndex);
 }
 
-uint64_t DataProviders::XlsReader::getColumnCount() {
+uint64_t DataProviders::XlsReader::getColumnCount() const {
   return currentRecord.size();
 }
 
-std::vector<std::string> DataProviders::XlsReader::getHeader() {
+const std::vector<std::string> &DataProviders::XlsReader::getHeader() const {
   return header;
 }
 
-uint64_t DataProviders::XlsReader::getCurrentRecordNumber() {
+uint64_t DataProviders::XlsReader::getCurrentRecordNumber() const {
   return currentRecordNumber;
 }
 
@@ -68,7 +68,7 @@ void DataProviders::XlsReader::first() {
   throw NotImplementedException();
 }
 
-bool DataProviders::XlsReader::eof() {
+bool DataProviders::XlsReader::eof() const {
   return _eof;
 }
 
