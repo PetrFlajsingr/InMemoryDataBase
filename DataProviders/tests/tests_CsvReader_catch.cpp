@@ -36,7 +36,7 @@ SCENARIO("Using via BaseDataProvider interface", "[CsvReader]") {
 
     WHEN("reading the file contents") {
 
-      THEN("values corespond to test values") {
+      THEN("values correspond to test values") {
         int i = 0;
         while (!reader->eof()) {
           REQUIRE(reader->getRow().size() == 5);
@@ -57,9 +57,9 @@ SCENARIO("Using via BaseDataProvider interface", "[CsvReader]") {
         std::vector<std::vector<std::string>> toCheck;
         while (!reader->eof()) {
           std::vector<std::string> row;
-          for (const auto &value : reader->getRow()) {
-            row.emplace_back(value);
-          }
+          std::copy(reader->getRow().begin(),
+                    reader->getRow().end(),
+                    std::back_inserter(row));
           toCheck.emplace_back(row);
           reader->next();
         }
@@ -169,8 +169,8 @@ SCENARIO("Using via iterator", "[CsvReader]") {
         for (const auto &value : *reader) {
           REQUIRE(reader->getRow().size() == 5);
           int j = 0;
-          for (const auto &value : reader->getRow()) {
-            REQUIRE(value == recordsSmall[i][j]);
+          for (const auto &record : value) {
+            REQUIRE(record == recordsSmall[i][j]);
             j++;
           }
           i++;
@@ -217,9 +217,8 @@ SCENARIO("Using via iterator", "[CsvReader]") {
         for (const auto &value : *reader) {
           REQUIRE(reader->getRow().size() == 3);
           int j = 0;
-          for (const auto &value : reader->getRow()) {
-            REQUIRE(value == advancedTest[i][j]);
-            j++;
+          for (auto j = 0; j < 3; ++j) {
+            REQUIRE(value[j] == advancedTest[i][j]);
           }
           i++;
         }
