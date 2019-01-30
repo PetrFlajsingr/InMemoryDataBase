@@ -18,6 +18,8 @@
 #include <XlsxWriter.h>
 #include <array>
 
+// TODO: pridat const do parametru a kontraktu funkci
+
 const std::string csvPath = "/Users/petr/Desktop/csvs/";
 const std::string outPath = csvPath + "out/";
 const std::string dotaceCSVName = "dotace.csv";

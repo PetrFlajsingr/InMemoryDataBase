@@ -35,12 +35,12 @@ void RelationLayer::Relation::removeRelation(void *dataFirstDataSet,
 }
 
 const std::vector<RelationLayer::RelationContainer> *RelationLayer::Relation::findRelations(
-    void *pointerToData) {
+    void *pointerToData) const {
   auto result = new std::vector<RelationContainer>();
   std::copy_if(relations.begin(),
                relations.end(),
                std::back_inserter(*result),
-               [pointerToData](RelationContainer &container) {
+               [pointerToData](const RelationContainer &container) {
                  return container.data_SecondDataSet == pointerToData
                      || container.data_FirstDataSet == pointerToData;
                });

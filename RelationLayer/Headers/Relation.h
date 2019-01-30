@@ -5,8 +5,10 @@
 #ifndef CSV_READER_BASERELATION_H
 #define CSV_READER_BASERELATION_H
 
+#include <iterator>
 #include <vector>
 #include <Types.h>
+#include <mach/machine.h>
 
 namespace RelationLayer {
 
@@ -25,6 +27,11 @@ struct RelationContainer {
   void *data_SecondDataSet;
 
   RelationContainer(void *data_FirstDataSet, void *data_SecondDataSet);
+
+  RelationContainer &operator=(const RelationContainer &rhs) {
+    data_FirstDataSet = rhs.data_FirstDataSet;
+    data_SecondDataSet = rhs.data_SecondDataSet;
+  }
 };
 
 /**
@@ -40,6 +47,156 @@ class Relation {
   std::vector<RelationContainer> relations;
 
  public:
+  /**
+   * Random access iterator.
+   */
+  class iterator : std::iterator<std::random_access_iterator_tag,
+                                 RelationContainer> {
+   private:
+    Relation *relation;
+    uint64_t position;  //< pozice v poli
+
+   public:
+    iterator() = default;
+
+    explicit iterator(Relation *relation, int position)
+        : relation(relation), position(position) {}
+
+    iterator(const iterator &other) {
+      relation = other.relation;
+      position = other.position;
+    }
+
+    /**
+     * Prepis hodnoty
+     * @param rhs
+     * @return
+     */
+    iterator &operator=(const RelationContainer &rhs) {
+      relation->relations[position] = rhs;
+      return *this;
+    }
+
+    /**
+     * Posun vpred
+     * @return
+     */
+    iterator &operator++() {
+      if (position < relation->relations.size()) {
+        position++;
+      }
+      return *this;
+    }
+
+    /**
+     * Posun vpred
+     * @return
+     */
+    const iterator operator++(int) {
+      iterator result = *this;
+      ++(*this);
+      return result;
+    }
+
+    /**
+     * Srovnani pozice
+     * @param rhs
+     * @return
+     */
+    bool operator==(const iterator &rhs) const {
+      return position == rhs.position;
+    }
+
+    /**
+     * Srovnani pozice
+     * @param rhs
+     * @return
+     */
+    bool operator!=(const iterator &rhs) const {
+      return !(rhs == *this);
+    }
+
+    RelationContainer &operator*(int) {
+      return relation->relations[position];
+    }
+
+    iterator *operator->() {
+      return this;
+    }
+
+    iterator &operator--() {
+      if (position > 0) {
+        position--;
+      }
+      return *this;
+    }
+
+    const iterator operator--(int) {
+      iterator result = *this;
+      --(*this);
+      return result;
+    }
+
+    iterator operator+(const uint64_t rhs) {
+      iterator result = *this;
+      result.position += rhs;
+
+      if (result.position > relation->relations.size()) {
+        result.position = relation->relations.size();
+      }
+
+      return result;
+    }
+
+    iterator operator-(const uint64_t rhs) {
+      iterator result = *this;
+      if (rhs > result.position) {
+        result.position = 0;
+      } else {
+        result.position -= rhs;
+      }
+      return result;
+    }
+
+    iterator operator-(const iterator &rhs) {
+      *this = *this - rhs.position;
+    }
+
+    bool operator<(const iterator &rhs) {
+      return position < rhs.position;
+    }
+
+    bool operator>(const iterator &rhs) {
+      return position > rhs.position;
+    }
+
+    bool operator<=(const iterator &rhs) {
+      return position <= rhs.position;
+    }
+
+    bool operator>=(const iterator &rhs) {
+      return position >= rhs.position;
+    }
+
+    iterator &operator+=(const uint64_t rhs) {
+      position += rhs;
+      return *this;
+    }
+
+    iterator &operator-=(const uint64_t rhs) {
+      if (rhs > position) {
+        position = 0;
+      } else {
+        position -= rhs;
+      }
+      return *this;
+    }
+
+    RelationContainer &operator[](const uint64_t index) {
+      return relation->relations[index];
+    }
+  };
+
   explicit Relation(RelationType relationType);
 
   virtual ~Relation() = 0;
@@ -64,7 +221,7 @@ class Relation {
    * @param pointerToData vyhledavana hodnota
    * @return vector nalezenych relaci
    */
-  virtual const std::vector<RelationContainer> *findRelations(void *pointerToData);
+  virtual const std::vector<RelationContainer> *findRelations(void *pointerToData) const;
 
   RelationType getRelationType() const;
 
