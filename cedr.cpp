@@ -465,3 +465,38 @@ int main(int argc, char **argv) {
   Logger::getInstance().printElapsedTime();
   return 0;
 }
+
+void demo() {
+  std::vector<std::string> listOfFiles;
+
+  auto writer = new DataWriters::XlsxWriter("output.xlsx");
+
+  for (const auto &filename : listOfFiles) {
+    auto provider = new DataProviders::CsvReader(filename);
+    std::copy(provider->begin(), provider->end(), writer->begin());
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

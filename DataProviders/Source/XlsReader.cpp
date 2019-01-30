@@ -27,6 +27,7 @@ DataProviders::XlsReader::XlsReader(const std::string &fileName) {
       delete value;
     }
   }
+  next();
 }
 
 const std::vector<std::string> &DataProviders::XlsReader::getRow() const {
@@ -51,10 +52,19 @@ uint64_t DataProviders::XlsReader::getCurrentRecordNumber() const {
 
 bool DataProviders::XlsReader::next() {
   if (xlsxioread_sheet_next_row(xlsxioSheet) != 0) {
+    currentRecord.clear();
     char *value;
     while ((value = xlsxioread_sheet_next_cell(xlsxioSheet)) != nullptr) {
       currentRecord.emplace_back(value);
       delete value;
+    }
+    if (std::all_of(currentRecord.begin(),
+                    currentRecord.end(),
+                    [](const std::string &value) {
+                      return value.empty();
+                    })) {
+      _eof = true;
+      return true;
     }
     currentRecordNumber++;
   } else {
@@ -65,7 +75,9 @@ bool DataProviders::XlsReader::next() {
 }
 
 void DataProviders::XlsReader::first() {
-  throw NotImplementedException();
+  xlsxioread_sheet_close(xlsxioSheet);
+  xlsxioSheet =
+      xlsxioread_sheet_open(xlsxioReader, nullptr, XLSXIOREAD_SKIP_EMPTY_ROWS);
 }
 
 bool DataProviders::XlsReader::eof() const {
@@ -73,6 +85,10 @@ bool DataProviders::XlsReader::eof() const {
 }
 
 DataProviders::XlsReader::~XlsReader() {
+  close();
+}
+
+void DataProviders::XlsReader::close() {
   xlsxioread_sheet_close(xlsxioSheet);
   xlsxioread_close(xlsxioReader);
 }

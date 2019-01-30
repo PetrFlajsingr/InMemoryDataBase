@@ -8,18 +8,17 @@
 #include <string>
 #include <vector>
 #include <xlsxio_read.h>
-#include "BaseDataProvider.h"
+#include <BaseDataProvider.h>
 
 namespace DataProviders {
 
-// TODO: napsat testy
 
 /**
  * Trida pro cteni dat z xlsx souboru.
  *
  * Podporuje pouze cteni jako string.
  */
-class XlsReader : BaseDataProvider {
+class XlsReader : public BaseDataProvider {
  private:
   xlsxioreader xlsxioReader;  //< Handle na xlsxio reader
 
@@ -32,6 +31,8 @@ class XlsReader : BaseDataProvider {
   uint64_t currentRecordNumber = 0;
 
   bool _eof = false;
+
+  void close();
 
  public:
   /**

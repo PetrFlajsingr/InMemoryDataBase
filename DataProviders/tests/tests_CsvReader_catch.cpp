@@ -1,11 +1,11 @@
 //
 // Created by Petr Flajsingr on 2019-01-30.
 //
-
+#include <Catch2Define.h>
 #include <catch.hpp>
 #include <CsvReader.h>
 
-SCENARIO("Using via BaseDataProvider interface", "[CsvReader]") {
+SCENARIO("Reading csv file via BaseDataProvider interface", "[CsvReader]") {
 
   GIVEN("A simple csv file") {
     const std::string columnNamesSmall[5]{
@@ -149,7 +149,7 @@ SCENARIO("Using via BaseDataProvider interface", "[CsvReader]") {
   }
 }
 
-SCENARIO("Using via iterator", "[CsvReader]") {
+SCENARIO("Reading csv file via iterator", "[CsvReader]") {
 
   GIVEN("A simple csv file") {
     const std::string recordsSmall[3][5]{

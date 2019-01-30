@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.8)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "-Wall -Wextra -o3")
 
-add_compile_definitions(CATCH_CONFIG_MAIN)
+include_directories(Misc/tests)
 
 include_directories(Misc/Headers)
 
