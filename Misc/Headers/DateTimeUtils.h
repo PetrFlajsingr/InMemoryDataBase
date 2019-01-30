@@ -14,7 +14,7 @@
 enum DateTimeMode { DateTime_s, Date_s, Time_s };
 
 /**
- * Trida pro repreztenaci casu a data
+ * Trida pro reprezentaci casu a data.
  */
 class DateTime {
  private:
@@ -117,8 +117,6 @@ class DateTime {
   DateTimeMode getMode() const {
     return mode;
   }
-
-  DateTime &operator=(const DateTime &rhs) = default;
 
   // operator overloads
   bool operator==(const DateTime &rhs) const {

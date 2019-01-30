@@ -11,7 +11,7 @@
 #include <algorithm>
 
 namespace DataWorkers {
-  class SQLException : public std::exception {};
+class SQLParseException : public std::exception {};
 
   enum Operation {
     Distinct, Sum, Average
@@ -50,8 +50,6 @@ enum JoinType {
   };
 
   class SQLParser {
-   private:
-
    public:
     static QueryData parse(std::string sql) {
       auto splitSql = Utilities::splitStringByDelimiter(std::move(sql), " ");
@@ -60,7 +58,7 @@ enum JoinType {
 
       int iter = 0;
       if (splitSql[iter] != "SELECT") {
-        throw SQLException();
+        throw SQLParseException();
       }
       iter++;
 
@@ -78,7 +76,7 @@ enum JoinType {
           } else if (split[0] == "SUM") {
             operation = Sum;
           } else {
-            throw SQLException();
+            throw SQLParseException();
           }
 
           split[1] = split[1].substr(0, split[1].size() - 1);
@@ -110,12 +108,12 @@ enum JoinType {
         JoinOperation op;
         if (splitSql[iter] != "JOIN") {
           if (splitSql[iter] != "LEFT") {
-            throw SQLException();
+            throw SQLParseException();
           }
           op.joinType = LeftJoin;
           iter++;
           if (splitSql[iter] != "JOIN") {
-            throw SQLException();
+            throw SQLParseException();
           }
         } else {
           op.joinType = NormalJoin;
@@ -127,7 +125,7 @@ enum JoinType {
         iter++;
 
         if (splitSql[iter] != "ON") {
-          throw SQLException();
+          throw SQLParseException();
         }
         iter++;
 
@@ -137,7 +135,7 @@ enum JoinType {
         iter++;
 
         if (splitSql[iter] != "=") {
-          throw SQLException();
+          throw SQLParseException();
         }
         iter++;
 
@@ -158,7 +156,7 @@ enum JoinType {
         selectionOperation.tableName = colInfo[0];
         iter++;
         if (splitSql[iter] != "=") {
-          throw SQLException();
+          throw SQLParseException();
         }
 
         do {
@@ -167,7 +165,7 @@ enum JoinType {
           iter++;
         } while (iter < splitSql.size() && splitSql[iter] == "|");
         if (iter < splitSql.size() && splitSql[iter] != "AND") {
-          throw SQLException();
+          throw SQLParseException();
         }
 
         result.selections.push_back(selectionOperation);

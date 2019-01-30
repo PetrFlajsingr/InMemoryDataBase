@@ -19,11 +19,13 @@ enum LogLevel { Verbose, Info, Status, Debug, Warning, Error };
 // TODO: povoleni/zakaz vypis Debug, Verbose
 class Logger {
  private:
+  Logger(bool isAllowedDebug = false) : isAllowedDebug(isAllowedDebug) {}
+
   /**
    *
    * @return Momentalni cas ve formatu HH-MM-SS
    */
-  static std::string getTime() {
+  std::string getTime() {
     auto t = std::time(nullptr);
     auto tm = *std::localtime(&t);
     std::stringstream ss;
@@ -36,7 +38,7 @@ class Logger {
    * @param level
    * @return
    */
-  static std::string levelToString(LogLevel level) {
+  std::string levelToString(LogLevel level) {
     switch (level) {
       case Verbose:return "";
       case Info: return "[INFO]";
@@ -48,15 +50,19 @@ class Logger {
     return "";
   }
 
-  static bool isAllowedDebug;
+  bool isAllowedDebug;
 
   /**
    * Pro logovani casu
    */
-  inline static std::chrono::milliseconds startTimeMs;
-  inline static std::chrono::milliseconds endTimeMs;
+  std::chrono::milliseconds startTimeMs;
+  std::chrono::milliseconds endTimeMs;
 
  public:
+  static Logger getInstance() {
+    static Logger instance;
+    return instance;
+  }
 
   /**
    * Vypis zpravu na stdout
@@ -64,7 +70,7 @@ class Logger {
    * @param message zprava
    * @param printTime pokud true, vypise cas, jinak nic
    */
-  static void log(LogLevel logLevel, std::string message, bool printTime = false) {
+  void log(LogLevel logLevel, std::string message, bool printTime = false) {
     if (isAllowedDebug && logLevel == LogLevel::Debug) {
       return;
     }
@@ -84,7 +90,9 @@ class Logger {
    * @param exception vyjimka, o niz se ma vypsat info
    * @param printTime pokud true, vypise cas, jinak nic
    */
-  static void log(LogLevel logLevel, const std::exception &exception, bool printTime = false) {
+  void log(LogLevel logLevel,
+           const std::exception &exception,
+           bool printTime = false) {
     if (isAllowedDebug && logLevel == LogLevel::Debug) {
       return;
     }
@@ -102,7 +110,7 @@ class Logger {
   /**
    * Uloz pocatecni stav pro logovani.
    */
-  static void startTime() {
+  void startTime() {
     Logger::startTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::system_clock::now().time_since_epoch());
   }
@@ -110,7 +118,7 @@ class Logger {
   /**
    * Uloz koncovy stav pro logovani.
    */
-  static void endTime() {
+  void endTime() {
     Logger::endTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::system_clock::now().time_since_epoch());
   }
@@ -118,16 +126,15 @@ class Logger {
   /**
    * Vypise na stdout rozdil endTime a startTime v ms.
    */
-  static void printElapsedTime() {
+  void printElapsedTime() {
     auto tmp = Logger::endTimeMs - Logger::startTimeMs;
-    Logger::log(Verbose, "Time elapsed: " + std::to_string(tmp.count()) + " ms");
+    Logger::log(Verbose,
+                "Time elapsed: " + std::to_string(tmp.count()) + " ms");
   }
 
-  static void allowDebug() {
+  void allowDebug() {
     isAllowedDebug = true;
   }
 };
-
-bool Logger::isAllowedDebug = false;
 
 #endif //CSV_READER_LOGGER_H

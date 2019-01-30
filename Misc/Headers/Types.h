@@ -5,13 +5,20 @@
 #ifndef MISC_HEADERS_TYPES_H_
 #define MISC_HEADERS_TYPES_H_
 
-#include "decimal.h"
+#include <decimal.h>
 
 class DateTime;
 /**
  * Typy ulozenych dat
  */
-enum ValueType { NoneValue, IntegerValue, DoubleValue, StringValue, CurrencyValue, DateTimeValue };
+enum ValueType {
+  NoneValue,
+  IntegerValue,
+  DoubleValue,
+  StringValue,
+  CurrencyValue,
+  DateTimeValue
+};
 
 /**
  * Poradi pro razeni
@@ -24,7 +31,7 @@ enum SortOrder { Ascending, Descending };
 typedef dec::decimal<2> Currency;
 
 /**
- * Union ukladajici data v pameti.
+ * Union ukladajici data memory data setu.
  */
 typedef union {
   char *_string = nullptr;

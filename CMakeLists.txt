@@ -52,7 +52,7 @@ set(SOURCE_FILES
         FileDownloaders/Headers/FileDownloadObserver.h third_party/decimal/Decimal.h
         Datasets/Fields/Source/CurrencyField.cpp Datasets/Fields/Headers/CurrencyField.h
         DataWorkers/Headers/BaseDataWorker.h DataWorkers/Source/MemoryDataWorker.cpp
-        DataWorkers/Headers/MemoryDataWorker.h
+        DataWorkers/Headers/MemoryDataWorker.h Datasets/Fields/Source/BaseField.cpp
         DataWriters/Headers/BaseDataWriter.h DataWriters/Source/ArrayWriter.cpp
         DataWriters/Headers/ArrayWriter.h Datasets/Headers/SortStructures.h
         Misc/Headers/Logger.h cedr.cpp)

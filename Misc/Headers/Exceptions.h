@@ -35,17 +35,10 @@ class IOException : public std::exception {
 /**
  * Exception pro informovani o chybne zadanych argumentech
  */
-class InvalidArgumentException : public std::exception {
- private:
-  const char *errorMessage;
+class InvalidArgumentException : public std::invalid_argument {
  public:
-  explicit InvalidArgumentException(const char *message) {
-    this->errorMessage = message;
-  }
-
-  char const *what() const noexcept override {
-    return errorMessage;
-  }
+  explicit InvalidArgumentException(const char *message) : invalid_argument(
+      message) {}
 };
 
 /**

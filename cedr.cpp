@@ -110,7 +110,7 @@ void countIntersection() {
                                   StringValue, StringValue, IntegerValue,
                                   StringValue});
   prijemceDataSet->open();
-  Logger::log(Debug, "Prijemce loaded", true);
+  Logger::getInstance().log(Debug, "Prijemce loaded", true);
 
   auto subjektyDataSet = new DataSets::MemoryDataSet("subjekty");
   subjektyDataSet->setDataProvider(subjektyProvider);
@@ -119,7 +119,7 @@ void countIntersection() {
                                   StringValue,
                                   StringValue, StringValue});
   subjektyDataSet->open();
-  Logger::log(Debug, "Subjekty loaded", true);
+  Logger::getInstance().log(Debug, "Subjekty loaded", true);
 
   DataSets::SortOptions options;
   options.addOption(prijemceDataSet->fieldByName("ico")->getIndex(), Ascending);
@@ -130,7 +130,7 @@ void countIntersection() {
                      Ascending);
   subjektyDataSet->sort(options2);
 
-  Logger::log(Debug, "Sorted", true);
+  Logger::getInstance().log(Debug, "Sorted", true);
 
   auto fieldPrijemce =
       dynamic_cast<DataSets::IntegerField *>(prijemceDataSet->fieldByName("ico"));
@@ -165,7 +165,9 @@ void countIntersection() {
 
     prijemceDataSet->next();
   }
-  Logger::log(Info, "Total intersection count: " + std::to_string(cnt), true);
+  Logger::getInstance().log(Info,
+                            "Total intersection count: " + std::to_string(cnt),
+                            true);
 
 }
 
@@ -190,7 +192,7 @@ void checkDupl() {
     total++;
     if (Utilities::compareString(field->getAsString(), last) == 0) {
       if (!logged) {
-        //Logger::log(Warning, "Duplicate: " + last);
+        //Logger::getInstance().log(Warning, "Duplicate: " + last);
         cnt++;
         logged = true;
       }
@@ -203,10 +205,12 @@ void checkDupl() {
     dataset->next();
   }
 
-  Logger::log(Warning, "Record count: " + std::to_string(total));
-  Logger::log(Warning, "Duplicate count: " + std::to_string(cnt2));
-  Logger::log(Warning, "Unique duplicate count: " + std::to_string(cnt));
-  Logger::log(Warning,
+  Logger::getInstance().log(Warning, "Record count: " + std::to_string(total));
+  Logger::getInstance().log(Warning,
+                            "Duplicate count: " + std::to_string(cnt2));
+  Logger::getInstance().log(Warning,
+                            "Unique duplicate count: " + std::to_string(cnt));
+  Logger::getInstance().log(Warning,
               "Avg on duplicates: " + std::to_string(cnt2 / (double) cnt));
 
   delete prov;
@@ -263,16 +267,16 @@ void writerTest() {
 int main(int argc, char **argv) {
   writerTest();
   for (auto i = 0; i < 1; ++i) {
-    Logger::startTime();
+    Logger::getInstance().startTime();
     //iterExample();
     //checkDupl();
     //dominikKontrola();
     //countIntersection();
-    Logger::endTime();
-    Logger::printElapsedTime();
+    Logger::getInstance().endTime();
+    Logger::getInstance().printElapsedTime();
   }
   return 0;
-  Logger::startTime();
+  Logger::getInstance().startTime();
   // open input files
   auto dotaceProvider =
       new DataProviders::CsvReader(csvPath + dotaceCSVName, ",");
@@ -285,7 +289,7 @@ int main(int argc, char **argv) {
   auto subjektyProvider =
       new DataProviders::CsvReader(csvPath + subjektyCSVName, ";");
 
-  Logger::log(Debug, "Providers prepared", true);
+  Logger::getInstance().log(Debug, "Providers prepared", true);
   printMemoryUsageMacOS();
 
   auto dotaceDataSet = new DataSets::MemoryDataSet("dotace");
@@ -293,14 +297,14 @@ int main(int argc, char **argv) {
   dotaceDataSet->setFieldTypes({StringValue, StringValue, StringValue,
                                 StringValue, StringValue, StringValue});
   dotaceDataSet->open();
-  Logger::log(Debug, "Dotace loaded", true);
+  Logger::getInstance().log(Debug, "Dotace loaded", true);
   printMemoryUsageMacOS();
 
   auto rozhodnutiDataSet = new DataSets::MemoryDataSet("rozhodnuti");
   rozhodnutiDataSet->setDataProvider(rozhodnutiProvider);
   rozhodnutiDataSet->setFieldTypes({StringValue, StringValue, StringValue});
   rozhodnutiDataSet->open();
-  Logger::log(Debug, "Rozhodnuti loaded", true);
+  Logger::getInstance().log(Debug, "Rozhodnuti loaded", true);
   printMemoryUsageMacOS();
 
   DataWorkers::DataSetMerger merger;
@@ -309,7 +313,7 @@ int main(int argc, char **argv) {
 
   auto dotace_rozhodnutiDataSet =
       merger.mergeDataSets("dotace", "rozhodnuti", "idDotace", "idDotace");
-  Logger::log(Debug, "Merged dotace, rozhodnuti", true);
+  Logger::getInstance().log(Debug, "Merged dotace, rozhodnuti", true);
   printMemoryUsageMacOS();
 
   merger.removeDataSet("dotace");
@@ -322,7 +326,7 @@ int main(int argc, char **argv) {
   obdobiDataSet->setFieldTypes({StringValue, StringValue, CurrencyValue,
                                 CurrencyValue, StringValue, StringValue});
   obdobiDataSet->open();
-  Logger::log(Debug, "Obdobi loaded", true);
+  Logger::getInstance().log(Debug, "Obdobi loaded", true);
   printMemoryUsageMacOS();
 
   merger.addDataSet(dotace_rozhodnutiDataSet);
@@ -333,7 +337,7 @@ int main(int argc, char **argv) {
                            "obdobi",
                            "idRozhodnuti",
                            "idRozhodnuti");
-  Logger::log(Debug, "Merged dotace_rozhodnuti, obdobi", true);
+  Logger::getInstance().log(Debug, "Merged dotace_rozhodnuti, obdobi", true);
   printMemoryUsageMacOS();
 
   merger.removeDataSet("dotace_rozhodnuti");
@@ -348,7 +352,7 @@ int main(int argc, char **argv) {
   prijemceDataSet->setDataProvider(prijemceProvider);
   prijemceDataSet->setFieldTypes({StringValue, IntegerValue, StringValue});
   prijemceDataSet->open();
-  Logger::log(Debug, "Prijemce loaded", true);
+  Logger::getInstance().log(Debug, "Prijemce loaded", true);
   printMemoryUsageMacOS();
 
   auto subjektyDataSet = new DataSets::MemoryDataSet("subjekty");
@@ -357,14 +361,14 @@ int main(int argc, char **argv) {
                                   StringValue, StringValue, StringValue,
                                   StringValue});
   subjektyDataSet->open();
-  Logger::log(Debug, "Subjekty loaded", true);
+  Logger::getInstance().log(Debug, "Subjekty loaded", true);
   printMemoryUsageMacOS();
 
   merger.addDataSet(subjektyDataSet);
   merger.addDataSet(prijemceDataSet);
   auto prijemce_subjektyDataSet =
       merger.mergeDataSets("prijemce", "subjekty", "ico", "IČO_num");
-  Logger::log(Debug, "Merged prijemce, subjekty", true);
+  Logger::getInstance().log(Debug, "Merged prijemce, subjekty", true);
   printMemoryUsageMacOS();
 
   delete subjektyDataSet;
@@ -376,7 +380,7 @@ int main(int argc, char **argv) {
   operacniProgramDataSet->setDataProvider(operacniProgramProvider);
   operacniProgramDataSet->setFieldTypes({StringValue, StringValue});
   operacniProgramDataSet->open();
-  Logger::log(Debug, "operacniProgram loaded", true);
+  Logger::getInstance().log(Debug, "operacniProgram loaded", true);
   printMemoryUsageMacOS();
 
   auto grantoveSchemaProvider =
@@ -385,7 +389,7 @@ int main(int argc, char **argv) {
   grantoveSchemaDataSet->setDataProvider(grantoveSchemaProvider);
   grantoveSchemaDataSet->setFieldTypes({StringValue, StringValue});
   grantoveSchemaDataSet->open();
-  Logger::log(Debug, "grantoveSchema loaded", true);
+  Logger::getInstance().log(Debug, "grantoveSchema loaded", true);
   printMemoryUsageMacOS();
 
   auto dotaceTitulProvider =
@@ -394,7 +398,7 @@ int main(int argc, char **argv) {
   dotaceTitulDataSet->setDataProvider(dotaceTitulProvider);
   dotaceTitulDataSet->setFieldTypes({StringValue, StringValue});
   dotaceTitulDataSet->open();
-  Logger::log(Debug, "dotaceTitul loaded", true);
+  Logger::getInstance().log(Debug, "dotaceTitul loaded", true);
   printMemoryUsageMacOS();
 
   auto poskytovatelDotaceProvider =
@@ -404,7 +408,7 @@ int main(int argc, char **argv) {
   poskytovatelDotaceDataSet->setDataProvider(poskytovatelDotaceProvider);
   poskytovatelDotaceDataSet->setFieldTypes({StringValue, StringValue});
   poskytovatelDotaceDataSet->open();
-  Logger::log(Debug, "poskytovatelDotace loaded", true);
+  Logger::getInstance().log(Debug, "poskytovatelDotace loaded", true);
   printMemoryUsageMacOS();
 
   dataWorker->addDataSet(prijemce_subjektyDataSet);
@@ -412,7 +416,7 @@ int main(int argc, char **argv) {
   dataWorker->addDataSet(grantoveSchemaDataSet);
   dataWorker->addDataSet(dotaceTitulDataSet);
   dataWorker->addDataSet(poskytovatelDotaceDataSet);
-  Logger::log(Debug, "Add datasets to data worker", true);
+  Logger::getInstance().log(Debug, "Add datasets to data worker", true);
   printMemoryUsageMacOS();
 
   auto dataWriter = new DataWriters::CsvWriter(outPath + "all.csv", ",");
@@ -420,7 +424,7 @@ int main(int argc, char **argv) {
   dataWorker->writeResult(*dataWriter,
                           query);
 
-  Logger::log(Debug, "Written query: " + query, true);
+  Logger::getInstance().log(Debug, "Written query: " + query, true);
   printMemoryUsageMacOS();
 
   delete dataWriter;
@@ -428,7 +432,7 @@ int main(int argc, char **argv) {
   query = QUERY_AGR;
   dataWorker->writeResult(*dataWriter,
                           query);
-  Logger::log(Debug, "Written query: " + query, true);
+  Logger::getInstance().log(Debug, "Written query: " + query, true);
   printMemoryUsageMacOS();
   delete dataWriter;
 
@@ -436,7 +440,7 @@ int main(int argc, char **argv) {
   query = QUERY_2017;
   dataWorker->writeResult(*dataWriter,
                           query);
-  Logger::log(Debug, "Written query: " + query, true);
+  Logger::getInstance().log(Debug, "Written query: " + query, true);
   printMemoryUsageMacOS();
   delete dataWriter;
 
@@ -444,7 +448,7 @@ int main(int argc, char **argv) {
   query = QUERY_AGR_2017;
   dataWorker->writeResult(*dataWriter,
                           query);
-  Logger::log(Debug, "Written query: " + query, true);
+  Logger::getInstance().log(Debug, "Written query: " + query, true);
   printMemoryUsageMacOS();
   delete dataWriter;
 
@@ -456,10 +460,10 @@ int main(int argc, char **argv) {
   delete grantoveSchemaDataSet;
   delete dotaceTitulDataSet;
   delete poskytovatelDotaceDataSet;
-  Logger::log(Debug, "Done", true);
+  Logger::getInstance().log(Debug, "Done", true);
   printMemoryUsageMacOS();
 
-  Logger::endTime();
-  Logger::printElapsedTime();
+  Logger::getInstance().endTime();
+  Logger::getInstance().printElapsedTime();
   return 0;
 }
