@@ -8,11 +8,11 @@ cmake_minimum_required(VERSION 3.8)
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 include_directories(${gmock_SOURCE_DIR}/include ${gmock_SOURCE_DIR})
 
-add_subdirectory(lib/google_test)
+add_subdirectory(third_party/google_test)
 
-include_directories(lib/google_test/googletest/include)
+include_directories(third_party/google_test/googletest/include)
 
-include_directories(lib/google_test/googlemock/include)
+include_directories(third_party/google_test/googlemock/include)
 
 include_directories(Misc/Headers)
 
@@ -26,13 +26,13 @@ include_directories(Datasets/Fields/Headers)
 
 include_directories(FileDownloaders/Headers)
 
-include_directories(lib/Decimal)
+include_directories(third_party/Decimal)
 
 include_directories(DataWorkers/Headers)
 
 include_directories(RelationLayer/Headers)
 
-include_directories(lib/xlsxio/include)
+include_directories(third_party/xlsxio/include)
 
 project(csv_reader)
 
@@ -58,7 +58,7 @@ set(SOURCE_FILES
         DataProviders/Headers/ArrayDataProvider.h
         Datasets/Source/Async_MemoryDataSet.cpp Datasets/Headers/Async_MemoryDataSet.h
         DataWriters/Source/CsvWriter.cpp DataWriters/Headers/CsvWriter.h FileDownloaders/Headers/BaseFileDownloader.h
-        FileDownloaders/Headers/FileDownloadObserver.h lib/decimal/Decimal.h
+        FileDownloaders/Headers/FileDownloadObserver.h third_party/decimal/Decimal.h
         Datasets/Fields/Source/CurrencyField.cpp Datasets/Fields/Headers/CurrencyField.h
         DataWorkers/Headers/BaseDataWorker.h DataWorkers/Source/MemoryDataWorker.cpp DataWorkers/Headers/MemoryDataWorker.h
         DataWriters/Headers/BaseDataWriter.h DataWriters/Source/ArrayWriter.cpp
@@ -70,7 +70,7 @@ set(TEST_SOURCE_FILES
         RelationLayer/Headers/Relation.h RelationLayer/Source/Relation.cpp DataProviders/tests/tests_XlsReader.cpp
         DataProviders/Headers/XlsReader.h DataProviders/Source/XlsReader.cpp Misc/Headers/DateTimeUtils.h
         Datasets/Fields/Headers/DateTimeField.h Datasets/Fields/Source/DateTimeField.cpp
-        lib/xlsxio/include/xlsxio_read.h lib/xlsxio/include/xlsxio_write.h lib/xlsxio/include/xlsxio_version.h
+        third_party/xlsxio/include/xlsxio_read.h third_party/xlsxio/include/xlsxio_write.h third_party/xlsxio/include/xlsxio_version.h
         DataWriters/tests/tests_XslxWriter.cpp DataWriters/Headers/XlsxWriter.h DataWriters/Source/XlsxWriter.cpp
         DataWorkers/tests/tests_DataSetMerger.cpp DataWorkers/Source/DataSetMerger.cpp
         DataWorkers/Headers/DataSetMerger.h DataProviders/Source/CsvReader.cpp DataProviders/Headers/CsvReader.h
@@ -87,7 +87,7 @@ set(TEST_SOURCE_FILES
         Datasets/Source/Async_MemoryDataSet.cpp Datasets/Headers/Async_MemoryDataSet.h
         Datasets/tests/tests_AsyncMemoryDataset.cpp
         DataWriters/Source/CsvWriter.cpp DataWriters/Headers/CsvWriter.h FileDownloaders/Headers/BaseFileDownloader.h
-        FileDownloaders/Headers/FileDownloadObserver.h lib/decimal/Decimal.h
+        FileDownloaders/Headers/FileDownloadObserver.h third_party/decimal/Decimal.h
         Datasets/Fields/Source/CurrencyField.cpp Datasets/Fields/Headers/CurrencyField.h
         DataWorkers/Headers/BaseDataWorker.h DataWorkers/Source/MemoryDataWorker.cpp DataWorkers/Headers/MemoryDataWorker.h
         DataWorkers/tests/tests_DataWorkers.cpp DataWriters/Headers/BaseDataWriter.h DataWriters/Source/ArrayWriter.cpp
