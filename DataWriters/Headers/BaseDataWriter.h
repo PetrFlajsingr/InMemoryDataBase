@@ -13,16 +13,24 @@ namespace DataWriters {
 
 /**
  * Rozhrani pro zapis dat.
+ * Pouziti:
+ * DataProviders::BaseDataProvider provider;
+ *    while (!provider->eof()) {
+ *       writer->writeRecord(provider->getRow());
+ *       provider->next();
+ *    }
+ *
+ * Pouziti s iteratorem:
+ *    DataProviders::BaseDataProvider provider;
+ *    auto iter = dataWriter->begin();
+ *    for (auto row : provider) {
+ *       *iter++ = row;
+ *    }
  */
 class BaseDataWriter {
  public:
   /**
-   * Iterator pro jednoduchy zapis. Pouziti:
-   * DataProviders::BaseDataProvider provider;
-   * auto iter = dataWriter->begin();
-   * for (auto row : provider) {
-   *    *iter++ = row;
-   * }
+   * Iterator pro jednoduchy zapis a vyuziti std funkci
    */
   class iterator : public std::iterator<std::output_iterator_tag,
                                         std::vector<std::string>> {

@@ -11,7 +11,20 @@
 namespace DataProviders {
 
 /**
- * Jednoduche rozhrani pro cteni a pohyb v zaznamech
+ * Jednoduche rozhrani pro cteni a pohyb v zaznamech.
+ *
+ * Pouziti:
+ *  auto provider = new DataProviders::CsvReader(...);
+ *  while (!provider->eof()) {
+ *      // zpracuj data...
+ *      provider->next();
+ *  }
+ *
+ * Pouziti s iteratorem:
+ *  auto provider = new DataProviders::CsvReader(...);
+ *  for (const auto &row : provider) {
+ *      // zpracuj data...
+ *  }
  */
 class BaseDataProvider {
  public:
