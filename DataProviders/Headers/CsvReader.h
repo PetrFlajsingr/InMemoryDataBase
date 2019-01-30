@@ -76,7 +76,7 @@ class CsvReader : public BaseDataProvider {
    * Pokud se soubor nepodari otevrit je vyhozena IOException.
    * @param filePath Cesta k souboru
    */
-  explicit CsvReader(std::string filePath, std::string delimiter = ";");
+  explicit CsvReader(std::string filePath, std::string delimiter = ",");
 
   /**
    * Uzavreni souboru pri dealokaci objektu.

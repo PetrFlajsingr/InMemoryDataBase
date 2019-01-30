@@ -6,7 +6,8 @@
 #include <vector>
 #include "CsvWriter.h"
 
-DataWriters::CsvWriter::CsvWriter(std::string filePath, std::string delimiter) {
+DataWriters::CsvWriter::CsvWriter(const std::string &filePath,
+                                  const std::string &delimiter) {
   this->delimiter = delimiter;
   outputStream = new std::ofstream();
   outputStream->open(filePath, std::ofstream::out);

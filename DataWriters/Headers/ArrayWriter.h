@@ -16,14 +16,15 @@ class ArrayWriter : public BaseDataWriter {
   std::vector<std::vector<std::string>> *result;
 
   void writeHeader(const std::vector<std::string> &header) override;
+
   void writeRecord(const std::vector<std::string> &record) override;
 
   /**
    * Vytiskne obsah zapsanych dat na stdout.
    */
-  void print();
+  void print() const;
 
-  std::vector<std::vector<std::string>> *getArray();
+  const std::vector<std::vector<std::string>> &getArray() const;
 };
 
 }  // namespace DataWriters

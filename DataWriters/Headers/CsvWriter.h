@@ -25,7 +25,8 @@ class CsvWriter : public BaseDataWriter {
 
   void writeRow(const std::vector<std::string> &data);
  public:
-  explicit CsvWriter(std::string filePath, std::string delimiter = ";");
+  explicit CsvWriter(const std::string &filePath,
+                     const std::string &delimiter = ",");
 
   ~CsvWriter() override;
 

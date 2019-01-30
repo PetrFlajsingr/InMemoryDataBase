@@ -471,7 +471,7 @@ DataSets::MemoryDataSet::MemoryDataSet(const std::string &dataSetName)
 bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
   auto field = fields[item.fieldIndex];
 
-  uint32_t min = 0, max = data.size();
+  unsigned long min = 0, max = data.size();
 
   bool breakLoop = false;
 

@@ -29,7 +29,7 @@ class BaseDataSet {
 
   std::string dataSetName;
 
-  uint32_t columnCount = 0;
+  unsigned long columnCount = 0;
 
   /**
    * Nastaveni dat pole.
