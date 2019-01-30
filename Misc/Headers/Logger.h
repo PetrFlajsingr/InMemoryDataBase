@@ -16,10 +16,10 @@
  */
 enum LogLevel { Verbose, Info, Status, Debug, Warning, Error };
 
-// TODO: povoleni/zakaz vypis Debug, Verbose
 class Logger {
  private:
-  Logger(bool isAllowedDebug = false) : isAllowedDebug(isAllowedDebug) {}
+  explicit Logger(bool isAllowedDebug = false)
+      : isAllowedDebug(isAllowedDebug) {}
 
   /**
    *

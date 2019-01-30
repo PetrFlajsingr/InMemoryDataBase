@@ -2,6 +2,7 @@
 // Created by Petr Flajsingr on 29/08/2018.
 //
 
+#include <Utilities.h>
 #include <gtest/gtest.h>
 
 class splitStringByDelimiter_tests : public ::testing::Test {
