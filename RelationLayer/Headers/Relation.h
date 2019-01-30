@@ -16,7 +16,7 @@ namespace RelationLayer {
  * Typy relaci, podobne jako v SQL databazich
  */
 enum RelationType {
-  OneToOne, OneToN, NTom
+  OneToOne, OneToN, NToM
 };
 
 /**
@@ -27,11 +27,6 @@ struct RelationContainer {
   void *data_SecondDataSet;
 
   RelationContainer(void *data_FirstDataSet, void *data_SecondDataSet);
-
-  RelationContainer &operator=(const RelationContainer &rhs) {
-    data_FirstDataSet = rhs.data_FirstDataSet;
-    data_SecondDataSet = rhs.data_SecondDataSet;
-  }
 };
 
 /**
@@ -59,7 +54,7 @@ class Relation {
    public:
     iterator() = default;
 
-    explicit iterator(Relation *relation, int position)
+    explicit iterator(Relation *relation, uint64_t position)
         : relation(relation), position(position) {}
 
     iterator(const iterator &other) {
@@ -116,6 +111,10 @@ class Relation {
       return !(rhs == *this);
     }
 
+    /**
+     * Dereference na ulozenou hodnotu
+     * @return
+     */
     RelationContainer &operator*(int) {
       return relation->relations[position];
     }
@@ -124,6 +123,10 @@ class Relation {
       return this;
     }
 
+    /**
+     * Posun vzad
+     * @return
+     */
     iterator &operator--() {
       if (position > 0) {
         position--;
@@ -131,12 +134,21 @@ class Relation {
       return *this;
     }
 
+    /**
+     * Posun vzad
+     * @return
+     */
     const iterator operator--(int) {
       iterator result = *this;
       --(*this);
       return result;
     }
 
+    /**
+     * Posun o libovolny krok vpred
+     * @param rhs
+     * @return
+     */
     iterator operator+(const uint64_t rhs) {
       iterator result = *this;
       result.position += rhs;
@@ -148,6 +160,11 @@ class Relation {
       return result;
     }
 
+    /**
+     * Posun o libovolný krok vzad
+     * @param rhs
+     * @return
+     */
     iterator operator-(const uint64_t rhs) {
       iterator result = *this;
       if (rhs > result.position) {
@@ -158,31 +175,66 @@ class Relation {
       return result;
     }
 
+    /**
+     * Vzdalenost dvou iteratoru
+     * @param rhs
+     * @return
+     */
     iterator operator-(const iterator &rhs) {
       *this = *this - rhs.position;
     }
 
+    /**
+     * Srovnani pozice
+     * @param rhs
+     * @return
+     */
     bool operator<(const iterator &rhs) {
       return position < rhs.position;
     }
 
+    /**
+     * Srovnani pozice
+     * @param rhs
+     * @return
+     */
     bool operator>(const iterator &rhs) {
       return position > rhs.position;
     }
 
+    /**
+     * Srovnani pozice
+     * @param rhs
+     * @return
+     */
     bool operator<=(const iterator &rhs) {
       return position <= rhs.position;
     }
 
+    /**
+     * Srovnani pozice
+     * @param rhs
+     * @return
+     */
     bool operator>=(const iterator &rhs) {
       return position >= rhs.position;
     }
 
+    /**
+     * Posun vpred o libovolnou hodnotu
+     * @param rhs
+     * @return
+     */
     iterator &operator+=(const uint64_t rhs) {
       position += rhs;
       return *this;
     }
 
+    /**
+     * Posun vzad o libovolnou hodnotu
+     * @param rhs
+     * @return
+     */
     iterator &operator-=(const uint64_t rhs) {
       if (rhs > position) {
         position = 0;
@@ -192,6 +244,11 @@ class Relation {
       return *this;
     }
 
+    /**
+     * Primy pristup k datum
+     * @param index
+     * @return
+     */
     RelationContainer &operator[](const uint64_t index) {
       return relation->relations[index];
     }
