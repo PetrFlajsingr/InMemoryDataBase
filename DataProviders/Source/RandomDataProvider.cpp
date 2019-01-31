@@ -3,7 +3,6 @@
 //
 
 #include <RandomDataProvider.h>
-#include <Utilities.h>
 
 DataProviders::RandomDataProvider::RandomDataProvider(int columnCount,
                                                       int minDataLength,
@@ -15,7 +14,7 @@ DataProviders::RandomDataProvider::RandomDataProvider(int columnCount,
   uniformIntDistribution =
       std::uniform_int_distribution(minDataLength, maxDataLength);
   for (auto i = 0; i < columnCount; ++i) {
-    header.emplace_back(Utilities::random_string(static_cast<size_t>(uniformIntDistribution(
+    header.emplace_back(Utilities::getRandomString(static_cast<size_t>(uniformIntDistribution(
         randomEngine))));
   }
 }
@@ -47,7 +46,7 @@ bool DataProviders::RandomDataProvider::next() {
   }
   currentRecord.clear();
   for (auto i = 0; i < columnCount; ++i) {
-    currentRecord.emplace_back(Utilities::random_string(static_cast<size_t>(uniformIntDistribution(
+    currentRecord.emplace_back(Utilities::getRandomString(static_cast<size_t>(uniformIntDistribution(
         randomEngine))));
   }
   currentRecordNumber++;

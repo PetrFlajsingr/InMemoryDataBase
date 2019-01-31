@@ -21,7 +21,9 @@ std::vector<std::string> Utilities::splitStringByDelimiter(std::string str,
   return result;
 }
 
-std::vector<std::string> Utilities::splitStringByDelimiterReserve(std::string str, std::string delimiter, int reserve) {
+std::vector<std::string> Utilities::splitStringByDelimiterReserve(std::string str,
+                                                                  std::string delimiter,
+                                                                  int reserve) {
   std::vector<std::string> result;
   result.reserve(reserve);
 
@@ -36,7 +38,7 @@ std::vector<std::string> Utilities::splitStringByDelimiterReserve(std::string st
 }
 
 int Utilities::stringToInt(const std::string &str) {
-  char* p;
+  char *p;
   long converted = strtol(str.c_str(), &p, 10);
   if (*p) {
     return 0;
@@ -46,7 +48,7 @@ int Utilities::stringToInt(const std::string &str) {
 }
 
 double Utilities::stringToDouble(const std::string &str) {
-  char* p;
+  char *p;
   double converted = strtod(str.c_str(), &p);
   if (*p) {
     return 0;
@@ -137,4 +139,18 @@ int8_t Utilities::compareDateTime(const DateTime &a, const DateTime &b) {
     return -1;
   }
   return 1;
+}
+
+std::string Utilities::getRandomString(size_t length) {
+  auto randChar = []() -> char {
+    const char charset[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+    const size_t max_index = (sizeof(charset) - 1);
+    return charset[rand() % max_index];
+  };
+  std::string str(length, 0);
+  std::generate_n(str.begin(), length, randChar);
+  return str;
 }
