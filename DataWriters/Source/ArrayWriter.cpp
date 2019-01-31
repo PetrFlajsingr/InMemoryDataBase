@@ -6,15 +6,15 @@
 #include <iostream>
 
 void DataWriters::ArrayWriter::writeHeader(const std::vector<std::string> &header) {
-  result->push_back(header);
+  result.emplace_back(header);
 }
 
 void DataWriters::ArrayWriter::writeRecord(const std::vector<std::string> &record) {
-  result->push_back(record);
+  result.emplace_back(record);
 }
 
 void DataWriters::ArrayWriter::print() const {
-  for (auto &vec : *result) {
+  for (auto &vec : result) {
     for (auto &str : vec) {
       std::cout << str << ",\t";
     }
@@ -22,6 +22,6 @@ void DataWriters::ArrayWriter::print() const {
   }
 }
 
-const std::vector<std::vector<std::string>> &DataWriters::ArrayWriter::getArray() const {
-  return *result;
+const std::vector<const std::vector<std::string>> &DataWriters::ArrayWriter::getArray() const {
+  return result;
 }

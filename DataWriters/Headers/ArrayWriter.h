@@ -13,7 +13,7 @@ namespace DataWriters {
 
 class ArrayWriter : public BaseDataWriter {
  public:
-  std::vector<std::vector<std::string>> *result;
+  std::vector<const std::vector<std::string>> result;
 
   void writeHeader(const std::vector<std::string> &header) override;
 
@@ -24,7 +24,7 @@ class ArrayWriter : public BaseDataWriter {
    */
   void print() const;
 
-  const std::vector<std::vector<std::string>> &getArray() const;
+  const std::vector<const std::vector<std::string>> &getArray() const;
 };
 
 }  // namespace DataWriters

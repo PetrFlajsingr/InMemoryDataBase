@@ -38,7 +38,11 @@ class BaseDataProvider {
 
    public:
     explicit iterator(BaseDataProvider *provider)
-        : provider(provider) {}
+        : provider(provider) {
+      if (provider->getCurrentRecordNumber() == -1) {
+        provider->next();
+      }
+    }
 
     iterator(const iterator &other) {
       provider = other.provider;

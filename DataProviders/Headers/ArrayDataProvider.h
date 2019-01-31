@@ -18,13 +18,6 @@ namespace DataProviders {
  * Podporuje jen dvojity vector, slouzi k testovani.
  */
 class ArrayDataProvider : public BaseDataProvider {
- private:
-  std::vector<std::vector<std::string>> data;
-
-  std::vector<std::string> header;
-
-  uint64_t currentRow = 0;
-
  public:
   /**
    * Priprava header jakozt index sloupce.
@@ -74,7 +67,16 @@ class ArrayDataProvider : public BaseDataProvider {
   bool eof() const override {
     return currentRow == data.size();
   }
+
+ private:
+  std::vector<std::vector<std::string>> data;
+
+  std::vector<std::string> header;
+
+  uint64_t currentRow = 0;
+
 };
+
 }  // namespace DataProviders
 
 #endif  // DATAPROVIDERS_HEADERS_ARRAYDATAPROVIDER_H_

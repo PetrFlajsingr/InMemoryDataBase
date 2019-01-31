@@ -20,21 +20,19 @@ namespace DataProviders {
  * Podporuje uvozovky " pro pouziti delimiteru v v zaznamu.
  *
  * Ukazka pouziti:
- *  auto csvReader = new DataProviders::CsvReader(PATH_TO_FILE, DELIMITER);
+ *  DataProviders::CsvReader csvReader(PATH_TO_FILE, DELIMITER);
  *
  *  auto header = csvReader->getHeader();
  *
- *  while (!csvReader->eof()) {
- *      auto currentRow = csvReader->getRow();
- *
- *      csvReader->next();
+ *  while (csvReader.next()) {
+ *      auto currentRow = csvReader.getRow();
  *  }
  *
  *  delete csvReader;
  * Pouziti s iterator:
  *  auto csvReader = new DataProvider::CsvReader(PATH_TO_FILe, DELIMITER);
  *
- *  auto header = csvReader->getHeader();
+ *  auto header = csvReader.getHeader();
  *
  *  for (auto row : *header) {
  *      //delej neco se zaznamem
@@ -54,7 +52,9 @@ class CsvReader : public BaseDataProvider {
 
   std::vector<std::string> currentRecord;  //< momentalni zaznam, rozdeleny
 
-  uint64_t currentRecordNumber = 0;  //< cislo momentalniho zaznamu
+  int currentRecordNumber = -1;  //< cislo momentalniho zaznamu
+
+  bool _eof = false;
 
   /**
    * Precteni hlavicky CSV souboru a zapsani do this->header
@@ -122,6 +122,7 @@ class CsvReader : public BaseDataProvider {
    * @param delimiter
    */
   void setDelimiter(char delimiter);
+
 };
 }  // namespace DataProviders
 

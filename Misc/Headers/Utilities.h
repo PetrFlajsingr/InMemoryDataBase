@@ -34,8 +34,8 @@ class Utilities {
    * @return vector casti
    */
   static std::vector<std::string> splitStringByDelimiterReserve(std::string str,
-                                                         std::string delimiter,
-                                                         int reserve);
+                                                                std::string delimiter,
+                                                                int reserve);
 
   /**
    * Prevod string do int.
@@ -131,6 +131,20 @@ class Utilities {
    * @return -1 pokud a < b, 0 pokud a == b, 1 pokud a > b
    */
   static int8_t compareDateTime(const DateTime &a, const DateTime &b);
+
+  static std::string random_string(size_t length) {
+    auto randChar = []() -> char {
+      const char charset[] =
+          "0123456789"
+          "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+          "abcdefghijklmnopqrstuvwxyz";
+      const size_t max_index = (sizeof(charset) - 1);
+      return charset[rand() % max_index];
+    };
+    std::string str(length, 0);
+    std::generate_n(str.begin(), length, randChar);
+    return str;
+  }
 };
 
 #endif //  MISC_HEADERS_UTILITIES_H_

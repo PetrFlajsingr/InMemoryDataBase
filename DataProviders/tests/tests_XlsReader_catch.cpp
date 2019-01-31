@@ -2,35 +2,35 @@
 // Created by Petr Flajsingr on 2019-01-29.
 //
 
-//
-// Created by Petr Flajsingr on 2019-01-30.
-//
-
 #include <catch.hpp>
 #include <XlsReader.h>
+#include <ArrayWriter.h>
+
+#define COLUMN_COUNT 5
+#define ROW_COUNT 3
 
 SCENARIO("Reading xlsx file via BaseDataProvider interface", "[XlsReader]") {
 
   GIVEN("A usual xlsx file") {
-    const std::string columnNamesSmall[5]{
+    const std::string columnNamesSmall[COLUMN_COUNT]{
         "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4", "COLUMN5"
     };
 
-    const std::string recordsSmall[3][5]{
+    const std::string recordsSmall[ROW_COUNT][COLUMN_COUNT]{
         {"RECORD11", "RECORD12", "RECORD13", "RECORD14", "RECORD15"},
         {"RECORD21", "RECORD22", "RECORD23", "RECORD24", "RECORD25"},
         {"RECORD31", "RECORD32", "RECOR33", "RECORD34", "RECORD35"}
     };
 
-    auto reader =
-        new DataProviders::XlsReader("../DataProviders/tests/Files/simple.xlsx");
+    DataProviders::XlsReader
+        xlsReader("../DataProviders/tests/Files/simple.xlsx");
 
     WHEN("reading the header") {
 
       THEN("header is the same as test value") {
-        REQUIRE(reader->getHeader().size() == 5);
+        REQUIRE(xlsReader.getHeader().size() == COLUMN_COUNT);
         int i = 0;
-        for (const auto &value : reader->getHeader()) {
+        for (const auto &value : xlsReader.getHeader()) {
           REQUIRE(value == columnNamesSmall[i]);
           i++;
         }
@@ -40,17 +40,16 @@ SCENARIO("Reading xlsx file via BaseDataProvider interface", "[XlsReader]") {
     WHEN("reading the file contents") {
 
       THEN("values correspond to test values") {
-        int i = 0;
-        while (!reader->eof()) {
-          REQUIRE(reader->getRow().size() == 5);
-          int j = 0;
-          for (const auto &value : reader->getRow()) {
-            REQUIRE(value == recordsSmall[i][j]);
+        int recordCount = 0;
+        while (xlsReader.next()) {
+          REQUIRE(xlsReader.getRow().size() == COLUMN_COUNT);
+          for (auto j = 0; j < COLUMN_COUNT; ++j) {
+            REQUIRE(xlsReader.getRow()[j] == recordsSmall[recordCount][j]);
             j++;
           }
-          i++;
-          reader->next();
+          recordCount++;
         }
+        REQUIRE(recordCount == ROW_COUNT);
       }
     }
 
@@ -58,23 +57,21 @@ SCENARIO("Reading xlsx file via BaseDataProvider interface", "[XlsReader]") {
 
       THEN("the read contents are the same") {
         std::vector<std::vector<std::string>> toCheck;
-        while (!reader->eof()) {
+        while (xlsReader.next()) {
           std::vector<std::string> row;
-          std::copy(reader->getRow().begin(),
-                    reader->getRow().end(),
+          std::copy(xlsReader.getRow().begin(),
+                    xlsReader.getRow().end(),
                     std::back_inserter(row));
           toCheck.emplace_back(row);
-          reader->next();
         }
 
-        reader->first();
+        xlsReader.first();
 
         int i = 0;
-        while (!reader->eof()) {
+        while (xlsReader.next()) {
           for (int j = 0; j < toCheck[i].size(); ++j) {
-            REQUIRE(reader->getRow()[j] == toCheck[i][j]);
+            REQUIRE(xlsReader.getRow()[j] == toCheck[i][j]);
           }
-          reader->next();
           i++;
         }
       }
@@ -85,29 +82,29 @@ SCENARIO("Reading xlsx file via BaseDataProvider interface", "[XlsReader]") {
 
 SCENARIO("Reading xlsx file via iterator", "[XlsReader]") {
 
-  GIVEN("A simple csv file") {
-    const std::string recordsSmall[3][5]{
+  GIVEN("A usual xlsx file") {
+    const std::string recordsSmall[ROW_COUNT][COLUMN_COUNT]{
         {"RECORD11", "RECORD12", "RECORD13", "RECORD14", "RECORD15"},
         {"RECORD21", "RECORD22", "RECORD23", "RECORD24", "RECORD25"},
         {"RECORD31", "RECORD32", "RECOR33", "RECORD34", "RECORD35"}
     };
 
-    auto reader =
-        new DataProviders::XlsReader("../DataProviders/tests/Files/simple.xlsx");
+    DataProviders::XlsReader
+        xlsReader("../DataProviders/tests/Files/simple.xlsx");
 
     WHEN("reading the file contents") {
 
       THEN("values correspond to test values") {
-        int i = 0;
-        for (const auto &value : *reader) {
-          REQUIRE(reader->getRow().size() == 5);
+        int recordCount = 0;
+        for (const auto &value : xlsReader) {
+          REQUIRE(value.size() == COLUMN_COUNT);
           int j = 0;
-          for (const auto &record : value) {
-            REQUIRE(record == recordsSmall[i][j]);
-            j++;
+          for (auto j = 0; j < COLUMN_COUNT; ++j) {
+            REQUIRE(value[j] == recordsSmall[recordCount][j]);
           }
-          i++;
+          recordCount++;
         }
+        REQUIRE(recordCount == ROW_COUNT);
       }
     }
 
@@ -115,22 +112,105 @@ SCENARIO("Reading xlsx file via iterator", "[XlsReader]") {
 
       THEN("the read contents are the same") {
         std::vector<std::vector<std::string>> toCheck;
-        std::copy(reader->begin(),
-                  reader->end(),
+        std::copy(xlsReader.begin(),
+                  xlsReader.end(),
                   std::back_inserter(toCheck));
 
-        reader->first();
+        xlsReader.first();
 
         int i = 0;
-        for (const auto &value : *reader) {
+        for (const auto &value : xlsReader) {
           for (auto j = 0; j < toCheck[i].size(); ++j) {
             REQUIRE(value[j] == toCheck[i][j]);
           }
-
           ++i;
         }
       }
     }
   }
+}
 
+SCENARIO(
+    "Writing parsed xlsx directly to DataWriter using BaseDataProvider interface",
+    "[XlsReader][integration]") {
+
+  GIVEN("A usual xlsx file") {
+    const std::string columnNamesSmall[COLUMN_COUNT]{
+        "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4", "COLUMN5"
+    };
+
+    const std::string recordsSmall[ROW_COUNT][COLUMN_COUNT]{
+        {"RECORD11", "RECORD12", "RECORD13", "RECORD14", "RECORD15"},
+        {"RECORD21", "RECORD22", "RECORD23", "RECORD24", "RECORD25"},
+        {"RECORD31", "RECORD32", "RECOR33", "RECORD34", "RECORD35"}
+    };
+
+    DataProviders::XlsReader
+        xlsReader("../DataProviders/tests/Files/simple.xlsx");
+
+    DataWriters::ArrayWriter writer;
+    WHEN("reading the content") {
+
+      THEN("data output by CsvWriter is the same as test values") {
+        REQUIRE(xlsReader.getHeader().size() == COLUMN_COUNT);
+        auto header = xlsReader.getHeader();
+        writer.writeHeader(header);
+
+        for (auto i = 0; i < COLUMN_COUNT; ++i) {
+          REQUIRE(writer.getArray()[0][i] == columnNamesSmall[i]);
+        }
+
+        while (xlsReader.next()) {
+          writer.writeRecord(xlsReader.getRow());
+        }
+
+        for (auto i = 0; i < ROW_COUNT; ++i) {
+          for (auto j = 0; j < COLUMN_COUNT; ++j) {
+            REQUIRE(writer.getArray()[i + 1][j] == recordsSmall[i][j]);
+          }
+        }
+      }
+    }
+  }
+}
+
+SCENARIO("Writing parsed xlsx directly to DataWriter using iterator",
+         "[XlsReader][integration]") {
+
+  GIVEN("A usual xlsx file") {
+    const std::string columnNamesSmall[COLUMN_COUNT]{
+        "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4", "COLUMN5"
+    };
+
+    const std::string recordsSmall[ROW_COUNT][COLUMN_COUNT]{
+        {"RECORD11", "RECORD12", "RECORD13", "RECORD14", "RECORD15"},
+        {"RECORD21", "RECORD22", "RECORD23", "RECORD24", "RECORD25"},
+        {"RECORD31", "RECORD32", "RECOR33", "RECORD34", "RECORD35"}
+    };
+
+    DataProviders::XlsReader
+        xlsReader("../DataProviders/tests/Files/simple.xlsx");
+
+    DataWriters::ArrayWriter writer;
+    WHEN("reading the content") {
+
+      THEN("data output by CsvWriter is the same as test values") {
+        REQUIRE(xlsReader.getHeader().size() == COLUMN_COUNT);
+        auto header = xlsReader.getHeader();
+        writer.writeHeader(header);
+
+        for (auto i = 0; i < COLUMN_COUNT; ++i) {
+          REQUIRE(writer.getArray()[0][i] == columnNamesSmall[i]);
+        }
+
+        std::copy(xlsReader.begin(), xlsReader.end(), writer.begin());
+
+        for (auto i = 0; i < ROW_COUNT; ++i) {
+          for (auto j = 0; j < COLUMN_COUNT; ++j) {
+            REQUIRE(writer.getArray()[i + 1][j] == recordsSmall[i][j]);
+          }
+        }
+      }
+    }
+  }
 }

@@ -1,33 +1,39 @@
 //
 // Created by Petr Flajsingr on 2019-01-30.
 //
+
 #include <Catch2Define.h>
 #include <catch.hpp>
 #include <CsvReader.h>
+#include <ArrayWriter.h>
+
+#define SMALL_COLUMN_COUNT 5
+#define SMALL_ROW_COUNT 3
+#define ADV_COLUMN_COUNT 3
+#define ADV_ROW_COUNT 2
 
 SCENARIO("Reading csv file via BaseDataProvider interface", "[CsvReader]") {
 
   GIVEN("A simple csv file") {
-    const std::string columnNamesSmall[5]{
+    const std::string columnNamesSmall[SMALL_COLUMN_COUNT]{
         "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4", "COLUMN5"
     };
 
-    const std::string recordsSmall[3][5]{
+    const std::string recordsSmall[SMALL_ROW_COUNT][SMALL_COLUMN_COUNT]{
         {"RECORD11", "RECORD12", "RECORD13", "RECORD14", "RECOR15"},
         {"RECORD21", "RECORD22", "RECORD23", "RECORD24", "RECORD25"},
         {"RECORD31", "RECORD32", "RECORD33", "RECORD34", "RECORD35"}
     };
 
-    auto reader =
-        new DataProviders::CsvReader("../DataProviders/tests/Files/small.csv",
-                                     ";");
+    DataProviders::CsvReader csvReader("../DataProviders/tests/Files/small.csv",
+                                       ";");
 
     WHEN("reading the header") {
 
       THEN("header is the same as test value") {
-        REQUIRE(reader->getHeader().size() == 5);
+        REQUIRE(csvReader.getHeader().size() == SMALL_COLUMN_COUNT);
         int i = 0;
-        for (const auto &value : reader->getHeader()) {
+        for (const auto &value : csvReader.getHeader()) {
           REQUIRE(value == columnNamesSmall[i]);
           i++;
         }
@@ -37,17 +43,15 @@ SCENARIO("Reading csv file via BaseDataProvider interface", "[CsvReader]") {
     WHEN("reading the file contents") {
 
       THEN("values correspond to test values") {
-        int i = 0;
-        while (!reader->eof()) {
-          REQUIRE(reader->getRow().size() == 5);
-          int j = 0;
-          for (const auto &value : reader->getRow()) {
-            REQUIRE(value == recordsSmall[i][j]);
-            j++;
+        int recordCount = 0;
+        while (csvReader.next()) {
+          REQUIRE(csvReader.getRow().size() == SMALL_COLUMN_COUNT);
+          for (auto j = 0; j < SMALL_COLUMN_COUNT; ++j) {
+            REQUIRE(csvReader.getRow()[j] == recordsSmall[recordCount][j]);
           }
-          i++;
-          reader->next();
+          ++recordCount;
         }
+        REQUIRE(recordCount == SMALL_ROW_COUNT);
       }
     }
 
@@ -55,49 +59,47 @@ SCENARIO("Reading csv file via BaseDataProvider interface", "[CsvReader]") {
 
       THEN("the read contents are the same") {
         std::vector<std::vector<std::string>> toCheck;
-        while (!reader->eof()) {
+        while (csvReader.next()) {
           std::vector<std::string> row;
-          std::copy(reader->getRow().begin(),
-                    reader->getRow().end(),
+          std::copy(csvReader.getRow().begin(),
+                    csvReader.getRow().end(),
                     std::back_inserter(row));
           toCheck.emplace_back(row);
-          reader->next();
         }
 
-        reader->first();
+        csvReader.first();
 
-        int i = 0;
-        while (!reader->eof()) {
-          for (int j = 0; j < toCheck[i].size(); ++j) {
-            REQUIRE(reader->getRow()[j] == toCheck[i][j]);
+        int recordCount = 0;
+        while (csvReader.next()) {
+          for (int j = 0; j < toCheck[recordCount].size(); ++j) {
+            REQUIRE(csvReader.getRow()[j] == toCheck[recordCount][j]);
           }
-          reader->next();
-          i++;
+          recordCount++;
         }
+        REQUIRE(recordCount == SMALL_ROW_COUNT);
       }
     }
   }
 
   GIVEN("A bit complex csv") {
-    const std::string advancedHeader[3]{
+    const std::string advancedHeader[ADV_COLUMN_COUNT]{
         "A       ", "B", "C"
     };
 
-    const std::string advancedTest[3][3]{
+    const std::string advancedTest[ADV_ROW_COUNT][ADV_COLUMN_COUNT]{
         {"\"Ah, oj\"", "B", "C"},
         {"\"Ah, oj\"", "B", R"("test man"", jojo")"},
     };
 
-    auto reader =
-        new DataProviders::CsvReader("../DataProviders/tests/Files/adv.csv",
-                                     ",");
+    DataProviders::CsvReader csvReader("../DataProviders/tests/Files/adv.csv",
+                                       ",");
 
     WHEN("reading the header") {
 
       THEN("header is the same as test value") {
-        REQUIRE(reader->getHeader().size() == 3);
+        REQUIRE(csvReader.getHeader().size() == ADV_COLUMN_COUNT);
         int i = 0;
-        for (const auto &value : reader->getHeader()) {
+        for (const auto &value : csvReader.getHeader()) {
           REQUIRE(value == advancedHeader[i]);
           i++;
         }
@@ -108,15 +110,14 @@ SCENARIO("Reading csv file via BaseDataProvider interface", "[CsvReader]") {
 
       THEN("values correspond to test values") {
         int i = 0;
-        while (!reader->eof()) {
-          REQUIRE(reader->getRow().size() == 3);
+        while (csvReader.next()) {
+          REQUIRE(csvReader.getRow().size() == ADV_COLUMN_COUNT);
           int j = 0;
-          for (const auto &value : reader->getRow()) {
+          for (const auto &value : csvReader.getRow()) {
             REQUIRE(value == advancedTest[i][j]);
             j++;
           }
           i++;
-          reader->next();
         }
       }
     }
@@ -125,23 +126,23 @@ SCENARIO("Reading csv file via BaseDataProvider interface", "[CsvReader]") {
 
       THEN("the read contents are the same") {
         std::vector<std::vector<std::string>> toCheck;
-        while (!reader->eof()) {
+        while (!csvReader.eof()) {
           std::vector<std::string> row;
-          for (const auto &value : reader->getRow()) {
+          for (const auto &value : csvReader.getRow()) {
             row.emplace_back(value);
           }
           toCheck.emplace_back(row);
-          reader->next();
+          csvReader.next();
         }
 
-        reader->first();
+        csvReader.first();
 
         int i = 0;
-        while (!reader->eof()) {
+        while (!csvReader.eof()) {
           for (int j = 0; j < toCheck[i].size(); ++j) {
-            REQUIRE(reader->getRow()[j] == toCheck[i][j]);
+            REQUIRE(csvReader.getRow()[j] == toCheck[i][j]);
           }
-          reader->next();
+          csvReader.next();
           i++;
         }
       }
@@ -152,29 +153,28 @@ SCENARIO("Reading csv file via BaseDataProvider interface", "[CsvReader]") {
 SCENARIO("Reading csv file via iterator", "[CsvReader]") {
 
   GIVEN("A simple csv file") {
-    const std::string recordsSmall[3][5]{
+    const std::string recordsSmall[SMALL_ROW_COUNT][SMALL_COLUMN_COUNT]{
         {"RECORD11", "RECORD12", "RECORD13", "RECORD14", "RECOR15"},
         {"RECORD21", "RECORD22", "RECORD23", "RECORD24", "RECORD25"},
         {"RECORD31", "RECORD32", "RECORD33", "RECORD34", "RECORD35"}
     };
 
-    auto reader =
-        new DataProviders::CsvReader("../DataProviders/tests/Files/small.csv",
-                                     ";");
+    DataProviders::CsvReader reader("../DataProviders/tests/Files/small.csv",
+                                    ";");
 
     WHEN("reading the file contents") {
 
       THEN("values correspond to test values") {
-        int i = 0;
-        for (const auto &value : *reader) {
-          REQUIRE(reader->getRow().size() == 5);
-          int j = 0;
-          for (const auto &record : value) {
-            REQUIRE(record == recordsSmall[i][j]);
+        int recordCount = 0;
+        for (const auto &value : reader) {
+          REQUIRE(value.size() == SMALL_COLUMN_COUNT);
+          for (auto j = 0; j < SMALL_COLUMN_COUNT; ++j) {
+            REQUIRE(value[j] == recordsSmall[recordCount][j]);
             j++;
           }
-          i++;
+          recordCount++;
         }
+        REQUIRE(recordCount == SMALL_ROW_COUNT);
       }
     }
 
@@ -182,46 +182,45 @@ SCENARIO("Reading csv file via iterator", "[CsvReader]") {
 
       THEN("the read contents are the same") {
         std::vector<std::vector<std::string>> toCheck;
-        std::copy(reader->begin(),
-                  reader->end(),
+        std::copy(reader.begin(),
+                  reader.end(),
                   std::back_inserter(toCheck));
 
-        reader->first();
+        reader.first();
 
-        int i = 0;
-        for (const auto &value : *reader) {
-          for (auto j = 0; j < toCheck[i].size(); ++j) {
-            REQUIRE(value[j] == toCheck[i][j]);
+        int recordCount = 0;
+        for (const auto &value : reader) {
+          for (auto j = 0; j < toCheck[recordCount].size(); ++j) {
+            REQUIRE(value[j] == toCheck[recordCount][j]);
           }
-
-          ++i;
+          ++recordCount;
         }
+        REQUIRE(recordCount == SMALL_ROW_COUNT);
       }
     }
   }
 
   GIVEN("A bit complex csv") {
-    const std::string advancedTest[3][3]{
+    const std::string advancedTest[ADV_ROW_COUNT][ADV_COLUMN_COUNT]{
         {"\"Ah, oj\"", "B", "C"},
         {"\"Ah, oj\"", "B", R"("test man"", jojo")"},
     };
 
-    auto reader =
-        new DataProviders::CsvReader("../DataProviders/tests/Files/adv.csv",
-                                     ",");
+    DataProviders::CsvReader csvReader("../DataProviders/tests/Files/adv.csv",
+                                       ",");
 
     WHEN("reading the file contents") {
 
       THEN("values correspond to test values") {
-        int i = 0;
-        for (const auto &value : *reader) {
-          REQUIRE(reader->getRow().size() == 3);
-          int j = 0;
-          for (auto j = 0; j < 3; ++j) {
-            REQUIRE(value[j] == advancedTest[i][j]);
+        int recordCount = 0;
+        for (const auto &value : csvReader) {
+          REQUIRE(value.size() == ADV_COLUMN_COUNT);
+          for (auto j = 0; j < ADV_COLUMN_COUNT; ++j) {
+            REQUIRE(value[j] == advancedTest[recordCount][j]);
           }
-          i++;
+          recordCount++;
         }
+        REQUIRE(recordCount == ADV_ROW_COUNT);
       }
     }
 
@@ -229,18 +228,104 @@ SCENARIO("Reading csv file via iterator", "[CsvReader]") {
 
       THEN("the read contents are the same") {
         std::vector<std::vector<std::string>> toCheck;
-        std::copy(reader->begin(),
-                  reader->end(),
+        std::copy(csvReader.begin(),
+                  csvReader.end(),
                   std::back_inserter(toCheck));
 
-        reader->first();
+        csvReader.first();
 
-        int i = 0;
-        for (const auto &value : *reader) {
-          for (auto j = 0; j < toCheck[i].size(); ++j) {
-            REQUIRE(value[j] == toCheck[i][j]);
+        int recordCount = 0;
+        for (const auto &value : csvReader) {
+          for (auto j = 0; j < toCheck[recordCount].size(); ++j) {
+            REQUIRE(value[j] == toCheck[recordCount][j]);
           }
-          ++i;
+          ++recordCount;
+        }
+        REQUIRE(recordCount == ADV_ROW_COUNT);
+      }
+    }
+  }
+}
+
+SCENARIO(
+    "Writing parsed csv directly to DataWriter using BaseDataProvider interface",
+    "[CsvReader][integration]") {
+
+  GIVEN("A simple csv file") {
+    const std::string columnNamesSmall[SMALL_COLUMN_COUNT]{
+        "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4", "COLUMN5"
+    };
+
+    const std::string recordsSmall[SMALL_ROW_COUNT][SMALL_COLUMN_COUNT]{
+        {"RECORD11", "RECORD12", "RECORD13", "RECORD14", "RECOR15"},
+        {"RECORD21", "RECORD22", "RECORD23", "RECORD24", "RECORD25"},
+        {"RECORD31", "RECORD32", "RECORD33", "RECORD34", "RECORD35"}
+    };
+
+    DataProviders::CsvReader csvReader("../DataProviders/tests/Files/small.csv",
+                                       ";");
+
+    DataWriters::ArrayWriter writer;
+    WHEN("reading the content") {
+
+      THEN("data output by CsvWriter is the same as test values") {
+        REQUIRE(csvReader.getHeader().size() == SMALL_COLUMN_COUNT);
+        auto header = csvReader.getHeader();
+        writer.writeHeader(header);
+
+        for (auto i = 0; i < SMALL_COLUMN_COUNT; ++i) {
+          REQUIRE(writer.getArray()[0][i] == columnNamesSmall[i]);
+        }
+
+        while (csvReader.next()) {
+          writer.writeRecord(csvReader.getRow());
+        }
+
+        for (auto i = 0; i < SMALL_ROW_COUNT; ++i) {
+          for (auto j = 0; j < SMALL_COLUMN_COUNT; ++j) {
+            REQUIRE(writer.getArray()[i + 1][j] == recordsSmall[i][j]);
+          }
+        }
+      }
+    }
+  }
+}
+
+SCENARIO("Writing parsed csv directly to DataWriter using iterator",
+         "[CsvReader][integration]") {
+
+  GIVEN("A simple csv file") {
+    const std::string columnNamesSmall[SMALL_COLUMN_COUNT]{
+        "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4", "COLUMN5"
+    };
+
+    const std::string recordsSmall[SMALL_ROW_COUNT][SMALL_COLUMN_COUNT]{
+        {"RECORD11", "RECORD12", "RECORD13", "RECORD14", "RECOR15"},
+        {"RECORD21", "RECORD22", "RECORD23", "RECORD24", "RECORD25"},
+        {"RECORD31", "RECORD32", "RECORD33", "RECORD34", "RECORD35"}
+    };
+
+    DataProviders::CsvReader csvReader("../DataProviders/tests/Files/small.csv",
+                                       ";");
+
+    DataWriters::ArrayWriter writer;
+    WHEN("reading the content") {
+
+      THEN("data output by CsvWriter is the same as test values") {
+        REQUIRE(csvReader.getHeader().size() == SMALL_COLUMN_COUNT);
+        auto header = csvReader.getHeader();
+        writer.writeHeader(header);
+
+        for (auto i = 0; i < SMALL_COLUMN_COUNT; ++i) {
+          REQUIRE(writer.getArray()[0][i] == columnNamesSmall[i]);
+        }
+
+        std::copy(csvReader.begin(), csvReader.end(), writer.begin());
+
+        for (auto i = 0; i < SMALL_ROW_COUNT; ++i) {
+          for (auto j = 0; j < SMALL_COLUMN_COUNT; ++j) {
+            REQUIRE(writer.getArray()[i + 1][j] == recordsSmall[i][j]);
+          }
         }
       }
     }

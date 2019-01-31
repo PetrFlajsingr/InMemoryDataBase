@@ -35,10 +35,8 @@ void DataSets::MemoryDataSet::openEmpty() {
 }
 
 void DataSets::MemoryDataSet::loadData() {
-  while (!dataProvider->eof()) {
+  while (dataProvider->next()) {
     addRecord();
-
-    dataProvider->next();
   }
 }
 

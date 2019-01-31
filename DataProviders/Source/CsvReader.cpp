@@ -17,7 +17,6 @@ DataProviders::CsvReader::CsvReader(std::string filePath,
   }
 
   readHeader();
-  parseRecord();
 }
 
 DataProviders::CsvReader::~CsvReader() {
@@ -42,6 +41,7 @@ void DataProviders::CsvReader::readHeader() {
 
 bool DataProviders::CsvReader::next() {
   if (file.eof()) {
+    _eof = true;
     return false;
   }
 
@@ -68,13 +68,13 @@ void DataProviders::CsvReader::first() {
   file.seekg(0, std::ios::beg);
 
   readHeader();
-  parseRecord();
 
-  currentRecordNumber = 0;
+  _eof = false;
+  currentRecordNumber = -1;
 }
 
 bool DataProviders::CsvReader::eof() const {
-  return file.eof();
+  return _eof;
 }
 
 void DataProviders::CsvReader::setDelimiter(char delimiter) {
