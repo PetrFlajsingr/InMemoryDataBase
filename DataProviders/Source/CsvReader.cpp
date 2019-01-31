@@ -77,10 +77,6 @@ bool DataProviders::CsvReader::eof() const {
   return _eof;
 }
 
-void DataProviders::CsvReader::setDelimiter(char delimiter) {
-  this->delimiter = delimiter;
-}
-
 std::vector<std::string> DataProviders::CsvReader::tokenize(const std::string &line,
                                                             int vectorReserve) const {
   char buffer[BUFFER_SIZE];

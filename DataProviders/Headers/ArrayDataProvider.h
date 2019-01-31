@@ -12,15 +12,14 @@
 #include "BaseDataProvider.h"
 
 namespace DataProviders {
+
 /**
- * Dodavatel dat z pole a podobnych konstruktu.
- *
- * Podporuje jen dvojity vector, slouzi k testovani.
+ * Class used for testing
  */
 class ArrayDataProvider : public BaseDataProvider {
  public:
   /**
-   * Priprava header jakozt index sloupce.
+   * Prepares header names as indexes of fields.
    */
   explicit ArrayDataProvider(const std::vector<std::vector<std::string>> &data)
       : data(data) {
@@ -29,8 +28,6 @@ class ArrayDataProvider : public BaseDataProvider {
       header.emplace_back(std::to_string(i));
     }
   }
-
-  ~ArrayDataProvider() override = default;
 
   const std::vector<std::string> &getRow() const override {
     return data[currentRow];
@@ -48,7 +45,7 @@ class ArrayDataProvider : public BaseDataProvider {
     return header;
   }
 
-  uint64_t getCurrentRecordNumber() const override {
+  int getCurrentRecordNumber() const override {
     return currentRow;
   }
 

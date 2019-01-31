@@ -11,32 +11,34 @@
 namespace DataProviders {
 
 /**
- * Jednoduche rozhrani pro cteni a pohyb v zaznamech.
+ * Simple interface for reading a moving forward in records.
  *
- * Pouziti:
- *  auto provider = new DataProviders::CsvReader(...);
- *  while (!provider->eof()) {
- *      // zpracuj data...
- *      provider->next();
+ * Usage:
+ *  DataProviders::SomeProvider provider(...);
+ *  while (provider.next()) {
+ *      // work with data
+ *
  *  }
  *
- * Pouziti s iteratorem:
- *  auto provider = new DataProviders::CsvReader(...);
+ * Usage with iterator:
+ *  DataProviders::SomeProvider provider(...);
  *  for (const auto &row : provider) {
- *      // zpracuj data...
+ *      // work with data
  *  }
  */
 class BaseDataProvider {
  public:
-  /**
-   * Iterator pro velmi snadnou iteraci zaznamy za pouziti for each konstrukce.
-   */
+
   class iterator : public std::iterator<std::input_iterator_tag,
                                         std::vector<std::string>> {
    private:
     BaseDataProvider *provider;
 
    public:
+    /**
+     * Move provider to the first record when no data has been read.
+     * @param provider
+     */
     explicit iterator(BaseDataProvider *provider)
         : provider(provider) {
       if (provider->getCurrentRecordNumber() == -1) {
@@ -49,7 +51,7 @@ class BaseDataProvider {
     }
 
     /**
-     * Posun na dalsi zaznam.
+     * Move to next record
      * @return
      */
     iterator &operator++() {
@@ -57,10 +59,6 @@ class BaseDataProvider {
       return *this;
     }
 
-    /**
-     * Posun na dalsi zaznam
-     * @return
-     */
     const iterator operator++(int) {
       iterator result = *this;
       ++(*this);
@@ -68,23 +66,19 @@ class BaseDataProvider {
     }
 
     /**
-     * Zneuziti porovnani begin() == end() pro kontrolu eof()
+     * Abuse of == for eof checking
      * @return
      */
     bool operator==(const iterator &) const {
       return provider->eof();
     }
 
-    /**
-     * Zneuziti porovnani begin() == end() pro kontrolu eof()
-     * @return
-     */
     bool operator!=(const iterator &other) const {
       return !(*this == other);
     }
 
     /**
-     * Dereference na aktualni zaznam
+     * Get current record from provider
      * @return
      */
     std::vector<std::string> operator*() const {
@@ -93,51 +87,43 @@ class BaseDataProvider {
   };
 
   /**
-   * Zaznam rozdeleny na sloupce
+   * Get a record divided into fields
    * @return
    */
   virtual const std::vector<std::string> &getRow() const = 0;
 
   /**
-   * Hodnota ve vybranem sloupci
-   * @param columnIndex Index sloupce
-   * @return
+   * Get a name of a column - usually first row in a file...
+   * @param columnIndex Index of desired column name
+   * @return name of the column
    */
   virtual std::string getColumnName(unsigned int columnIndex) const = 0;
 
-  /**
-   * Pocet sloupcu zaznamu
-   * @return
-   */
   virtual uint64_t getColumnCount() const = 0;
 
   /**
-   * Nazvy sloupcu
-   * @return
+   *
+   * @return vector of all column names
    */
   virtual const std::vector<std::string> &getHeader() const = 0;
 
   /**
-   * Pocet prozatim prectenych zaznamu
-   * @return
+   *
+   * @return amount of records that have been read already
    */
-  virtual uint64_t getCurrentRecordNumber() const = 0;
+  virtual int getCurrentRecordNumber() const = 0;
 
   /**
-   * Presun na nasledujici zaznam
-   * @return
+   * Move to the next record.
+   * @return true if function call produced new record, false otherwise
    */
   virtual bool next() = 0;
 
   /**
-   * Presun na prvni zaznam
+   * Move to the first record
    */
   virtual void first() = 0;
 
-  /**
-   * Kontrola dostupnosti zaznamu
-   * @return false pokud neni dostupny dalsi zaznam, jinak true
-   */
   inline virtual bool eof() const = 0;
 
   iterator begin() {

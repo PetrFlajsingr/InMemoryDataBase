@@ -10,15 +10,26 @@
 #include <BaseDataProvider.h>
 #include <random>
 #include <Utilities.h>
+#include <gsl/gsl>
 
 namespace DataProviders {
 
+/**
+ * Provide random data whose length is based on constructor parameters.
+ */
 class RandomDataProvider : public BaseDataProvider {
  public:
-  explicit RandomDataProvider(int columnCount,
-                              int minDataLength,
-                              int maxDataLength,
-                              int recordCount);
+  /**
+   *
+   * @param columnCount amount of records in each row
+   * @param minDataLength minimum length of a cell
+   * @param maxDataLength maximum length of a cell
+   * @param recordCount amount of records in total
+   */
+  RandomDataProvider(int columnCount,
+                     int minDataLength,
+                     int maxDataLength,
+                     int recordCount);
 
   const std::vector<std::string> &getRow() const override;
 
@@ -28,7 +39,7 @@ class RandomDataProvider : public BaseDataProvider {
 
   const std::vector<std::string> &getHeader() const override;
 
-  uint64_t getCurrentRecordNumber() const override;
+  int getCurrentRecordNumber() const override;
 
   bool next() override;
 

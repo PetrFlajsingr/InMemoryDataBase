@@ -39,7 +39,7 @@ const std::vector<std::string> &DataProviders::XlsReader::getHeader() const {
   return header;
 }
 
-uint64_t DataProviders::XlsReader::getCurrentRecordNumber() const {
+int DataProviders::XlsReader::getCurrentRecordNumber() const {
   return currentRecordNumber;
 }
 

@@ -13,80 +13,39 @@
 
 namespace DataProviders {
 /**
- * Trida implementujici metody IReader.
- * Slouzi ke cteni CSV formatu sekvencne ze souboru.
- *
- * Podporuje libovolny delimiter, predpoklada \n nebo \r\n pro konec zaznamu.
- * Podporuje uvozovky " pro pouziti delimiteru v v zaznamu.
- *
- * Ukazka pouziti:
+ * Usage:
  *  DataProviders::CsvReader csvReader(PATH_TO_FILE, DELIMITER);
  *
- *  auto header = csvReader->getHeader();
+ *  auto header = csvReader.getHeader();
  *
  *  while (csvReader.next()) {
  *      auto currentRow = csvReader.getRow();
  *  }
  *
- *  delete csvReader;
- * Pouziti s iterator:
- *  auto csvReader = new DataProvider::CsvReader(PATH_TO_FILe, DELIMITER);
+ * Usage with iterator:
+ *  DataProviders::CsvReader csvReader(PATH_TO_FILE, DELIMITER);
  *
  *  auto header = csvReader.getHeader();
  *
- *  for (auto row : *header) {
- *      //delej neco se zaznamem
+ *  for (auto row : header) {
+ *      // work with data...
  *  }
  *
  */
 class CsvReader : public BaseDataProvider {
- private:
-  enum TokeniserStates { Read, QuotMark1, QuotMark2 };
-  const uint32_t BUFFER_SIZE = 4096;  //< velikost bufferu pro cteni radku
-
-  std::string delimiter;  //< rozdelovac CSV dat
-
-  std::ifstream file;  //< vstupni soubor
-
-  std::vector<std::string> header;  //< nazvy sloupcu zaznamu
-
-  std::vector<std::string> currentRecord;  //< momentalni zaznam, rozdeleny
-
-  int currentRecordNumber = -1;  //< cislo momentalniho zaznamu
-
-  bool _eof = false;
-
-  /**
-   * Precteni hlavicky CSV souboru a zapsani do this->header
-   */
-  void readHeader();
-
-  /**
-   * Zpracovani zaznamu pred jeho zpristupnenim
-   */
-  void parseRecord();
-
-  std::vector<std::string> tokenize(const std::string &line,
-                                    int vectorReserve) const;
-
  public:
   /**
-   * Vytvori ctecku nad zadanym souborem.
-   *
-   * Pokud se soubor nepodari otevrit je vyhozena IOException.
-   * @param filePath Cesta k souboru
+   * If the file can not be opened throws IOException.
+   * @param filePath path to file
+   * @param delimiter csv delimiter
    */
   explicit CsvReader(std::string filePath, std::string delimiter = ",");
 
   /**
-   * Uzavreni souboru pri dealokaci objektu.
+   * Close file on deletion.
    */
   ~CsvReader() override;
 
-  /**
-   * Vraci zaznam souboru, ktery je na rade.
-   * @return rozdeleny zaznamu podle CSV delimiter.
-   */
   inline const std::vector<std::string> &getRow() const override {
     return currentRecord;
   }
@@ -95,15 +54,11 @@ class CsvReader : public BaseDataProvider {
     return header.at(columnIndex);
   }
 
-  /**
-   * Posun na dalsi zaznam.
-   * @return false pokud byl přečten celý soubor (EOF), jinak true
-   */
   bool next() override;
 
   void first() override;
 
-  uint64_t getCurrentRecordNumber() const override {
+  int getCurrentRecordNumber() const override {
     return currentRecordNumber;
   }
 
@@ -117,11 +72,44 @@ class CsvReader : public BaseDataProvider {
 
   bool eof() const override;
 
+ private:
   /**
-   * Nataveni delimiteru pro rozdelovani csv souboru
-   * @param delimiter
+   * FSM states for csv parsing.
    */
-  void setDelimiter(char delimiter);
+  enum TokeniserStates { Read, QuotMark1, QuotMark2 };
+
+  const uint32_t BUFFER_SIZE = 4096;
+
+  std::string delimiter;
+
+  std::ifstream file;
+
+  std::vector<std::string> header;
+
+  std::vector<std::string> currentRecord;
+
+  int currentRecordNumber = -1;
+
+  bool _eof = false;
+
+  /**
+   * Read first row of the file into header member
+   */
+  void readHeader();
+
+  /**
+   * Read next row into currentRecord member
+   */
+  void parseRecord();
+
+  /**
+   * Parse line based on CSV specification.
+   * @param line string to parse
+   * @param vectorReserve value to reserve vector size for
+   * @return tokenized vector from line
+   */
+  std::vector<std::string> tokenize(const std::string &line,
+                                    int vectorReserve) const;
 
 };
 }  // namespace DataProviders

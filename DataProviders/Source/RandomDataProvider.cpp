@@ -9,6 +9,10 @@ DataProviders::RandomDataProvider::RandomDataProvider(int columnCount,
                                                       int maxDataLength,
                                                       int recordCount)
     : columnCount(columnCount), recordCount(recordCount) {
+  Expects(columnCount > 0);
+  Expects(minDataLength >= 0);
+  Expects(maxDataLength >= 0);
+  Expects(recordCount >= 0);
   std::random_device randomDevice;
   randomEngine = std::default_random_engine(randomDevice());
   uniformIntDistribution =
@@ -35,7 +39,7 @@ const std::vector<std::string> &DataProviders::RandomDataProvider::getHeader() c
   return header;
 }
 
-uint64_t DataProviders::RandomDataProvider::getCurrentRecordNumber() const {
+int DataProviders::RandomDataProvider::getCurrentRecordNumber() const {
   return currentRecordNumber;
 }
 
