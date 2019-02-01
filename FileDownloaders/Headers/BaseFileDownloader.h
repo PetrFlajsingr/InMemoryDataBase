@@ -29,6 +29,46 @@
  *
  */
 class BaseFileDownloader {
+ public:
+  explicit BaseFileDownloader(const std::string &downloadLocation)
+      : downloadLocation(downloadLocation) {}
+
+  virtual ~BaseFileDownloader() = default;
+
+  /**
+   *
+   * @return Nazvy souboru dostupnych ke stazeni
+   */
+  virtual std::vector<std::string> getAvailableFiles() const {
+    return availableFiles;
+  }
+
+  /**
+   * Stazeni vybraneho souboru na disk. Cesta k ulozeni je urcena
+   * v konstruktoru objektu.
+   * @param fileName Nazev souboru ke stazeni
+   */
+  virtual void downloadFile(const std::string &fileName) {
+    auto result = std::find(availableFiles.begin(),
+                            availableFiles.end(),
+                            fileName);
+
+    if (result == availableFiles.end()) {
+      throw InvalidArgumentException(
+          ("The file " + fileName + " is not available").c_str());
+    }
+  }
+
+  /**
+   * Stazeni vybraneho souboru podle jeho vnitrniho indexu.
+   * @param fileIndex Index souboru ke stazeni
+   */
+  virtual void downloadFile(size_t fileIndex) = 0;
+
+  virtual void addObserver(FileDownloadObserver *observer) {
+    observers.push_back(observer);
+  }
+
  protected:
   std::vector<FileDownloadObserver*> observers;
   std::vector<std::string> availableFiles;
@@ -52,48 +92,6 @@ class BaseFileDownloader {
     for (auto observer : observers) {
       observer->onDownloadFinished(fileName, filePath);
     }
-  }
-
- public:
-  explicit BaseFileDownloader(const std::string &downloadLocation)
-    : downloadLocation(downloadLocation) {}
-
-  virtual ~BaseFileDownloader() = default;
-
-  /**
-   *
-   * @return Nazvy souboru dostupnych ke stazeni
-   */
-  virtual std::vector<std::string> getAvailableFiles() const {
-    return availableFiles;
-  }
-
-  /**
-   * Stazeni vybraneho souboru na disk. Cesta k ulozeni je urcena
-   * v konstruktoru objektu.
-   * @param fileName Nazev souboru ke stazeni
-   */
-  virtual void downloadFile(const std::string &fileName) {
-    auto result = std::find(availableFiles.begin(),
-        availableFiles.end(),
-        fileName);
-
-    if (result == availableFiles.end()) {
-      throw InvalidArgumentException(
-          ("The file " + fileName + " is not available").c_str());
-    }
-
-    downloadFile(result - availableFiles.begin());
-  }
-
-  /**
-   * Stazeni vybraneho souboru podle jeho vnitrniho indexu.
-   * @param fileIndex Index souboru ke stazeni
-   */
-  virtual void downloadFile(size_t fileIndex) = 0;
-
-  virtual void addObserver(FileDownloadObserver* observer) {
-    observers.push_back(observer);
   }
 };
 
