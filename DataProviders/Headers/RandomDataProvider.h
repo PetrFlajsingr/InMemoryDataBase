@@ -5,12 +5,13 @@
 #ifndef PROJECT_RANDOMDATAPROVIDER_H
 #define PROJECT_RANDOMDATAPROVIDER_H
 
+#include <gsl/gsl>
 #include <string>
 #include <vector>
-#include <BaseDataProvider.h>
 #include <random>
 #include <Utilities.h>
-#include <gsl/gsl>
+#include <BaseDataProvider.h>
+
 
 namespace DataProviders {
 

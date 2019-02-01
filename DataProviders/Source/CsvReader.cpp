@@ -1,10 +1,8 @@
-#include <utility>
-
 //
 // Created by Petr Flajsingr on 24/08/2018.
 //
 
-#include <iostream>
+#include <utility>
 #include <CsvReader.h>
 
 DataProviders::CsvReader::CsvReader(std::string filePath,

@@ -5,10 +5,12 @@
 #ifndef CSV_READER_XLSREADER_H
 #define CSV_READER_XLSREADER_H
 
+#include <xlsxio_read.h>
+#include <gsl/gsl>
 #include <string>
 #include <vector>
-#include <xlsxio_read.h>
 #include <BaseDataProvider.h>
+#include <Exceptions.h>
 
 namespace DataProviders {
 

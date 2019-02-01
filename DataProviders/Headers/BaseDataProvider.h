@@ -5,9 +5,9 @@
 #ifndef DATAPROVIDERS_HEADERS_BASEDATAPROVIDER_H_
 #define DATAPROVIDERS_HEADERS_BASEDATAPROVIDER_H_
 
+#include <gsl/gsl>
 #include <string>
 #include <vector>
-#include <gsl/gsl>
 
 namespace DataProviders {
 

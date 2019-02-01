@@ -3,8 +3,6 @@
 //
 
 #include <XlsReader.h>
-#include <Exceptions.h>
-#include <gsl/gsl>
 
 DataProviders::XlsReader::XlsReader(const std::string &fileName) {
   xlsxioReader = xlsxioread_open(fileName.c_str());
