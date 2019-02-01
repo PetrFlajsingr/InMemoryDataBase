@@ -17,6 +17,21 @@
 namespace DataWorkers {
 
 class ResultAccumulator {
+ public:
+  ResultAccumulator(DataSets::BaseField *field, Operation op);
+
+  bool step();
+
+  std::string getResult();
+
+  std::string getResultForce();
+
+  void reset();
+
+  std::string getName();
+
+  DataContainer getContainer();
+
  private:
   DataContainer data;
 
@@ -45,24 +60,22 @@ class ResultAccumulator {
   std::string resultAverage();
 
   std::string resultDistinct();
-
- public:
-  ResultAccumulator(DataSets::BaseField *field, Operation op);
-
-  bool step();
-
-  std::string getResult();
-
-  std::string getResultForce();
-
-  void reset();
-
-  std::string getName();
-
-  DataContainer getContainer();
 };
 
 class MemoryDataWorker : public BaseDataWorker {
+ public:
+  MemoryDataWorker(DataProviders::BaseDataProvider *dataProvider,
+                   std::vector<ValueType> fieldTypes);
+
+  explicit MemoryDataWorker(gsl::not_null<DataSets::BaseDataSet *> dataSet);
+
+  std::vector<std::string> getMultiChoiceNames() override;
+
+  std::vector<std::string> getChoices(std::string choiceName) override;
+
+  void writeResult(DataWriters::BaseDataWriter &writer,
+                   const std::string &sql) override;
+
  private:
   struct InnerJoinStructure {
     uint64_t indexAddi;
@@ -76,18 +89,6 @@ class MemoryDataWorker : public BaseDataWorker {
   void filterDataSet();
 
   void T_ThreadSort(DataSets::SortOptions &sortOptions);
- public:
-  MemoryDataWorker(DataProviders::BaseDataProvider *dataProvider,
-                   std::vector<ValueType> fieldTypes);
-
-  MemoryDataWorker(DataSets::BaseDataSet *dataSet);
-
-  std::vector<std::string> getMultiChoiceNames() override;
-
-  std::vector<std::string> getChoices(std::string choiceName) override;
-
-  void writeResult(DataWriters::BaseDataWriter &writer,
-                   const std::string &sql) override;
 };
 }  // namespace DataWorkers
 

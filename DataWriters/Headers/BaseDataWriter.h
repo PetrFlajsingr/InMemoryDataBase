@@ -31,6 +31,20 @@ namespace DataWriters {
 class BaseDataWriter {
  public:
   /**
+   * Zapise hlavicku dat (nazvy sloupcu)
+   * @param header nazvy sloupcu
+   */
+  virtual void writeHeader(const std::vector<std::string> &header) = 0;
+
+  /**
+   * Zapise zaznam
+   * @param record zaznam k zapsani
+   */
+  virtual void writeRecord(const std::vector<std::string> &record) = 0;
+
+  virtual ~BaseDataWriter() = default;
+
+  /**
    * Iterator pro jednoduchy zapis a vyuziti std funkci
    */
   class iterator : public std::iterator<std::output_iterator_tag,
@@ -82,26 +96,11 @@ class BaseDataWriter {
     const iterator operator++(int) {
       return *this;
     }
-
   };
-
-  /**
-   * Zapise hlavicku dat (nazvy sloupcu)
-   * @param header nazvy sloupcu
-   */
-  virtual void writeHeader(const std::vector<std::string> &header) = 0;
-
-  /**
-   * Zapise zaznam
-   * @param record zaznam k zapsani
-   */
-  virtual void writeRecord(const std::vector<std::string> &record) = 0;
 
   iterator begin() {
     return iterator(this);
   }
-
-  virtual ~BaseDataWriter() = default;
 };
 
 }  // namespace DataWriters

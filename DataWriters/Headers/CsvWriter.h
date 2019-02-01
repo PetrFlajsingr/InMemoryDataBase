@@ -16,14 +16,6 @@ namespace DataWriters {
  * Zapsani dat ve formatu csv na disk.
  */
 class CsvWriter : public BaseDataWriter {
- private:
-  std::ofstream *outputStream;
-
-  uint64_t columnCount = 0;
-
-  std::string delimiter;
-
-  void writeRow(const std::vector<std::string> &data);
  public:
   explicit CsvWriter(const std::string &filePath,
                      const std::string &delimiter = ",");
@@ -33,6 +25,15 @@ class CsvWriter : public BaseDataWriter {
   void writeHeader(const std::vector<std::string> &header) override;
 
   void writeRecord(const std::vector<std::string> &record) override;
+
+ private:
+  std::ofstream *outputStream;
+
+  uint64_t columnCount = 0;
+
+  std::string delimiter;
+
+  void writeRow(const std::vector<std::string> &data);
 };
 
 }  // namespace DataWriters

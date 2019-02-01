@@ -22,34 +22,6 @@ class BaseField;
  * Rozhrani pro objekt dodavajici data.
  */
 class BaseDataSet {
- protected:
-  friend class BaseField;  //< kvuli pristupu k BaseField::setData(...)
-
-  std::vector<BaseField *> fields;  //< Pole umoznujici pristup k datum
-
-  std::string dataSetName;
-
-  unsigned long columnCount = 0;
-
-  /**
-   * Nastaveni dat pole.
-   *
-   * Zpristupnuje IField::setData potomkum
-   * @param field Field, kteremu budou nastavena data
-   * @param data Data pro zapis
-   */
-  void setFieldData(BaseField *field, void *data);
-
-  /**
-   * Nastaveni dat uvnitr datasetu.
-   *
-   * Volano pri externi zmene dat Field
-   * @param data Data k zapisu
-   * @param index Index v zaznamu
-   * @param type Typ dat
-   */
-  virtual void setData(void *data, uint64_t index, ValueType type) = 0;
-
  public:
   class iterator : public std::iterator<std::random_access_iterator_tag, int> {
    private:
@@ -291,6 +263,34 @@ class BaseDataSet {
    * Smazani vsech alokovanych Fields
    */
   virtual ~BaseDataSet();
+
+ protected:
+  friend class BaseField;  //< kvuli pristupu k BaseField::setData(...)
+
+  std::vector<BaseField *> fields;  //< Pole umoznujici pristup k datum
+
+  std::string dataSetName;
+
+  unsigned long columnCount = 0;
+
+  /**
+   * Nastaveni dat pole.
+   *
+   * Zpristupnuje IField::setData potomkum
+   * @param field Field, kteremu budou nastavena data
+   * @param data Data pro zapis
+   */
+  void setFieldData(BaseField *field, void *data);
+
+  /**
+   * Nastaveni dat uvnitr datasetu.
+   *
+   * Volano pri externi zmene dat Field
+   * @param data Data k zapisu
+   * @param index Index v zaznamu
+   * @param type Typ dat
+   */
+  virtual void setData(void *data, uint64_t index, ValueType type) = 0;
 };
 }  // namespace DataSets
 

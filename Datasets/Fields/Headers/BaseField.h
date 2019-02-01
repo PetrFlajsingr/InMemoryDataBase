@@ -19,30 +19,6 @@ struct DataSetRow;
  * Interface pro fields datasetu.
  */
 class BaseField {
- protected:
-  std::string fieldName;  //< Nazev reprezentovaneho sloupce
-
-  uint64_t index;  //< Index sloupce
-
-  friend class BaseDataSet;  //< Pro pristup k primemu nastaveni dat
-
-  BaseDataSet *dataSet;  //< Vlastnik
-
-  /**
-   * Nastaveni hodnoty field.
-   * @param data pointer na data
-   */
-  virtual void setValue(void *data) = 0;
-
-  /**
-   * Nastaveni dat v datasetu.
-   *
-   * Tato funkce zpristupnuje setValue potomkum.
-   * @param data data pro ulozeni
-   * @param type typ dat
-   */
-  void setData(void *data, ValueType type);
-
  public:
   /**
    * Nastaveni datasetu, nazvu a indexu field
@@ -103,6 +79,29 @@ class BaseField {
   virtual std::function<int8_t(DataSetRow *,
                                DataSetRow *)> getCompareFunction() = 0;
 
+ protected:
+  std::string fieldName;  //< Nazev reprezentovaneho sloupce
+
+  uint64_t index;  //< Index sloupce
+
+  friend class BaseDataSet;  //< Pro pristup k primemu nastaveni dat
+
+  BaseDataSet *dataSet;  //< Vlastnik
+
+  /**
+   * Nastaveni hodnoty field.
+   * @param data pointer na data
+   */
+  virtual void setValue(void *data) = 0;
+
+  /**
+   * Nastaveni dat v datasetu.
+   *
+   * Tato funkce zpristupnuje setValue potomkum.
+   * @param data data pro ulozeni
+   * @param type typ dat
+   */
+  void setData(void *data, ValueType type);
 };
 }  // namespace DataSets
 

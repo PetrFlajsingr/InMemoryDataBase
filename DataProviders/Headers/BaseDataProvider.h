@@ -29,6 +29,47 @@ namespace DataProviders {
  */
 class BaseDataProvider {
  public:
+  /**
+   * Get a record divided into fields
+   * @return
+   */
+  virtual const std::vector<std::string> &getRow() const = 0;
+
+  /**
+   * Get a name of a column - usually first row in a file...
+   * @param columnIndex Index of desired column name
+   * @return name of the column
+   */
+  virtual std::string getColumnName(unsigned int columnIndex) const = 0;
+
+  virtual uint64_t getColumnCount() const = 0;
+
+  /**
+   *
+   * @return vector of all column names
+   */
+  virtual const std::vector<std::string> &getHeader() const = 0;
+
+  /**
+   *
+   * @return amount of records that have been read already
+   */
+  virtual int getCurrentRecordNumber() const = 0;
+
+  /**
+   * Move to the next record.
+   * @return true if function call produced new record, false otherwise
+   */
+  virtual bool next() = 0;
+
+  /**
+   * Move to the first record
+   */
+  virtual void first() = 0;
+
+  inline virtual bool eof() const = 0;
+
+  virtual ~BaseDataProvider() = default;
 
   class iterator : public std::iterator<std::input_iterator_tag,
                                         std::vector<std::string>> {
@@ -87,46 +128,6 @@ class BaseDataProvider {
     }
   };
 
-  /**
-   * Get a record divided into fields
-   * @return
-   */
-  virtual const std::vector<std::string> &getRow() const = 0;
-
-  /**
-   * Get a name of a column - usually first row in a file...
-   * @param columnIndex Index of desired column name
-   * @return name of the column
-   */
-  virtual std::string getColumnName(unsigned int columnIndex) const = 0;
-
-  virtual uint64_t getColumnCount() const = 0;
-
-  /**
-   *
-   * @return vector of all column names
-   */
-  virtual const std::vector<std::string> &getHeader() const = 0;
-
-  /**
-   *
-   * @return amount of records that have been read already
-   */
-  virtual int getCurrentRecordNumber() const = 0;
-
-  /**
-   * Move to the next record.
-   * @return true if function call produced new record, false otherwise
-   */
-  virtual bool next() = 0;
-
-  /**
-   * Move to the first record
-   */
-  virtual void first() = 0;
-
-  inline virtual bool eof() const = 0;
-
   iterator begin() {
     return iterator(this);
   }
@@ -134,8 +135,6 @@ class BaseDataProvider {
   iterator end() {
     return iterator(this);
   }
-
-  virtual ~BaseDataProvider() = default;
 };
 
 }  // namespace DataProviders

@@ -16,10 +16,6 @@ namespace DataSets {
  * Field zpristupnujici hodnoty typu Currency v data setu.
  */
 class CurrencyField : public BaseField {
- protected:
-  void setValue(void *data) override;
-
-  Currency data;
  public:
   CurrencyField(const std::string &fieldName,
                 BaseDataSet *dataset,
@@ -37,6 +33,11 @@ class CurrencyField : public BaseField {
 
   std::function<int8_t(DataSetRow *,
                        DataSetRow *)> getCompareFunction() override;
+
+ protected:
+  void setValue(void *data) override;
+
+  Currency data;
 };
 }
 

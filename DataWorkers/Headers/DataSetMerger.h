@@ -13,10 +13,6 @@
 namespace DataWorkers {
 
 class DataSetMerger {
- private:
-  std::vector<DataSets::BaseDataSet *> dataSets;
-
-  void appendData(std::vector<DataSets::BaseField *> fields, DataSets::BaseDataSet *dataset);
  public:
   DataSetMerger();
 
@@ -31,6 +27,11 @@ class DataSetMerger {
                                        const std::string &columnName1,
                                        const std::string &columnName2);
 
+ private:
+  std::vector<DataSets::BaseDataSet *> dataSets;
+
+  void appendData(std::vector<DataSets::BaseField *> fields,
+                  DataSets::BaseDataSet *dataset);
 };
 
 }  //namespace DataWorkers

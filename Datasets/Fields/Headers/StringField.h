@@ -15,11 +15,6 @@ namespace DataSets {
  * Field zpristupnujici hodnoty typu std::string ulozene v data setu
  */
 class StringField : public BaseField {
- protected:
-  std::string data;
-
-  void setValue(void *data) override;
-
  public:
   StringField(const std::string &fieldName,
               BaseDataSet *dataset,
@@ -32,6 +27,11 @@ class StringField : public BaseField {
   std::string getAsString() const override;
 
   std::function<int8_t (DataSetRow *, DataSetRow *)> getCompareFunction() override;
+
+ protected:
+  std::string data;
+
+  void setValue(void *data) override;
 };
 }
 

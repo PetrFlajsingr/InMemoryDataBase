@@ -14,9 +14,6 @@
 namespace DataWriters {
 
 class XlsxWriter : public BaseDataWriter {
- private:
-  xlsxiowriter xlsxWriterHandle;
-
  public:
   explicit XlsxWriter(const std::string &fileName,
                       const std::string &sheetName = "");
@@ -26,6 +23,9 @@ class XlsxWriter : public BaseDataWriter {
   void writeHeader(const std::vector<std::string> &header) override;
 
   void writeRecord(const std::vector<std::string> &record) override;
+
+ private:
+  xlsxiowriter xlsxWriterHandle;
 };
 
 }  // namespace DataWriters

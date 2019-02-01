@@ -14,11 +14,6 @@ namespace DataSets {
  * Field umoznujici pristup k datum typu double v data setu.
  */
 class DoubleField : public BaseField {
- protected:
-  void setValue(void *data) override;
-
-  double data;
-
  public:
   DoubleField(const std::string &fieldName,
               BaseDataSet *dataset,
@@ -36,6 +31,11 @@ class DoubleField : public BaseField {
 
   std::function<int8_t(DataSetRow *,
                        DataSetRow *)> getCompareFunction() override;
+
+ protected:
+  void setValue(void *data) override;
+
+  double data;
 };
 }
 

@@ -4,7 +4,7 @@
 
 #include <MemoryDataSet.h>
 
-DataWorkers::MemoryDataWorker::MemoryDataWorker(DataSets::BaseDataSet *dataSet) {
+DataWorkers::MemoryDataWorker::MemoryDataWorker(gsl::not_null<DataSets::BaseDataSet *> dataSet) {
   this->dataset = dataSet;
 }
 

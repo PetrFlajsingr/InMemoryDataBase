@@ -76,54 +76,6 @@ typedef std::vector<DataSetRow *> DataSetData;
     delete dataSet;
  */
 class MemoryDataSet : public BaseDataSet {
- private:
-  /**
-   * Struktura pro vnitrni reprezentaci dat
-   */
-
-  //\
-
-  DataProviders::BaseDataProvider *dataProvider = nullptr;  //< dodavatel dat
-
-  bool isOpen = false;
-
-  uint64_t currentRecord = 0;  //< Pocitadlo zaznamu
-
-  bool dataValidityChanged = false;
-  //< Nastaveno pri zmene dat naprikald pomoci find
-
-  DataSetData data;
-
-  /**
-   * Nacteni dat do this->data
-   */
-  void loadData();
-
-  /**
-   * Pridani zaznamu do this->data()
-   */
-  void addRecord();
-
-  /**
-   * Vytvoreni Fields se jmeny podle nazvu sloupcu.
-   * @param columns nazvy sloupcu
-   */
-  void createFields(std::vector<std::string> columns,
-                    std::vector<ValueType> types);
-
-  /**
-   * Nastaveni hodnot this->fields.
-   *
-   * Vynechava zaznamy s dataValidity == false
-   * @param index Index Field
-   * @param searchForward Smer vyhledavani validniho zaznamu
-   * @return
-   */
-  bool setFieldValues(uint64_t index, bool searchForward);
-
- protected:
-  void setData(void *data, uint64_t index, ValueType type) override;
-
  public:
   explicit MemoryDataSet(const std::string &dataSetName);
 
@@ -169,6 +121,54 @@ class MemoryDataSet : public BaseDataSet {
   virtual void appendDataProvider(DataProviders::BaseDataProvider *provider);
 
   bool findFirst(FilterItem &item) override;
+
+ protected:
+  void setData(void *data, uint64_t index, ValueType type) override;
+
+ private:
+  /**
+   * Struktura pro vnitrni reprezentaci dat
+   */
+
+  //\
+
+  DataProviders::BaseDataProvider *dataProvider = nullptr;  //< dodavatel dat
+
+  bool isOpen = false;
+
+  uint64_t currentRecord = 0;  //< Pocitadlo zaznamu
+
+  bool dataValidityChanged = false;
+  //< Nastaveno pri zmene dat naprikald pomoci find
+
+  DataSetData data;
+
+  /**
+   * Nacteni dat do this->data
+   */
+  void loadData();
+
+  /**
+   * Pridani zaznamu do this->data()
+   */
+  void addRecord();
+
+  /**
+   * Vytvoreni Fields se jmeny podle nazvu sloupcu.
+   * @param columns nazvy sloupcu
+   */
+  void createFields(std::vector<std::string> columns,
+                    std::vector<ValueType> types);
+
+  /**
+   * Nastaveni hodnot this->fields.
+   *
+   * Vynechava zaznamy s dataValidity == false
+   * @param index Index Field
+   * @param searchForward Smer vyhledavani validniho zaznamu
+   * @return
+   */
+  bool setFieldValues(uint64_t index, bool searchForward);
 };
 }  // namespace DataSets
 

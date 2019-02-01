@@ -22,6 +22,21 @@ class IAsyncMemoryDataSetObserver;
  * Pouziti obdobne jako MemoryDataSet, krom vyvolanych udalosti
  */
 class Async_MemoryDataSet : public MemoryDataSet {
+ public:
+  explicit Async_MemoryDataSet(const std::string &dataSetName);
+
+  void open() override;
+
+  void filter(const FilterOptions &options) override;
+
+  void sort(SortOptions &options) override;
+
+  void appendDataProvider(DataProviders::BaseDataProvider *provider) override;
+
+  void addObserver(IAsyncMemoryDataSetObserver *observer);
+
+  void removeObserver(IAsyncMemoryDataSetObserver *observer);
+
  protected:
   std::vector<IAsyncMemoryDataSetObserver *> observers;
 
@@ -65,21 +80,6 @@ class Async_MemoryDataSet : public MemoryDataSet {
    * @param type
    */
   void notify(EventType type);
-
- public:
-  explicit Async_MemoryDataSet(const std::string &dataSetName);
-
-  void open() override;
-
-  void filter(const FilterOptions &options) override;
-
-  void sort(SortOptions &options) override;
-
-  void appendDataProvider(DataProviders::BaseDataProvider *provider) override;
-
-  void addObserver(IAsyncMemoryDataSetObserver *observer);
-
-  void removeObserver(IAsyncMemoryDataSetObserver *observer);
 };
 
 class IAsyncMemoryDataSetObserver {

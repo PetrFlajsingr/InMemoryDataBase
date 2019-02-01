@@ -14,15 +14,6 @@
 namespace DataWorkers {
 
 class BaseDataWorker {
- protected:
-  std::vector<std::string> columnChoices;
-
-  DataSets::BaseDataSet* dataset = nullptr;
-
-  QueryData queryData;
-
-  std::vector<DataSets::BaseDataSet*> additionalDataSets;
-
  public:
   virtual ~BaseDataWorker() = default;
 
@@ -44,6 +35,15 @@ class BaseDataWorker {
   void clearDataSets() {
     additionalDataSets.clear();
   }
+
+ protected:
+  std::vector<std::string> columnChoices;
+
+  DataSets::BaseDataSet *dataset = nullptr;
+
+  QueryData queryData;
+
+  std::vector<DataSets::BaseDataSet *> additionalDataSets;
 };
 }  // namespace DataWorkers
 

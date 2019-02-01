@@ -15,11 +15,6 @@ namespace DataSets {
  * Field zpristupnujici hodnoty typu int v data setu.
  */
 class IntegerField : public BaseField {
- protected:
-  void setValue(void *data) override;
-
-  int data;
-
  public:
   IntegerField(const std::string &fieldName,
                BaseDataSet *dataset,
@@ -37,6 +32,11 @@ class IntegerField : public BaseField {
 
   std::function<int8_t(DataSetRow *,
                        DataSetRow *)> getCompareFunction() override;
+
+ protected:
+  void setValue(void *data) override;
+
+  int data;
 };
 }
 
