@@ -17,6 +17,7 @@ namespace DataProviders {
  * Usage:
  *  DataProviders::SomeProvider provider(...);
  *  while (provider.next()) {
+ *      auto row = provider.getRow();
  *      // work with data
  *
  *  }
@@ -123,7 +124,7 @@ class BaseDataProvider {
      * Get current record from provider
      * @return
      */
-    std::vector<std::string> operator*() const {
+    const std::vector<std::string> &operator*() const {
       return provider->getRow();
     }
   };

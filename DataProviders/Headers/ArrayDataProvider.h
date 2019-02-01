@@ -50,19 +50,21 @@ class ArrayDataProvider : public BaseDataProvider {
   }
 
   bool next() override {
-    if (currentRow < data.size()) {
+    if (currentRow == -1 || currentRow < data.size() - 1) {
       currentRow++;
       return true;
     }
+    _eof = true;
     return false;
   }
 
   void first() override {
-    currentRow = 0;
+    currentRow = -1;
+    _eof = false;
   }
 
   bool eof() const override {
-    return currentRow == data.size();
+    return _eof;
   }
 
  private:
@@ -70,8 +72,9 @@ class ArrayDataProvider : public BaseDataProvider {
 
   std::vector<std::string> header;
 
-  uint64_t currentRow = 0;
+  int currentRow = -1;
 
+  bool _eof = false;
 };
 
 }  // namespace DataProviders

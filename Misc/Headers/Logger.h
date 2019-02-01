@@ -111,7 +111,7 @@ class Logger {
    * Uloz pocatecni stav pro logovani.
    */
   void startTime() {
-    Logger::startTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+    startTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::system_clock::now().time_since_epoch());
   }
 
@@ -119,7 +119,7 @@ class Logger {
    * Uloz koncovy stav pro logovani.
    */
   void endTime() {
-    Logger::endTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+    endTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::system_clock::now().time_since_epoch());
   }
 
@@ -127,8 +127,8 @@ class Logger {
    * Vypise na stdout rozdil endTime a startTime v ms.
    */
   void printElapsedTime() {
-    auto tmp = Logger::endTimeMs - Logger::startTimeMs;
-    Logger::log(LogLevel::Verbose,
+    auto tmp = endTimeMs - startTimeMs;
+    log(LogLevel::Verbose,
                 "Time elapsed: " + std::to_string(tmp.count()) + " ms");
   }
 
