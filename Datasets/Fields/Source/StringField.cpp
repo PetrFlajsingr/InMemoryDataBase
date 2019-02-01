@@ -12,7 +12,7 @@ DataSets::StringField::StringField(const std::string &fieldName,
                                                                index) {}
 
 ValueType DataSets::StringField::getFieldType() const {
-  return StringValue;
+  return ValueType::String;
 }
 
 void DataSets::StringField::setAsString(const std::string &value) {
@@ -30,7 +30,7 @@ void DataSets::StringField::setValue(void *data) {
     this->data = "";
     return;
   }
-  this->data = std::string(reinterpret_cast<char *>(data));
+  this->data = std::string(reinterpret_cast<gsl::zstring<> >(data));
 }
 
 std::function<int8_t(DataSets::DataSetRow *,

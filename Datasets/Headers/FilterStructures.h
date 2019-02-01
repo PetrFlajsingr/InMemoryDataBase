@@ -13,14 +13,14 @@
 // TODO: predelat pro prehlednost - vytvorit DataContainer for FilterOptions uvnitr automaticky
 //  - pretizena funkce pro vsechny mozne hodnoty?
 namespace DataSets {
-enum FilterOption {
-  EQUALS,
-  STARTS_WITH,
-  CONTAINS,
-  ENDS_WITH,
-  NOT_CONTAINS,
-  NOT_STARTS_WITH,
-  NOT_ENDS_WITH
+enum class FilterOption {
+  Equals,
+  StartsWith,
+  Contains,
+  EndsWith,
+  NotContains,
+  NotStartsWith,
+  NotEndsWith
 };
 
 struct FilterItem {

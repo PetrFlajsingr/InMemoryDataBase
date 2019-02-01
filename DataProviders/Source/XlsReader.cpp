@@ -4,6 +4,7 @@
 
 #include <XlsReader.h>
 #include <Exceptions.h>
+#include <gsl/gsl>
 
 DataProviders::XlsReader::XlsReader(const std::string &fileName) {
   xlsxioReader = xlsxioread_open(fileName.c_str());
@@ -46,7 +47,7 @@ int DataProviders::XlsReader::getCurrentRecordNumber() const {
 bool DataProviders::XlsReader::next() {
   if (xlsxioread_sheet_next_row(xlsxioSheet) != 0) {
     currentRecord.clear();
-    char *value;
+    gsl::zstring<> value;
     while ((value = xlsxioread_sheet_next_cell(xlsxioSheet)) != nullptr) {
       currentRecord.emplace_back(value);
       delete value;
@@ -90,7 +91,7 @@ void DataProviders::XlsReader::close() {
 
 void DataProviders::XlsReader::readHeader() {
   if (xlsxioread_sheet_next_row(xlsxioSheet) != 0) {
-    char *value;
+    gsl::zstring<> value;
     while ((value = xlsxioread_sheet_next_cell(xlsxioSheet)) != nullptr) {
       header.emplace_back(value);
       delete value;

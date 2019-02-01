@@ -14,7 +14,7 @@
 /**
  * Typ zpravy pro log
  */
-enum LogLevel { Verbose, Info, Status, Debug, Warning, Error };
+enum class LogLevel { Verbose, Info, Status, Debug, Warning, Error };
 
 class Logger {
  private:

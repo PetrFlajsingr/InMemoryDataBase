@@ -4,9 +4,10 @@
 
 #include <catch.hpp>
 #include <Utilities.h>
+#include <DateTimeUtils.h>
 #include <map>
 
-TEST_CASE("Compare integers", "[int_compare]") {
+TEST_CASE("Compare integers", "[compareInt]") {
   REQUIRE(Utilities::compareInt(0, 0) == 0);
   REQUIRE(Utilities::compareInt(1, 1) == 0);
   REQUIRE(Utilities::compareInt(100, 100) == 0);
@@ -26,7 +27,7 @@ TEST_CASE("Compare integers", "[int_compare]") {
   REQUIRE(Utilities::compareInt(-10, -100) == 1);
 }
 
-TEST_CASE("Compare doubles", "[double_compare]") {
+TEST_CASE("Compare doubles", "[compareDouble]") {
   REQUIRE(Utilities::compareDouble(0, 0) == 0);
   REQUIRE(Utilities::compareDouble(1, 1) == 0);
   REQUIRE(Utilities::compareDouble(100, 100) == 0);
@@ -46,7 +47,7 @@ TEST_CASE("Compare doubles", "[double_compare]") {
   REQUIRE(Utilities::compareDouble(-10, -100) == 1);
 }
 
-TEST_CASE("Compare Currency", "[Currency_compare]") {
+TEST_CASE("Compare Currency", "[compareCurrency]") {
   std::map<double, Currency> testVals{
       {0, Currency(0)},
       {1, Currency(1)},
@@ -80,5 +81,57 @@ TEST_CASE("Compare Currency", "[Currency_compare]") {
   REQUIRE(Utilities::compareCurrency(testVals[0.11], testVals[0.1]) == 1);
 }
 
-// TODO: Compare String, Compare DateTime, CopyStringToNewChar, endsWith, getType,
-// stringToDouble, stringToInt, splitStringByDelimiter/Reserve
+TEST_CASE("Compare strings", "[compareString]") {
+  REQUIRE(Utilities::compareString("", "") == 0);
+  REQUIRE(Utilities::compareString("aa", "aa") == 0);
+  REQUIRE(Utilities::compareString("abcdefg", "abcdefg") == 0);
+  REQUIRE(Utilities::compareString("-1", "-1") == 0);
+
+  REQUIRE(Utilities::compareString("abc", "bac") == -1);
+  REQUIRE(Utilities::compareString("jujky", "ujky") == -1);
+
+  REQUIRE(Utilities::compareString("bac", "abc") == 1);
+  REQUIRE(Utilities::compareString("ujky", "jujky") == 1);
+}
+
+TEST_CASE("Compare DateTime", "[compareDateTime]") {
+  DateTime dateTime1;
+  dateTime1.fromString("2020-10-09 00-00-00-0");
+  DateTime dateTime2;
+  dateTime2.fromString("10-01-06 00-00-00-0");
+  DateTime dateTime3;
+  dateTime3.fromString("2020-08-09 00-00-00-0");
+  DateTime dateTime4;
+  dateTime4.fromString("2020-10-12 00-00-00-0");
+
+  DateTime testVal = dateTime1;
+  REQUIRE(Utilities::compareDateTime(dateTime1, testVal) == 0);
+  testVal = dateTime2;
+  REQUIRE(Utilities::compareDateTime(dateTime2, testVal) == 0);
+  testVal = dateTime3;
+  REQUIRE(Utilities::compareDateTime(dateTime3, testVal) == 0);
+  testVal = dateTime4;
+  REQUIRE(Utilities::compareDateTime(dateTime4, testVal) == 0);
+
+  REQUIRE(Utilities::compareDateTime(dateTime1, dateTime4) == -1);
+  REQUIRE(Utilities::compareDateTime(dateTime2, dateTime1) == -1);
+  REQUIRE(Utilities::compareDateTime(dateTime2, dateTime3) == -1);
+  REQUIRE(Utilities::compareDateTime(dateTime3, dateTime1) == -1);
+  REQUIRE(Utilities::compareDateTime(dateTime3, dateTime4) == -1);
+
+  REQUIRE(Utilities::compareDateTime(dateTime4, dateTime1) == 1);
+  REQUIRE(Utilities::compareDateTime(dateTime1, dateTime2) == 1);
+  REQUIRE(Utilities::compareDateTime(dateTime3, dateTime2) == 1);
+  REQUIRE(Utilities::compareDateTime(dateTime1, dateTime3) == 1);
+  REQUIRE(Utilities::compareDateTime(dateTime4, dateTime3) == 1);
+}
+
+TEST_CASE("Create zstring from string", "[copyStringToNewChar") {
+
+}
+
+
+
+// TODO: CopyStringToNewChar, endsWith, getType,
+//  stringToDouble, stringToInt, splitStringByDelimiter/Reserve
+//  DateTimeUtils

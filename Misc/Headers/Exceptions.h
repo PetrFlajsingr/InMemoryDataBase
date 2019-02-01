@@ -7,6 +7,7 @@
 
 #include <stdexcept>
 #include <string>
+#include <gsl/gsl>
 
 /**
  * Exception slouzici k oznaceni funkci, ktere nejsou implementovany
@@ -21,11 +22,9 @@ class NotImplementedException : public std::logic_error {
  */
 class IOException : public std::exception {
  private:
-  const char *errorMessage;
+  const gsl::czstring<> errorMessage;
  public:
-  explicit IOException(const char *message) {
-    this->errorMessage = message;
-  }
+  explicit IOException(const gsl::czstring<> message) : errorMessage(message) {}
 
   char const *what() const noexcept override {
     return errorMessage;
@@ -37,7 +36,8 @@ class IOException : public std::exception {
  */
 class InvalidArgumentException : public std::invalid_argument {
  public:
-  explicit InvalidArgumentException(const char *message) : invalid_argument(
+  explicit InvalidArgumentException(const gsl::czstring<> message)
+      : invalid_argument(
       message) {}
 };
 
@@ -46,11 +46,10 @@ class InvalidArgumentException : public std::invalid_argument {
  */
 class IllegalStateException : public std::exception {
  private:
-  const char *errorMessage;
+  const gsl::czstring<> errorMessage;
  public:
-  explicit IllegalStateException(const char *message) {
-    this->errorMessage = message;
-  }
+  explicit IllegalStateException(const gsl::czstring<> message) : errorMessage(
+      message) {}
 
   char const *what() const noexcept override {
     return errorMessage;
@@ -62,11 +61,10 @@ class IllegalStateException : public std::exception {
  */
 class UnsupportedOperationException : public std::exception {
  private:
-  const char *errorMessage;
+  const gsl::czstring<> errorMessage;
  public:
-  explicit UnsupportedOperationException(const char *message) {
-    this->errorMessage = message;
-  }
+  explicit UnsupportedOperationException(const gsl::czstring<> message)
+      : errorMessage(message) {}
 
   char const *what() const noexcept override {
     return errorMessage;

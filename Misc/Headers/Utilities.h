@@ -5,6 +5,7 @@
 #ifndef MISC_HEADERS_UTILITIES_H_
 #define MISC_HEADERS_UTILITIES_H_
 
+#include <gsl/gsl>
 #include <string>
 #include <vector>
 #include "Types.h"
@@ -89,7 +90,7 @@ namespace Utilities {
    * @param str string pro zkopirovani
    * @return nove alokovany char* obsahujici str.data()
    */
-  char *copyStringToNewChar(const std::string &str);
+  gsl::zstring<> copyStringToNewChar(const std::string &str);
 
   /**
    * Srovnani integer hodnot

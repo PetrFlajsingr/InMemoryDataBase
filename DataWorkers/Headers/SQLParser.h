@@ -9,13 +9,10 @@
 #include <Utilities.h>
 #include <iostream>
 #include <algorithm>
+#include <Types.h>
 
 namespace DataWorkers {
 class SQLParseException : public std::exception {};
-
-  enum Operation {
-    Distinct, Sum, Average
-  };
 
   struct ProjectionOperation {
     std::string columnName;
@@ -23,7 +20,7 @@ class SQLParseException : public std::exception {};
     Operation operation;
   };
 
-enum JoinType {
+enum class JoinType {
   LeftJoin, NormalJoin
 };
 
@@ -72,9 +69,9 @@ enum JoinType {
           auto split = Utilities::splitStringByDelimiter(splitSql[iter], "(");
           Operation operation;
           if (split[0] == "AVG") {
-            operation = Average;
+            operation = Operation::Average;
           } else if (split[0] == "SUM") {
-            operation = Sum;
+            operation = Operation::Sum;
           } else {
             throw SQLParseException();
           }
@@ -110,13 +107,13 @@ enum JoinType {
           if (splitSql[iter] != "LEFT") {
             throw SQLParseException();
           }
-          op.joinType = LeftJoin;
+          op.joinType = JoinType::LeftJoin;
           iter++;
           if (splitSql[iter] != "JOIN") {
             throw SQLParseException();
           }
         } else {
-          op.joinType = NormalJoin;
+          op.joinType = JoinType::NormalJoin;
         }
         iter++;
 

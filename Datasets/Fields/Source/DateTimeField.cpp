@@ -5,7 +5,7 @@
 #include <DateTimeField.h>
 
 ValueType DataSets::DateTimeField::getFieldType() const {
-  return DateTimeValue;
+  return ValueType::DateTime;
 }
 
 void DataSets::DateTimeField::setAsString(const std::string &value) {
@@ -44,4 +44,4 @@ DateTime DataSets::DateTimeField::getAsDateTime() const {
 }
 
 DataSets::DateTimeField::DateTimeField(const std::string &fieldName, DataSets::BaseDataSet *dataset, uint64_t index)
-    : BaseField(fieldName, dataset, index), data(DateTime(DateTime_s)) {}
+    : BaseField(fieldName, dataset, index) {}

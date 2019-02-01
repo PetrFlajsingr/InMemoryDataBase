@@ -15,7 +15,7 @@ namespace RelationLayer {
 /**
  * Typy relaci, podobne jako v SQL databazich
  */
-enum RelationType {
+enum class RelationType {
   OneToOne, OneToN, NToM
 };
 

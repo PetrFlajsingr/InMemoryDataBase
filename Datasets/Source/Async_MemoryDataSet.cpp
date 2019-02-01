@@ -6,7 +6,7 @@
 #include <future>
 
 void DataSets::Async_MemoryDataSet::open() {
-  notify(BEFORE_OPEN);
+  notify(EventType::BeforeOpen);
   auto handle = std::async(std::launch::async,
                            &Async_MemoryDataSet::innerOpen,
                            this);
@@ -14,47 +14,47 @@ void DataSets::Async_MemoryDataSet::open() {
 
 void DataSets::Async_MemoryDataSet::innerOpen() {
   MemoryDataSet::open();
-  notify(AFTER_OPEN);
+  notify(EventType::AfterOpen);
 }
 
 void DataSets::Async_MemoryDataSet::notify(Async_MemoryDataSet::EventType type) {
   switch (type) {
-    case BEFORE_OPEN:
+    case EventType::BeforeOpen:
       for (auto observer : observers) {
         observer->onBeforeOpen(this);
       }
       break;
-    case AFTER_OPEN:
+    case EventType::AfterOpen:
       for (auto observer : observers) {
         observer->onAfterOpen(this);
       }
       break;
-    case BEFORE_SORT:
+    case EventType::BeforeSort:
       for (auto observer : observers) {
         observer->onBeforeSort(this);
       }
       break;
-    case AFTER_SORT:
+    case EventType::AfterSort:
       for (auto observer : observers) {
         observer->onAfterSort(this);
       }
       break;
-    case BEFORE_FILTER:
+    case EventType::BeforeFilter:
       for (auto observer : observers) {
         observer->onBeforeFilter(this);
       }
       break;
-    case AFTER_FILTER:
+    case EventType::AfterFilter:
       for (auto observer : observers) {
         observer->onAfterFilter(this);
       }
       break;
-    case BEFORE_APPEND:
+    case EventType::BeforeAppend:
       for (auto observer : observers) {
         observer->onBeforeAppendDataProvider(this);
       }
       break;
-    case AFTER_APPEND:
+    case EventType::AfterAppend:
       for (auto observer : observers) {
         observer->onAfterAppendDataProvider(this);
       }
@@ -71,7 +71,7 @@ void DataSets::Async_MemoryDataSet::removeObserver(IAsyncMemoryDataSetObserver *
 }
 
 void DataSets::Async_MemoryDataSet::filter(const FilterOptions &options) {
-  notify(BEFORE_FILTER);
+  notify(EventType::BeforeFilter);
   auto handle = std::async(std::launch::async,
                            &Async_MemoryDataSet::innerFilter,
                            this,
@@ -80,11 +80,11 @@ void DataSets::Async_MemoryDataSet::filter(const FilterOptions &options) {
 
 void DataSets::Async_MemoryDataSet::innerFilter(const FilterOptions &options) {
   MemoryDataSet::filter(options);
-  notify(AFTER_FILTER);
+  notify(EventType::AfterFilter);
 }
 
 void DataSets::Async_MemoryDataSet::sort(SortOptions &options) {
-  notify(BEFORE_SORT);
+  notify(EventType::BeforeSort);
   auto handle = std::async(std::launch::async,
                            &Async_MemoryDataSet::innerSort,
                            this,
@@ -93,11 +93,11 @@ void DataSets::Async_MemoryDataSet::sort(SortOptions &options) {
 
 void DataSets::Async_MemoryDataSet::innerSort(SortOptions &options) {
   MemoryDataSet::sort(options);
-  notify(AFTER_SORT);
+  notify(EventType::AfterSort);
 }
 
 void DataSets::Async_MemoryDataSet::appendDataProvider(DataProviders::BaseDataProvider *provider) {
-  notify(BEFORE_APPEND);
+  notify(EventType::BeforeAppend);
   auto handle = std::async(std::launch::async,
                            &Async_MemoryDataSet::innerAppendDataProvider,
                            this,
@@ -106,6 +106,6 @@ void DataSets::Async_MemoryDataSet::appendDataProvider(DataProviders::BaseDataPr
 
 void DataSets::Async_MemoryDataSet::innerAppendDataProvider(DataProviders::BaseDataProvider *provider) {
   MemoryDataSet::appendDataProvider(provider);
-  notify(AFTER_APPEND);
+  notify(EventType::AfterAppend);
 }
 DataSets::Async_MemoryDataSet::Async_MemoryDataSet(const std::string &dataSetName) : MemoryDataSet(dataSetName) {}

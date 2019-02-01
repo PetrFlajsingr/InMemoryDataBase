@@ -10,33 +10,13 @@
 #include <sstream>
 #include <ostream>
 #include "Utilities.h"
-
-enum DateTimeMode { DateTime_s, Date_s, Time_s };
+#include <gsl/gsl>
 
 /**
  * Trida pro reprezentaci casu a data.
  */
 class DateTime {
- private:
-  int32_t year = 0;
-  uint8_t month = 1;
-  uint8_t day = 1;
-
-  uint8_t hour = 0;
-  uint8_t minute = 0;
-  uint8_t second = 0;
-
-  uint16_t millisecond = 0;
-
-  DateTimeMode mode;
-
  public:
-
-  /**
-   *
-   * @param mode Urcuje typ ukladane hodnoty
-   */
-  explicit DateTime(DateTimeMode mode) : mode(mode) {}
 
   /**
    * Prevod ze string ve formatu YYYY-MM-DD HH-MM-SS
@@ -71,6 +51,7 @@ class DateTime {
   }
 
   void setMonth(uint8_t month) {
+    Expects(0 < month && month <= 12);
     DateTime::month = month;
   }
 
@@ -79,6 +60,8 @@ class DateTime {
   }
 
   void setDay(uint8_t day) {
+    //  TODO
+    Expects(0 < day && day <= 31);
     DateTime::day = day;
   }
 
@@ -87,6 +70,7 @@ class DateTime {
   }
 
   void setHour(uint8_t hour) {
+    Expects(hour <= 24);
     DateTime::hour = hour;
   }
 
@@ -95,6 +79,7 @@ class DateTime {
   }
 
   void setMinute(uint8_t minute) {
+    Expects(minute <= 59);
     DateTime::minute = minute;
   }
 
@@ -103,6 +88,7 @@ class DateTime {
   }
 
   void setSecond(uint8_t second) {
+    Expects(second <= 59);
     DateTime::second = second;
   }
 
@@ -111,11 +97,8 @@ class DateTime {
   }
 
   void setMillisecond(uint16_t millisecond) {
+    Expects(millisecond <= 999);
     DateTime::millisecond = millisecond;
-  }
-
-  DateTimeMode getMode() const {
-    return mode;
   }
 
   // operator overloads
@@ -174,20 +157,10 @@ class DateTime {
   }
 
   friend std::ostream &operator<<(std::ostream &os, const DateTime &dateTime) {
-    switch (dateTime.mode) {
-      case DateTime_s:
-        os << dateTime.year << "-" << dateTime.month << "-" << dateTime.day << " "
-            << dateTime.hour << "-" << dateTime.minute << "-" << dateTime.second << " "
-            << dateTime.millisecond;
-        break;
-      case Date_s:os << dateTime.year << "-" << dateTime.month << "-" << dateTime.day;
-        break;
-      case Time_s:
-        os << dateTime.hour << "-" << dateTime.minute << "-" << dateTime.second << "-"
-            << dateTime.millisecond;
-        break;
-    }
-
+    os << dateTime.year << "-" << dateTime.month << "-" << dateTime.day << " "
+       << dateTime.hour << "-" << dateTime.minute << "-" << dateTime.second
+       << " "
+       << dateTime.millisecond;
     return os;
   }
 
@@ -196,26 +169,34 @@ class DateTime {
   friend std::istream &operator>>(std::istream &is, DateTime &dateTime) {
     std::string temp;
 
-    if (dateTime.mode == DateTime_s || dateTime.mode == Date_s) {
-      is >> temp;
-      auto dateVals = Utilities::splitStringByDelimiter(temp, "-");
-      dateTime.year = Utilities::stringToInt(dateVals[0]);
-      dateTime.month = Utilities::stringToInt(dateVals[1]);
-      dateTime.day = Utilities::stringToInt(dateVals[2]);
-    }
+    is >> temp;
+    auto dateVals = Utilities::splitStringByDelimiter(temp, "-");
+    dateTime.setYear(Utilities::stringToInt(dateVals[0]));
+    dateTime.setMonth(Utilities::stringToInt(dateVals[1]));
+    dateTime.setDay(Utilities::stringToInt(dateVals[2]));
 
-    if (dateTime.mode == DateTime_s || dateTime.mode == Time_s) {
-      is >> temp;
-      auto timeVals = Utilities::splitStringByDelimiter(temp, "-");
-      dateTime.hour = Utilities::stringToInt(timeVals[0]);
-      dateTime.minute = Utilities::stringToInt(timeVals[1]);
-      dateTime.second = Utilities::stringToInt(timeVals[2]);
-      dateTime.millisecond = Utilities::stringToInt(timeVals[3]);
-    }
+    is >> temp;
+    auto timeVals = Utilities::splitStringByDelimiter(temp, "-");
+    dateTime.setHour(Utilities::stringToInt(timeVals[0]));
+    dateTime.setMinute(Utilities::stringToInt(timeVals[1]));
+    dateTime.setSecond(Utilities::stringToInt(timeVals[2]));
+    dateTime.setMillisecond(Utilities::stringToInt(timeVals[3]));
 
     return is;
   }
 #pragma clang diagnostic pop
+
+ private:
+  int32_t year = 0;
+  uint8_t month = 1;
+  uint8_t day = 1;
+
+  uint8_t hour = 0;
+  uint8_t minute = 0;
+  uint8_t second = 0;
+
+  uint16_t millisecond = 0;
+
 };
 
 #endif //CSV_READER_DATETIMEUTILS_H

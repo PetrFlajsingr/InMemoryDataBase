@@ -78,10 +78,10 @@ bool DataProviders::CsvReader::eof() const {
 }
 
 std::vector<std::string> DataProviders::CsvReader::tokenize(const std::string &line,
-                                                            int vectorReserve) const {
+                                                            unsigned int vectorReserve) const {
   char buffer[BUFFER_SIZE];
   uint64_t bufferIter = 0;
-  TokeniserStates state = Read;
+  ParseState state = ParseState::Read;
   /*
    * Popis stavu:
    *  - Read: Bezne cteni bunky, preruseno pri nalezeni delimiteru
@@ -93,9 +93,9 @@ std::vector<std::string> DataProviders::CsvReader::tokenize(const std::string &l
   result.reserve(vectorReserve);
   for (auto character : line) {
     switch (state) {
-      case Read:  // normal read
+      case ParseState::Read:  // normal read
         if (character == '\"') {
-          state = QuotMark1;
+          state = ParseState::QuotMark1;
         } else if (character == delimiter[0]) {
           buffer[bufferIter] = '\0';
           result.emplace_back(std::string(buffer));
@@ -105,24 +105,24 @@ std::vector<std::string> DataProviders::CsvReader::tokenize(const std::string &l
         buffer[bufferIter] = character;
         bufferIter++;
         break;
-      case QuotMark1:  // read inside " "
+      case ParseState::QuotMark1:  // read inside " "
         if (character == '\"') {
-          state = QuotMark2;
+          state = ParseState::QuotMark2;
         }
         buffer[bufferIter] = character;
         bufferIter++;
         break;
-      case QuotMark2:
+      case ParseState::QuotMark2:
         if (character == '\"') {
-          state = QuotMark1;
+          state = ParseState::QuotMark1;
         } else if (character == delimiter[0]) {
           buffer[bufferIter] = '\0';
           result.emplace_back(std::string(buffer));
           bufferIter = 0;
-          state = Read;
+          state = ParseState::Read;
           break;
         } else {
-          state = Read;
+          state = ParseState::Read;
         }
         buffer[bufferIter] = character;
         bufferIter++;

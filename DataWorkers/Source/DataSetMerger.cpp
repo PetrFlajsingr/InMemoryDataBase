@@ -82,19 +82,20 @@ DataSets::BaseDataSet *DataWorkers::DataSetMerger::mergeDataSets(const std::stri
     throw InvalidArgumentException(errMsg.c_str());
   }
 
-  if (mergeField1->getFieldType() != IntegerValue & mergeField1->getFieldType() != StringValue) {
+  if (mergeField1->getFieldType() != ValueType::Integer
+      & mergeField1->getFieldType() != ValueType::String) {
     std::string errMsg = "Unsupported field type for merging (not integer nor string).";
     throw InvalidArgumentException(errMsg.c_str());
   }
 
-  auto isIntegerField = mergeField1->getFieldType() == IntegerValue;
+  auto isIntegerField = mergeField1->getFieldType() == ValueType::Integer;
 
   DataSets::SortOptions options1;
-  options1.addOption(mergeField1->getIndex(), Ascending);
+  options1.addOption(mergeField1->getIndex(), SortOrder::Ascending);
   dataSet1->sort(options1);
 
   DataSets::SortOptions options2;
-  options2.addOption(mergeField2->getIndex(), Ascending);
+  options2.addOption(mergeField2->getIndex(), SortOrder::Ascending);
   dataSet2->sort(options2);
 
   int8_t cmpResult;
@@ -136,23 +137,23 @@ void DataWorkers::DataSetMerger::appendData(std::vector<DataSets::BaseField *> f
 
   for (auto i = 0; i < fields.size(); ++i) {
     switch (dataSetFields[i]->getFieldType()) {
-      case IntegerValue:
+      case ValueType::Integer:
         reinterpret_cast<DataSets::IntegerField *>(dataSetFields[i])
             ->setAsInteger(reinterpret_cast<DataSets::IntegerField *>(fields[i])->getAsInteger());
         break;
-      case DoubleValue:
+      case ValueType::Double:
         reinterpret_cast<DataSets::DoubleField *>(dataSetFields[i])
             ->setAsDouble(reinterpret_cast<DataSets::DoubleField *>(fields[i])->getAsDouble());
         break;
-      case CurrencyValue: {
+      case ValueType::Currency: {
         auto value = reinterpret_cast<DataSets::CurrencyField *>(fields[i])->getAsCurrency();
         reinterpret_cast<DataSets::CurrencyField *>(dataSetFields[i])
             ->setAsCurrency(value);
       }
         break;
-      case StringValue:dataSetFields[i]->setAsString(fields[i]->getAsString());
+      case ValueType::String:dataSetFields[i]->setAsString(fields[i]->getAsString());
         break;
-      case DateTimeValue: {
+      case ValueType::DateTime: {
         auto value = reinterpret_cast<DataSets::DateTimeField *>(fields[i])->getAsDateTime();
         reinterpret_cast<DataSets::DateTimeField *>(dataSetFields[i])
             ->setAsDateTime(value);

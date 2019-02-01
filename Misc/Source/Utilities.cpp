@@ -38,7 +38,7 @@ std::vector<std::string> Utilities::splitStringByDelimiterReserve(std::string st
 }
 
 int Utilities::stringToInt(const std::string &str) {
-  char *p;
+  gsl::zstring<> p;
   long converted = strtol(str.c_str(), &p, 10);
   if (*p) {
     return 0;
@@ -48,7 +48,7 @@ int Utilities::stringToInt(const std::string &str) {
 }
 
 double Utilities::stringToDouble(const std::string &str) {
-  char *p;
+  gsl::zstring<> p;
   double converted = strtod(str.c_str(), &p);
   if (*p) {
     return 0;
@@ -71,11 +71,11 @@ bool Utilities::isDouble(const std::string &value) {
 
 ValueType Utilities::getType(const std::string &value) {
   if (isInteger(value)) {
-    return IntegerValue;
+    return ValueType::Integer;
   } else if (isDouble(value)) {
-    return DoubleValue;
+    return ValueType::Double;
   } else {
-    return StringValue;
+    return ValueType::String;
   }
 }
 
@@ -85,7 +85,7 @@ bool Utilities::endsWith(const std::string &value, const std::string &ending) {
   return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
 }
 
-char *Utilities::copyStringToNewChar(const std::string &str) {
+gsl::zstring<> Utilities::copyStringToNewChar(const std::string &str) {
   auto result = new char[str.length() + 1];
   strcpy(result, str.c_str());
   return result;

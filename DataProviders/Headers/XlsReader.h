@@ -43,7 +43,7 @@ class XlsReader : public BaseDataProvider {
 
   std::vector<std::string> header;
 
-  uint64_t currentRecordNumber = -1;
+  int currentRecordNumber = -1;
 
   bool _eof = false;
 

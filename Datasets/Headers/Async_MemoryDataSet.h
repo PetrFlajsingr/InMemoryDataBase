@@ -25,15 +25,15 @@ class Async_MemoryDataSet : public MemoryDataSet {
  protected:
   std::vector<IAsyncMemoryDataSetObserver *> observers;
 
-  enum EventType {
-    BEFORE_OPEN,
-    AFTER_OPEN,
-    BEFORE_SORT,
-    AFTER_SORT,
-    BEFORE_FILTER,
-    AFTER_FILTER,
-    BEFORE_APPEND,
-    AFTER_APPEND
+  enum class EventType {
+    BeforeOpen,
+    AfterOpen,
+    BeforeSort,
+    AfterSort,
+    BeforeFilter,
+    AfterFilter,
+    BeforeAppend,
+    AfterAppend
   };
 
   /**

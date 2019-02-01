@@ -76,7 +76,7 @@ class CsvReader : public BaseDataProvider {
   /**
    * FSM states for csv parsing.
    */
-  enum TokeniserStates { Read, QuotMark1, QuotMark2 };
+  enum class ParseState { Read, QuotMark1, QuotMark2 };
 
   const uint32_t BUFFER_SIZE = 4096;
 
@@ -109,7 +109,7 @@ class CsvReader : public BaseDataProvider {
    * @return tokenized vector from line
    */
   std::vector<std::string> tokenize(const std::string &line,
-                                    int vectorReserve) const;
+                                    unsigned int vectorReserve) const;
 
 };
 }  // namespace DataProviders
