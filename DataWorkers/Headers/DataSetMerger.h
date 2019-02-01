@@ -22,10 +22,10 @@ class DataSetMerger {
 
   void removeDataSet(const std::string &dataSetName);
 
-  DataSets::BaseDataSet *mergeDataSets(const std::string &dataSetName1,
-                                       const std::string &dataSetName2,
-                                       const std::string &columnName1,
-                                       const std::string &columnName2);
+  gsl::not_null<DataSets::BaseDataSet *> mergeDataSets(const std::string &dataSetName1,
+                                                       const std::string &dataSetName2,
+                                                       const std::string &columnName1,
+                                                       const std::string &columnName2);
 
  private:
   std::vector<DataSets::BaseDataSet *> dataSets;

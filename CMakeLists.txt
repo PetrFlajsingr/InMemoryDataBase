@@ -68,6 +68,9 @@ FILE(GLOB RelationLayerSources RelationLayer/Source/*.cpp)
 FILE(GLOB RelationLayerHeaders RelationLayer/Headers/*.h)
 FILE(GLOB RelationLayerTests RelationLayer/tests/*catch*.cpp)
 
+FILE(GLOB FileDownloaderSources FileDownloaders/Source/*.cpp)
+FILE(GLOB FileDownloaderHeaders FileDownloaders/Headers/*.h)
+
 # third party:
 FILE(GLOB xlsxioHeaders third_party/xlsxio/include/*.h)
 FILE(GLOB decimalHeaders third_party/decimal/*.h)
@@ -79,7 +82,8 @@ set(SOURCE_FILES
         ${DataWorkerSources}
         ${DataWriterSources}
         ${MiscSources}
-        ${RelationLayerSources})
+        ${RelationLayerSources}
+        ${FileDownloaderSources})
 
 set(TEST_SOURCE_FILES
         ${SOURCE_FILES}

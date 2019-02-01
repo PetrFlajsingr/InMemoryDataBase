@@ -18,10 +18,11 @@ void DataWorkers::DataSetMerger::removeDataSet(const std::string &dataSetName) {
     dataSets.erase(foundDataSet);
   }
 }
-DataSets::BaseDataSet *DataWorkers::DataSetMerger::mergeDataSets(const std::string &dataSetName1,
-                                                                 const std::string &dataSetName2,
-                                                                 const std::string &columnName1,
-                                                                 const std::string &columnName2) {
+gsl::not_null<DataSets::BaseDataSet *> DataWorkers::DataSetMerger::mergeDataSets(
+    const std::string &dataSetName1,
+    const std::string &dataSetName2,
+    const std::string &columnName1,
+    const std::string &columnName2) {
   // find required data sets
   auto dataSet1Iterator = std::find_if(dataSets.begin(),
                                        dataSets.end(),

@@ -10,6 +10,7 @@
 #include <set>
 #include <unordered_set>
 #include <XlsxWriter.h>
+#include <BaseFileDownloader.h>
 
 const std::string csvPath = "/Users/petr/Desktop/csvs/";
 const std::string outPath = csvPath + "out/";
@@ -423,7 +424,11 @@ int main(int argc, char **argv) {
   return 0;
 }
 
-void demo() {
+struct Test {
+  int a, b, c;
+};
+
+std::tuple<int *, bool> demo() {
   std::vector<std::string> listOfFiles;
 
   auto writer = new DataWriters::XlsxWriter("output.xlsx");
@@ -432,7 +437,21 @@ void demo() {
     auto provider = new DataProviders::CsvReader(filename);
     std::copy(provider->begin(), provider->end(), writer->begin());
   }
+
+  bool success = true;
+
+  int *retVal = nullptr;
+  return std::make_tuple(retVal, success);
 }
+
+void vaaat() {
+  if (auto[value, success] = demo(); success) {
+    // ...
+  }
+
+}
+
+
 
 
 

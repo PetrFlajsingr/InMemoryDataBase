@@ -65,12 +65,19 @@ class BaseFileDownloader {
    */
   virtual void downloadFile(size_t fileIndex) = 0;
 
-  virtual void addObserver(FileDownloadObserver *observer) {
-    observers.push_back(observer);
+  void addObserver(gsl::not_null<FileDownloadObserver *> observer) {
+    observers.emplace_back(observer);
+  }
+
+  void removeObserver(FileDownloadObserver *observer) {
+    if (auto found = std::find(observers.begin(), observers.end(), observer);
+        found != observers.end()) {
+      observers.erase(found);
+    }
   }
 
  protected:
-  std::vector<FileDownloadObserver*> observers;
+  std::vector<FileDownloadObserver *> observers;
   std::vector<std::string> availableFiles;
   std::string downloadLocation;
 
