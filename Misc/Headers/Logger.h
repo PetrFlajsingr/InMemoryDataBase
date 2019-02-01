@@ -40,12 +40,12 @@ class Logger {
    */
   std::string levelToString(LogLevel level) {
     switch (level) {
-      case Verbose:return "";
-      case Info: return "[INFO]";
-      case Status: return "[STATUS]";
-      case Debug: return "[DEBUG]";
-      case Warning: return "[WARNING]";
-      case Error: return "[ERROR]";
+      case LogLevel::Verbose:return "";
+      case LogLevel::Info: return "[INFO]";
+      case LogLevel::Status: return "[STATUS]";
+      case LogLevel::Debug: return "[DEBUG]";
+      case LogLevel::Warning: return "[WARNING]";
+      case LogLevel::Error: return "[ERROR]";
     }
     return "";
   }
@@ -74,7 +74,7 @@ class Logger {
     if (isAllowedDebug && logLevel == LogLevel::Debug) {
       return;
     }
-    if (logLevel != Verbose) {
+    if (logLevel != LogLevel::Verbose) {
       if (printTime) {
         message = levelToString(logLevel) + " " + getTime() + ": " + message;
       } else {
@@ -97,7 +97,7 @@ class Logger {
       return;
     }
     std::string message = exception.what();
-    if (logLevel != Verbose) {
+    if (logLevel != LogLevel::Verbose) {
       if (printTime) {
         message = levelToString(logLevel) + " " + getTime() + ": " + message;
       } else {
@@ -128,7 +128,7 @@ class Logger {
    */
   void printElapsedTime() {
     auto tmp = Logger::endTimeMs - Logger::startTimeMs;
-    Logger::log(Verbose,
+    Logger::log(LogLevel::Verbose,
                 "Time elapsed: " + std::to_string(tmp.count()) + " ms");
   }
 

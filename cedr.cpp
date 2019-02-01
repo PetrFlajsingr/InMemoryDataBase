@@ -4,19 +4,12 @@
 #include <iomanip>
 #include <MemoryDataSet.h>
 #include <DataSetMerger.h>
-#include <MemoryDataWorker.h>
 #include "DataProviders/Headers/CsvReader.h"
 #include <Logger.h>
-
-#include <mach/vm_statistics.h>
-#include <mach/mach_types.h>
-#include <mach/mach_init.h>
-#include <mach/mach_host.h>
 
 #include <set>
 #include <unordered_set>
 #include <XlsxWriter.h>
-#include <array>
 
 const std::string csvPath = "/Users/petr/Desktop/csvs/";
 const std::string outPath = csvPath + "out/";
@@ -72,27 +65,6 @@ const std::string QUERY_AGR =
 const std::string
     QUERY_AGR_2017 = QUERY_AGR + " WHERE main.rozpoctoveObdobi = 2017";
 
-void printMemoryUsageMacOS() {
-  return;
-  vm_size_t page_size;
-  mach_port_t mach_port;
-  mach_msg_type_number_t count;
-  vm_statistics64_data_t vm_stats;
-
-  mach_port = mach_host_self();
-  count = sizeof(vm_stats) / sizeof(natural_t);
-  if (KERN_SUCCESS == host_page_size(mach_port, &page_size) &&
-      KERN_SUCCESS == host_statistics64(mach_port, HOST_VM_INFO,
-                                        (host_info64_t) &vm_stats, &count)) {
-    long long free_memory = (int64_t) vm_stats.free_count * (int64_t) page_size;
-
-    long long used_memory = ((int64_t) vm_stats.active_count +
-        (int64_t) vm_stats.inactive_count +
-        (int64_t) vm_stats.wire_count) * (int64_t) page_size;
-    printf("free memory: %lld\nused memory: %lld\n", free_memory, used_memory);
-  }
-}
-
 void countIntersection() {
   auto prijemceProvider =
       new DataProviders::CsvReader(csvPath + "2017_no_filter.csv", ",");
@@ -101,34 +73,41 @@ void countIntersection() {
 
   auto prijemceDataSet = new DataSets::MemoryDataSet("prijemce");
   prijemceDataSet->setDataProvider(prijemceProvider);
-  prijemceDataSet->setFieldTypes({StringValue, StringValue, StringValue,
-                                  StringValue, StringValue, StringValue,
-                                  StringValue,
-                                  StringValue, StringValue, StringValue,
-                                  StringValue, StringValue, IntegerValue,
-                                  StringValue});
+  prijemceDataSet->setFieldTypes({ValueType::String, ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String, ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String, ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String, ValueType::String,
+                                  ValueType::Integer,
+                                  ValueType::String});
   prijemceDataSet->open();
-  Logger::getInstance().log(Debug, "Prijemce loaded", true);
+  Logger::getInstance().log(LogLevel::Debug, "Prijemce loaded", true);
 
   auto subjektyDataSet = new DataSets::MemoryDataSet("subjekty");
   subjektyDataSet->setDataProvider(subjektyProvider);
-  subjektyDataSet->setFieldTypes({IntegerValue, IntegerValue, IntegerValue,
-                                  StringValue, StringValue, StringValue,
-                                  StringValue,
-                                  StringValue, StringValue});
+  subjektyDataSet->setFieldTypes({ValueType::Integer, ValueType::Integer,
+                                  ValueType::Integer,
+                                  ValueType::String, ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String, ValueType::String});
   subjektyDataSet->open();
-  Logger::getInstance().log(Debug, "Subjekty loaded", true);
+  Logger::getInstance().log(LogLevel::Debug, "Subjekty loaded", true);
 
   DataSets::SortOptions options;
-  options.addOption(prijemceDataSet->fieldByName("ico")->getIndex(), Ascending);
+  options.addOption(prijemceDataSet->fieldByName("ico")->getIndex(),
+                    SortOrder::Ascending);
   prijemceDataSet->sort(options);
 
   DataSets::SortOptions options2;
   options2.addOption(subjektyDataSet->fieldByName("IČO_num")->getIndex(),
-                     Ascending);
+                     SortOrder::Ascending);
   subjektyDataSet->sort(options2);
 
-  Logger::getInstance().log(Debug, "Sorted", true);
+  Logger::getInstance().log(LogLevel::Debug, "Sorted", true);
 
   auto fieldPrijemce =
       dynamic_cast<DataSets::IntegerField *>(prijemceDataSet->fieldByName("ico"));
@@ -163,7 +142,7 @@ void countIntersection() {
 
     prijemceDataSet->next();
   }
-  Logger::getInstance().log(Info,
+  Logger::getInstance().log(LogLevel::Info,
                             "Total intersection count: " + std::to_string(cnt),
                             true);
 
@@ -174,13 +153,13 @@ void checkDupl() {
       csvPath + "dotaceTitul_rozpoctovaSkladbaPolozka.csv", ",");
   auto dataset = new DataSets::MemoryDataSet("tmp");
   dataset->setDataProvider(prov);
-  dataset->setFieldTypes({StringValue, StringValue});
+  dataset->setFieldTypes({ValueType::String, ValueType::String});
   dataset->open();
 
   auto field = dataset->fieldByIndex(0);
 
   DataSets::SortOptions options;
-  options.addOption(0, Ascending);
+  options.addOption(0, SortOrder::Ascending);
   dataset->sort(options);
 
   std::string last = "";
@@ -190,7 +169,7 @@ void checkDupl() {
     total++;
     if (Utilities::compareString(field->getAsString(), last) == 0) {
       if (!logged) {
-        //Logger::getInstance().log(Warning, "Duplicate: " + last);
+        //Logger::getInstance().log(LogLevel::Warning, "Duplicate: " + last);
         cnt++;
         logged = true;
       }
@@ -203,13 +182,15 @@ void checkDupl() {
     dataset->next();
   }
 
-  Logger::getInstance().log(Warning, "Record count: " + std::to_string(total));
-  Logger::getInstance().log(Warning,
+  Logger::getInstance().log(LogLevel::Warning,
+                            "Record count: " + std::to_string(total));
+  Logger::getInstance().log(LogLevel::Warning,
                             "Duplicate count: " + std::to_string(cnt2));
-  Logger::getInstance().log(Warning,
+  Logger::getInstance().log(LogLevel::Warning,
                             "Unique duplicate count: " + std::to_string(cnt));
-  Logger::getInstance().log(Warning,
-              "Avg on duplicates: " + std::to_string(cnt2 / (double) cnt));
+  Logger::getInstance().log(LogLevel::Warning,
+                            "Avg on duplicates: "
+                                + std::to_string(cnt2 / (double) cnt));
 
   delete prov;
   delete dataset;
@@ -287,33 +268,28 @@ int main(int argc, char **argv) {
   auto subjektyProvider =
       new DataProviders::CsvReader(csvPath + subjektyCSVName, ";");
 
-  Logger::getInstance().log(Debug, "Providers prepared", true);
-  printMemoryUsageMacOS();
-
+  Logger::getInstance().log(LogLevel::Debug, "Providers prepared", true);
   auto dotaceDataSet = new DataSets::MemoryDataSet("dotace");
   dotaceDataSet->setDataProvider(dotaceProvider);
-  dotaceDataSet->setFieldTypes({StringValue, StringValue, StringValue,
-                                StringValue, StringValue, StringValue});
+  dotaceDataSet->setFieldTypes({ValueType::String, ValueType::String,
+                                ValueType::String,
+                                ValueType::String, ValueType::String,
+                                ValueType::String});
   dotaceDataSet->open();
-  Logger::getInstance().log(Debug, "Dotace loaded", true);
-  printMemoryUsageMacOS();
-
+  Logger::getInstance().log(LogLevel::Debug, "Dotace loaded", true);
   auto rozhodnutiDataSet = new DataSets::MemoryDataSet("rozhodnuti");
   rozhodnutiDataSet->setDataProvider(rozhodnutiProvider);
-  rozhodnutiDataSet->setFieldTypes({StringValue, StringValue, StringValue});
+  rozhodnutiDataSet->setFieldTypes({ValueType::String, ValueType::String,
+                                    ValueType::String});
   rozhodnutiDataSet->open();
-  Logger::getInstance().log(Debug, "Rozhodnuti loaded", true);
-  printMemoryUsageMacOS();
-
+  Logger::getInstance().log(LogLevel::Debug, "Rozhodnuti loaded", true);
   DataWorkers::DataSetMerger merger;
   merger.addDataSet(dotaceDataSet);
   merger.addDataSet(rozhodnutiDataSet);
 
   auto dotace_rozhodnutiDataSet =
       merger.mergeDataSets("dotace", "rozhodnuti", "idDotace", "idDotace");
-  Logger::getInstance().log(Debug, "Merged dotace, rozhodnuti", true);
-  printMemoryUsageMacOS();
-
+  Logger::getInstance().log(LogLevel::Debug, "Merged dotace, rozhodnuti", true);
   merger.removeDataSet("dotace");
   merger.removeDataSet("rozhodnuti");
   delete dotaceDataSet;
@@ -321,12 +297,12 @@ int main(int argc, char **argv) {
 
   auto obdobiDataSet = new DataSets::MemoryDataSet("obdobi");
   obdobiDataSet->setDataProvider(obdobiProvider);
-  obdobiDataSet->setFieldTypes({StringValue, StringValue, CurrencyValue,
-                                CurrencyValue, StringValue, StringValue});
+  obdobiDataSet->setFieldTypes({ValueType::String, ValueType::String,
+                                ValueType::Currency,
+                                ValueType::Currency, ValueType::String,
+                                ValueType::String});
   obdobiDataSet->open();
-  Logger::getInstance().log(Debug, "Obdobi loaded", true);
-  printMemoryUsageMacOS();
-
+  Logger::getInstance().log(LogLevel::Debug, "Obdobi loaded", true);
   merger.addDataSet(dotace_rozhodnutiDataSet);
   merger.addDataSet(obdobiDataSet);
 
@@ -335,9 +311,9 @@ int main(int argc, char **argv) {
                            "obdobi",
                            "idRozhodnuti",
                            "idRozhodnuti");
-  Logger::getInstance().log(Debug, "Merged dotace_rozhodnuti, obdobi", true);
-  printMemoryUsageMacOS();
-
+  Logger::getInstance().log(LogLevel::Debug,
+                            "Merged dotace_rozhodnuti, obdobi",
+                            true);
   merger.removeDataSet("dotace_rozhodnuti");
   merger.removeDataSet("obdobi");
   delete obdobiDataSet;
@@ -348,27 +324,24 @@ int main(int argc, char **argv) {
 
   auto prijemceDataSet = new DataSets::MemoryDataSet("prijemce");
   prijemceDataSet->setDataProvider(prijemceProvider);
-  prijemceDataSet->setFieldTypes({StringValue, IntegerValue, StringValue});
+  prijemceDataSet->setFieldTypes({ValueType::String, ValueType::Integer,
+                                  ValueType::String});
   prijemceDataSet->open();
-  Logger::getInstance().log(Debug, "Prijemce loaded", true);
-  printMemoryUsageMacOS();
-
+  Logger::getInstance().log(LogLevel::Debug, "Prijemce loaded", true);
   auto subjektyDataSet = new DataSets::MemoryDataSet("subjekty");
   subjektyDataSet->setDataProvider(subjektyProvider);
-  subjektyDataSet->setFieldTypes({IntegerValue, IntegerValue, IntegerValue,
-                                  StringValue, StringValue, StringValue,
-                                  StringValue});
+  subjektyDataSet->setFieldTypes({ValueType::Integer, ValueType::Integer,
+                                  ValueType::Integer,
+                                  ValueType::String, ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String});
   subjektyDataSet->open();
-  Logger::getInstance().log(Debug, "Subjekty loaded", true);
-  printMemoryUsageMacOS();
-
+  Logger::getInstance().log(LogLevel::Debug, "Subjekty loaded", true);
   merger.addDataSet(subjektyDataSet);
   merger.addDataSet(prijemceDataSet);
   auto prijemce_subjektyDataSet =
       merger.mergeDataSets("prijemce", "subjekty", "ico", "IČO_num");
-  Logger::getInstance().log(Debug, "Merged prijemce, subjekty", true);
-  printMemoryUsageMacOS();
-
+  Logger::getInstance().log(LogLevel::Debug, "Merged prijemce, subjekty", true);
   delete subjektyDataSet;
   delete prijemceDataSet;
 
@@ -376,91 +349,75 @@ int main(int argc, char **argv) {
       new DataProviders::CsvReader(csvPath + operacniProgramCSVName, ",");
   auto operacniProgramDataSet = new DataSets::MemoryDataSet("operacniProgram");
   operacniProgramDataSet->setDataProvider(operacniProgramProvider);
-  operacniProgramDataSet->setFieldTypes({StringValue, StringValue});
+  operacniProgramDataSet->setFieldTypes({ValueType::String, ValueType::String});
   operacniProgramDataSet->open();
-  Logger::getInstance().log(Debug, "operacniProgram loaded", true);
-  printMemoryUsageMacOS();
-
+  Logger::getInstance().log(LogLevel::Debug, "operacniProgram loaded", true);
   auto grantoveSchemaProvider =
       new DataProviders::CsvReader(csvPath + grantoveSchemaCSVName, ",");
   auto grantoveSchemaDataSet = new DataSets::MemoryDataSet("grantoveSchema");
   grantoveSchemaDataSet->setDataProvider(grantoveSchemaProvider);
-  grantoveSchemaDataSet->setFieldTypes({StringValue, StringValue});
+  grantoveSchemaDataSet->setFieldTypes({ValueType::String, ValueType::String});
   grantoveSchemaDataSet->open();
-  Logger::getInstance().log(Debug, "grantoveSchema loaded", true);
-  printMemoryUsageMacOS();
-
+  Logger::getInstance().log(LogLevel::Debug, "grantoveSchema loaded", true);
   auto dotaceTitulProvider =
       new DataProviders::CsvReader(csvPath + dotacniTitulCSVName, ",");
   auto dotaceTitulDataSet = new DataSets::MemoryDataSet("dotaceTitul");
   dotaceTitulDataSet->setDataProvider(dotaceTitulProvider);
-  dotaceTitulDataSet->setFieldTypes({StringValue, StringValue});
+  dotaceTitulDataSet->setFieldTypes({ValueType::String, ValueType::String});
   dotaceTitulDataSet->open();
-  Logger::getInstance().log(Debug, "dotaceTitul loaded", true);
-  printMemoryUsageMacOS();
-
+  Logger::getInstance().log(LogLevel::Debug, "dotaceTitul loaded", true);
   auto poskytovatelDotaceProvider =
       new DataProviders::CsvReader(csvPath + poskytovatelDotaceCSVName, ",");
   auto poskytovatelDotaceDataSet =
       new DataSets::MemoryDataSet("poskytovatelDotace");
   poskytovatelDotaceDataSet->setDataProvider(poskytovatelDotaceProvider);
-  poskytovatelDotaceDataSet->setFieldTypes({StringValue, StringValue});
+  poskytovatelDotaceDataSet->setFieldTypes({ValueType::String,
+                                            ValueType::String});
   poskytovatelDotaceDataSet->open();
-  Logger::getInstance().log(Debug, "poskytovatelDotace loaded", true);
-  printMemoryUsageMacOS();
-
+  Logger::getInstance().log(LogLevel::Debug, "poskytovatelDotace loaded", true);
   dataWorker->addDataSet(prijemce_subjektyDataSet);
   dataWorker->addDataSet(operacniProgramDataSet);
   dataWorker->addDataSet(grantoveSchemaDataSet);
   dataWorker->addDataSet(dotaceTitulDataSet);
   dataWorker->addDataSet(poskytovatelDotaceDataSet);
-  Logger::getInstance().log(Debug, "Add datasets to data worker", true);
-  printMemoryUsageMacOS();
-
+  Logger::getInstance().log(LogLevel::Debug,
+                            "Add datasets to data worker",
+                            true);
   auto dataWriter = new DataWriters::CsvWriter(outPath + "all.csv", ",");
   std::string query = QUERY;
   dataWorker->writeResult(*dataWriter,
                           query);
 
-  Logger::getInstance().log(Debug, "Written query: " + query, true);
-  printMemoryUsageMacOS();
-
+  Logger::getInstance().log(LogLevel::Debug, "Written query: " + query, true);
   delete dataWriter;
   dataWriter = new DataWriters::CsvWriter(outPath + "all_agr.csv", ",");
   query = QUERY_AGR;
   dataWorker->writeResult(*dataWriter,
                           query);
-  Logger::getInstance().log(Debug, "Written query: " + query, true);
-  printMemoryUsageMacOS();
+  Logger::getInstance().log(LogLevel::Debug, "Written query: " + query, true);
   delete dataWriter;
 
   dataWriter = new DataWriters::CsvWriter(outPath + "2017.csv", ",");
   query = QUERY_2017;
   dataWorker->writeResult(*dataWriter,
                           query);
-  Logger::getInstance().log(Debug, "Written query: " + query, true);
-  printMemoryUsageMacOS();
+  Logger::getInstance().log(LogLevel::Debug, "Written query: " + query, true);
   delete dataWriter;
 
   dataWriter = new DataWriters::CsvWriter(outPath + "2017_agr.csv", ",");
   query = QUERY_AGR_2017;
   dataWorker->writeResult(*dataWriter,
                           query);
-  Logger::getInstance().log(Debug, "Written query: " + query, true);
-  printMemoryUsageMacOS();
+  Logger::getInstance().log(LogLevel::Debug, "Written query: " + query, true);
   delete dataWriter;
 
   delete dataWorker;
   delete subjektyProvider;
-  printMemoryUsageMacOS();
-
   delete operacniProgramDataSet;
   delete grantoveSchemaDataSet;
   delete dotaceTitulDataSet;
   delete poskytovatelDotaceDataSet;
-  Logger::getInstance().log(Debug, "Done", true);
-  printMemoryUsageMacOS();
-
+  Logger::getInstance().log(LogLevel::Debug, "Done", true);
   Logger::getInstance().endTime();
   Logger::getInstance().printElapsedTime();
   return 0;
