@@ -13,10 +13,6 @@
 
 namespace DataWorkers {
 
-const std::string AggregationString[] {
-  "",  "(Sum)", "(Avg)"
-};
-
 class BaseDataWorker {
  protected:
   std::vector<std::string> columnChoices;
@@ -28,23 +24,20 @@ class BaseDataWorker {
   std::vector<DataSets::BaseDataSet*> additionalDataSets;
 
  public:
-  BaseDataWorker() = default;
-
-  virtual ~BaseDataWorker() {
-  }
+  virtual ~BaseDataWorker() = default;
 
   virtual std::vector<std::string> getMultiChoiceNames() = 0;
 
   virtual std::vector<std::string> getChoices(std::string choiceName) = 0;
 
   virtual void writeResult(DataWriters::BaseDataWriter &writer,
-                           std::string &sql) = 0;
+                           const std::string &sql) = 0;
 
   void setColumnChoices(std::vector<std::string> &data) {
     columnChoices = data;
   }
 
-  void addDataSet(DataSets::BaseDataSet* dataset) {
+  void addDataSet(gsl::not_null<DataSets::BaseDataSet *> dataset) {
     additionalDataSets.push_back(dataset);
   }
 

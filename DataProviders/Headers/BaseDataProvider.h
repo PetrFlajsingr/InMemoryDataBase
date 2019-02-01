@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include <gsl/gsl>
 
 namespace DataProviders {
 
@@ -39,7 +40,7 @@ class BaseDataProvider {
      * Move provider to the first record when no data has been read.
      * @param provider
      */
-    explicit iterator(BaseDataProvider *provider)
+    explicit iterator(gsl::not_null<BaseDataProvider *> provider)
         : provider(provider) {
       if (provider->getCurrentRecordNumber() == -1) {
         provider->next();

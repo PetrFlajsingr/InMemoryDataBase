@@ -51,10 +51,10 @@ class BaseField {
    * @param index Index pole v zaznamu
    */
   explicit BaseField(const std::string &fieldName,
-                     BaseDataSet *dataset,
+                     gsl::not_null<BaseDataSet *> dataset,
                      uint64_t index) : fieldName(fieldName),
-                                       dataSet(dataset),
-                                       index(index) {}
+                                       index(index),
+                                       dataSet(dataset) {}
 
   virtual ~BaseField() = default;
 

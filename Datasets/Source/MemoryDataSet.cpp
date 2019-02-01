@@ -5,7 +5,7 @@
 #include <MemoryDataSet.h>
 
 void DataSets::MemoryDataSet::setDataProvider(
-    DataProviders::BaseDataProvider *provider) {
+    gsl::not_null<DataProviders::BaseDataProvider *> provider) {
   dataProvider = provider;
 }
 

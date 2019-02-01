@@ -133,7 +133,7 @@ class MemoryDataSet : public BaseDataSet {
 
   void openEmpty() override;
 
-  void setDataProvider(DataProviders::BaseDataProvider *provider) override;
+  void setDataProvider(gsl::not_null<DataProviders::BaseDataProvider *> provider) override;
 
   void close() override;
 

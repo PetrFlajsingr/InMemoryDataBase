@@ -5,6 +5,7 @@
 #ifndef CSV_READER_BASEDATAWRITER_H
 #define CSV_READER_BASEDATAWRITER_H
 
+#include <gsl/gsl>
 #include <string>
 #include <vector>
 #include <iterator>
@@ -41,7 +42,8 @@ class BaseDataWriter {
      * Vytvoreni iteratoru pro dany data writer
      * @param dataWriter vystup nad kterym se iteruje
      */
-    explicit iterator(BaseDataWriter *dataWriter) : dataWriter(dataWriter) {}
+    explicit iterator(gsl::not_null<BaseDataWriter *> dataWriter) : dataWriter(
+        dataWriter) {}
 
     iterator(const iterator &other) {
       dataWriter = other.dataWriter;

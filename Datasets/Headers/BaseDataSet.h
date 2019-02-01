@@ -58,7 +58,8 @@ class BaseDataSet {
    public:
     iterator() = default;
 
-    explicit iterator(BaseDataSet *dataSet) : dataSet(dataSet) {}
+    explicit iterator(gsl::not_null<BaseDataSet *> dataSet)
+        : dataSet(dataSet) {}
 
     iterator(const iterator &other) {
       dataSet = other.dataSet;
@@ -170,7 +171,7 @@ class BaseDataSet {
    * Nastaveni IDataProvider dodavajici data
    * @param provider
    */
-  virtual void setDataProvider(DataProviders::BaseDataProvider *provider) = 0;
+  virtual void setDataProvider(gsl::not_null<DataProviders::BaseDataProvider *> provider) = 0;
 
   /**
    * Uzavreni datasetu a znepristupneni jeho dat

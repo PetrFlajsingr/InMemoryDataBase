@@ -86,7 +86,8 @@ class MemoryDataWorker : public BaseDataWorker {
 
   std::vector<std::string> getChoices(std::string choiceName) override;
 
-  void writeResult(DataWriters::BaseDataWriter &writer, std::string &sql) override;
+  void writeResult(DataWriters::BaseDataWriter &writer,
+                   const std::string &sql) override;
 };
 }  // namespace DataWorkers
 

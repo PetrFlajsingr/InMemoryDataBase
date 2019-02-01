@@ -64,7 +64,7 @@ class BaseFileDownloader {
    *
    * @return Nazvy souboru dostupnych ke stazeni
    */
-  virtual std::vector<std::string> getAvailableFiles() {
+  virtual std::vector<std::string> getAvailableFiles() const {
     return availableFiles;
   }
 

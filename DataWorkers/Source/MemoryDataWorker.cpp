@@ -52,7 +52,7 @@ DataWorkers::MemoryDataWorker::MemoryDataWorker(
 }
 
 void DataWorkers::MemoryDataWorker::writeResult(DataWriters::BaseDataWriter &writer,
-                                                std::string &sql) {
+                                                const std::string &sql) {
   queryData = SQLParser::parse(sql);
 
   writeHeaders(writer);

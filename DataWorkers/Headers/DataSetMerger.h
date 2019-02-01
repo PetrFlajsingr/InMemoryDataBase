@@ -6,6 +6,7 @@
 #define CSV_READER_DATASETMERGER_H
 
 #include <vector>
+#include <string>
 #include <BaseDataSet.h>
 #include <MemoryDataSet.h>
 
@@ -19,7 +20,7 @@ class DataSetMerger {
  public:
   DataSetMerger();
 
-  void addDataSet(DataSets::BaseDataSet *dataSet) {
+  void addDataSet(gsl::not_null<DataSets::BaseDataSet *> dataSet) {
     dataSets.emplace_back(dataSet);
   }
 
