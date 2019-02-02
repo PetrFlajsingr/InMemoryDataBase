@@ -16,17 +16,18 @@ namespace DataSets {
  */
 class StringField : public BaseField {
  public:
-  StringField(const std::string &fieldName,
+  StringField(std::string_view fieldName,
               BaseDataSet *dataset,
               uint64_t index);
 
   ValueType getFieldType() const override;
 
-  void setAsString(const std::string &value) override;
+  void setAsString(std::string_view value) override;
 
   std::string getAsString() const override;
 
-  std::function<int8_t (DataSetRow *, DataSetRow *)> getCompareFunction() override;
+  std::function<int8_t(DataSetRow *,
+                       DataSetRow *)> getCompareFunction() override;
 
  protected:
   std::string data;

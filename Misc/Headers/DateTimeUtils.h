@@ -5,12 +5,12 @@
 #ifndef CSV_READER_DATETIMEUTILS_H
 #define CSV_READER_DATETIMEUTILS_H
 
+#include <gsl/gsl>
 #include <cstdint>
 #include <string>
 #include <sstream>
 #include <ostream>
-#include "Utilities.h"
-#include <gsl/gsl>
+#include <Utilities.h>
 
 /**
  * Trida pro reprezentaci casu a data.
@@ -22,7 +22,7 @@ class DateTime {
    * Prevod ze string ve formatu YYYY-MM-DD HH-MM-SS
    * @param value
    */
-  void fromString(const std::string &value) {
+  void fromString(std::string_view value) {
     std::stringstream ss;
     ss << value;
     ss >> *this;

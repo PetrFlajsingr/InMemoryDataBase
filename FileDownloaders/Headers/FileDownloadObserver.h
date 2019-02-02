@@ -9,13 +9,13 @@
 
 class FileDownloadObserver {
  public:
-  virtual void onDownloadStarted(const std::string &fileName) = 0;
+  virtual void onDownloadStarted(std::string_view fileName) = 0;
 
-  virtual void onDownloadFailed(const std::string &fileName,
-                            const std::string &errorMessage) = 0;
+  virtual void onDownloadFailed(std::string_view fileName,
+                                std::string_view errorMessage) = 0;
 
-  virtual void onDownloadFinished(const std::string &fileName,
-                              const std::string &filePath) = 0;
+  virtual void onDownloadFinished(std::string_view fileName,
+                                  std::string_view filePath) = 0;
 };
 
 #endif  //FILEDOWNLOADERS_HEADERS_FILEDOWNLOADOBSERVER_H_

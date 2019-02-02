@@ -4,18 +4,18 @@
 
 #include <XlsReader.h>
 
-DataProviders::XlsReader::XlsReader(const std::string &fileName) {
-  xlsxioReader = xlsxioread_open(fileName.c_str());
+DataProviders::XlsReader::XlsReader(std::string_view fileName) {
+  std::string strFileName(fileName);
+  xlsxioReader = xlsxioread_open(strFileName.c_str());
   if (xlsxioReader == nullptr) {
-    auto errMsg = "File could not be open: " + fileName;
+    auto errMsg = "File could not be open: " + strFileName;
     throw IOException(errMsg.c_str());
   }
-
   xlsxioSheet =
       xlsxioread_sheet_open(xlsxioReader, nullptr, XLSXIOREAD_SKIP_EMPTY_ROWS);
 
   if (xlsxioSheet == nullptr) {
-    auto errMsg = "Error while opening xls file: " + fileName;
+    auto errMsg = "Error while opening xls file: " + strFileName;
     throw IOException(errMsg.c_str());
   }
 
@@ -52,7 +52,7 @@ bool DataProviders::XlsReader::next() {
     }
     if (std::all_of(currentRecord.begin(),
                     currentRecord.end(),
-                    [](const std::string &value) {
+                    [](std::string_view value) {
                       return value.empty();
                     })) {
       _eof = true;

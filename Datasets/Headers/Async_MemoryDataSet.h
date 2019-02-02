@@ -23,7 +23,7 @@ class IAsyncMemoryDataSetObserver;
  */
 class Async_MemoryDataSet : public MemoryDataSet {
  public:
-  explicit Async_MemoryDataSet(const std::string &dataSetName);
+  explicit Async_MemoryDataSet(std::string_view dataSetName);
 
   void open() override;
 

@@ -5,7 +5,7 @@
 #include "IntegerField.h"
 #include "MemoryDataSet.h"
 
-DataSets::IntegerField::IntegerField(const std::string &fieldName,
+DataSets::IntegerField::IntegerField(std::string_view fieldName,
                                      BaseDataSet *dataset,
                                      uint64_t index) : BaseField(fieldName,
                                                                  dataset,
@@ -15,7 +15,7 @@ ValueType DataSets::IntegerField::getFieldType() const {
   return ValueType::Integer;
 }
 
-void DataSets::IntegerField::setAsString(const std::string &value) {
+void DataSets::IntegerField::setAsString(std::string_view value) {
   data = Utilities::stringToInt(value);
   BaseField::setData(&data, getFieldType());
 }

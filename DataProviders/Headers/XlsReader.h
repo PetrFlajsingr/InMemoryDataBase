@@ -16,7 +16,7 @@ namespace DataProviders {
 
 class XlsReader : public BaseDataProvider {
  public:
-  explicit XlsReader(const std::string &fileName);
+  explicit XlsReader(std::string_view fileName);
 
   ~XlsReader() override;
 

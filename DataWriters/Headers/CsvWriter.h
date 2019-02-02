@@ -17,8 +17,8 @@ namespace DataWriters {
  */
 class CsvWriter : public BaseDataWriter {
  public:
-  explicit CsvWriter(const std::string &filePath,
-                     const std::string &delimiter = ",");
+  explicit CsvWriter(std::string_view filePath,
+                     std::string_view delimiter = ",");
 
   ~CsvWriter() override;
 

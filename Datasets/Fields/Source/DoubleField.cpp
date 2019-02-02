@@ -4,7 +4,7 @@
 #include "DoubleField.h"
 #include "MemoryDataSet.h"
 
-DataSets::DoubleField::DoubleField(const std::string &fieldName,
+DataSets::DoubleField::DoubleField(std::string_view fieldName,
                                    BaseDataSet *dataset,
                                    uint64_t index) : BaseField(fieldName,
                                                                dataset,
@@ -14,7 +14,7 @@ ValueType DataSets::DoubleField::getFieldType() const {
   return ValueType::Double;
 }
 
-void DataSets::DoubleField::setAsString(const std::string &value) {
+void DataSets::DoubleField::setAsString(std::string_view value) {
   data = Utilities::stringToDouble(value);
   setData(&data, getFieldType());
 }

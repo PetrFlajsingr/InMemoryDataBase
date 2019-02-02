@@ -290,7 +290,8 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
         for (const auto &search : filter.searchData) {
           switch (filter.filterOption) {
             case FilterOption::Equals:
-              valid = std::strcmp(toCompare.c_str(), search._string) == 0;
+              valid = std::strcmp(toCompare.c_str(),
+                                  search._string) == 0;
               break;
             case FilterOption::StartsWith:
               valid = std::strncmp(toCompare.c_str(),
@@ -302,7 +303,8 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
                   != std::string::npos;
               break;
             case FilterOption::EndsWith:
-              valid = Utilities::endsWith(toCompare, search._string);
+              valid = Utilities::endsWith(toCompare,
+                                          search._string);
               break;
             case FilterOption::NotContains:
               valid = toCompare.find(search._string)
@@ -354,13 +356,14 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
 }
 
 DataSets::BaseField *DataSets::MemoryDataSet::fieldByName(
-    const std::string &name) {
+    std::string_view name) {
   for (auto &field : fields) {
     if (Utilities::compareString(field->getFieldName(), name) == 0) {
       return field;
     }
   }
-  std::string errMsg = "Field named \"" + name
+  std::string nameStr(name);
+  std::string errMsg = "Field named \"" + nameStr
       + "\" not found. DataSets::MemoryDataSet::fieldByName";
   throw InvalidArgumentException(errMsg.c_str());
 }
@@ -460,7 +463,7 @@ void DataSets::MemoryDataSet::appendDataProvider(
   data.shrink_to_fit();
 }
 
-DataSets::MemoryDataSet::MemoryDataSet(const std::string &dataSetName)
+DataSets::MemoryDataSet::MemoryDataSet(std::string_view dataSetName)
     : BaseDataSet(dataSetName) {}
 
 #pragma clang diagnostic push
@@ -573,11 +576,12 @@ std::vector<DataSets::BaseField *> DataSets::MemoryDataSet::getFields() {
 
 std::vector<std::string> DataSets::MemoryDataSet::getFieldNames() {
   std::vector<std::string> result;
-
-  for (const auto &field : fields) {
-    result.push_back(field->getFieldName());
-  }
-
+  std::transform(fields.begin(),
+                 fields.end(),
+                 result.begin(),
+                 [](BaseField *field) {
+                   return field->getFieldName();
+                 });
   return result;
 }
 

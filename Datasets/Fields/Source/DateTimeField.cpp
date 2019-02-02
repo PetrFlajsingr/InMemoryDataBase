@@ -8,7 +8,7 @@ ValueType DataSets::DateTimeField::getFieldType() const {
   return ValueType::DateTime;
 }
 
-void DataSets::DateTimeField::setAsString(const std::string &value) {
+void DataSets::DateTimeField::setAsString(std::string_view value) {
   data.fromString(value);
 }
 
@@ -43,5 +43,7 @@ DateTime DataSets::DateTimeField::getAsDateTime() const {
   return data;
 }
 
-DataSets::DateTimeField::DateTimeField(const std::string &fieldName, DataSets::BaseDataSet *dataset, uint64_t index)
+DataSets::DateTimeField::DateTimeField(std::string_view fieldName,
+                                       DataSets::BaseDataSet *dataset,
+                                       uint64_t index)
     : BaseField(fieldName, dataset, index) {}

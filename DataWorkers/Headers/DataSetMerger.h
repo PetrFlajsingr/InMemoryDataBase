@@ -20,12 +20,12 @@ class DataSetMerger {
     dataSets.emplace_back(dataSet);
   }
 
-  void removeDataSet(const std::string &dataSetName);
+  void removeDataSet(std::string_view dataSetName);
 
-  gsl::not_null<DataSets::BaseDataSet *> mergeDataSets(const std::string &dataSetName1,
-                                                       const std::string &dataSetName2,
-                                                       const std::string &columnName1,
-                                                       const std::string &columnName2);
+  gsl::not_null<DataSets::BaseDataSet *> mergeDataSets(std::string_view dataSetName1,
+                                                       std::string_view dataSetName2,
+                                                       std::string_view columnName1,
+                                                       std::string_view columnName2);
 
  private:
   std::vector<DataSets::BaseDataSet *> dataSets;

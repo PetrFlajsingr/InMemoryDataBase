@@ -26,7 +26,7 @@ class BaseField {
    * @param dataset Rodicovsky dataset
    * @param index Index pole v zaznamu
    */
-  explicit BaseField(const std::string &fieldName,
+  explicit BaseField(std::string_view fieldName,
                      gsl::not_null<BaseDataSet *> dataset,
                      uint64_t index) : fieldName(fieldName),
                                        index(index),
@@ -44,7 +44,7 @@ class BaseField {
    * Nastaveni hodnoty pole pomoci string
    * @param value
    */
-  virtual void setAsString(const std::string &value) = 0;
+  virtual void setAsString(std::string_view value) = 0;
 
   /**
    * Navrat hodnoty v poli jako string
@@ -64,7 +64,7 @@ class BaseField {
    *
    * @return Nazev pole
    */
-  const std::string &getFieldName() const {
+  std::string_view getFieldName() const {
     return fieldName;
   }
 

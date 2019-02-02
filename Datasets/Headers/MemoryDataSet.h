@@ -77,7 +77,7 @@ typedef std::vector<DataSetRow *> DataSetData;
  */
 class MemoryDataSet : public BaseDataSet {
  public:
-  explicit MemoryDataSet(const std::string &dataSetName);
+  explicit MemoryDataSet(std::string_view dataSetName);
 
   ~MemoryDataSet() override;
 
@@ -101,7 +101,7 @@ class MemoryDataSet : public BaseDataSet {
 
   void filter(const FilterOptions &options) override;
 
-  BaseField *fieldByName(const std::string &name) override;
+  BaseField *fieldByName(std::string_view name) override;
 
   BaseField *fieldByIndex(uint64_t index) override;
 

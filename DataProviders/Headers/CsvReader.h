@@ -109,7 +109,7 @@ class CsvReader : public BaseDataProvider {
    * @param vectorReserve value to reserve vector size for
    * @return tokenized vector from line
    */
-  std::vector<std::string> tokenize(const std::string &line,
+  std::vector<std::string> tokenize(std::string_view line,
                                     unsigned int vectorReserve) const;
 
 };

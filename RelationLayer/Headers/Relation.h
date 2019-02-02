@@ -181,7 +181,9 @@ class Relation {
      * @return
      */
     iterator operator-(const iterator &rhs) {
-      *this = *this - rhs.position;
+      auto result = *this;
+      result.position -= rhs.position;
+      return result;
     }
 
     /**

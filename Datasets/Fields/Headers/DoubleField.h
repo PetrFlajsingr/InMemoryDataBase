@@ -15,13 +15,13 @@ namespace DataSets {
  */
 class DoubleField : public BaseField {
  public:
-  DoubleField(const std::string &fieldName,
+  DoubleField(std::string_view fieldName,
               BaseDataSet *dataset,
               uint64_t index);
 
   ValueType getFieldType() const override;
 
-  void setAsString(const std::string &value) override;
+  void setAsString(std::string_view value) override;
 
   std::string getAsString() const override;
 

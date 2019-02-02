@@ -48,7 +48,7 @@ struct QueryData {
 
 class SQLParser {
  public:
-  static QueryData parse(std::string sql) {
+  static QueryData parse(std::string_view sql) {
     auto splitSql = Utilities::splitStringByDelimiter(std::move(sql), " ");
 
     QueryData result;

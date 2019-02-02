@@ -28,7 +28,7 @@ class ResultAccumulator {
 
   void reset();
 
-  std::string getName();
+  std::string_view getName();
 
   DataContainer getContainer();
 
@@ -74,7 +74,7 @@ class MemoryDataWorker : public BaseDataWorker {
   std::vector<std::string> getChoices(std::string choiceName) override;
 
   void writeResult(DataWriters::BaseDataWriter &writer,
-                   const std::string &sql) override;
+                   std::string_view sql) override;
 
  private:
   struct InnerJoinStructure {

@@ -30,7 +30,7 @@
  */
 class BaseFileDownloader {
  public:
-  explicit BaseFileDownloader(const std::string &downloadLocation)
+  explicit BaseFileDownloader(std::string_view downloadLocation)
       : downloadLocation(downloadLocation) {}
 
   virtual ~BaseFileDownloader() = default;
@@ -48,7 +48,7 @@ class BaseFileDownloader {
    * v konstruktoru objektu.
    * @param fileName Nazev souboru ke stazeni
    */
-  virtual void downloadFile(const std::string &fileName) {
+  virtual void downloadFile(std::string_view fileName) {
     auto result = std::find(availableFiles.begin(),
                             availableFiles.end(),
                             fileName);
@@ -81,21 +81,21 @@ class BaseFileDownloader {
   std::vector<std::string> availableFiles;
   std::string downloadLocation;
 
-  void notifyDownloadStarted(const std::string &fileName) {
+  void notifyDownloadStarted(std::string_view fileName) {
     for (auto observer : observers) {
       observer->onDownloadStarted(fileName);
     }
   }
 
-  void notifyDownloadFailed(const std::string &fileName,
-                            const std::string &errorMessage) {
+  void notifyDownloadFailed(std::string_view fileName,
+                            std::string_view errorMessage) {
     for (auto observer : observers) {
       observer->onDownloadFailed(fileName, errorMessage);
     }
   }
 
-  void notifyDownloadFinished(const std::string &fileName,
-                              const std::string &filePath) {
+  void notifyDownloadFinished(std::string_view fileName,
+                              std::string_view filePath) {
     for (auto observer : observers) {
       observer->onDownloadFinished(fileName, filePath);
     }

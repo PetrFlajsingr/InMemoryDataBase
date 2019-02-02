@@ -7,7 +7,7 @@
 
 DataWorkers::DataSetMerger::DataSetMerger() {}
 
-void DataWorkers::DataSetMerger::removeDataSet(const std::string &dataSetName) {
+void DataWorkers::DataSetMerger::removeDataSet(std::string_view dataSetName) {
   auto foundDataSet = std::find_if(dataSets.begin(),
                                    dataSets.end(),
                                    [&dataSetName](DataSets::BaseDataSet *dataSet) {
@@ -19,10 +19,10 @@ void DataWorkers::DataSetMerger::removeDataSet(const std::string &dataSetName) {
   }
 }
 gsl::not_null<DataSets::BaseDataSet *> DataWorkers::DataSetMerger::mergeDataSets(
-    const std::string &dataSetName1,
-    const std::string &dataSetName2,
-    const std::string &columnName1,
-    const std::string &columnName2) {
+    std::string_view dataSetName1,
+    std::string_view dataSetName2,
+    std::string_view columnName1,
+    std::string_view columnName2) {
   // find required data sets
   auto dataSet1Iterator = std::find_if(dataSets.begin(),
                                        dataSets.end(),
@@ -31,7 +31,8 @@ gsl::not_null<DataSets::BaseDataSet *> DataWorkers::DataSetMerger::mergeDataSets
                                        });
 
   if (dataSet1Iterator == dataSets.end()) {
-    std::string errMsg = "DataSet named \"" + dataSetName1 + "\" does not exist.";
+    std::string strName(dataSetName1);
+    std::string errMsg = "DataSet named \"" + strName + "\" does not exist.";
     throw InvalidArgumentException(errMsg.c_str());
   }
 
@@ -44,14 +45,17 @@ gsl::not_null<DataSets::BaseDataSet *> DataWorkers::DataSetMerger::mergeDataSets
                                        });
 
   if (dataSet2Iterator == dataSets.end()) {
-    std::string errMsg = "DataSet named \"" + dataSetName2 + "\" does not exist.";
+    std::string strName(dataSetName2);
+    std::string errMsg = "DataSet named \"" + strName + "\" does not exist.";
     throw InvalidArgumentException(errMsg.c_str());
   }
 
   auto dataSet2 = dynamic_cast<DataSets::MemoryDataSet *>(*dataSet2Iterator);
 
   // prepare result data set fields and open it -- all fields of both merged data sets
-  auto resultDataSetName = dataSetName1 + "_" + dataSetName2;
+  std::string strName1(dataSetName1);
+  std::string strName2(dataSetName2);
+  auto resultDataSetName = strName1 + "_" + strName2;
   auto result = new DataSets::MemoryDataSet(resultDataSetName);
   std::vector<ValueType> fieldTypes;
   std::vector<std::string> fieldNames;

@@ -15,8 +15,8 @@ namespace DataWriters {
 
 class XlsxWriter : public BaseDataWriter {
  public:
-  explicit XlsxWriter(const std::string &fileName,
-                      const std::string &sheetName = "");
+  explicit XlsxWriter(std::string_view fileName,
+                      std::string_view sheetName = "");
 
   ~XlsxWriter() override;
 

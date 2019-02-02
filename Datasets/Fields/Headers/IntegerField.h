@@ -16,13 +16,13 @@ namespace DataSets {
  */
 class IntegerField : public BaseField {
  public:
-  IntegerField(const std::string &fieldName,
+  IntegerField(std::string_view fieldName,
                BaseDataSet *dataset,
                uint64_t index);
 
   ValueType getFieldType() const override;
 
-  void setAsString(const std::string &value) override;
+  void setAsString(std::string_view value) override;
 
   std::string getAsString() const override;
 

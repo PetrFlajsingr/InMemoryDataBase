@@ -14,8 +14,8 @@ ValueType DataSets::CurrencyField::getFieldType() const {
   return ValueType::Currency;
 }
 
-void DataSets::CurrencyField::setAsString(const std::string &value) {
-  data = dec::fromString<Currency>(value);
+void DataSets::CurrencyField::setAsString(std::string_view value) {
+  data = dec::fromString<Currency>(std::string(value));
   setData(&data, getFieldType());
 }
 
@@ -48,7 +48,7 @@ Currency DataSets::CurrencyField::getAsCurrency() const {
   return data;
 }
 
-DataSets::CurrencyField::CurrencyField(const std::string &fieldName,
+DataSets::CurrencyField::CurrencyField(std::string_view fieldName,
                                        DataSets::BaseDataSet *dataset,
                                        uint64_t index)
     : BaseField(fieldName, dataset, index) {}

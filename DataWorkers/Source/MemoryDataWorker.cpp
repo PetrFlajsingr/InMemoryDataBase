@@ -52,7 +52,7 @@ DataWorkers::MemoryDataWorker::MemoryDataWorker(
 }
 
 void DataWorkers::MemoryDataWorker::writeResult(DataWriters::BaseDataWriter &writer,
-                                                const std::string &sql) {
+                                                std::string_view sql) {
   queryData = SQLParser::parse(sql);
 
   writeHeaders(writer);
@@ -552,9 +552,11 @@ std::string DataWorkers::ResultAccumulator::resultDistinct() {
   }
   return getResultForce();
 }
-std::string DataWorkers::ResultAccumulator::getName() {
+
+std::string_view DataWorkers::ResultAccumulator::getName() {
   return field->getFieldName();
 }
+
 DataContainer DataWorkers::ResultAccumulator::getContainer() {
   if (distinct) {
     return previousData;

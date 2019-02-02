@@ -5,7 +5,7 @@
 #include "StringField.h"
 #include "MemoryDataSet.h"
 
-DataSets::StringField::StringField(const std::string &fieldName,
+DataSets::StringField::StringField(std::string_view fieldName,
                                    BaseDataSet *dataset,
                                    uint64_t index) : BaseField(fieldName,
                                                                dataset,
@@ -15,7 +15,7 @@ ValueType DataSets::StringField::getFieldType() const {
   return ValueType::String;
 }
 
-void DataSets::StringField::setAsString(const std::string &value) {
+void DataSets::StringField::setAsString(std::string_view value) {
   data = value;
   BaseField::setData(Utilities::copyStringToNewChar(value),
                      getFieldType());

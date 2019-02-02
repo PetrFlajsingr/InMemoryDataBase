@@ -2,74 +2,84 @@
 // Created by Petr Flajsingr on 24/08/2018.
 //
 
-#include <sstream>
-#include <regex>
 #include <Utilities.h>
-#include "DateTimeUtils.h"
+#include <DateTimeUtils.h>
 
-std::vector<std::string> Utilities::splitStringByDelimiter(std::string str,
-                                                           std::string delimiter) {
+std::vector<std::string> Utilities::splitStringByDelimiter(std::string_view str,
+                                                           std::string_view delimiter) {
   std::vector<std::string> result;
+  size_t first = 0;
 
-  size_t pos = 0;
-  while ((pos = str.find(delimiter)) != std::string::npos) {
-    result.emplace_back(std::move(str.substr(0, pos)));
-    str.erase(0, pos + delimiter.length());
+  while (first < str.size()) {
+    const auto second = str.find_first_of(delimiter, first);
+
+    if (first != second) {
+      result.emplace_back(str.substr(first, second - first));
+    }
+    if (second == std::string_view::npos) {
+      break;
+    }
+    first = second + 1;
   }
-  result.emplace_back(std::move(str));
 
   return result;
 }
 
-std::vector<std::string> Utilities::splitStringByDelimiterReserve(std::string str,
-                                                                  std::string delimiter,
+std::vector<std::string> Utilities::splitStringByDelimiterReserve(std::string_view str,
+                                                                  std::string_view delimiter,
                                                                   int reserve) {
   std::vector<std::string> result;
   result.reserve(reserve);
+  size_t first = 0;
 
-  size_t pos = 0;
-  while ((pos = str.find(delimiter)) != std::string::npos) {
-    result.emplace_back(str.substr(0, pos));
-    str.erase(0, pos + delimiter.length());
+  while (first < str.size()) {
+    const auto second = str.find_first_of(delimiter, first);
+
+    if (first != second) {
+      result.emplace_back(str.substr(first, second - first));
+    }
+    if (second == std::string_view::npos) {
+      break;
+    }
+    first = second + 1;
   }
-  result.emplace_back(str);
 
   return result;
 }
 
-int Utilities::stringToInt(const std::string &str) {
+int Utilities::stringToInt(std::string_view str) {
   gsl::zstring<> p;
-  long converted = strtol(str.c_str(), &p, 10);
+  auto result = strtol(std::string(str).c_str(), &p, 10);
   if (*p) {
     return 0;
   } else {
-    return converted;
+    return result;
   }
 }
 
-double Utilities::stringToDouble(const std::string &str) {
+double Utilities::stringToDouble(std::string_view str) {
   gsl::zstring<> p;
-  double converted = strtod(str.c_str(), &p);
+  auto result = strtod(std::string(str).c_str(), &p);
   if (*p) {
     return 0;
   } else {
-    return converted;
+    return result;
   }
 }
 
-bool Utilities::isInteger(const std::string &value) {
+bool Utilities::isInteger(std::string_view value) {
   std::regex integerRegex("(\\+|-)?[1-9][0-9]*");
 
-  return std::regex_match(value, integerRegex);
+  return std::regex_match(std::string(value), integerRegex);
 }
 
-bool Utilities::isDouble(const std::string &value) {
+bool Utilities::isDouble(std::string_view value) {
   std::regex doubleRegex("[+-]?([0-9]*[.])?[0-9]+");
 
-  return std::regex_match(value, doubleRegex);
+  return std::regex_match(std::string(value), doubleRegex);
 }
 
-ValueType Utilities::getType(const std::string &value) {
+ValueType Utilities::getType(std::string_view value) {
   if (isInteger(value)) {
     return ValueType::Integer;
   } else if (isDouble(value)) {
@@ -79,15 +89,15 @@ ValueType Utilities::getType(const std::string &value) {
   }
 }
 
-bool Utilities::endsWith(const std::string &value, const std::string &ending) {
+bool Utilities::endsWith(std::string_view value, std::string_view ending) {
   if (ending.size() > value.size())
     return false;
   return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
 }
 
-gsl::zstring<> Utilities::copyStringToNewChar(const std::string &str) {
+gsl::zstring<> Utilities::copyStringToNewChar(std::string_view str) {
   auto result = new char[str.length() + 1];
-  strcpy(result, str.c_str());
+  strcpy(result, std::string(str).c_str());
   return result;
 }
 
@@ -111,7 +121,7 @@ int8_t Utilities::compareDouble(double a, double b) {
   return 1;
 }
 
-int8_t Utilities::compareCurrency(Currency &a, Currency &b) {
+int8_t Utilities::compareCurrency(const Currency &a, const Currency &b) {
   if (a == b) {
     return 0;
   }
@@ -121,7 +131,7 @@ int8_t Utilities::compareCurrency(Currency &a, Currency &b) {
   return 1;
 }
 
-int8_t Utilities::compareString(std::string a, std::string b) {
+int8_t Utilities::compareString(std::string_view a, std::string_view b) {
   auto cmpResult = a.compare(b);
   if (cmpResult < 0) {
     return -1;

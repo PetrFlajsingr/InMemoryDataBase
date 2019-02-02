@@ -126,7 +126,7 @@ class BaseDataSet {
     }
 
   };
-  explicit BaseDataSet(const std::string &dataSetName)
+  explicit BaseDataSet(std::string_view dataSetName)
       : dataSetName(dataSetName) {};
 
   /**
@@ -181,7 +181,7 @@ class BaseDataSet {
    * @param name Nazev sloupce/Field
    * @return
    */
-  virtual BaseField *fieldByName(const std::string &name) = 0;
+  virtual BaseField *fieldByName(std::string_view name) = 0;
 
   /**
    * Field podle jeho indexu v zaznamu

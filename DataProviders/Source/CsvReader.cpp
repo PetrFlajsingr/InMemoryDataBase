@@ -75,7 +75,7 @@ bool DataProviders::CsvReader::eof() const {
   return _eof;
 }
 
-std::vector<std::string> DataProviders::CsvReader::tokenize(const std::string &line,
+std::vector<std::string> DataProviders::CsvReader::tokenize(std::string_view line,
                                                             unsigned int vectorReserve) const {
   char buffer[BUFFER_SIZE];
   uint64_t bufferIter = 0;
