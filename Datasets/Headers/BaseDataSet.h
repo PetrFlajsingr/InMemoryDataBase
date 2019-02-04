@@ -132,18 +132,14 @@ class BaseDataSet {
   /**
    * Nacteni dat datasetu z IDataProvider
    */
-  virtual void open() = 0;
+  virtual void open(DataProviders::BaseDataProvider &dataProvider,
+                    const std::vector<ValueType> &fieldTypes) = 0;
 
   /**
    * Otevreni prazdneho datasetu
    */
-  virtual void openEmpty() = 0;
-
-  /**
-   * Nastaveni IDataProvider dodavajici data
-   * @param provider
-   */
-  virtual void setDataProvider(gsl::not_null<DataProviders::BaseDataProvider *> provider) = 0;
+  virtual void openEmpty(const std::vector<std::string> &fieldNames,
+                         const std::vector<ValueType> &fieldTypes) = 0;
 
   /**
    * Uzavreni datasetu a znepristupneni jeho dat
@@ -163,66 +159,56 @@ class BaseDataSet {
   /**
    * Presun na nasledujici polozku datasetu
    */
-  virtual void next() = 0;
+  virtual bool next() = 0;
 
   /**
    * Presun na predchazejici polozku datasetu
    */
-  virtual void previous() = 0;
+  virtual bool previous() = 0;
 
   /**
    * Kontrola pruchodu vsemi zaznamy.
-   * @return false pokud neni dostupny zadny zaznam, jinak true
+   * @return false pokud neni dostupny zadny dalsi zaznam pomoci previous(), jinak true
    */
-  virtual bool eof() = 0;
+  virtual bool isFirst() const = 0;
+
+  /**
+   * Kontrola pruchodu vsemi zaznamy.
+   * @return false pokud neni dostupny zadny dalsi zaznam pomoci next(), jinak true
+   */
+  virtual bool isLast() const = 0;
 
   /**
    * Field podle nazvu sloupce
    * @param name Nazev sloupce/Field
    * @return
    */
-  virtual BaseField *fieldByName(std::string_view name) = 0;
+  virtual BaseField *fieldByName(std::string_view name) const = 0;
 
   /**
    * Field podle jeho indexu v zaznamu
    * @param index
    * @return
    */
-  virtual BaseField *fieldByIndex(uint64_t index) = 0;
+  virtual BaseField *fieldByIndex(uint64_t index) const = 0;
 
   /**
    * Vsechny fields
    * @return
    */
-  virtual std::vector<BaseField *> getFields() = 0;
-
-  /**
-   * Nastaveni typu Fields.
-   * Vytvori objekty BaseField.
-   * @param types
-   */
-  virtual void setFieldTypes(std::vector<ValueType> types) = 0;
-
-  /**
-   * Nastaveni typu Field a jejich nazvu.
-   * Pouzito pro otevreni data setu bez data provider
-   * @param fieldNames nazvy sloupcu
-   * @param types datove typy v jednotlivych sloupcich
-   */
-  virtual void setFieldTypes(std::vector<std::string> fieldNames,
-                             std::vector<ValueType> types) = 0;
+  virtual std::vector<BaseField *> getFields() const = 0;
 
   /**
    * Nazvy vsech sloupcu v datasetu
    * @return
    */
-  virtual std::vector<std::string> getFieldNames() = 0;
+  virtual std::vector<std::string> getFieldNames() const = 0;
 
   /**
    *
    * @return pocet sloupcu v data setu
    */
-  uint32_t getColumnCount();
+  gsl::index getColumnCount() const;
 
   /**
    * Vytvoreni noveho zaznamu v datasetu
@@ -255,19 +241,20 @@ class BaseDataSet {
    */
   virtual bool findFirst(FilterItem &item) = 0;
 
-  std::string getName() {
+  std::string getName() const {
     return dataSetName;
   }
 
   /**
    * Smazani vsech alokovanych Fields
    */
-  virtual ~BaseDataSet();
+  virtual ~BaseDataSet() = default;
 
  protected:
   friend class BaseField;  //< kvuli pristupu k BaseField::setData(...)
 
-  std::vector<BaseField *> fields;  //< Pole umoznujici pristup k datum
+  std::vector<std::shared_ptr<BaseField>>
+      fields;  //< Pole umoznujici pristup k datum
 
   std::string dataSetName;
 

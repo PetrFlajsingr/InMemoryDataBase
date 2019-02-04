@@ -55,7 +55,7 @@ class BaseFileDownloader {
 
     if (result == availableFiles.end()) {
       throw InvalidArgumentException(
-          ("The file " + fileName + " is not available").c_str());
+          ("The file " + std::string(fileName) + " is not available").c_str());
     }
   }
 

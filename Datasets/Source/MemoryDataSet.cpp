@@ -3,155 +3,120 @@
 //
 
 #include <MemoryDataSet.h>
+#include <FieldFactory.h>
 
-void DataSets::MemoryDataSet::setDataProvider(
-    gsl::not_null<DataProviders::BaseDataProvider *> provider) {
-  dataProvider = provider;
-}
-
-void DataSets::MemoryDataSet::open() {
+void DataSets::MemoryDataSet::open(DataProviders::BaseDataProvider &dataProvider,
+                                   const std::vector<ValueType> &fieldTypes) {
   if (isOpen) {
     throw IllegalStateException("Dataset is already open.");
   }
-
-  if (dataProvider == nullptr) {
-    throw IllegalStateException("Data provider has not been set.");
-  }
-
-  loadData();
+  createFields(dataProvider.getHeader(), fieldTypes);
+  columnCount = fields.size();
+  loadData(dataProvider);
   data.shrink_to_fit();
 
   isOpen = true;
-
   setFieldValues(0, true);
 }
 
-void DataSets::MemoryDataSet::openEmpty() {
+void DataSets::MemoryDataSet::openEmpty(const std::vector<std::string> &fieldNames,
+                                        const std::vector<ValueType> &fieldTypes) {
   if (isOpen) {
     throw IllegalStateException("Dataset is already open.");
   }
-
+  createFields(fieldNames, fieldTypes);
   isOpen = true;
 }
 
-void DataSets::MemoryDataSet::loadData() {
-  while (dataProvider->next()) {
-    addRecord();
+void DataSets::MemoryDataSet::loadData(DataProviders::BaseDataProvider &dataProvider) {
+  while (dataProvider.next()) {
+    addRecord(dataProvider);
   }
 }
 
 void DataSets::MemoryDataSet::createFields(std::vector<std::string> columns,
                                            std::vector<ValueType> types) {
-  if (columns.size() != types.size()) {
-    std::string errMsg =
-        "Amount of columns and types must match. Data set: " + this->getName();
-    throw InvalidArgumentException(errMsg.c_str());
-  }
-  size_t iter = 0;
-  for (const auto &col : columns) {
-    BaseField *newField = nullptr;
-    switch (types[iter]) {
-      case ValueType::Integer: {
-        newField = new IntegerField(col, this, iter);
-        break;
-      }
-      case ValueType::Double: {
-        newField = new DoubleField(col, this, iter);
-        break;
-      }
-      case ValueType::String: {
-        newField = new StringField(col, this, iter);
-        break;
-      }
-      case ValueType::Currency: {
-        newField = new CurrencyField(col, this, iter);
-        break;
-      }
-      case ValueType::DateTime: {
-        newField = new DateTimeField(col, this, iter);
-      }
-      default:throw IllegalStateException("Internal error.");
-    }
-    fields.emplace_back(newField);
-    iter++;
+  Expects(columns.size() == types.size());
+  for (gsl::index i = 0; i < columns.size(); ++i) {
+    fields.emplace_back(FieldFactory::Get().CreateField(
+        columns[i],
+        i,
+        types[i],
+        this));
   }
 }
 
-void DataSets::MemoryDataSet::addRecord() {
-  auto record = dataProvider->getRow();
+void DataSets::MemoryDataSet::addRecord(DataProviders::BaseDataProvider &dataProvider) {
+  auto record = dataProvider.getRow();
+  data.emplace_back(DataSetRow{true, {}});
 
-  auto newRecord = new DataSetRowCells();
-  newRecord->reserve(columnCount);
-  size_t iter = 0;
-  for (const auto &part : record) {
-    switch (fields[iter]->getFieldType()) {
+  data.back().cells.reserve(columnCount);
+  for (gsl::index i = 0; i < record.size(); ++i) {
+    switch (fields[i]->getFieldType()) {
       case ValueType::Integer:
-        newRecord->emplace_back(new DataContainer({._integer = Utilities::stringToInt(
-            part)}));
+        data.back().cells.emplace_back(DataContainer{._integer = Utilities::stringToInt(
+            record[i])});
         break;
       case ValueType::Double:
-        newRecord->emplace_back(new DataContainer({._double = Utilities::stringToDouble(
-            part)}));
+        data.back().cells.emplace_back(DataContainer{._double = Utilities::stringToDouble(
+            record[i])});
         break;
       case ValueType::String:
-        newRecord->emplace_back(new DataContainer({._string = strdup(part.c_str())}));
+        data.back().cells.emplace_back(DataContainer{._string = strdup(record[i].c_str())});
         break;
       case ValueType::Currency:
-        newRecord->emplace_back(new DataContainer({._currency = new Currency(
-            part)}));
+        data.back().cells.emplace_back(DataContainer{._currency = new Currency(
+            record[i])});
         break;
-      case ValueType::DateTime:newRecord->emplace_back(new DataContainer({._dateTime = new DateTime()}));
+      case ValueType::DateTime:
+        data.back().cells.emplace_back(DataContainer{._dateTime = new DateTime(
+            record[i])});
         break;
-      default:throw IllegalStateException("Internal error.");
+      default:
+        throw IllegalStateException(
+            "Internal error. DataSets::MemoryDataSet::addRecord");
     }
-    iter++;
   }
-
-  data.emplace_back(new DataSetRow{true, newRecord});
 }
 
 void DataSets::MemoryDataSet::close() {
-  dataProvider = nullptr;
-
   isOpen = false;
-
   if (!data.empty()) {
     for (auto level1 : data) {
-      size_t iter = 0;
-      for (auto level2 : *level1->cells) {
+      gsl::index iter = 0;
+      for (auto level2 : level1.cells) {
         if (fields[iter]->getFieldType() == ValueType::String) {
-          delete level2->_string;
+          delete level2._string;
         } else if (fields[iter]->getFieldType() == ValueType::Currency) {
-          delete level2->_currency;
+          delete level2._currency;
         } else if (fields[iter]->getFieldType() == ValueType::DateTime) {
-          delete level2->_dateTime;
+          delete level2._dateTime;
         }
-        delete level2;
         iter++;
       }
-      level1->cells->clear();
-      delete level1->cells;
+      level1.cells.clear();
     }
     data.clear();
   }
 }
 
-bool DataSets::MemoryDataSet::setFieldValues(uint64_t index,
+// TODO: rework
+bool DataSets::MemoryDataSet::setFieldValues(gsl::index index,
                                              bool searchForward) {
-  int64_t iter = index;
+  gsl::index iter = index;
   if (dataValidityChanged) {
     bool found = false;
 
     if (searchForward) {
       for (iter = index; iter < data.size(); iter++) {
-        if (data[iter]->valid) {
+        if (data[iter].valid) {
           found = true;
           break;
         }
       }
     } else {
       for (iter = index; iter >= 0; iter--) {
-        if (data[iter]->valid) {
+        if (data[iter].valid) {
           found = true;
           break;
         }
@@ -165,27 +130,34 @@ bool DataSets::MemoryDataSet::setFieldValues(uint64_t index,
       }
       return false;
     }
-    currentRecord = static_cast<uint64_t>(iter);
+    currentRecord = iter;
   }
-
-  DataSetRowCells *value = data[iter]->cells;
 
   for (size_t i = 0; i < fields.size(); i++) {
     switch (fields[i]->getFieldType()) {
-      case ValueType::Integer:setFieldData(fields[i], &(*value)[i]->_integer);
+      case ValueType::Integer:
+        setFieldData(fields[i].get(),
+                     &data[iter].cells[i]._integer);
         break;
-      case ValueType::Double:setFieldData(fields[i], &(*value)[i]->_double);
+      case ValueType::Double:
+        setFieldData(fields[i].get(),
+                     &data[iter].cells[i]._double);
         break;
-      case ValueType::String:setFieldData(fields[i], (*value)[i]->_string);
+      case ValueType::String:
+        setFieldData(fields[i].get(),
+                     data[iter].cells[i]._string);
         break;
-      case ValueType::Currency:setFieldData(fields[i], (*value)[i]->_currency);
+      case ValueType::Currency:
+        setFieldData(fields[i].get(),
+                     data[iter].cells[i]._currency);
         break;
-      case ValueType::DateTime:setFieldData(fields[i], (*value)[i]->_dateTime);
+      case ValueType::DateTime:
+        setFieldData(fields[i].get(),
+                     data[iter].cells[i]._dateTime);
         break;
       default:throw IllegalStateException("Internal error.");
     }
   }
-
   return true;
 }
 
@@ -199,23 +171,26 @@ void DataSets::MemoryDataSet::last() {
   setFieldValues(data.size() - 1, false);
 }
 
-void DataSets::MemoryDataSet::next() {
-  currentRecord++;
-
-  if (currentRecord > data.size()) {
-    currentRecord = data.size();
+// TODO: rework na zarazku
+bool DataSets::MemoryDataSet::next() {
+  if (currentRecord == data.size() - 1) {
+    return false;
   }
-  if (!eof()) {
+  currentRecord++;
+  if (!isLast()) {
     setFieldValues(currentRecord, true);
   }
+  return true;
 }
 
-void DataSets::MemoryDataSet::previous() {
+// TODO: rework na zarazku
+bool DataSets::MemoryDataSet::previous() {
   if (currentRecord == 0) {
-    return;
+    return false;
   }
   currentRecord--;
   setFieldValues(currentRecord, false);
+  return true;
 }
 
 void DataSets::MemoryDataSet::sort(SortOptions &options) {
@@ -225,22 +200,24 @@ void DataSets::MemoryDataSet::sort(SortOptions &options) {
                                [fieldCount](SortItem &item) {
                                  return item.fieldIndex < fieldCount;
                                });
-
   if (!isInRange) {
     throw InvalidArgumentException("Field index is out of bounds");
   }
 
-  std::vector<std::function<int8_t(DataSetRow *, DataSetRow *)>>
+  std::vector<std::function<int8_t(const DataSetRow &, const DataSetRow &)>>
       compareFunctions;
 
-  for (auto &option : options.options) {
-    compareFunctions.emplace_back(
-        fields[option.fieldIndex]->getCompareFunction());
-  }
+  std::transform(options.options.begin(),
+                 options.options.end(),
+                 std::back_inserter(compareFunctions),
+                 [this](const SortItem &option) {
+                   return fields[option.fieldIndex]->getCompareFunction();
+                 });
 
   auto optionArray = options.options;
   auto compareFunction =
-      [&optionArray, &compareFunctions](DataSetRow *a, DataSetRow *b) {
+      [&optionArray, &compareFunctions](const DataSetRow &a,
+                                        const DataSetRow &b) {
         for (uint8_t i = 0; i < optionArray.size(); ++i) {
           int compareResult = compareFunctions[i](a, b);
           if (compareResult < 0) {
@@ -259,34 +236,30 @@ void DataSets::MemoryDataSet::sort(SortOptions &options) {
   first();
 }
 
+// TODO: rework
 void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
   if (options.options.empty()) {
     dataValidityChanged = false;
-
     for (auto &iter : data) {
-      iter->valid = true;
+      iter.valid = true;
     }
-
     first();
-
     return;
   }
-
   dataValidityChanged = true;
 
-  size_t i = 0;
-  std::string toCompare;
-  for (auto iter : data) {
+  gsl::index i = 0;
+  for (const auto &iter : data) {
     bool valid = true;
 
-    size_t optionCounter = 0;
-    for (auto filter : options.options) {
+    gsl::index optionCounter = 0;
+    for (const auto &filter : options.options) {
       if (!valid) {
         break;
       }
 
       if (filter.type == ValueType::String) {
-        std::string toCompare = (*iter->cells)[filter.fieldIndex]->_string;
+        std::string toCompare = iter.cells[filter.fieldIndex]._string;
         for (const auto &search : filter.searchData) {
           switch (filter.filterOption) {
             case FilterOption::Equals:
@@ -322,23 +295,23 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
           }
         }
       } else if (filter.type == ValueType::Integer) {
-        int toCompare = (*iter->cells)[filter.fieldIndex]->_integer;
+        auto toCompare = iter.cells[filter.fieldIndex]._integer;
         for (const auto &search : filter.searchData) {
           valid = Utilities::compareInt(toCompare, search._integer) == 0;
         }
       } else if (filter.type == ValueType::Double) {
-        double toCompare = (*iter->cells)[filter.fieldIndex]->_double;
+        auto toCompare = iter.cells[filter.fieldIndex]._double;
         for (const auto &search : filter.searchData) {
           valid = Utilities::compareDouble(toCompare, search._integer) == 0;
         }
       } else if (filter.type == ValueType::Currency) {
-        Currency *toCompare = (*iter->cells)[filter.fieldIndex]->_currency;
+        auto toCompare = iter.cells[filter.fieldIndex]._currency;
         for (const auto &search : filter.searchData) {
           valid =
               Utilities::compareCurrency(*toCompare, *search._currency) == 0;
         }
       } else if (filter.type == ValueType::DateTime) {
-        DateTime *toCompare = (*iter->cells)[filter.fieldIndex]->_dateTime;
+        auto toCompare = iter.cells[filter.fieldIndex]._dateTime;
         for (const auto &search : filter.searchData) {
           valid =
               Utilities::compareDateTime(*toCompare, *search._dateTime) == 0;
@@ -348,7 +321,7 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
       optionCounter++;
     }
 
-    data[i]->valid = valid;
+    data[i].valid = valid;
     i++;
   }
 
@@ -356,39 +329,27 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
 }
 
 DataSets::BaseField *DataSets::MemoryDataSet::fieldByName(
-    std::string_view name) {
+    std::string_view name) const {
   for (auto &field : fields) {
     if (Utilities::compareString(field->getFieldName(), name) == 0) {
-      return field;
+      return field.get();
     }
   }
-  std::string nameStr(name);
-  std::string errMsg = "Field named \"" + nameStr
+  std::string errMsg = "Field named \"" + std::string(name)
       + "\" not found. DataSets::MemoryDataSet::fieldByName";
   throw InvalidArgumentException(errMsg.c_str());
 }
 
-DataSets::BaseField *DataSets::MemoryDataSet::fieldByIndex(uint64_t index) {
-  return fields.at(index);
+DataSets::BaseField *DataSets::MemoryDataSet::fieldByIndex(uint64_t index) const {
+  return fields.at(index).get();
 }
 
-bool DataSets::MemoryDataSet::eof() {
-  return currentRecord >= data.size();
+bool DataSets::MemoryDataSet::isLast() const {
+  return currentRecord >= data.size() - 1;
 }
 
 DataSets::MemoryDataSet::~MemoryDataSet() {
   close();
-}
-
-void DataSets::MemoryDataSet::setFieldTypes(std::vector<ValueType> types) {
-  createFields(dataProvider->getHeader(), types);
-  columnCount = fields.size();
-}
-
-void DataSets::MemoryDataSet::setFieldTypes(std::vector<std::string> fieldNames,
-                                            std::vector<ValueType> types) {
-  createFields(fieldNames, types);
-  columnCount = fields.size();
 }
 
 void DataSets::MemoryDataSet::setData(void *data,
@@ -396,70 +357,57 @@ void DataSets::MemoryDataSet::setData(void *data,
                                       ValueType type) {
   switch (type) {
     case ValueType::Integer:
-      (*this->data[currentRecord]->cells)[index]->_integer
+      this->data[currentRecord].cells[index]._integer
           = *reinterpret_cast<int *>(data);
       break;
     case ValueType::Double:
-      (*this->data[currentRecord]->cells)[index]->_double
+      this->data[currentRecord].cells[index]._double
           = *reinterpret_cast<int *>(data);
       break;
-    case ValueType::String:delete[] (*this->data[currentRecord]->cells)[index]->_string;
-      (*this->data[currentRecord]->cells)[index]->_string
+    case ValueType::String:delete[] this->data[currentRecord].cells[index]._string;
+      this->data[currentRecord].cells[index]._string
           = reinterpret_cast<gsl::zstring<>>(data);
       break;
     case ValueType::Currency:
-      *((*this->data[currentRecord]->cells)[index]->_currency)
+      *(this->data[currentRecord].cells[index]._currency)
           = *(reinterpret_cast<Currency *>(data));
       break;
     case ValueType::DateTime:
-      *((*this->data[currentRecord]->cells)[index]->_dateTime)
+      *(this->data[currentRecord].cells[index]._dateTime)
           = *(reinterpret_cast<DateTime *>(data));
       break;
     default:throw IllegalStateException("Invalid value type.");
   }
-
 }
 
 void DataSets::MemoryDataSet::append() {
-  auto newRecord = new DataSetRowCells();
-  for (size_t i = 0; i < fields.size(); ++i) {
-    auto dataContainer = new DataContainer();
-
-    switch (fields[i]->getFieldType()) {
-      case ValueType::Integer:dataContainer->_integer = 0;
+  data.emplace_back(DataSetRow{true, {}});
+  for (auto &field : fields) {
+    switch (field->getFieldType()) {
+      case ValueType::Integer:data.back().cells.emplace_back(DataContainer{._integer = 0});
         break;
-      case ValueType::Double:dataContainer->_double = 0;
+      case ValueType::Double:data.back().cells.emplace_back(DataContainer{._double = 0});
         break;
-      case ValueType::String:dataContainer->_string = nullptr;
+      case ValueType::String:data.back().cells.emplace_back(DataContainer{._string = nullptr});
         break;
-      case ValueType::Currency:dataContainer->_currency = new Currency();
+      case ValueType::Currency:data.back().cells.emplace_back(DataContainer{._currency = new Currency()});
         break;
-      case ValueType::DateTime:dataContainer->_dateTime = new DateTime();
+      case ValueType::DateTime:data.back().cells.emplace_back(DataContainer{._dateTime = new DateTime()});
         break;
       default:
         throw IllegalStateException(
             "Internal error DataSets::MemoryDataSet::append().");
     }
-    newRecord->emplace_back(dataContainer);
   }
-
-  data.emplace_back(new DataSetRow{true, newRecord});
   last();
 }
 
 void DataSets::MemoryDataSet::appendDataProvider(
-    DataProviders::BaseDataProvider *provider) {
+    DataProviders::BaseDataProvider &dataProvider) {
   if (!isOpen) {
     throw IllegalStateException("Dataset is not open.");
   }
-
-  if (provider == nullptr) {
-    throw InvalidArgumentException("Data provider has not been set.");
-  }
-
-  dataProvider = provider;
-
-  loadData();
+  loadData(dataProvider);
   data.shrink_to_fit();
 }
 
@@ -468,11 +416,10 @@ DataSets::MemoryDataSet::MemoryDataSet(std::string_view dataSetName)
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCDFAInspection"
+// TODO: predelat na iterator a std::lower_bound
 bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
   auto field = fields[item.fieldIndex];
-
   unsigned long min = 0, max = data.size();
-
   bool breakLoop = false;
 
   do {
@@ -485,16 +432,17 @@ bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
         break;
       case ValueType::Integer:
         comparisonResult = Utilities::compareInt(
-            reinterpret_cast<IntegerField *>(field)->getAsInteger(),
+            reinterpret_cast<IntegerField *>(field.get())->getAsInteger(),
             item.searchData[0]._integer);
         break;
       case ValueType::Double:
         comparisonResult = Utilities::compareDouble(
-            reinterpret_cast<DoubleField *>(field)->getAsDouble(),
+            reinterpret_cast<DoubleField *>(field.get())->getAsDouble(),
             item.searchData[0]._double);
         break;
       case ValueType::Currency: {
-        auto cur = reinterpret_cast<CurrencyField *>(field)->getAsCurrency();
+        auto cur =
+            reinterpret_cast<CurrencyField *>(field.get())->getAsCurrency();
         comparisonResult = Utilities::compareCurrency(
             cur,
             *item.searchData[0]._currency);
@@ -502,7 +450,7 @@ bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
         break;
       case ValueType::DateTime:
         auto dateTime =
-            reinterpret_cast<DateTimeField *>(field)->getAsDateTime();
+            reinterpret_cast<DateTimeField *>(field.get())->getAsDateTime();
         comparisonResult =
             Utilities::compareDateTime(dateTime, *item.searchData[0]._dateTime);
         break;
@@ -528,27 +476,29 @@ bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
       breakLoop = true;
     }
   } while (currentRecord > 0 && currentRecord < data.size());
+
   if (currentRecord == 0) {
     int8_t comparisonResult;
     switch (field->getFieldType()) {
       case ValueType::String:
         comparisonResult = Utilities::compareString(
-            field->getAsString().c_str(),
+            field->getAsString(),
             item.searchData[0]._string);
         break;
       case ValueType::Integer:
         comparisonResult = Utilities::compareInt(
-            reinterpret_cast<IntegerField *>(field)->getAsInteger(),
+            reinterpret_cast<IntegerField *>(field.get())->getAsInteger(),
             item.searchData[0]._integer);
         break;
       case ValueType::Double:
         comparisonResult = Utilities::compareDouble(
-            reinterpret_cast<DoubleField *>(field)->getAsDouble(),
+            reinterpret_cast<DoubleField *>(field.get())->getAsDouble(),
             item.searchData[0]._double);
         break;
       case ValueType::Currency: {
         Currency
-            cur = reinterpret_cast<CurrencyField *>(field)->getAsCurrency();
+            cur =
+            reinterpret_cast<CurrencyField *>(field.get())->getAsCurrency();
         comparisonResult = Utilities::compareCurrency(
             cur,
             *item.searchData[0]._currency);
@@ -556,7 +506,7 @@ bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
         break;
       case ValueType::DateTime:
         DateTime dateTime =
-            reinterpret_cast<DateTimeField *>(field)->getAsDateTime();
+            reinterpret_cast<DateTimeField *>(field.get())->getAsDateTime();
         comparisonResult = Utilities::compareDateTime(
             dateTime,
             *item.searchData[0]._dateTime);
@@ -570,19 +520,27 @@ bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
   return false;
 }
 
-std::vector<DataSets::BaseField *> DataSets::MemoryDataSet::getFields() {
-  return fields;
+std::vector<DataSets::BaseField *> DataSets::MemoryDataSet::getFields() const {
+  std::vector<BaseField *> result;
+  for (const auto &field : fields) {
+    result.emplace_back(field.get());
+  }
+  return result;
 }
 
-std::vector<std::string> DataSets::MemoryDataSet::getFieldNames() {
+std::vector<std::string> DataSets::MemoryDataSet::getFieldNames() const {
   std::vector<std::string> result;
   std::transform(fields.begin(),
                  fields.end(),
                  result.begin(),
-                 [](BaseField *field) {
+                 [](const std::shared_ptr<BaseField> &field) {
                    return field->getFieldName();
                  });
   return result;
+}
+
+bool DataSets::MemoryDataSet::isFirst() const {
+  return currentRecord == 0;
 }
 
 #pragma clang diagnostic pop

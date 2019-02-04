@@ -17,6 +17,11 @@
  */
 class DateTime {
  public:
+  DateTime() = default;
+
+  explicit DateTime(std::string_view str) {
+    fromString(str);
+  }
 
   /**
    * Prevod ze string ve formatu YYYY-MM-DD HH-MM-SS

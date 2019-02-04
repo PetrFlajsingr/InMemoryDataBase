@@ -64,8 +64,8 @@ class ResultAccumulator {
 
 class MemoryDataWorker : public BaseDataWorker {
  public:
-  MemoryDataWorker(DataProviders::BaseDataProvider *dataProvider,
-                   std::vector<ValueType> fieldTypes);
+  MemoryDataWorker(DataProviders::BaseDataProvider &dataProvider,
+                   const std::vector<ValueType> &fieldTypes);
 
   explicit MemoryDataWorker(gsl::not_null<DataSets::BaseDataSet *> dataSet);
 

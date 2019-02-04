@@ -34,7 +34,7 @@ SCENARIO("Reading csv file via BaseDataProvider interface", "[CsvReader]") {
         REQUIRE(csvReader.getHeader().size() == SMALL_COLUMN_COUNT);
         int i = 0;
         for (const auto &value : csvReader.getHeader()) {
-          REQUIRE(value == columnNamesSmall[i]);
+          CHECK(value == columnNamesSmall[i]);
           i++;
         }
       }
@@ -47,7 +47,7 @@ SCENARIO("Reading csv file via BaseDataProvider interface", "[CsvReader]") {
         while (csvReader.next()) {
           REQUIRE(csvReader.getRow().size() == SMALL_COLUMN_COUNT);
           for (auto j = 0; j < SMALL_COLUMN_COUNT; ++j) {
-            REQUIRE(csvReader.getRow()[j] == recordsSmall[recordCount][j]);
+            CHECK(csvReader.getRow()[j] == recordsSmall[recordCount][j]);
           }
           ++recordCount;
         }
@@ -71,8 +71,9 @@ SCENARIO("Reading csv file via BaseDataProvider interface", "[CsvReader]") {
 
         int recordCount = 0;
         while (csvReader.next()) {
+          REQUIRE(csvReader.getRow().size() == SMALL_COLUMN_COUNT);
           for (int j = 0; j < toCheck[recordCount].size(); ++j) {
-            REQUIRE(csvReader.getRow()[j] == toCheck[recordCount][j]);
+            CHECK(csvReader.getRow()[j] == toCheck[recordCount][j]);
           }
           recordCount++;
         }
@@ -100,7 +101,7 @@ SCENARIO("Reading csv file via BaseDataProvider interface", "[CsvReader]") {
         REQUIRE(csvReader.getHeader().size() == ADV_COLUMN_COUNT);
         int i = 0;
         for (const auto &value : csvReader.getHeader()) {
-          REQUIRE(value == advancedHeader[i]);
+          CHECK(value == advancedHeader[i]);
           i++;
         }
       }
@@ -114,7 +115,7 @@ SCENARIO("Reading csv file via BaseDataProvider interface", "[CsvReader]") {
           REQUIRE(csvReader.getRow().size() == ADV_COLUMN_COUNT);
           int j = 0;
           for (const auto &value : csvReader.getRow()) {
-            REQUIRE(value == advancedTest[i][j]);
+            CHECK(value == advancedTest[i][j]);
             j++;
           }
           i++;
@@ -139,8 +140,9 @@ SCENARIO("Reading csv file via BaseDataProvider interface", "[CsvReader]") {
 
         int i = 0;
         while (!csvReader.eof()) {
+          REQUIRE(csvReader.getRow().size() == ADV_COLUMN_COUNT);
           for (int j = 0; j < toCheck[i].size(); ++j) {
-            REQUIRE(csvReader.getRow()[j] == toCheck[i][j]);
+            CHECK(csvReader.getRow()[j] == toCheck[i][j]);
           }
           csvReader.next();
           i++;
@@ -169,8 +171,7 @@ SCENARIO("Reading csv file via iterator", "[CsvReader]") {
         for (const auto &value : reader) {
           REQUIRE(value.size() == SMALL_COLUMN_COUNT);
           for (auto j = 0; j < SMALL_COLUMN_COUNT; ++j) {
-            REQUIRE(value[j] == recordsSmall[recordCount][j]);
-            j++;
+            CHECK(value[j] == recordsSmall[recordCount][j]);
           }
           recordCount++;
         }
@@ -190,8 +191,9 @@ SCENARIO("Reading csv file via iterator", "[CsvReader]") {
 
         int recordCount = 0;
         for (const auto &value : reader) {
+          REQUIRE(value.size() == SMALL_COLUMN_COUNT);
           for (auto j = 0; j < toCheck[recordCount].size(); ++j) {
-            REQUIRE(value[j] == toCheck[recordCount][j]);
+            CHECK(value[j] == toCheck[recordCount][j]);
           }
           ++recordCount;
         }
@@ -216,7 +218,7 @@ SCENARIO("Reading csv file via iterator", "[CsvReader]") {
         for (const auto &value : csvReader) {
           REQUIRE(value.size() == ADV_COLUMN_COUNT);
           for (auto j = 0; j < ADV_COLUMN_COUNT; ++j) {
-            REQUIRE(value[j] == advancedTest[recordCount][j]);
+            CHECK(value[j] == advancedTest[recordCount][j]);
           }
           recordCount++;
         }
@@ -236,8 +238,9 @@ SCENARIO("Reading csv file via iterator", "[CsvReader]") {
 
         int recordCount = 0;
         for (const auto &value : csvReader) {
+          REQUIRE(value.size() == ADV_COLUMN_COUNT);
           for (auto j = 0; j < toCheck[recordCount].size(); ++j) {
-            REQUIRE(value[j] == toCheck[recordCount][j]);
+            CHECK(value[j] == toCheck[recordCount][j]);
           }
           ++recordCount;
         }
@@ -274,7 +277,7 @@ SCENARIO(
         writer.writeHeader(header);
 
         for (auto i = 0; i < SMALL_COLUMN_COUNT; ++i) {
-          REQUIRE(writer.getArray()[0][i] == columnNamesSmall[i]);
+          CHECK(writer.getArray()[0][i] == columnNamesSmall[i]);
         }
 
         while (csvReader.next()) {
@@ -283,7 +286,7 @@ SCENARIO(
 
         for (auto i = 0; i < SMALL_ROW_COUNT; ++i) {
           for (auto j = 0; j < SMALL_COLUMN_COUNT; ++j) {
-            REQUIRE(writer.getArray()[i + 1][j] == recordsSmall[i][j]);
+            CHECK(writer.getArray()[i + 1][j] == recordsSmall[i][j]);
           }
         }
       }
@@ -317,14 +320,14 @@ SCENARIO("Writing parsed csv directly to DataWriter using iterator",
         writer.writeHeader(header);
 
         for (auto i = 0; i < SMALL_COLUMN_COUNT; ++i) {
-          REQUIRE(writer.getArray()[0][i] == columnNamesSmall[i]);
+          CHECK(writer.getArray()[0][i] == columnNamesSmall[i]);
         }
 
         std::copy(csvReader.begin(), csvReader.end(), writer.begin());
 
         for (auto i = 0; i < SMALL_ROW_COUNT; ++i) {
           for (auto j = 0; j < SMALL_COLUMN_COUNT; ++j) {
-            REQUIRE(writer.getArray()[i + 1][j] == recordsSmall[i][j]);
+            CHECK(writer.getArray()[i + 1][j] == recordsSmall[i][j]);
           }
         }
       }

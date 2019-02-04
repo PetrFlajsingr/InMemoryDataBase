@@ -27,10 +27,11 @@ class BaseField {
    * @param index Index pole v zaznamu
    */
   explicit BaseField(std::string_view fieldName,
-                     gsl::not_null<BaseDataSet *> dataset,
-                     uint64_t index) : fieldName(fieldName),
-                                       index(index),
-                                       dataSet(dataset) {}
+                     gsl::index index,
+                     BaseDataSet *dataSet)
+      : fieldName(fieldName),
+        index(index),
+        dataSet(dataSet) {}
 
   virtual ~BaseField() = default;
 
@@ -50,13 +51,13 @@ class BaseField {
    * Navrat hodnoty v poli jako string
    * @return
    */
-  virtual std::string getAsString() const = 0;
+  virtual std::string_view getAsString() const = 0;
 
   /**
    *
    * @return Index Field v DataSet
    */
-  uint64_t getIndex() const {
+  gsl::index getIndex() const {
     return index;
   }
 
@@ -76,17 +77,17 @@ class BaseField {
    *    1 pokud je prvni vetsi
    *    -1 pokud je prvni mensi
    */
-  virtual std::function<int8_t(DataSetRow *,
-                               DataSetRow *)> getCompareFunction() = 0;
+  virtual std::function<int8_t(const DataSetRow &,
+                               const DataSetRow &)> getCompareFunction() = 0;
 
  protected:
   std::string fieldName;  //< Nazev reprezentovaneho sloupce
 
-  uint64_t index;  //< Index sloupce
+  gsl::index index;  //< Index sloupce
 
   friend class BaseDataSet;  //< Pro pristup k primemu nastaveni dat
 
-  BaseDataSet *dataSet;  //< Vlastnik
+  BaseDataSet *dataSet;
 
   /**
    * Nastaveni hodnoty field.

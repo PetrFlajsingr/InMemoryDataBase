@@ -40,7 +40,8 @@ class CsvReader : public BaseDataProvider {
    * @param filePath path to file
    * @param delimiter csv delimiter
    */
-  explicit CsvReader(std::string filePath, std::string delimiter = ",");
+  explicit CsvReader(std::string_view filePath,
+                     std::string_view delimiter = ",");
 
   /**
    * Close file on deletion.

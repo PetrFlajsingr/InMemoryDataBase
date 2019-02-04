@@ -67,183 +67,6 @@ const std::string QUERY_AGR =
 const std::string
     QUERY_AGR_2017 = QUERY_AGR + " WHERE main.rozpoctoveObdobi = 2017";
 
-void countIntersection() {
-  auto prijemceProvider =
-      new DataProviders::CsvReader(csvPath + "2017_no_filter.csv", ",");
-  auto subjektyProvider =
-      new DataProviders::CsvReader(csvPath + subjektyCSVName, ";");
-
-  auto prijemceDataSet = new DataSets::MemoryDataSet("prijemce");
-  prijemceDataSet->setDataProvider(prijemceProvider);
-  prijemceDataSet->setFieldTypes({ValueType::String, ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String, ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String, ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String, ValueType::String,
-                                  ValueType::Integer,
-                                  ValueType::String});
-  prijemceDataSet->open();
-  Logger::getInstance().log(LogLevel::Debug, "Prijemce loaded", true);
-
-  auto subjektyDataSet = new DataSets::MemoryDataSet("subjekty");
-  subjektyDataSet->setDataProvider(subjektyProvider);
-  subjektyDataSet->setFieldTypes({ValueType::Integer, ValueType::Integer,
-                                  ValueType::Integer,
-                                  ValueType::String, ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String, ValueType::String});
-  subjektyDataSet->open();
-  Logger::getInstance().log(LogLevel::Debug, "Subjekty loaded", true);
-
-  DataSets::SortOptions options;
-  options.addOption(prijemceDataSet->fieldByName("ico")->getIndex(),
-                    SortOrder::Ascending);
-  prijemceDataSet->sort(options);
-
-  DataSets::SortOptions options2;
-  options2.addOption(subjektyDataSet->fieldByName("IČO_num")->getIndex(),
-                     SortOrder::Ascending);
-  subjektyDataSet->sort(options2);
-
-  Logger::getInstance().log(LogLevel::Debug, "Sorted", true);
-
-  auto fieldPrijemce =
-      dynamic_cast<DataSets::IntegerField *>(prijemceDataSet->fieldByName("ico"));
-  auto fieldSubjekty =
-      dynamic_cast<DataSets::IntegerField *>(subjektyDataSet->fieldByName(
-          "IČO_num"));
-  int cnt = 0;
-  int lastFound = 0;
-  while (!prijemceDataSet->eof()) {
-
-    while (!subjektyDataSet->eof()) {
-
-      switch (Utilities::compareInt(fieldPrijemce->getAsInteger(),
-                                    fieldSubjekty->getAsInteger())) {
-        case 0:
-          if (lastFound != fieldPrijemce->getAsInteger()) {
-            cnt++;
-          }
-          goto man;
-        case -1:goto man;
-        case 1:goto uganda;
-      }
-      uganda:
-      subjektyDataSet->next();
-    }
-    man:
-    lastFound = fieldPrijemce->getAsInteger();
-
-    if (subjektyDataSet->eof()) {
-      break;
-    }
-
-    prijemceDataSet->next();
-  }
-  Logger::getInstance().log(LogLevel::Info,
-                            "Total intersection count: " + std::to_string(cnt),
-                            true);
-
-}
-
-void checkDupl() {
-  auto prov = new DataProviders::CsvReader(
-      csvPath + "dotaceTitul_rozpoctovaSkladbaPolozka.csv", ",");
-  auto dataset = new DataSets::MemoryDataSet("tmp");
-  dataset->setDataProvider(prov);
-  dataset->setFieldTypes({ValueType::String, ValueType::String});
-  dataset->open();
-
-  auto field = dataset->fieldByIndex(0);
-
-  DataSets::SortOptions options;
-  options.addOption(0, SortOrder::Ascending);
-  dataset->sort(options);
-
-  std::string last = "";
-  int cnt = 0, cnt2 = 0, total = 0;
-  bool logged = false;
-  while (!dataset->eof()) {
-    total++;
-    if (Utilities::compareString(field->getAsString(), last) == 0) {
-      if (!logged) {
-        //Logger::getInstance().log(LogLevel::Warning, "Duplicate: " + last);
-        cnt++;
-        logged = true;
-      }
-      cnt2++;
-    } else {
-      logged = false;
-    }
-
-    last = field->getAsString();
-    dataset->next();
-  }
-
-  Logger::getInstance().log(LogLevel::Warning,
-                            "Record count: " + std::to_string(total));
-  Logger::getInstance().log(LogLevel::Warning,
-                            "Duplicate count: " + std::to_string(cnt2));
-  Logger::getInstance().log(LogLevel::Warning,
-                            "Unique duplicate count: " + std::to_string(cnt));
-  Logger::getInstance().log(LogLevel::Warning,
-                            "Avg on duplicates: "
-                                + std::to_string(cnt2 / (double) cnt));
-
-  delete prov;
-  delete dataset;
-}
-
-void dominikKontrola() {
-  std::ifstream kontrola;
-
-  std::string kontrolaLine;
-  std::string buffer;
-
-  std::unordered_set<std::string> kontrolaSet;
-
-  int pos, counter = 0;
-
-  kontrola.open("/Users/petr/Desktop/kontrola.csv", std::ios::out);
-
-  while (getline(kontrola, kontrolaLine)) {
-    pos = kontrolaLine.find(",");
-    buffer = kontrolaLine.substr(0, pos);
-    if (kontrolaSet.count(buffer)) {
-      counter++;
-      continue;
-    }
-    kontrolaSet.insert(buffer);
-  }
-  //printf("%d \n", counter);
-}
-
-void writerTest() {
-  auto prov = new DataProviders::CsvReader(
-      csvPath + "dotaceTitul_rozpoctovaSkladbaPolozka.csv", ",");
-
-  auto writer = new DataWriters::CsvWriter("/Users/petr/Desktop/output.csv");
-  writer->writeHeader({"jemen"});
-
-  std::array<int, 1> colIndices = {0};
-  std::transform(prov->begin(),
-                 prov->end(),
-                 writer->begin(),
-                 [&colIndices](std::vector<std::string> row) -> std::vector<std::string> {
-                   std::vector<std::string> subSet;
-                   subSet.reserve(colIndices.size());
-                   for (auto index : colIndices) {
-                     subSet.emplace_back(row[index]);
-                   }
-                   return subSet;
-                 });
-  delete writer;
-  delete prov;
-}
 
 void measure(int index) {
 
@@ -347,13 +170,13 @@ int main(int argc, char **argv) {
                                 ValueType::String,
                                 ValueType::String, ValueType::String,
                                 ValueType::String});
-  dotaceDataSet->open();
+  dotaceDataSet->open(<#initializer#>, <#initializer#>);
   Logger::getInstance().log(LogLevel::Debug, "Dotace loaded", true);
   auto rozhodnutiDataSet = new DataSets::MemoryDataSet("rozhodnuti");
   rozhodnutiDataSet->setDataProvider(rozhodnutiProvider);
   rozhodnutiDataSet->setFieldTypes({ValueType::String, ValueType::String,
                                     ValueType::String});
-  rozhodnutiDataSet->open();
+  rozhodnutiDataSet->open(<#initializer#>, <#initializer#>);
   Logger::getInstance().log(LogLevel::Debug, "Rozhodnuti loaded", true);
   DataWorkers::DataSetMerger merger;
   merger.addDataSet(dotaceDataSet);
@@ -373,7 +196,7 @@ int main(int argc, char **argv) {
                                 ValueType::Currency,
                                 ValueType::Currency, ValueType::String,
                                 ValueType::String});
-  obdobiDataSet->open();
+  obdobiDataSet->open(<#initializer#>, <#initializer#>);
   Logger::getInstance().log(LogLevel::Debug, "Obdobi loaded", true);
   merger.addDataSet(dotace_rozhodnutiDataSet);
   merger.addDataSet(obdobiDataSet);
@@ -398,7 +221,7 @@ int main(int argc, char **argv) {
   prijemceDataSet->setDataProvider(prijemceProvider);
   prijemceDataSet->setFieldTypes({ValueType::String, ValueType::Integer,
                                   ValueType::String});
-  prijemceDataSet->open();
+  prijemceDataSet->open(<#initializer#>, <#initializer#>);
   Logger::getInstance().log(LogLevel::Debug, "Prijemce loaded", true);
   auto subjektyDataSet = new DataSets::MemoryDataSet("subjekty");
   subjektyDataSet->setDataProvider(subjektyProvider);
@@ -407,7 +230,7 @@ int main(int argc, char **argv) {
                                   ValueType::String, ValueType::String,
                                   ValueType::String,
                                   ValueType::String});
-  subjektyDataSet->open();
+  subjektyDataSet->open(<#initializer#>, <#initializer#>);
   Logger::getInstance().log(LogLevel::Debug, "Subjekty loaded", true);
   merger.addDataSet(subjektyDataSet);
   merger.addDataSet(prijemceDataSet);
@@ -422,21 +245,21 @@ int main(int argc, char **argv) {
   auto operacniProgramDataSet = new DataSets::MemoryDataSet("operacniProgram");
   operacniProgramDataSet->setDataProvider(operacniProgramProvider);
   operacniProgramDataSet->setFieldTypes({ValueType::String, ValueType::String});
-  operacniProgramDataSet->open();
+  operacniProgramDataSet->open(<#initializer#>, <#initializer#>);
   Logger::getInstance().log(LogLevel::Debug, "operacniProgram loaded", true);
   auto grantoveSchemaProvider =
       new DataProviders::CsvReader(csvPath + grantoveSchemaCSVName, ",");
   auto grantoveSchemaDataSet = new DataSets::MemoryDataSet("grantoveSchema");
   grantoveSchemaDataSet->setDataProvider(grantoveSchemaProvider);
   grantoveSchemaDataSet->setFieldTypes({ValueType::String, ValueType::String});
-  grantoveSchemaDataSet->open();
+  grantoveSchemaDataSet->open(<#initializer#>, <#initializer#>);
   Logger::getInstance().log(LogLevel::Debug, "grantoveSchema loaded", true);
   auto dotaceTitulProvider =
       new DataProviders::CsvReader(csvPath + dotacniTitulCSVName, ",");
   auto dotaceTitulDataSet = new DataSets::MemoryDataSet("dotaceTitul");
   dotaceTitulDataSet->setDataProvider(dotaceTitulProvider);
   dotaceTitulDataSet->setFieldTypes({ValueType::String, ValueType::String});
-  dotaceTitulDataSet->open();
+  dotaceTitulDataSet->open(<#initializer#>, <#initializer#>);
   Logger::getInstance().log(LogLevel::Debug, "dotaceTitul loaded", true);
   auto poskytovatelDotaceProvider =
       new DataProviders::CsvReader(csvPath + poskytovatelDotaceCSVName, ",");
@@ -445,7 +268,7 @@ int main(int argc, char **argv) {
   poskytovatelDotaceDataSet->setDataProvider(poskytovatelDotaceProvider);
   poskytovatelDotaceDataSet->setFieldTypes({ValueType::String,
                                             ValueType::String});
-  poskytovatelDotaceDataSet->open();
+  poskytovatelDotaceDataSet->open(<#initializer#>, <#initializer#>);
   Logger::getInstance().log(LogLevel::Debug, "poskytovatelDotace loaded", true);
   dataWorker->addDataSet(prijemce_subjektyDataSet);
   dataWorker->addDataSet(operacniProgramDataSet);

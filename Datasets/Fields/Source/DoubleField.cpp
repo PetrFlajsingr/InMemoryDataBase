@@ -5,10 +5,10 @@
 #include "MemoryDataSet.h"
 
 DataSets::DoubleField::DoubleField(std::string_view fieldName,
-                                   BaseDataSet *dataset,
-                                   uint64_t index) : BaseField(fieldName,
-                                                               dataset,
-                                                               index) {}
+                                   gsl::index index,
+                                   BaseDataSet *dataSet)
+    : BaseField(fieldName,
+                index, dataSet) {}
 
 ValueType DataSets::DoubleField::getFieldType() const {
   return ValueType::Double;
@@ -19,7 +19,7 @@ void DataSets::DoubleField::setAsString(std::string_view value) {
   setData(&data, getFieldType());
 }
 
-std::string DataSets::DoubleField::getAsString() const {
+std::string_view DataSets::DoubleField::getAsString() const {
   return std::to_string(data);
 }
 
@@ -36,19 +36,12 @@ double DataSets::DoubleField::getAsDouble() const {
   return data;
 }
 
-std::function<int8_t(DataSets::DataSetRow *,
-                     DataSets::DataSetRow *)> DataSets::DoubleField::getCompareFunction() {
-  return [this](const DataSetRow *a,
-                const DataSetRow *b) {
-    if ((*a->cells)[index]->_double
-        == (*b->cells)[index]->_double) {
-      return 0;
-    }
-    if ((*a->cells)[index]->_double
-        < (*b->cells)[index]->_double) {
-      return -1;
-    }
-    return 1;
+std::function<int8_t(const DataSets::DataSetRow &,
+                     const DataSets::DataSetRow &)> DataSets::DoubleField::getCompareFunction() {
+  return [this](const DataSetRow &a,
+                const DataSetRow &b) {
+    return Utilities::compareDouble(a.cells[index]._double,
+                                    b.cells[index]._double);
   };
 }
 

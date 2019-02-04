@@ -11,11 +11,6 @@ void DataSets::BaseDataSet::setFieldData(BaseField *field, void *data) {
   field->setValue(data);
 }
 
-DataSets::BaseDataSet::~BaseDataSet() {
-  for (auto tmp : fields) {
-    delete tmp;
-  }
-}
-uint32_t DataSets::BaseDataSet::getColumnCount() {
+gsl::index DataSets::BaseDataSet::getColumnCount() const {
   return columnCount;
 }

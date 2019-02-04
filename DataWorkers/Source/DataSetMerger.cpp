@@ -74,9 +74,8 @@ gsl::not_null<DataSets::BaseDataSet *> DataWorkers::DataSetMerger::mergeDataSets
     fieldNames.emplace_back(field->getFieldName());
     sourceFields.emplace_back(field);
   }
-  result->setFieldTypes(fieldNames, fieldTypes);
 
-  result->openEmpty();
+  result->openEmpty(fieldNames, fieldTypes);
 
   // sort merging datasets
   auto mergeField1 = dataSet1->fieldByName(columnName1);
@@ -104,9 +103,9 @@ gsl::not_null<DataSets::BaseDataSet *> DataWorkers::DataSetMerger::mergeDataSets
   dataSet2->sort(options2);
 
   int8_t cmpResult;
-  while (!dataSet1->eof()) {
+  while (!dataSet1->isLast()) {
 
-    while (!dataSet2->eof()) {
+    while (!dataSet2->isLast()) {
       if (isIntegerField) {
         cmpResult = Utilities::compareInt(reinterpret_cast<DataSets::IntegerField *>(mergeField1)->getAsInteger(),
                                           reinterpret_cast<DataSets::IntegerField *>(mergeField2)->getAsInteger());
@@ -116,7 +115,6 @@ gsl::not_null<DataSets::BaseDataSet *> DataWorkers::DataSetMerger::mergeDataSets
       }
       if (cmpResult == 0) {
         appendData(sourceFields, result);
-        //dataSet2->next();
         break;
       } else if (cmpResult < 0) {
         break;
@@ -124,7 +122,7 @@ gsl::not_null<DataSets::BaseDataSet *> DataWorkers::DataSetMerger::mergeDataSets
         dataSet2->next();
       }
     }
-    if (dataSet2->eof()) {
+    if (dataSet2->isLast()) {
       break;
     }
 

@@ -25,13 +25,14 @@ class Async_MemoryDataSet : public MemoryDataSet {
  public:
   explicit Async_MemoryDataSet(std::string_view dataSetName);
 
-  void open() override;
+  void open(DataProviders::BaseDataProvider &dataProvider,
+            const std::vector<ValueType> &fieldTypes) override;
 
   void filter(const FilterOptions &options) override;
 
   void sort(SortOptions &options) override;
 
-  void appendDataProvider(DataProviders::BaseDataProvider *provider) override;
+  void appendDataProvider(DataProviders::BaseDataProvider &dataProvider) override;
 
   void addObserver(IAsyncMemoryDataSetObserver *observer);
 
@@ -54,7 +55,8 @@ class Async_MemoryDataSet : public MemoryDataSet {
   /**
    * Pro otevreni data setu v dalsim vlakne (std::async)
    */
-  void innerOpen();
+  void innerOpen(DataProviders::BaseDataProvider &dataProvider,
+                 const std::vector<ValueType> &fieldTypes);
 
   /**
    * Pro filtrovani dat v dalsim vlakne (std::async)
@@ -72,7 +74,7 @@ class Async_MemoryDataSet : public MemoryDataSet {
    * Pro pridani dat z dalsiho provideru ve vlakne (std::async)
    * @param provider
    */
-  void innerAppendDataProvider(DataProviders::BaseDataProvider *provider);
+  void innerAppendDataProvider(DataProviders::BaseDataProvider &provider);
 
   /**
    * Notifikuj posluchace o udalosti daneho typu.

@@ -27,7 +27,7 @@ std::vector<std::string> DataWorkers::MemoryDataWorker::getChoices(std::string c
 
   std::vector<std::string> result;
 
-  while (!dataset->eof()) {
+  while (!dataset->isLast()) {
     if (field->getAsString() != value) {
       value = field->getAsString();
       result.emplace_back(value);
@@ -39,16 +39,12 @@ std::vector<std::string> DataWorkers::MemoryDataWorker::getChoices(std::string c
 }
 
 DataWorkers::MemoryDataWorker::MemoryDataWorker(
-    DataProviders::BaseDataProvider *dataProvider,
-    std::vector<ValueType> fieldTypes)
+    DataProviders::BaseDataProvider &dataProvider,
+    const std::vector<ValueType> &fieldTypes)
     : BaseDataWorker() {
   dataset = new DataSets::MemoryDataSet("main");
 
-  dataset->setDataProvider(dataProvider);
-
-  dataset->setFieldTypes(fieldTypes);
-
-  dataset->open();
+  dataset->open(dataProvider, fieldTypes);
 }
 
 void DataWorkers::MemoryDataWorker::writeResult(DataWriters::BaseDataWriter &writer,
@@ -126,7 +122,7 @@ void DataWorkers::MemoryDataWorker::writeResult(DataWriters::BaseDataWriter &wri
   bool savedResults = false, writeResults = false;
   std::vector<std::string> results;
   results.reserve(queryData.projections.size());
-  while (!dataset->eof()) {
+  while (!dataset->isLast()) {
     for (auto accumulator : accumulators) {
       if (accumulator->step() && !savedResults) {
         for (auto toSave : accumulators) {
@@ -339,17 +335,17 @@ bool DataWorkers::ResultAccumulator::handleDistinct() {
       break;
     }
     case ValueType::String: {
-      std::string value = field->getAsString();
+      auto value = field->getAsString();
       if (!firstDone) {
         firstDone = true;
-        data._string = strdup(value.c_str());
+        data._string = Utilities::copyStringToNewChar(value);
         return false;
       }
       if (value != data._string) {
         previousData._string = strdup(data._string);
         result = data._string;
         delete[] data._string;
-        data._string = strdup(value.c_str());
+        data._string = Utilities::copyStringToNewChar(value);
         distinct = true;
         return true;
       }

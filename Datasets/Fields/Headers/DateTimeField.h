@@ -17,21 +17,21 @@ namespace DataSets {
 class DateTimeField : public BaseField {
  public:
   DateTimeField(std::string_view fieldName,
-                BaseDataSet *dataset,
-                uint64_t index);
+                gsl::index index,
+                BaseDataSet *dataSet);
 
   ValueType getFieldType() const override;
 
   void setAsString(std::string_view value) override;
 
-  std::string getAsString() const override;
+  std::string_view getAsString() const override;
 
   void setAsDateTime(const DateTime &dateTime);
 
   DateTime getAsDateTime() const;
 
-  std::function<int8_t(DataSetRow *,
-                       DataSetRow *)> getCompareFunction() override;
+  std::function<int8_t(const DataSetRow &,
+                       const DataSetRow &)> getCompareFunction() override;
 
  protected:
   void setValue(void *data) override;

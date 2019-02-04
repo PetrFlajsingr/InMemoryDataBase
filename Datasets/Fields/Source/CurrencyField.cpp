@@ -6,6 +6,11 @@
 
 #include "MemoryDataSet.h"
 
+DataSets::CurrencyField::CurrencyField(std::string_view fieldName,
+                                       gsl::index index,
+                                       BaseDataSet *dataSet)
+    : BaseField(fieldName, index, dataSet) {}
+
 void DataSets::CurrencyField::setValue(void *data) {
   this->data = *reinterpret_cast<Currency *>(data);
 }
@@ -19,27 +24,20 @@ void DataSets::CurrencyField::setAsString(std::string_view value) {
   setData(&data, getFieldType());
 }
 
-std::string DataSets::CurrencyField::getAsString() const {
+std::string_view DataSets::CurrencyField::getAsString() const {
   return dec::toString(data);
 }
 
-std::function<int8_t(DataSets::DataSetRow *,
-                     DataSets::DataSetRow *)> DataSets::CurrencyField::getCompareFunction() {
-  return [this](const DataSetRow *a,
-                const DataSetRow *b) {
-    if (*(*a->cells)[index]->_currency
-        == *(*b->cells)[index]->_currency) {
-      return 0;
-    }
-    if (*(*a->cells)[index]->_currency
-        < *(*b->cells)[index]->_currency) {
-      return -1;
-    }
-    return 1;
+std::function<int8_t(const DataSets::DataSetRow &,
+                     const DataSets::DataSetRow &)> DataSets::CurrencyField::getCompareFunction() {
+  return [this](const DataSetRow &a,
+                const DataSetRow &b) {
+    return Utilities::compareCurrency(*a.cells[index]._currency,
+                                      *b.cells[index]._currency);
   };
 }
 
-void DataSets::CurrencyField::setAsCurrency(Currency &value) {
+void DataSets::CurrencyField::setAsCurrency(const Currency &value) {
   data = value;
   BaseField::setData(&data, getFieldType());
 }
@@ -47,8 +45,3 @@ void DataSets::CurrencyField::setAsCurrency(Currency &value) {
 Currency DataSets::CurrencyField::getAsCurrency() const {
   return data;
 }
-
-DataSets::CurrencyField::CurrencyField(std::string_view fieldName,
-                                       DataSets::BaseDataSet *dataset,
-                                       uint64_t index)
-    : BaseField(fieldName, dataset, index) {}

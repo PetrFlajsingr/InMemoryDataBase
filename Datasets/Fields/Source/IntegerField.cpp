@@ -6,10 +6,10 @@
 #include "MemoryDataSet.h"
 
 DataSets::IntegerField::IntegerField(std::string_view fieldName,
-                                     BaseDataSet *dataset,
-                                     uint64_t index) : BaseField(fieldName,
-                                                                 dataset,
-                                                                 index) {}
+                                     gsl::index index,
+                                     BaseDataSet *dataSet)
+    : BaseField(fieldName,
+                index, dataSet) {}
 
 ValueType DataSets::IntegerField::getFieldType() const {
   return ValueType::Integer;
@@ -20,7 +20,7 @@ void DataSets::IntegerField::setAsString(std::string_view value) {
   BaseField::setData(&data, getFieldType());
 }
 
-std::string DataSets::IntegerField::getAsString() const {
+std::string_view DataSets::IntegerField::getAsString() const {
   return std::to_string(data);
 }
 
@@ -37,18 +37,11 @@ int DataSets::IntegerField::getAsInteger() const {
   return data;
 }
 
-std::function<int8_t(DataSets::DataSetRow *,
-                     DataSets::DataSetRow *)> DataSets::IntegerField::getCompareFunction() {
-  return [this](const DataSetRow *a,
-                const DataSetRow *b) {
-    if ((*a->cells)[index]->_integer
-        == (*b->cells)[index]->_integer) {
-      return 0;
-    }
-    if ((*a->cells)[index]->_integer
-        < (*b->cells)[index]->_integer) {
-      return -1;
-    }
-    return 1;
+std::function<int8_t(const DataSets::DataSetRow &,
+                     const DataSets::DataSetRow &)> DataSets::IntegerField::getCompareFunction() {
+  return [this](const DataSetRow &a,
+                const DataSetRow &b) {
+    return Utilities::compareInt(a.cells[index]._integer,
+                                 b.cells[index]._integer);
   };
 }

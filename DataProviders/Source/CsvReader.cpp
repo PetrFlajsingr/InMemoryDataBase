@@ -5,12 +5,12 @@
 #include <utility>
 #include <CsvReader.h>
 
-DataProviders::CsvReader::CsvReader(std::string filePath,
-                                    std::string delimiter) {
-  this->delimiter = std::move(delimiter);
-  file.open(filePath);
+DataProviders::CsvReader::CsvReader(std::string_view filePath,
+                                    std::string_view delimiter) {
+  this->delimiter = delimiter;
+  file.open(std::string(filePath));
   if (!file.is_open()) {
-    std::string errMsg = "File could not be open: " + filePath;
+    std::string errMsg = "File could not be open: " + std::string(filePath);
     throw IOException(errMsg.c_str());
   }
 
@@ -27,7 +27,7 @@ void DataProviders::CsvReader::readHeader() {
   char buffer[BUFFER_SIZE];
 
   file.getline(buffer, BUFFER_SIZE);
-  auto line = std::string(buffer);
+  auto line = std::string_view(buffer);
   while (!isalnum(line[0])) {
     line = line.substr(1);
   }
@@ -53,7 +53,7 @@ void DataProviders::CsvReader::parseRecord() {
   char buffer[BUFFER_SIZE];
 
   file.getline(buffer, BUFFER_SIZE);
-  auto line = std::string(buffer);
+  auto line = std::string_view(buffer);
   if (!line.empty() && line[line.length() - 1] == '\r') {
     line = line.substr(0, line.length() - 1);
   }

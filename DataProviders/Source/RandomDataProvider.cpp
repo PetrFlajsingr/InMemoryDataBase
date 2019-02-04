@@ -9,10 +9,8 @@ DataProviders::RandomDataProvider::RandomDataProvider(int columnCount,
                                                       int maxDataLength,
                                                       int recordCount)
     : columnCount(columnCount), recordCount(recordCount) {
-  Expects(columnCount > 0);
-  Expects(minDataLength >= 0);
-  Expects(maxDataLength >= 0);
-  Expects(recordCount >= 0);
+  Expects(columnCount > 0 && minDataLength >= 0 && maxDataLength >= 0
+              && recordCount >= 0);
   std::random_device randomDevice;
   randomEngine = std::default_random_engine(randomDevice());
   uniformIntDistribution =

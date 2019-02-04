@@ -5,15 +5,19 @@
 #include "Async_MemoryDataSet.h"
 #include <future>
 
-void DataSets::Async_MemoryDataSet::open() {
+void DataSets::Async_MemoryDataSet::open(DataProviders::BaseDataProvider &dataProvider,
+                                         const std::vector<ValueType> &fieldTypes) {
   notify(EventType::BeforeOpen);
   auto handle = std::async(std::launch::async,
                            &Async_MemoryDataSet::innerOpen,
-                           this);
+                           this,
+                           std::ref(dataProvider),
+                           std::ref(fieldTypes));
 }
 
-void DataSets::Async_MemoryDataSet::innerOpen() {
-  MemoryDataSet::open();
+void DataSets::Async_MemoryDataSet::innerOpen(DataProviders::BaseDataProvider &dataProvider,
+                                              const std::vector<ValueType> &fieldTypes) {
+  MemoryDataSet::open(dataProvider, fieldTypes);
   notify(EventType::AfterOpen);
 }
 
@@ -96,15 +100,15 @@ void DataSets::Async_MemoryDataSet::innerSort(SortOptions &options) {
   notify(EventType::AfterSort);
 }
 
-void DataSets::Async_MemoryDataSet::appendDataProvider(DataProviders::BaseDataProvider *provider) {
+void DataSets::Async_MemoryDataSet::appendDataProvider(DataProviders::BaseDataProvider &dataProvider) {
   notify(EventType::BeforeAppend);
   auto handle = std::async(std::launch::async,
                            &Async_MemoryDataSet::innerAppendDataProvider,
                            this,
-                           provider);
+                           std::ref(dataProvider));
 }
 
-void DataSets::Async_MemoryDataSet::innerAppendDataProvider(DataProviders::BaseDataProvider *provider) {
+void DataSets::Async_MemoryDataSet::innerAppendDataProvider(DataProviders::BaseDataProvider &provider) {
   MemoryDataSet::appendDataProvider(provider);
   notify(EventType::AfterAppend);
 }

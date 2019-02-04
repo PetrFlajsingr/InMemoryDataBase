@@ -25,18 +25,13 @@
 #include <DateTimeField.h>
 
 namespace DataSets {
-
-typedef std::vector<DataContainer *> DataSetRowCells;
-
 /**
  * Struktura pro jeden zaznam v data setu.
  */
 struct DataSetRow {
   bool valid;  //< true pokud vyhovuje filtru/neni filtrovat, jinak false
-  DataSetRowCells *cells;  //< data v pameti
+  std::vector<DataContainer> cells;  //< data v pameti
 };
-
-typedef std::vector<DataSetRow *> DataSetData;
 /**
  * Dataset ukladajici data primo v operacni pameti.
  *
@@ -81,11 +76,11 @@ class MemoryDataSet : public BaseDataSet {
 
   ~MemoryDataSet() override;
 
-  void open() override;
+  void open(DataProviders::BaseDataProvider &dataProvider,
+            const std::vector<ValueType> &fieldTypes) override;
 
-  void openEmpty() override;
-
-  void setDataProvider(gsl::not_null<DataProviders::BaseDataProvider *> provider) override;
+  void openEmpty(const std::vector<std::string> &fieldNames,
+                 const std::vector<ValueType> &fieldTypes) override;
 
   void close() override;
 
@@ -93,32 +88,29 @@ class MemoryDataSet : public BaseDataSet {
 
   void last() override;
 
-  void next() override;
+  bool next() override;
 
-  void previous() override;
+  bool previous() override;
 
   void sort(SortOptions &options) override;
 
   void filter(const FilterOptions &options) override;
 
-  BaseField *fieldByName(std::string_view name) override;
+  BaseField *fieldByName(std::string_view name) const override;
 
-  BaseField *fieldByIndex(uint64_t index) override;
+  BaseField *fieldByIndex(uint64_t index) const override;
 
-  std::vector<BaseField *> getFields() override;
+  std::vector<BaseField *> getFields() const override;
 
-  bool eof() override;
+  bool isFirst() const override;
 
-  std::vector<std::string> getFieldNames() override;
+  bool isLast() const override;
 
-  void setFieldTypes(std::vector<ValueType> types) override;
-
-  void setFieldTypes(std::vector<std::string> fieldNames,
-                     std::vector<ValueType> types) override;
+  std::vector<std::string> getFieldNames() const override;
 
   void append() override;
 
-  virtual void appendDataProvider(DataProviders::BaseDataProvider *provider);
+  virtual void appendDataProvider(DataProviders::BaseDataProvider &dataProvider);
 
   bool findFirst(FilterItem &item) override;
 
@@ -130,28 +122,24 @@ class MemoryDataSet : public BaseDataSet {
    * Struktura pro vnitrni reprezentaci dat
    */
 
-  //\
-
-  DataProviders::BaseDataProvider *dataProvider = nullptr;  //< dodavatel dat
-
   bool isOpen = false;
 
-  uint64_t currentRecord = 0;  //< Pocitadlo zaznamu
+  gsl::index currentRecord = 0;  //< Pocitadlo zaznamu
 
   bool dataValidityChanged = false;
   //< Nastaveno pri zmene dat naprikald pomoci find
 
-  DataSetData data;
+  std::vector<DataSetRow> data;
 
   /**
    * Nacteni dat do this->data
    */
-  void loadData();
+  void loadData(DataProviders::BaseDataProvider &dataProvider);
 
   /**
    * Pridani zaznamu do this->data()
    */
-  void addRecord();
+  void addRecord(DataProviders::BaseDataProvider &dataProvider);
 
   /**
    * Vytvoreni Fields se jmeny podle nazvu sloupcu.
@@ -168,7 +156,7 @@ class MemoryDataSet : public BaseDataSet {
    * @param searchForward Smer vyhledavani validniho zaznamu
    * @return
    */
-  bool setFieldValues(uint64_t index, bool searchForward);
+  bool setFieldValues(gsl::index index, bool searchForward);
 };
 }  // namespace DataSets
 
