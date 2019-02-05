@@ -78,8 +78,8 @@ class MemoryDataWorker : public BaseDataWorker {
 
  private:
   struct InnerJoinStructure {
-    uint64_t indexAddi;
-    uint64_t indexMain;
+    gsl::index indexAddi;
+    gsl::index indexMain;
 
     std::vector<DataSets::BaseField*> projectFields;
   };

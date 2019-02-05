@@ -24,7 +24,7 @@ enum class FilterOption {
 };
 
 struct FilterItem {
-  uint64_t fieldIndex;
+  gsl::index fieldIndex;
   ValueType type;
   std::vector<DataContainer> searchData;
   FilterOption filterOption;
@@ -33,7 +33,7 @@ struct FilterItem {
 struct FilterOptions {
   std::vector<FilterItem> options;
 
-  void addOption(const uint64_t fieldIndex,
+  void addOption(const gsl::index fieldIndex,
                  const ValueType type,
                  const std::vector<DataContainer> &searchString,
                  const FilterOption filterOption) {

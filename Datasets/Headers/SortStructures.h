@@ -11,14 +11,14 @@
 namespace DataSets {
 
 struct SortItem {
-  uint64_t fieldIndex;  //< index field v data set
+  gsl::index fieldIndex;  //< index field v data set
   SortOrder order;  //< Ascending/Descending
 };
 
 struct SortOptions {
   std::vector<SortItem> options;
 
-  void addOption(uint64_t index, SortOrder order) {
+  void addOption(gsl::index index, SortOrder order) {
     SortItem item {
       index,
       order};

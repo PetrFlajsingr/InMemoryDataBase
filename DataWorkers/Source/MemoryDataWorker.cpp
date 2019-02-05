@@ -15,10 +15,6 @@ std::vector<std::string> DataWorkers::MemoryDataWorker::getMultiChoiceNames() {
 std::vector<std::string> DataWorkers::MemoryDataWorker::getChoices(std::string choiceName) {
   DataSets::BaseField* field = dataset->fieldByName(choiceName);
 
-  if (field == nullptr) {
-    return {};
-  }
-
   DataSets::SortOptions sortOptions;
   sortOptions.addOption(field->getIndex(), SortOrder::Ascending);
   dataset->sort(sortOptions);
@@ -131,7 +127,7 @@ void DataWorkers::MemoryDataWorker::writeResult(DataWriters::BaseDataWriter &wri
 
         //  pokud je pozadovan join, je nutne hledat v dalsich tabulkach
         if (doJoin) {
-          for (int i = 0; i < joinStructures.size(); ++i) {
+          for (gsl::index i = 0; i < joinStructures.size(); ++i) {
             ValueType type = dataset->fieldByIndex(joinStructures[i].indexMain)->getFieldType();
             DataContainer container = accumulators[joinStructures[i].indexMain]->getContainer();
 
@@ -253,13 +249,11 @@ void DataWorkers::MemoryDataWorker::filterDataSet() {
           case ValueType::Currency:
             *container._currency = dec::fromString<Currency>(value);
             break;
-          case ValueType::DateTime:container._dateTime = new DateTime();
-            container._dateTime->fromString(value);
+          case ValueType::DateTime:container._dateTime = new DateTime(value);
             break;
         }
         filterSelection.emplace_back(container);
       }
-
 
       filterOptions.addOption(
           field->getIndex(),
@@ -543,7 +537,6 @@ std::string DataWorkers::ResultAccumulator::getResultForce() {
 
 std::string DataWorkers::ResultAccumulator::resultDistinct() {
   if (distinct) {
-    //distinct = false;
     return result;
   }
   return getResultForce();
