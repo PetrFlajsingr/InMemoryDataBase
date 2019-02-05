@@ -15,10 +15,24 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
     data.reserve(DATA_COUNT);
     std::vector<std::string> row;
     row.reserve(COL_COUNT);
-    for (auto i = 0; i < DATA_COUNT; ++i) {
+    int sortColVal = 0;
+    int sortColVal2 = 0;
+    for (gsl::index i = 0; i < DATA_COUNT; ++i) {
       auto firstPart = std::to_string(i);
-      for (auto j = 0; j < COL_COUNT; ++j) {
-        row.emplace_back(firstPart + "_" + std::to_string(j));
+      for (gsl::index j = 0; j < COL_COUNT; ++j) {
+        if (j == 2) {
+          row.emplace_back(std::to_string(sortColVal));
+        } else if (j == 4) {
+          row.emplace_back(std::to_string(sortColVal2));
+        } else {
+          row.emplace_back(firstPart + "_" + std::to_string(j));
+        }
+      }
+      if ((i & 0xF) == 0) {
+        sortColVal++;
+      }
+      if ((i & 0x7) == 0) {
+        sortColVal2++;
       }
       data.emplace_back(row);
       row.clear();
@@ -26,7 +40,8 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
 
     DataProviders::ArrayDataProvider provider(data);
 
-    WHEN("Reading the data from provider using BaseDataSet interface") {
+    WHEN("Reading the data from provider using BaseDataSet interface,"
+         " string values only") {
       DataSets::MemoryDataSet dataSet("test_dataset");
       auto fieldTypes = {
           ValueType::String,
@@ -62,7 +77,7 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
         REQUIRE(rowCount == -1);
       }
 
-      AND_THEN("The data can be sorted") {
+      THEN("The data can be sorted") {
         DataSets::SortOptions sortOptions;
         sortOptions.addOption(0, SortOrder::Descending);
         dataSet.sort(sortOptions);
@@ -86,7 +101,30 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
         }
       }
 
-      AND_THEN("The data can be filtered") {
+      AND_THEN("The data can be sorted by multiple keys") {
+        DataSets::SortOptions sortOptions;
+        sortOptions.addOption(2, SortOrder::Ascending);
+        sortOptions.addOption(4, SortOrder::Descending);
+        dataSet.sort(sortOptions);
+
+        auto field2 = dataSet.fieldByIndex(2);
+        auto field4 = dataSet.fieldByIndex(4);
+        std::string str2Last, str4Last;
+        while (dataSet.next()) {
+          REQUIRE(str2Last <= field2->getAsString());
+          if (str2Last == field2->getAsString()) {
+            REQUIRE(str4Last >= field4->getAsString());
+          }
+          str2Last = field2->getAsString();
+          str4Last = field4->getAsString();
+        }
+      }
+
+      THEN("The data can be filtered") {
+        FAIL("TODO: implement");
+      }
+
+      AND_THEN("The data can be filtered by multiple keys") {
         FAIL("TODO: implement");
       }
     }
