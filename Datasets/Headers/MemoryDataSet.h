@@ -110,7 +110,7 @@ class MemoryDataSet : public BaseDataSet {
 
   void append() override;
 
-  virtual void appendDataProvider(DataProviders::BaseDataProvider &dataProvider);
+  void append(DataProviders::BaseDataProvider &dataProvider) override;
 
   bool findFirst(FilterItem &item) override;
 
@@ -124,12 +124,17 @@ class MemoryDataSet : public BaseDataSet {
 
   bool isOpen = false;
 
+  const DataSetRow stopItem{true, {}};
+
   gsl::index currentRecord = 0;  //< Pocitadlo zaznamu
 
   bool dataValidityChanged = false;
   //< Nastaveno pri zmene dat naprikald pomoci find
 
   std::vector<DataSetRow> data;
+
+  inline gsl::index getFirst() const;
+  inline gsl::index getLast() const;
 
   /**
    * Nacteni dat do this->data

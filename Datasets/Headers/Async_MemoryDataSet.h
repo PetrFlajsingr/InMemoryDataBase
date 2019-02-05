@@ -32,7 +32,7 @@ class Async_MemoryDataSet : public MemoryDataSet {
 
   void sort(SortOptions &options) override;
 
-  void appendDataProvider(DataProviders::BaseDataProvider &dataProvider) override;
+  void append(DataProviders::BaseDataProvider &dataProvider) override;
 
   void addObserver(IAsyncMemoryDataSetObserver *observer);
 

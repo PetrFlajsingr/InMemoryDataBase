@@ -44,7 +44,7 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
         int rowCount = 0;
         while (dataSet.next()) {
           for (auto field : fields) {
-            REQUIRE(field->getAsString() == data[rowCount][field->getIndex()]);
+            CHECK(field->getAsString() == data[rowCount][field->getIndex()]);
           }
           rowCount++;
         }
@@ -55,7 +55,7 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
         while (dataSet.previous()) {
           auto wat = data[rowCount][0];
           for (auto field : fields) {
-            CHECK(field->getAsString() == data[rowCount][field->getIndex()]);
+            REQUIRE(field->getAsString() == data[rowCount][field->getIndex()]);
           }
           auto wat2 = data[rowCount][0];
           rowCount--;

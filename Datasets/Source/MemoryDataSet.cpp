@@ -11,12 +11,13 @@ void DataSets::MemoryDataSet::open(DataProviders::BaseDataProvider &dataProvider
     throw IllegalStateException("Dataset is already open.");
   }
   createFields(dataProvider.getHeader(), fieldTypes);
-  columnCount = fields.size();
+  data.emplace_back(stopItem);
+  data.emplace_back(stopItem);
   loadData(dataProvider);
   data.shrink_to_fit();
 
   isOpen = true;
-  setFieldValues(0, true);
+  setFieldValues(getFirst(), true);
 }
 
 void DataSets::MemoryDataSet::openEmpty(const std::vector<std::string> &fieldNames,
@@ -25,18 +26,23 @@ void DataSets::MemoryDataSet::openEmpty(const std::vector<std::string> &fieldNam
     throw IllegalStateException("Dataset is already open.");
   }
   createFields(fieldNames, fieldTypes);
+  data.emplace_back(stopItem);
+  data.emplace_back(stopItem);
   isOpen = true;
 }
 
 void DataSets::MemoryDataSet::loadData(DataProviders::BaseDataProvider &dataProvider) {
+  data.pop_back();
   while (dataProvider.next()) {
     addRecord(dataProvider);
   }
+  data.emplace_back(stopItem);
 }
 
 void DataSets::MemoryDataSet::createFields(std::vector<std::string> columns,
                                            std::vector<ValueType> types) {
   Expects(columns.size() == types.size());
+  columnCount = fields.size();
   for (gsl::index i = 0; i < columns.size(); ++i) {
     fields.emplace_back(FieldFactory::Get().CreateField(
         columns[i],
@@ -124,9 +130,9 @@ bool DataSets::MemoryDataSet::setFieldValues(gsl::index index,
     }
     if (!found) {
       if (searchForward) {
-        currentRecord = data.size();
+        currentRecord = getLast();
       } else {
-        currentRecord = 0;
+        currentRecord = getFirst();
       }
       return false;
     }
@@ -162,33 +168,31 @@ bool DataSets::MemoryDataSet::setFieldValues(gsl::index index,
 }
 
 void DataSets::MemoryDataSet::first() {
-  currentRecord = 0;
-  setFieldValues(0, true);
+  currentRecord = getFirst();
+  setFieldValues(currentRecord, true);
 }
 
 void DataSets::MemoryDataSet::last() {
-  currentRecord = data.size() - 1;
-  setFieldValues(data.size() - 1, false);
+  currentRecord = getLast();
+  setFieldValues(currentRecord, false);
 }
 
 // TODO: rework na zarazku
 bool DataSets::MemoryDataSet::next() {
+  currentRecord++;
   if (currentRecord == data.size() - 1) {
     return false;
   }
-  currentRecord++;
-  if (!isLast()) {
-    setFieldValues(currentRecord, true);
-  }
+  setFieldValues(currentRecord, true);
   return true;
 }
 
 // TODO: rework na zarazku
 bool DataSets::MemoryDataSet::previous() {
+  currentRecord--;
   if (currentRecord == 0) {
     return false;
   }
-  currentRecord--;
   setFieldValues(currentRecord, false);
   return true;
 }
@@ -229,8 +233,8 @@ void DataSets::MemoryDataSet::sort(SortOptions &options) {
         return false;
       };
 
-  std::sort(data.begin(),
-            data.end(),
+  std::sort(data.begin() + 1,
+            data.end() - 1,
             compareFunction);
 
   first();
@@ -250,6 +254,9 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
 
   gsl::index i = 0;
   for (const auto &iter : data) {
+    if (iter.cells.empty()) {
+      continue;
+    }
     bool valid = true;
 
     gsl::index optionCounter = 0;
@@ -345,7 +352,7 @@ DataSets::BaseField *DataSets::MemoryDataSet::fieldByIndex(uint64_t index) const
 }
 
 bool DataSets::MemoryDataSet::isLast() const {
-  return currentRecord >= data.size() - 1;
+  return currentRecord >= getLast();
 }
 
 DataSets::MemoryDataSet::~MemoryDataSet() {
@@ -381,7 +388,7 @@ void DataSets::MemoryDataSet::setData(void *data,
 }
 
 void DataSets::MemoryDataSet::append() {
-  data.emplace_back(DataSetRow{true, {}});
+  data.pop_back();
   for (auto &field : fields) {
     switch (field->getFieldType()) {
       case ValueType::Integer:data.back().cells.emplace_back(DataContainer{._integer = 0});
@@ -400,9 +407,10 @@ void DataSets::MemoryDataSet::append() {
     }
   }
   last();
+  data.emplace_back(stopItem);
 }
 
-void DataSets::MemoryDataSet::appendDataProvider(
+void DataSets::MemoryDataSet::append(
     DataProviders::BaseDataProvider &dataProvider) {
   if (!isOpen) {
     throw IllegalStateException("Dataset is not open.");
@@ -419,7 +427,7 @@ DataSets::MemoryDataSet::MemoryDataSet(std::string_view dataSetName)
 // TODO: predelat na iterator a std::lower_bound
 bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
   auto field = fields[item.fieldIndex];
-  unsigned long min = 0, max = data.size();
+  unsigned long min = getFirst(), max = getLast();
   bool breakLoop = false;
 
   do {
@@ -541,6 +549,14 @@ std::vector<std::string> DataSets::MemoryDataSet::getFieldNames() const {
 
 bool DataSets::MemoryDataSet::isFirst() const {
   return currentRecord == 0;
+}
+
+gsl::index DataSets::MemoryDataSet::getFirst() const {
+  return 1;
+}
+
+gsl::index DataSets::MemoryDataSet::getLast() const {
+  return data.size() - 2;
 }
 
 #pragma clang diagnostic pop

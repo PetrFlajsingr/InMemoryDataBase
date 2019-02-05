@@ -215,6 +215,8 @@ class BaseDataSet {
    */
   virtual void append() = 0;
 
+  virtual void append(DataProviders::BaseDataProvider &dataProvider) = 0;
+
   /**
    * Seradi data set podle dodaneho nastaveni.
    * Umoznuje razeni podle vice klicu - priorita podle poradi v options.
