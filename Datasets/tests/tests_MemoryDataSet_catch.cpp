@@ -63,7 +63,27 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
       }
 
       AND_THEN("The data can be sorted") {
-        FAIL("TODO: implement");
+        DataSets::SortOptions sortOptions;
+        sortOptions.addOption(0, SortOrder::Descending);
+        dataSet.sort(sortOptions);
+        auto field0 = dataSet.fieldByIndex(0);
+        // "zzz" since there are only string numbers in test data
+        std::string lastVal = "zzzz";
+        while (dataSet.next()) {
+          REQUIRE(lastVal >= field0->getAsString());
+          lastVal = field0->getAsString();
+        }
+
+        DataSets::SortOptions sortOptions2;
+        sortOptions2.addOption(3, SortOrder::Ascending);
+        dataSet.sort(sortOptions2);
+        auto field3 = dataSet.fieldByIndex(3);
+
+        lastVal = "";
+        while (dataSet.next()) {
+          REQUIRE(lastVal <= field3->getAsString());
+          lastVal = field3->getAsString();
+        }
       }
 
       AND_THEN("The data can be filtered") {

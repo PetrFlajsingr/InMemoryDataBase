@@ -220,7 +220,7 @@ void DataSets::MemoryDataSet::sort(SortOptions &options) {
   auto compareFunction =
       [&optionArray, &compareFunctions](const DataSetRow &a,
                                         const DataSetRow &b) {
-        for (uint8_t i = 0; i < optionArray.size(); ++i) {
+        for (gsl::index i = 0; i < optionArray.size(); ++i) {
           int compareResult = compareFunctions[i](a, b);
           if (compareResult < 0) {
             return optionArray[i].order == SortOrder::Ascending;
@@ -235,7 +235,7 @@ void DataSets::MemoryDataSet::sort(SortOptions &options) {
             data.end() - 1,
             compareFunction);
 
-  first();
+  currentRecord = 0;
 }
 
 // TODO: rework
