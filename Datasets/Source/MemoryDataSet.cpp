@@ -177,7 +177,6 @@ void DataSets::MemoryDataSet::last() {
   setFieldValues(currentRecord, false);
 }
 
-// TODO: rework na zarazku
 bool DataSets::MemoryDataSet::next() {
   currentRecord++;
   if (currentRecord == data.size() - 1) {
@@ -187,7 +186,6 @@ bool DataSets::MemoryDataSet::next() {
   return true;
 }
 
-// TODO: rework na zarazku
 bool DataSets::MemoryDataSet::previous() {
   currentRecord--;
   if (currentRecord == 0) {
@@ -347,7 +345,7 @@ DataSets::BaseField *DataSets::MemoryDataSet::fieldByName(
   throw InvalidArgumentException(errMsg.c_str());
 }
 
-DataSets::BaseField *DataSets::MemoryDataSet::fieldByIndex(uint64_t index) const {
+DataSets::BaseField *DataSets::MemoryDataSet::fieldByIndex(gsl::index index) const {
   return fields.at(index).get();
 }
 
@@ -360,7 +358,7 @@ DataSets::MemoryDataSet::~MemoryDataSet() {
 }
 
 void DataSets::MemoryDataSet::setData(void *data,
-                                      uint64_t index,
+                                      gsl::index index,
                                       ValueType type) {
   switch (type) {
     case ValueType::Integer:
@@ -557,6 +555,14 @@ gsl::index DataSets::MemoryDataSet::getFirst() const {
 
 gsl::index DataSets::MemoryDataSet::getLast() const {
   return data.size() - 2;
+}
+
+bool DataSets::MemoryDataSet::isBegin() const {
+  return currentRecord == 0;
+}
+
+bool DataSets::MemoryDataSet::isEnd() const {
+  return currentRecord == data.size() - 1;
 }
 
 #pragma clang diagnostic pop

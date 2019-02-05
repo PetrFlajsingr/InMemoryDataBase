@@ -172,11 +172,15 @@ class BaseDataSet {
    */
   virtual bool isFirst() const = 0;
 
+  virtual bool isBegin() const = 0;
+
   /**
    * Kontrola pruchodu vsemi zaznamy.
    * @return false pokud neni dostupny zadny dalsi zaznam pomoci next(), jinak true
    */
   virtual bool isLast() const = 0;
+
+  virtual bool isEnd() const = 0;
 
   /**
    * Field podle nazvu sloupce
@@ -190,7 +194,7 @@ class BaseDataSet {
    * @param index
    * @return
    */
-  virtual BaseField *fieldByIndex(uint64_t index) const = 0;
+  virtual BaseField *fieldByIndex(gsl::index index) const = 0;
 
   /**
    * Vsechny fields
@@ -279,7 +283,7 @@ class BaseDataSet {
    * @param index Index v zaznamu
    * @param type Typ dat
    */
-  virtual void setData(void *data, uint64_t index, ValueType type) = 0;
+  virtual void setData(void *data, gsl::index index, ValueType type) = 0;
 };
 }  // namespace DataSets
 

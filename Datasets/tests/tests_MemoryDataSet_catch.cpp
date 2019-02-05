@@ -50,12 +50,11 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
         }
         REQUIRE(rowCount == DATA_COUNT);
 
-        // TODO: predelat podobne jako DataProviders
         rowCount--;
         while (dataSet.previous()) {
           auto wat = data[rowCount][0];
           for (auto field : fields) {
-            REQUIRE(field->getAsString() == data[rowCount][field->getIndex()]);
+            CHECK(field->getAsString() == data[rowCount][field->getIndex()]);
           }
           auto wat2 = data[rowCount][0];
           rowCount--;

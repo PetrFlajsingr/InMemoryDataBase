@@ -98,7 +98,7 @@ class MemoryDataSet : public BaseDataSet {
 
   BaseField *fieldByName(std::string_view name) const override;
 
-  BaseField *fieldByIndex(uint64_t index) const override;
+  BaseField *fieldByIndex(gsl::index index) const override;
 
   std::vector<BaseField *> getFields() const override;
 
@@ -114,8 +114,12 @@ class MemoryDataSet : public BaseDataSet {
 
   bool findFirst(FilterItem &item) override;
 
+  bool isBegin() const override;
+
+  bool isEnd() const override;
+
  protected:
-  void setData(void *data, uint64_t index, ValueType type) override;
+  void setData(void *data, gsl::index index, ValueType type) override;
 
  private:
   /**

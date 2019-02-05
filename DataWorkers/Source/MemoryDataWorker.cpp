@@ -13,22 +13,20 @@ std::vector<std::string> DataWorkers::MemoryDataWorker::getMultiChoiceNames() {
 }
 
 std::vector<std::string> DataWorkers::MemoryDataWorker::getChoices(std::string choiceName) {
-  DataSets::BaseField* field = dataset->fieldByName(choiceName);
+  auto field = dataset->fieldByName(choiceName);
 
   DataSets::SortOptions sortOptions;
   sortOptions.addOption(field->getIndex(), SortOrder::Ascending);
   dataset->sort(sortOptions);
 
-  std::string value;
-
+  std::string_view value;
   std::vector<std::string> result;
 
-  while (!dataset->isLast()) {
+  while (dataset->next()) {
     if (field->getAsString() != value) {
       value = field->getAsString();
       result.emplace_back(value);
     }
-    dataset->next();
   }
 
   return result;
@@ -51,7 +49,7 @@ void DataWorkers::MemoryDataWorker::writeResult(DataWriters::BaseDataWriter &wri
 
   //  rozrazeni podle distinct hodnot
   DataSets::SortOptions sortOptions;
-  for (int i = 0;
+  for (gsl::index i = 0;
        i < dataset->getFieldNames().size()
            && i < queryData.projections.size();
        ++i) {
@@ -118,7 +116,7 @@ void DataWorkers::MemoryDataWorker::writeResult(DataWriters::BaseDataWriter &wri
   bool savedResults = false, writeResults = false;
   std::vector<std::string> results;
   results.reserve(queryData.projections.size());
-  while (!dataset->isLast()) {
+  while (dataset->next()) {
     for (auto accumulator : accumulators) {
       if (accumulator->step() && !savedResults) {
         for (auto toSave : accumulators) {
@@ -166,8 +164,6 @@ void DataWorkers::MemoryDataWorker::writeResult(DataWriters::BaseDataWriter &wri
       }
     }
     savedResults = false;
-
-    dataset->next();
   }
 
   for (auto toSave : accumulators) {
@@ -398,7 +394,8 @@ bool DataWorkers::ResultAccumulator::handleSum() {
       break;
     }
     case ValueType::String: {
-      throw IllegalStateException("Internal error. DataWorkers::ResultAccumulator::handleSum() on string");
+      throw IllegalStateException(
+          "Internal error. DataWorkers::ResultAccumulator::handleSum() on String");
     }
     case ValueType::Currency: {
       Currency value = reinterpret_cast<DataSets::CurrencyField *>(field)
@@ -460,6 +457,9 @@ std::string DataWorkers::ResultAccumulator::resultSum() {
       *data._currency = 0;
       return result;
     }
+    default:
+      throw IllegalStateException(
+          "Internal error. DataWorkers::ResultAccumulator::resultSum()");
   }
 }
 
@@ -480,6 +480,9 @@ std::string DataWorkers::ResultAccumulator::resultAverage() {
       *data._currency = 0;
       return result;
     }
+    default:
+      throw IllegalStateException(
+          "Internal error. DataWorkers::ResultAccumulator::resultSum()");
   }
 }
 
@@ -492,7 +495,8 @@ bool DataWorkers::ResultAccumulator::step() {
     case Operation::Average:
       return handleAverage();
     default:
-      throw IllegalStateException("Internal error.");
+      throw IllegalStateException(
+          "Internal error. DataWorkers::ResultAccumulator::step()");
   }
 }
 
@@ -532,6 +536,9 @@ std::string DataWorkers::ResultAccumulator::getResultForce() {
     case ValueType::DateTime: {
       return data._dateTime->toString();
     }
+    default:
+      throw IllegalStateException(
+          "Internal error. DataWorkers::ResultAccumulator::getResultForce()");
   }
 }
 

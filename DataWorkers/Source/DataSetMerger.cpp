@@ -26,7 +26,7 @@ gsl::not_null<DataSets::BaseDataSet *> DataWorkers::DataSetMerger::mergeDataSets
   // find required data sets
   auto dataSet1Iterator = std::find_if(dataSets.begin(),
                                        dataSets.end(),
-                                       [&dataSetName1](DataSets::BaseDataSet *dataSet) {
+                                       [&dataSetName1](const DataSets::BaseDataSet *dataSet) {
                                          return dataSet->getName() == dataSetName1;
                                        });
 
@@ -103,9 +103,8 @@ gsl::not_null<DataSets::BaseDataSet *> DataWorkers::DataSetMerger::mergeDataSets
   dataSet2->sort(options2);
 
   int8_t cmpResult;
-  while (!dataSet1->isLast()) {
-
-    while (!dataSet2->isLast()) {
+  while (dataSet1->next()) {
+    while (!dataSet2->isEnd()) {
       if (isIntegerField) {
         cmpResult = Utilities::compareInt(reinterpret_cast<DataSets::IntegerField *>(mergeField1)->getAsInteger(),
                                           reinterpret_cast<DataSets::IntegerField *>(mergeField2)->getAsInteger());
@@ -122,11 +121,9 @@ gsl::not_null<DataSets::BaseDataSet *> DataWorkers::DataSetMerger::mergeDataSets
         dataSet2->next();
       }
     }
-    if (dataSet2->isLast()) {
+    if (dataSet2->isEnd()) {
       break;
     }
-
-    dataSet1->next();
   }
 
   result->first();
