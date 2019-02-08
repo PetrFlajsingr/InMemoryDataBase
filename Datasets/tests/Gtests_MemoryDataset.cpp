@@ -11,6 +11,7 @@ using namespace DataProviders;
 
 class MemoryDataset_tests : public ::testing::Test {
  protected:
+  std::vector<ValueType> types;
   static const unsigned int columnCount = 5;
 
   MemoryDataSet *dataset{};
@@ -33,17 +34,13 @@ class MemoryDataset_tests : public ::testing::Test {
   void SetUp() override {
     dataset = new MemoryDataSet("main");
     dataProvider = new ArrayDataProvider(test);
-
-    dataset->setDataProvider(dataProvider);
-
-    std::vector<ValueType> types;
     for (int iter = 0; iter < dataProvider->getColumnCount(); iter++) {
-      types.push_back(StringValue);
+      types.push_back(ValueType::String);
     }
-    dataset->setFieldTypes(types);
   }
 
   void TearDown() override {
+    types.clear();
     delete dataset;
     delete dataProvider;
   }
@@ -53,6 +50,8 @@ class MemoryDataset_tests : public ::testing::Test {
 
  class MemoryDatasetSort_tests : public ::testing::Test {
   protected:
+   std::vector<ValueType> types;
+
    MemoryDataSet *dataset{};
 
    BaseDataProvider *dataProvider{};
@@ -73,35 +72,27 @@ class MemoryDataset_tests : public ::testing::Test {
 
   protected:
    void setAsInteger() {
-     std::vector<ValueType> types;
      for (int iter = 0; iter < dataProvider->getColumnCount(); iter++) {
-       types.push_back(IntegerValue);
+       types.push_back(ValueType::Integer);
      }
-     dataset->setFieldTypes(types);
    }
 
    void setAsDouble() {
-     std::vector<ValueType> types;
      for (int iter = 0; iter < dataProvider->getColumnCount(); iter++) {
-       types.push_back(DoubleValue);
+       types.push_back(ValueType::Double);
      }
-     dataset->setFieldTypes(types);
    }
 
    void setAsString() {
-     std::vector<ValueType> types;
      for (int iter = 0; iter < dataProvider->getColumnCount(); iter++) {
-       types.push_back(StringValue);
+       types.push_back(ValueType::String);
      }
-     dataset->setFieldTypes(types);
    }
 
    void setAsCurrency() {
-     std::vector<ValueType> types;
      for (int iter = 0; iter < dataProvider->getColumnCount(); iter++) {
-       types.push_back(CurrencyValue);
+       types.push_back(ValueType::Currency);
      }
-     dataset->setFieldTypes(types);
    }
   public:
    MemoryDatasetSort_tests() = default;
@@ -109,11 +100,10 @@ class MemoryDataset_tests : public ::testing::Test {
    void SetUp() override {
      dataset = new MemoryDataSet("main");
      dataProvider = new ArrayDataProvider(sortTest);
-
-     dataset->setDataProvider(dataProvider);
    }
 
    void TearDown() override {
+     types.clear();
      delete dataset;
      delete dataProvider;
    }
@@ -123,6 +113,7 @@ class MemoryDataset_tests : public ::testing::Test {
 
 class MemoryDatasetCurrency_tests : public ::testing::Test {
  protected:
+  std::vector<ValueType> types;
   std::vector<std::vector<std::string>> currencyData{{"0.00", "0.01", "0.10", "23.80", "248.99"},
                                                      {"0.80", "0.01", "0.10", "23.80", "248.99"},
                                                      {"1.00", "232.01", "0.10", "23.80", "248.99"},
@@ -142,17 +133,13 @@ class MemoryDatasetCurrency_tests : public ::testing::Test {
   void SetUp() override {
     dataset = new MemoryDataSet("main");
     dataProvider = new ArrayDataProvider(currencyData);
-
-    dataset->setDataProvider(dataProvider);
-
-    std::vector<ValueType> types;
     for (int iter = 0; iter < dataProvider->getColumnCount(); iter++) {
-      types.push_back(CurrencyValue);
+      types.push_back(ValueType::Currency);
     }
-    dataset->setFieldTypes(types);
   }
 
   void TearDown() override {
+    types.clear();
     delete dataset;
     delete dataProvider;
   }
@@ -161,7 +148,7 @@ class MemoryDatasetCurrency_tests : public ::testing::Test {
 };
 
 TEST_F(MemoryDataset_tests, open) {
-  ASSERT_NO_THROW(dataset->open());
+  ASSERT_NO_THROW(dataset->open(*dataProvider, types));
 
   auto value = dataset->getFieldNames();
 
@@ -173,7 +160,7 @@ TEST_F(MemoryDataset_tests, open) {
 }
 
 TEST_F(MemoryDataset_tests, columns) {
-  ASSERT_NO_THROW(dataset->open());
+  ASSERT_NO_THROW(dataset->open(*dataProvider, types));
 
   auto values = dataset->getFieldNames();
 
@@ -198,22 +185,21 @@ TEST_F(MemoryDataset_tests, fields) {
 }
 
 TEST_F(MemoryDataset_tests, read) {
-  ASSERT_NO_THROW(dataset->open());
+  ASSERT_NO_THROW(dataset->open(*dataProvider, types));
 
   unsigned int row = 0;
-  while (!dataset->eof()) {
+  while (dataset->next()) {
     for (int j = 0; j < 5; ++j) {
       EXPECT_EQ(dataset->fieldByIndex(j)->getAsString(), test[row][j]);
     }
     row++;
-    dataset->next();
   }
 
   EXPECT_EQ(row, 5);
 }
 
 TEST_F(MemoryDataset_tests, move_in_dataset) {
-  ASSERT_NO_THROW(dataset->open());
+  ASSERT_NO_THROW(dataset->open(*dataProvider, types));
 
   std::vector<BaseField *> fields;
   for (int i = 0; i < dataset->getFieldNames().size(); ++i) {
@@ -222,7 +208,7 @@ TEST_F(MemoryDataset_tests, move_in_dataset) {
 
   std::vector<std::string> temp;
   for (auto field : fields) {
-    temp.push_back(field->getAsString());
+    temp.push_back(std::string(field->getAsString()));
   }
   //
   dataset->next();
@@ -254,15 +240,13 @@ TEST_F(MemoryDataset_tests, move_in_dataset) {
   i = 0;
   temp.clear();
   for (auto field : fields) {
-    temp.push_back(field->getAsString());
+    temp.push_back(std::string(field->getAsString()));
     i++;
   }
   //
   dataset->first();
   //
-  while (!dataset->eof()) {
-    dataset->next();
-  }
+  while (dataset->next()) {}
 
   i = 0;
   for (auto field : fields) {
@@ -272,16 +256,16 @@ TEST_F(MemoryDataset_tests, move_in_dataset) {
 }
 
 TEST_F(MemoryDataset_tests, filter_equals) {
-  ASSERT_NO_THROW(dataset->open());
+  ASSERT_NO_THROW(dataset->open(*dataProvider, types));
 
   FilterOptions options;
   for (int i = 0; i < test[0].size(); ++i) {
     DataContainer container;
     container._string = strdup(("COLUMN" + std::to_string(i)).c_str());
-    options.addOption(i, ValueType::StringValue, {container}, EQUALS);
+    options.addOption(dataset->fieldByIndex(i),
+                      {container},
+                      FilterOption::Equals);
     dataset->filter(options);
-
-    EXPECT_TRUE(dataset->eof());
 
     options.options.clear();
   }
@@ -289,10 +273,11 @@ TEST_F(MemoryDataset_tests, filter_equals) {
     for (int j = 0; j < test[i].size(); ++j) {
       DataContainer container;
       container._string = strdup(("COLUMN" + std::to_string(i + 1) + std::to_string(j + 1)).c_str());
-      options.addOption(j, ValueType::StringValue, {container}, EQUALS);
+      options.addOption(dataset->fieldByIndex(j),
+                        {container},
+                        FilterOption::Equals);
       dataset->filter(options);
 
-      ASSERT_FALSE(dataset->eof());
       dataset->first();
       EXPECT_EQ(dataset->fieldByIndex(j)->getAsString(), test[i][j]);
 
@@ -302,16 +287,16 @@ TEST_F(MemoryDataset_tests, filter_equals) {
 }
 
 TEST_F(MemoryDataset_tests, filter_starts_with) {
-  ASSERT_NO_THROW(dataset->open());
+  ASSERT_NO_THROW(dataset->open(*dataProvider, types));
 
   FilterOptions options;
   for (int i = 0; i < test[0].size(); ++i) {
     DataContainer container;
     container._string = strdup("COL");
-    options.addOption(i, ValueType::StringValue, {container}, STARTS_WITH);
+    options.addOption(dataset->fieldByIndex(i),
+                      {container},
+                      FilterOption::StartsWith);
     dataset->filter(options);
-
-    ASSERT_FALSE(dataset->eof());
 
     options.options.clear();
 
@@ -322,76 +307,76 @@ TEST_F(MemoryDataset_tests, filter_starts_with) {
 }
 
 TEST_F(MemoryDataset_tests, filter_ends_with) {
-  ASSERT_NO_THROW(dataset->open());
+  ASSERT_NO_THROW(dataset->open(*dataProvider, types));
 
   FilterOptions options;
   for (int i = 0; i < test[0].size(); ++i) {
     DataContainer container;
     container._string = strdup("1");
-    options.addOption(i, ValueType::StringValue, {container}, ENDS_WITH);
+    options.addOption(dataset->fieldByIndex(i),
+                      {container},
+                      FilterOption::EndsWith);
     dataset->filter(options);
 
     options.options.clear();
 
     dataset->first();
     if (i == 0) {
-      ASSERT_FALSE(dataset->eof());
       for (int j = 0; j < test.size(); ++j) {
         EXPECT_EQ(dataset->fieldByIndex(i)->getAsString(), test[j][i]);
         dataset->next();
       }
     } else {
-      ASSERT_TRUE(dataset->eof());
     }
   }
 }
 
 TEST_F(MemoryDataset_tests, sort) {
-  ASSERT_NO_THROW(dataset->open());
+  ASSERT_NO_THROW(dataset->open(*dataProvider, types));
 
   SortOptions sortOptions0;
-  sortOptions0.addOption(0, Descending);
+  sortOptions0.addOption(dataset->fieldByIndex(0), SortOrder::Descending);
 
   //
   dataset->sort(sortOptions0);
   BaseField *col1 = dataset->fieldByIndex(0);
 
-  std::string previous = col1->getAsString();
+  auto previous = col1->getAsString();
 
   dataset->next();
-  while (!dataset->eof()) {
-    EXPECT_TRUE(std::strcmp(col1->getAsString().c_str(), previous.c_str()) < 0);
+  while (dataset->next()) {
+    EXPECT_TRUE(std::strcmp(std::string(col1->getAsString()).c_str(),
+                            std::string(previous).c_str()) < 0);
 
     previous = col1->getAsString();
-    dataset->next();
   }
   //\
   //
 
   SortOptions sortOptions3;
-  sortOptions3.addOption(3, Ascending);
+  sortOptions3.addOption(dataset->fieldByIndex(3), SortOrder::Ascending);
   dataset->sort(sortOptions3);
   BaseField *col3 = dataset->fieldByIndex(3);
 
   previous = col3->getAsString();
 
   dataset->next();
-  while (!dataset->eof()) {
-    EXPECT_TRUE(std::strcmp(col3->getAsString().c_str(), previous.c_str()) > 0);
+  while (dataset->next()) {
+    EXPECT_TRUE(std::strcmp(std::string(col3->getAsString()).c_str(),
+                            std::string(previous).c_str()) > 0);
 
     previous = col3->getAsString();
-    dataset->next();
   }
 }
 
 TEST_F(MemoryDataset_tests, append) {
-  ASSERT_NO_THROW(dataset->open());
+  ASSERT_NO_THROW(dataset->open(*dataProvider, types));
 
   std::vector<std::string> last;
 
   dataset->last();
   for (int i = 0; i < test[0].size(); ++i) {
-    last.push_back(dataset->fieldByIndex(i)->getAsString());
+    last.push_back(std::string(dataset->fieldByIndex(i)->getAsString()));
   }
 
   dataset->append();
@@ -415,40 +400,28 @@ TEST_F(MemoryDataset_tests, append) {
 }
 
 TEST_F(MemoryDataset_tests, append_provider) {
-  ASSERT_NO_THROW(dataset->open());
+  ASSERT_NO_THROW(dataset->open(*dataProvider, types));
 
   BaseDataProvider *provider = new ArrayDataProvider(test);
 
-  ASSERT_NO_THROW(dataset->appendDataProvider(provider));
+  ASSERT_NO_THROW(dataset->append(*provider));
 
   dataset->first();
 
   int row = 0;
-  while (!dataset->eof()) {
+  while (dataset->next()) {
     for (int i = 0; i < dataset->getFieldNames().size(); ++i) {
       EXPECT_EQ(dataset->fieldByIndex(i)->getAsString(), test[row % test.size()][i]);
     }
-
-    dataset->next();
     row++;
   }
 }
 
-TEST_F(MemoryDataset_tests, exceptions) {
-  ASSERT_NO_THROW(dataset->open());
-
-  SortOptions sortOptions;
-  sortOptions.addOption(233, Ascending);
-  EXPECT_THROW(dataset->sort(sortOptions), InvalidArgumentException);
-
-  EXPECT_THROW(dataset->appendDataProvider(nullptr), InvalidArgumentException);
-}
-
 TEST_F(MemoryDatasetCurrency_tests, read) {
-  ASSERT_NO_THROW(dataset->open());
+  ASSERT_NO_THROW(dataset->open(*dataProvider, types));
 
   unsigned int row = 0;
-  while (!dataset->eof()) {
+  while (dataset->next()) {
     for (int j = 0; j < 5; ++j) {
       auto *field = dynamic_cast<CurrencyField *>(dataset->fieldByIndex(j));
       EXPECT_EQ(field->getAsString(),
@@ -457,7 +430,6 @@ TEST_F(MemoryDatasetCurrency_tests, read) {
                 dec::fromString<Currency>(currencyData[row][j]));
     }
     row++;
-    dataset->next();
   }
 
   EXPECT_EQ(row, 5);
@@ -465,11 +437,11 @@ TEST_F(MemoryDatasetCurrency_tests, read) {
 
 TEST_F(MemoryDatasetSort_tests, sortAscendingInteger) {
   setAsInteger();
-  ASSERT_NO_THROW(dataset->open());
+  ASSERT_NO_THROW(dataset->open(*dataProvider, types));
 
   SortOptions options;
   for (int i = 0; i < 5;++i) {
-    options.addOption(i, Ascending);
+    options.addOption(dataset->fieldByIndex(i), SortOrder::Ascending);
   }
   //
 
@@ -485,7 +457,7 @@ TEST_F(MemoryDatasetSort_tests, sortAscendingInteger) {
 
   dataset->next();
   int cnt = 0;
-  while (!dataset->eof()) {
+  while (dataset->next()) {
     cnt++;
     for (int i = 0; i < 5; ++i) {
       EXPECT_GE(fields[i]->getAsInteger(), previous[i]);
@@ -497,19 +469,17 @@ TEST_F(MemoryDatasetSort_tests, sortAscendingInteger) {
     for (int i = 0; i < 5; ++i) {
       previous[i] = fields[i]->getAsInteger();
     }
-
-    dataset->next();
   }
 }
 
 
 TEST_F(MemoryDatasetSort_tests, sortDescendingInteger) {
   setAsInteger();
-  ASSERT_NO_THROW(dataset->open());
+  ASSERT_NO_THROW(dataset->open(*dataProvider, types));
 
   SortOptions options;
   for (int i = 0; i < 5;++i) {
-    options.addOption(i, Descending);
+    options.addOption(dataset->fieldByIndex(i), SortOrder::Descending);
   }
   //
 
@@ -525,7 +495,7 @@ TEST_F(MemoryDatasetSort_tests, sortDescendingInteger) {
 
   dataset->next();
   int cnt = 0;
-  while (!dataset->eof()) {
+  while (dataset->next()) {
     cnt++;
     for (int i = 0; i < 5; ++i) {
       EXPECT_LE(fields[i]->getAsInteger(), previous[i]);
@@ -537,25 +507,23 @@ TEST_F(MemoryDatasetSort_tests, sortDescendingInteger) {
     for (int i = 0; i < 5; ++i) {
       previous[i] = fields[i]->getAsInteger();
     }
-
-    dataset->next();
   }
 }
 
 
 TEST_F(MemoryDatasetSort_tests, sortCombinedInteger) {
   setAsInteger();
-  ASSERT_NO_THROW(dataset->open());
+  ASSERT_NO_THROW(dataset->open(*dataProvider, types));
 
-  SortOrder sortOrders[5] = {Ascending,
-                             Descending,
-                             Descending,
-                             Ascending,
-                             Descending};
+  SortOrder sortOrders[5] = {SortOrder::Ascending,
+                             SortOrder::Descending,
+                             SortOrder::Descending,
+                             SortOrder::Ascending,
+                             SortOrder::Descending};
 
   SortOptions options;
   for (int i = 0; i < 5;++i) {
-    options.addOption(i, sortOrders[i]);
+    options.addOption(dataset->fieldByIndex(i), sortOrders[i]);
   }
 
   //
@@ -572,10 +540,10 @@ TEST_F(MemoryDatasetSort_tests, sortCombinedInteger) {
 
   dataset->next();
   int cnt = 0;
-  while (!dataset->eof()) {
+  while (dataset->next()) {
     cnt++;
     for (int i = 0; i < 5; ++i) {
-      if (sortOrders[i] == Ascending) {
+      if (sortOrders[i] == SortOrder::Ascending) {
         EXPECT_GE(fields[i]->getAsInteger(), previous[i]);
       } else {
         EXPECT_LE(fields[i]->getAsInteger(), previous[i]);
@@ -588,18 +556,16 @@ TEST_F(MemoryDatasetSort_tests, sortCombinedInteger) {
     for (int i = 0; i < 5; ++i) {
       previous[i] = fields[i]->getAsInteger();
     }
-
-    dataset->next();
   }
 }
 
 TEST_F(MemoryDatasetSort_tests, sortAscendingDouble) {
   setAsDouble();
-  ASSERT_NO_THROW(dataset->open());
+  ASSERT_NO_THROW(dataset->open(*dataProvider, types));
 
   SortOptions options;
   for (int i = 0; i < 5;++i) {
-    options.addOption(i, Ascending);
+    options.addOption(dataset->fieldByIndex(i), SortOrder::Ascending);
   }
   //
 
@@ -615,7 +581,7 @@ TEST_F(MemoryDatasetSort_tests, sortAscendingDouble) {
 
   dataset->next();
   int cnt = 0;
-  while (!dataset->eof()) {
+  while (dataset->next()) {
     cnt++;
     for (int i = 0; i < 5; ++i) {
       EXPECT_GE(fields[i]->getAsDouble(), previous[i]);
@@ -627,19 +593,17 @@ TEST_F(MemoryDatasetSort_tests, sortAscendingDouble) {
     for (int i = 0; i < 5; ++i) {
       previous[i] = fields[i]->getAsDouble();
     }
-
-    dataset->next();
   }
 }
 
 
 TEST_F(MemoryDatasetSort_tests, sortDescendingDouble) {
   setAsDouble();
-  ASSERT_NO_THROW(dataset->open());
+  ASSERT_NO_THROW(dataset->open(*dataProvider, types));
 
   SortOptions options;
   for (int i = 0; i < 5;++i) {
-    options.addOption(i, Descending);
+    options.addOption(dataset->fieldByIndex(i), SortOrder::Descending);
   }
   //
 
@@ -655,7 +619,7 @@ TEST_F(MemoryDatasetSort_tests, sortDescendingDouble) {
 
   dataset->next();
   int cnt = 0;
-  while (!dataset->eof()) {
+  while (dataset->next()) {
     cnt++;
     for (int i = 0; i < 5; ++i) {
       EXPECT_LE(fields[i]->getAsDouble(), previous[i]);
@@ -667,25 +631,23 @@ TEST_F(MemoryDatasetSort_tests, sortDescendingDouble) {
     for (int i = 0; i < 5; ++i) {
       previous[i] = fields[i]->getAsDouble();
     }
-
-    dataset->next();
   }
 }
 
 
 TEST_F(MemoryDatasetSort_tests, sortCombinedDouble) {
   setAsDouble();
-  ASSERT_NO_THROW(dataset->open());
+  ASSERT_NO_THROW(dataset->open(*dataProvider, types));
 
-  SortOrder sortOrders[5] = {Ascending,
-                             Descending,
-                             Descending,
-                             Ascending,
-                             Descending};
+  SortOrder sortOrders[5] = {SortOrder::Ascending,
+                             SortOrder::Descending,
+                             SortOrder::Descending,
+                             SortOrder::Ascending,
+                             SortOrder::Descending};
 
   SortOptions options;
   for (int i = 0; i < 5;++i) {
-    options.addOption(i, sortOrders[i]);
+    options.addOption(dataset->fieldByIndex(i), sortOrders[i]);
   }
 
   //
@@ -702,10 +664,10 @@ TEST_F(MemoryDatasetSort_tests, sortCombinedDouble) {
 
   dataset->next();
   int cnt = 0;
-  while (!dataset->eof()) {
+  while (dataset->next()) {
     cnt++;
     for (int i = 0; i < 5; ++i) {
-      if (sortOrders[i] == Ascending) {
+      if (sortOrders[i] == SortOrder::Ascending) {
         EXPECT_GE(fields[i]->getAsDouble(), previous[i]);
       } else {
         EXPECT_LE(fields[i]->getAsDouble(), previous[i]);
@@ -718,18 +680,16 @@ TEST_F(MemoryDatasetSort_tests, sortCombinedDouble) {
     for (int i = 0; i < 5; ++i) {
       previous[i] = fields[i]->getAsDouble();
     }
-
-    dataset->next();
   }
 }
 
 TEST_F(MemoryDatasetSort_tests, sortAscendingString) {
   setAsString();
-  ASSERT_NO_THROW(dataset->open());
+  ASSERT_NO_THROW(dataset->open(*dataProvider, types));
 
   SortOptions options;
   for (int i = 0; i < 5;++i) {
-    options.addOption(i, Ascending);
+    options.addOption(dataset->fieldByIndex(i), SortOrder::Ascending);
   }
   //
 
@@ -745,7 +705,7 @@ TEST_F(MemoryDatasetSort_tests, sortAscendingString) {
 
   dataset->next();
   int cnt = 0;
-  while (!dataset->eof()) {
+  while (dataset->next()) {
     cnt++;
     for (int i = 0; i < 5; ++i) {
       EXPECT_GE(fields[i]->getAsString(), previous[i]);
@@ -757,19 +717,17 @@ TEST_F(MemoryDatasetSort_tests, sortAscendingString) {
     for (int i = 0; i < 5; ++i) {
       previous[i] = fields[i]->getAsString();
     }
-
-    dataset->next();
   }
 }
 
 
 TEST_F(MemoryDatasetSort_tests, sortDescendingString) {
   setAsString();
-  ASSERT_NO_THROW(dataset->open());
+  ASSERT_NO_THROW(dataset->open(*dataProvider, types));
 
   SortOptions options;
   for (int i = 0; i < 5;++i) {
-    options.addOption(i, Descending);
+    options.addOption(dataset->fieldByIndex(i), SortOrder::Descending);
   }
   //
 
@@ -785,7 +743,7 @@ TEST_F(MemoryDatasetSort_tests, sortDescendingString) {
 
   dataset->next();
   int cnt = 0;
-  while (!dataset->eof()) {
+  while (dataset->next()) {
     cnt++;
     for (int i = 0; i < 5; ++i) {
       EXPECT_LE(fields[i]->getAsString(), previous[i]);
@@ -797,25 +755,23 @@ TEST_F(MemoryDatasetSort_tests, sortDescendingString) {
     for (int i = 0; i < 5; ++i) {
       previous[i] = fields[i]->getAsString();
     }
-
-    dataset->next();
   }
 }
 
 
 TEST_F(MemoryDatasetSort_tests, sortCombinedString) {
   setAsString();
-  ASSERT_NO_THROW(dataset->open());
+  ASSERT_NO_THROW(dataset->open(*dataProvider, types));
 
-  SortOrder sortOrders[5] = {Ascending,
-                             Descending,
-                             Descending,
-                             Ascending,
-                             Descending};
+  SortOrder sortOrders[5] = {SortOrder::Ascending,
+                             SortOrder::Descending,
+                             SortOrder::Descending,
+                             SortOrder::Ascending,
+                             SortOrder::Descending};
 
   SortOptions options;
   for (int i = 0; i < 5;++i) {
-    options.addOption(i, sortOrders[i]);
+    options.addOption(dataset->fieldByIndex(i), sortOrders[i]);
   }
 
   //
@@ -832,10 +788,10 @@ TEST_F(MemoryDatasetSort_tests, sortCombinedString) {
 
   dataset->next();
   int cnt = 0;
-  while (!dataset->eof()) {
+  while (dataset->next()) {
     cnt++;
     for (int i = 0; i < 5; ++i) {
-      if (sortOrders[i] == Ascending) {
+      if (sortOrders[i] == SortOrder::Ascending) {
         EXPECT_GE(fields[i]->getAsString(), previous[i]);
       } else {
         EXPECT_LE(fields[i]->getAsString(), previous[i]);
@@ -848,19 +804,17 @@ TEST_F(MemoryDatasetSort_tests, sortCombinedString) {
     for (int i = 0; i < 5; ++i) {
       previous[i] = fields[i]->getAsString();
     }
-
-    dataset->next();
   }
 }
 
 
 TEST_F(MemoryDatasetSort_tests, sortAscendingCurrency) {
   setAsCurrency();
-  ASSERT_NO_THROW(dataset->open());
+  ASSERT_NO_THROW(dataset->open(*dataProvider, types));
 
   SortOptions options;
   for (int i = 0; i < 5;++i) {
-    options.addOption(i, Ascending);
+    options.addOption(dataset->fieldByIndex(i), SortOrder::Ascending);
   }
   //
 
@@ -876,7 +830,7 @@ TEST_F(MemoryDatasetSort_tests, sortAscendingCurrency) {
 
   dataset->next();
   int cnt = 0;
-  while (!dataset->eof()) {
+  while (dataset->next()) {
     cnt++;
     for (int i = 0; i < 5; ++i) {
       EXPECT_GE(fields[i]->getAsCurrency(), previous[i]);
@@ -888,19 +842,17 @@ TEST_F(MemoryDatasetSort_tests, sortAscendingCurrency) {
     for (int i = 0; i < 5; ++i) {
       previous[i] = fields[i]->getAsCurrency();
     }
-
-    dataset->next();
   }
 }
 
 
 TEST_F(MemoryDatasetSort_tests, sortDescendingCurrency) {
   setAsCurrency();
-  ASSERT_NO_THROW(dataset->open());
+  ASSERT_NO_THROW(dataset->open(*dataProvider, types));
 
   SortOptions options;
   for (int i = 0; i < 5; ++i) {
-    options.addOption(i, Descending);
+    options.addOption(dataset->fieldByIndex(i), SortOrder::Descending);
   }
   //
 
@@ -916,7 +868,7 @@ TEST_F(MemoryDatasetSort_tests, sortDescendingCurrency) {
 
   dataset->next();
   int cnt = 0;
-  while (!dataset->eof()) {
+  while (dataset->next()) {
     cnt++;
     for (int i = 0; i < 5; ++i) {
       EXPECT_LE(fields[i]->getAsCurrency(), previous[i]);
@@ -928,25 +880,23 @@ TEST_F(MemoryDatasetSort_tests, sortDescendingCurrency) {
     for (int i = 0; i < 5; ++i) {
       previous[i] = fields[i]->getAsCurrency();
     }
-
-    dataset->next();
   }
 }
 
 
 TEST_F(MemoryDatasetSort_tests, sortCombinedCurrency) {
   setAsCurrency();
-  ASSERT_NO_THROW(dataset->open());
+  ASSERT_NO_THROW(dataset->open(*dataProvider, types));
 
-  SortOrder sortOrders[5] = {Ascending,
-                             Descending,
-                             Descending,
-                             Ascending,
-                             Descending};
+  SortOrder sortOrders[5] = {SortOrder::Ascending,
+                             SortOrder::Descending,
+                             SortOrder::Descending,
+                             SortOrder::Ascending,
+                             SortOrder::Descending};
 
   SortOptions options;
   for (int i = 0; i < 5;++i) {
-    options.addOption(i, sortOrders[i]);
+    options.addOption(dataset->fieldByIndex(i), sortOrders[i]);
   }
 
   //
@@ -963,10 +913,10 @@ TEST_F(MemoryDatasetSort_tests, sortCombinedCurrency) {
 
   dataset->next();
   int cnt = 0;
-  while (!dataset->eof()) {
+  while (dataset->next()) {
     cnt++;
     for (int i = 0; i < 5; ++i) {
-      if (sortOrders[i] == Ascending) {
+      if (sortOrders[i] == SortOrder::Ascending) {
         EXPECT_GE(fields[i]->getAsCurrency(), previous[i]);
       } else {
         EXPECT_LE(fields[i]->getAsCurrency(), previous[i]);
@@ -979,7 +929,5 @@ TEST_F(MemoryDatasetSort_tests, sortCombinedCurrency) {
     for (int i = 0; i < 5; ++i) {
       previous[i] = fields[i]->getAsCurrency();
     }
-
-    dataset->next();
   }
 }

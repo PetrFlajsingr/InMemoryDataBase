@@ -95,14 +95,15 @@ gsl::not_null<DataSets::BaseDataSet *> DataWorkers::DataSetMerger::mergeDataSets
   auto isIntegerField = mergeField1->getFieldType() == ValueType::Integer;
 
   DataSets::SortOptions options1;
-  options1.addOption(mergeField1->getIndex(), SortOrder::Ascending);
+  options1.addOption(mergeField1, SortOrder::Ascending);
   dataSet1->sort(options1);
 
   DataSets::SortOptions options2;
-  options2.addOption(mergeField2->getIndex(), SortOrder::Ascending);
+  options2.addOption(mergeField2, SortOrder::Ascending);
   dataSet2->sort(options2);
 
   int8_t cmpResult;
+  dataSet2->first();
   while (dataSet1->next()) {
     while (!dataSet2->isEnd()) {
       if (isIntegerField) {

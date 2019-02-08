@@ -31,7 +31,7 @@ class DateTimeField : public BaseField {
   DateTime getAsDateTime() const;
 
   std::function<int8_t(const DataSetRow &,
-                       const DataSetRow &)> getCompareFunction() override;
+                       const DataSetRow &)> getCompareFunction() const override;
 
  protected:
   void setValue(void *data) override;

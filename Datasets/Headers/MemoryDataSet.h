@@ -118,6 +118,8 @@ class MemoryDataSet : public BaseDataSet {
 
   bool isEnd() const override;
 
+  gsl::index getCurrentRecord() const override;
+
  protected:
   void setData(void *data, gsl::index index, ValueType type) override;
 

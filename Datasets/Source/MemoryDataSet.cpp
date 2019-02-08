@@ -114,14 +114,14 @@ bool DataSets::MemoryDataSet::setFieldValues(gsl::index index,
     bool found = false;
 
     if (searchForward) {
-      for (iter = index; iter < data.size(); iter++) {
+      for (iter = index; iter <= getLast(); iter++) {
         if (data[iter].valid) {
           found = true;
           break;
         }
       }
     } else {
-      for (iter = index; iter >= 0; iter--) {
+      for (iter = index; iter >= getFirst(); iter--) {
         if (data[iter].valid) {
           found = true;
           break;
@@ -179,16 +179,16 @@ void DataSets::MemoryDataSet::last() {
 
 bool DataSets::MemoryDataSet::next() {
   currentRecord++;
-  if (currentRecord == data.size() - 1) {
+  if (currentRecord >= data.size() - 1) {
     return false;
   }
   setFieldValues(currentRecord, true);
-  return true;
+  return data[currentRecord].valid;
 }
 
 bool DataSets::MemoryDataSet::previous() {
   currentRecord--;
-  if (currentRecord == 0) {
+  if (currentRecord <= 0) {
     return false;
   }
   setFieldValues(currentRecord, false);
@@ -200,7 +200,7 @@ void DataSets::MemoryDataSet::sort(SortOptions &options) {
   bool isInRange = std::all_of(options.options.begin(),
                                options.options.end(),
                                [fieldCount](SortItem &item) {
-                                 return item.fieldIndex < fieldCount;
+                                 return item.field->getIndex() < fieldCount;
                                });
   if (!isInRange) {
     throw InvalidArgumentException("Field index is out of bounds");
@@ -212,8 +212,8 @@ void DataSets::MemoryDataSet::sort(SortOptions &options) {
   std::transform(options.options.begin(),
                  options.options.end(),
                  std::back_inserter(compareFunctions),
-                 [this](const SortItem &option) {
-                   return fields[option.fieldIndex]->getCompareFunction();
+                 [](const SortItem &option) {
+                   return option.field->getCompareFunction();
                  });
 
   auto optionArray = options.options;
@@ -253,6 +253,7 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
   gsl::index i = 0;
   for (const auto &iter : data) {
     if (iter.cells.empty()) {
+      ++i;
       continue;
     }
     bool valid = true;
@@ -263,13 +264,14 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
         break;
       }
 
-      if (filter.type == ValueType::String) {
-        std::string toCompare = iter.cells[filter.fieldIndex]._string;
+      // TODO: predelat na objekt?
+      if (filter.field->getFieldType() == ValueType::String) {
+        std::string toCompare = iter.cells[filter.field->getIndex()]._string;
         for (const auto &search : filter.searchData) {
           switch (filter.filterOption) {
             case FilterOption::Equals:
-              valid = std::strcmp(toCompare.c_str(),
-                                  search._string) == 0;
+              valid = Utilities::compareString(toCompare,
+                                               search._string) == 0;
               break;
             case FilterOption::StartsWith:
               valid = std::strncmp(toCompare.c_str(),
@@ -298,25 +300,29 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
                                            search._string);
               break;
           }
+          if (valid) {
+            break;
+          }
         }
-      } else if (filter.type == ValueType::Integer) {
-        auto toCompare = iter.cells[filter.fieldIndex]._integer;
+
+      } else if (filter.field->getFieldType() == ValueType::Integer) {
+        auto toCompare = iter.cells[filter.field->getIndex()]._integer;
         for (const auto &search : filter.searchData) {
           valid = Utilities::compareInt(toCompare, search._integer) == 0;
         }
-      } else if (filter.type == ValueType::Double) {
-        auto toCompare = iter.cells[filter.fieldIndex]._double;
+      } else if (filter.field->getFieldType() == ValueType::Double) {
+        auto toCompare = iter.cells[filter.field->getIndex()]._double;
         for (const auto &search : filter.searchData) {
-          valid = Utilities::compareDouble(toCompare, search._integer) == 0;
+          valid = Utilities::compareDouble(toCompare, search._double) == 0;
         }
-      } else if (filter.type == ValueType::Currency) {
-        auto toCompare = iter.cells[filter.fieldIndex]._currency;
+      } else if (filter.field->getFieldType() == ValueType::Currency) {
+        auto toCompare = iter.cells[filter.field->getIndex()]._currency;
         for (const auto &search : filter.searchData) {
           valid =
               Utilities::compareCurrency(*toCompare, *search._currency) == 0;
         }
-      } else if (filter.type == ValueType::DateTime) {
-        auto toCompare = iter.cells[filter.fieldIndex]._dateTime;
+      } else if (filter.field->getFieldType() == ValueType::DateTime) {
+        auto toCompare = iter.cells[filter.field->getIndex()]._dateTime;
         for (const auto &search : filter.searchData) {
           valid =
               Utilities::compareDateTime(*toCompare, *search._dateTime) == 0;
@@ -330,7 +336,7 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
     i++;
   }
 
-  first();
+  currentRecord = 0;
 }
 
 DataSets::BaseField *DataSets::MemoryDataSet::fieldByName(
@@ -387,6 +393,7 @@ void DataSets::MemoryDataSet::setData(void *data,
 
 void DataSets::MemoryDataSet::append() {
   data.pop_back();
+  data.emplace_back(DataSetRow{true, {}});
   for (auto &field : fields) {
     switch (field->getFieldType()) {
       case ValueType::Integer:data.back().cells.emplace_back(DataContainer{._integer = 0});
@@ -404,8 +411,8 @@ void DataSets::MemoryDataSet::append() {
             "Internal error DataSets::MemoryDataSet::append().");
     }
   }
-  last();
   data.emplace_back(stopItem);
+  last();
 }
 
 void DataSets::MemoryDataSet::append(
@@ -424,106 +431,81 @@ DataSets::MemoryDataSet::MemoryDataSet(std::string_view dataSetName)
 #pragma ide diagnostic ignored "OCDFAInspection"
 // TODO: predelat na iterator a std::lower_bound
 bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
-  auto field = fields[item.fieldIndex];
   unsigned long min = getFirst(), max = getLast();
+  currentRecord = (min + max) >> 1;
+  //setFieldValues(currentRecord, true);
   bool breakLoop = false;
 
   do {
     int8_t comparisonResult;
-    switch (field->getFieldType()) {
+    switch (item.field->getFieldType()) {
       case ValueType::String:
         comparisonResult = Utilities::compareString(
-            field->getAsString(),
+            data[currentRecord].cells[item.field->getIndex()]._string,
             item.searchData[0]._string);
+        //item.field->getAsString(),
+        //item.searchData[0]._string);
         break;
       case ValueType::Integer:
         comparisonResult = Utilities::compareInt(
-            reinterpret_cast<IntegerField *>(field.get())->getAsInteger(),
+            data[currentRecord].cells[item.field->getIndex()]._integer,
             item.searchData[0]._integer);
+        //reinterpret_cast<const IntegerField *>(item.field)->getAsInteger(),
+        //item.searchData[0]._integer);
         break;
       case ValueType::Double:
         comparisonResult = Utilities::compareDouble(
-            reinterpret_cast<DoubleField *>(field.get())->getAsDouble(),
+            data[currentRecord].cells[item.field->getIndex()]._double,
             item.searchData[0]._double);
+        //reinterpret_cast<const DoubleField *>(item.field)->getAsDouble(),
+        //item.searchData[0]._double);
         break;
       case ValueType::Currency: {
-        auto cur =
-            reinterpret_cast<CurrencyField *>(field.get())->getAsCurrency();
+        //auto cur =
+        //    reinterpret_cast<const CurrencyField *>(item.field)->getAsCurrency();
         comparisonResult = Utilities::compareCurrency(
-            cur,
+            *data[currentRecord].cells[item.field->getIndex()]._currency,
             *item.searchData[0]._currency);
+        //cur,
+        //*item.searchData[0]._currency);
+        break;
       }
         break;
       case ValueType::DateTime:
-        auto dateTime =
-            reinterpret_cast<DateTimeField *>(field.get())->getAsDateTime();
+        //auto dateTime =
+        //    reinterpret_cast<const DateTimeField *>(item.field)->getAsDateTime();
         comparisonResult =
-            Utilities::compareDateTime(dateTime, *item.searchData[0]._dateTime);
+            Utilities::compareDateTime(
+                *data[currentRecord].cells[item.field->getIndex()]._dateTime,
+                *item.searchData[0]._dateTime);
+        //dateTime,
+        //*item.searchData[0]._dateTime);
         break;
     }
     switch (comparisonResult) {
-      case 0:return true;
+      case 0:setFieldValues(currentRecord, true);
+        return true;
       case -1:min = currentRecord;
         currentRecord = (min + max) >> 1;
-        setFieldValues(currentRecord, true);
         break;
       case 1:max = currentRecord;
         currentRecord = (min + max) >> 1;
-        setFieldValues(currentRecord, true);
         break;
       default:
         throw IllegalStateException(
             "Internal error DataSets::MemoryDataSet::findFirst");
     }
+    if (currentRecord < getFirst() || currentRecord > getLast()) {
+      return false;
+    }
+    //setFieldValues(currentRecord, true);
     if (max - min < 2) {
       if (breakLoop) {
         return false;
       }
       breakLoop = true;
     }
-  } while (currentRecord > 0 && currentRecord < data.size());
-
-  if (currentRecord == 0) {
-    int8_t comparisonResult;
-    switch (field->getFieldType()) {
-      case ValueType::String:
-        comparisonResult = Utilities::compareString(
-            field->getAsString(),
-            item.searchData[0]._string);
-        break;
-      case ValueType::Integer:
-        comparisonResult = Utilities::compareInt(
-            reinterpret_cast<IntegerField *>(field.get())->getAsInteger(),
-            item.searchData[0]._integer);
-        break;
-      case ValueType::Double:
-        comparisonResult = Utilities::compareDouble(
-            reinterpret_cast<DoubleField *>(field.get())->getAsDouble(),
-            item.searchData[0]._double);
-        break;
-      case ValueType::Currency: {
-        Currency
-            cur =
-            reinterpret_cast<CurrencyField *>(field.get())->getAsCurrency();
-        comparisonResult = Utilities::compareCurrency(
-            cur,
-            *item.searchData[0]._currency);
-      }
-        break;
-      case ValueType::DateTime:
-        DateTime dateTime =
-            reinterpret_cast<DateTimeField *>(field.get())->getAsDateTime();
-        comparisonResult = Utilities::compareDateTime(
-            dateTime,
-            *item.searchData[0]._dateTime);
-        break;
-    }
-
-    if (comparisonResult == 0) {
-      return true;
-    }
-  }
-  return false;
+  } while (currentRecord >= getFirst() && currentRecord <= getLast());
 }
 
 std::vector<DataSets::BaseField *> DataSets::MemoryDataSet::getFields() const {
@@ -538,9 +520,9 @@ std::vector<std::string> DataSets::MemoryDataSet::getFieldNames() const {
   std::vector<std::string> result;
   std::transform(fields.begin(),
                  fields.end(),
-                 result.begin(),
+                 std::back_inserter(result),
                  [](const std::shared_ptr<BaseField> &field) {
-                   return field->getFieldName();
+                   return std::string(field->getFieldName());
                  });
   return result;
 }
@@ -563,6 +545,9 @@ bool DataSets::MemoryDataSet::isBegin() const {
 
 bool DataSets::MemoryDataSet::isEnd() const {
   return currentRecord == data.size() - 1;
+}
+gsl::index DataSets::MemoryDataSet::getCurrentRecord() const {
+  return getLast();
 }
 
 #pragma clang diagnostic pop

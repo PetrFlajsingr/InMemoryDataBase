@@ -29,11 +29,11 @@ std::string_view DataSets::CurrencyField::getAsString() const {
 }
 
 std::function<int8_t(const DataSets::DataSetRow &,
-                     const DataSets::DataSetRow &)> DataSets::CurrencyField::getCompareFunction() {
+                     const DataSets::DataSetRow &)> DataSets::CurrencyField::getCompareFunction() const {
   return [this](const DataSetRow &a,
                 const DataSetRow &b) {
-    return Utilities::compareCurrency(*a.cells[index]._currency,
-                                      *b.cells[index]._currency);
+    return Utilities::compareCurrency(*a.cells[getIndex()]._currency,
+                                      *b.cells[getIndex()]._currency);
   };
 }
 

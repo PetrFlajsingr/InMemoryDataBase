@@ -12,5 +12,5 @@ void DataSets::BaseDataSet::setFieldData(BaseField *field, void *data) {
 }
 
 gsl::index DataSets::BaseDataSet::getColumnCount() const {
-  return columnCount;
+  return fields.size();
 }

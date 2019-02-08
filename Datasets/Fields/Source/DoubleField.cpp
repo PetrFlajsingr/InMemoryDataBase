@@ -37,11 +37,11 @@ double DataSets::DoubleField::getAsDouble() const {
 }
 
 std::function<int8_t(const DataSets::DataSetRow &,
-                     const DataSets::DataSetRow &)> DataSets::DoubleField::getCompareFunction() {
+                     const DataSets::DataSetRow &)> DataSets::DoubleField::getCompareFunction() const {
   return [this](const DataSetRow &a,
                 const DataSetRow &b) {
-    return Utilities::compareDouble(a.cells[index]._double,
-                                    b.cells[index]._double);
+    return Utilities::compareDouble(a.cells[getIndex()]._double,
+                                    b.cells[getIndex()]._double);
   };
 }
 

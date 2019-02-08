@@ -44,6 +44,9 @@ bool DataProviders::CsvReader::next() {
   }
 
   parseRecord();
+  if (currentRecord.size() != header.size()) {
+    return false;
+  }
   currentRecordNumber++;
 
   return true;

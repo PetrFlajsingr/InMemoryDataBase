@@ -1,7 +1,7 @@
 //
 // Created by Petr Flajsingr on 12/11/2018.
 //
-
+#include <MemoryDataWorker.h>
 #include <MemoryDataSet.h>
 
 DataWorkers::MemoryDataWorker::MemoryDataWorker(gsl::not_null<DataSets::BaseDataSet *> dataSet) {
@@ -16,7 +16,7 @@ std::vector<std::string> DataWorkers::MemoryDataWorker::getChoices(std::string c
   auto field = dataset->fieldByName(choiceName);
 
   DataSets::SortOptions sortOptions;
-  sortOptions.addOption(field->getIndex(), SortOrder::Ascending);
+  sortOptions.addOption(field, SortOrder::Ascending);
   dataset->sort(sortOptions);
 
   std::string_view value;
@@ -56,18 +56,19 @@ void DataWorkers::MemoryDataWorker::writeResult(DataWriters::BaseDataWriter &wri
     if (queryData.projections[i].tableName == "main" &&
         queryData.projections[i].operation == Operation::Distinct) {
       sortOptions.addOption(
-          dataset->fieldByName(queryData.projections[i].columnName)->getIndex(),
+          dataset->fieldByName(queryData.projections[i].columnName),
           SortOrder::Ascending);
     }
   }
 
-  std::thread mainDataSetSortThread(&MemoryDataWorker::T_ThreadSort, this, std::ref(sortOptions));
+  std::thread mainDataSetSortThread
+      (&MemoryDataWorker::T_ThreadSort, this, std::ref(sortOptions));
 
   bool doJoin = !queryData.joins.empty();
   std::vector<InnerJoinStructure> joinStructures;
 
   //  akumulatory pro vysveldky pro kazdy radek
-  std::vector<ResultAccumulator*> accumulators;
+  std::vector<ResultAccumulator *> accumulators;
   for (auto &op : queryData.projections) {
     if (op.tableName == "main") {
       accumulators.emplace_back(
@@ -80,18 +81,21 @@ void DataWorkers::MemoryDataWorker::writeResult(DataWriters::BaseDataWriter &wri
   if (doJoin) {
     for (int i = 0; i < queryData.joins.size(); ++i) {
       InnerJoinStructure joinStructure;
-      joinStructure.indexAddi =
-          additionalDataSets[i]->fieldByName(queryData.joins[i].column2Name)->getIndex();
+      joinStructure.fieldAddi =
+          additionalDataSets[i]->fieldByName(queryData.joins[i].column2Name);
 
       std::string searchedName = queryData.joins[i].column1Name;
-      joinStructure.indexMain = std::find_if(accumulators.begin(),
-          accumulators.end(),
-          [&searchedName] (ResultAccumulator *acc) {
-        return acc->getName() == searchedName;
-      }) - accumulators.begin();
-      for (auto & proj : queryData.projections) {
+      joinStructure.fieldMain =
+          dataset->fieldByIndex(std::find_if(accumulators.begin(),
+                                             accumulators.end(),
+                                             [&searchedName](ResultAccumulator *acc) {
+                                               return acc->getName()
+                                                   == searchedName;
+                                             }) - accumulators.begin());
+      for (auto &proj : queryData.projections) {
         if (proj.tableName == queryData.joins[i].table2Name) {
-          joinStructure.projectFields.emplace_back(additionalDataSets[i]->fieldByName(proj.columnName));
+          joinStructure.projectFields.emplace_back(additionalDataSets[i]->fieldByName(
+              proj.columnName));
         }
       }
 
@@ -100,9 +104,10 @@ void DataWorkers::MemoryDataWorker::writeResult(DataWriters::BaseDataWriter &wri
       }
       joinStructures.emplace_back(joinStructure);
       DataSets::SortOptions options;
-      options.addOption(joinStructure.indexAddi,
+      options.addOption(joinStructure.fieldAddi,
                         SortOrder::Ascending);
       additionalDataSets[i]->sort(options);
+      additionalDataSets[i]->first();
     }
   }
 
@@ -126,12 +131,11 @@ void DataWorkers::MemoryDataWorker::writeResult(DataWriters::BaseDataWriter &wri
         //  pokud je pozadovan join, je nutne hledat v dalsich tabulkach
         if (doJoin) {
           for (gsl::index i = 0; i < joinStructures.size(); ++i) {
-            ValueType type = dataset->fieldByIndex(joinStructures[i].indexMain)->getFieldType();
-            DataContainer container = accumulators[joinStructures[i].indexMain]->getContainer();
+            DataContainer container =
+                accumulators[joinStructures[i].fieldMain->getIndex()]->getContainer();
 
-            DataSets::FilterItem item {
-                joinStructures[i].indexAddi,
-                type,
+            DataSets::FilterItem item{
+                joinStructures[i].fieldAddi,
                 {container},
                 DataSets::FilterOption::Equals
             };
@@ -172,12 +176,14 @@ void DataWorkers::MemoryDataWorker::writeResult(DataWriters::BaseDataWriter &wri
 
   if (doJoin) {
     for (int i = 0; i < joinStructures.size(); ++i) {
-      ValueType type = dataset->fieldByIndex(joinStructures[i].indexMain)->getFieldType();
-      DataContainer container = accumulators[joinStructures[i].indexMain]->getContainer();
+      ValueType type =
+          joinStructures[i].fieldMain->getFieldType();
+      DataContainer
+          container =
+          accumulators[joinStructures[i].fieldMain->getIndex()]->getContainer();
 
       DataSets::FilterItem item {
-          joinStructures[i].indexAddi,
-          type,
+          joinStructures[i].fieldAddi,
           {container},
           DataSets::FilterOption::Equals
       };
@@ -216,7 +222,7 @@ void DataWorkers::MemoryDataWorker::writeHeaders(DataWriters::BaseDataWriter &wr
                  std::back_inserter(header),
                  [](const ProjectionOperation &op) {
                    return op.columnName + OperationToString(op.operation);
-  });
+                 });
 
   writer.writeHeader(header);
 }
@@ -233,8 +239,7 @@ void DataWorkers::MemoryDataWorker::filterDataSet() {
       DataContainer container;
       for (std::string &value : selection.reqs) {
         switch (type) {
-          case ValueType::String:
-            container._string = strdup(value.c_str());
+          case ValueType::String:container._string = strdup(value.c_str());
             break;
           case ValueType::Integer:
             container._integer = Utilities::stringToInt(value);
@@ -252,8 +257,7 @@ void DataWorkers::MemoryDataWorker::filterDataSet() {
       }
 
       filterOptions.addOption(
-          field->getIndex(),
-          type,
+          field,
           filterSelection,
           DataSets::FilterOption::Equals);
     }
@@ -267,19 +271,16 @@ void DataWorkers::MemoryDataWorker::T_ThreadSort(DataSets::SortOptions &sortOpti
 }
 
 DataWorkers::ResultAccumulator::ResultAccumulator(DataSets::BaseField *field,
-    Operation op) : field(field), operation(op) {
+                                                  Operation op)
+    : field(field), operation(op) {
   switch (field->getFieldType()) {
-    case ValueType::String:
-      data._string = nullptr;
+    case ValueType::String:data._string = nullptr;
       break;
-    case ValueType::Integer:
-      data._integer = 0;
+    case ValueType::Integer:data._integer = 0;
       break;
-    case ValueType::Double:
-      data._double = 0.0;
+    case ValueType::Double:data._double = 0.0;
       break;
-    case ValueType::Currency:
-      data._currency = new Currency();
+    case ValueType::Currency:data._currency = new Currency();
       previousData._currency = new Currency();
       break;
     case ValueType::DateTime:data._dateTime = new DateTime();
@@ -332,9 +333,9 @@ bool DataWorkers::ResultAccumulator::handleDistinct() {
         return false;
       }
       if (value != data._string) {
-        previousData._string = strdup(data._string);
+        delete[] previousData._string;
+        previousData._string = data._string;
         result = data._string;
-        delete[] data._string;
         data._string = Utilities::copyStringToNewChar(value);
         distinct = true;
         return true;
@@ -404,7 +405,8 @@ bool DataWorkers::ResultAccumulator::handleSum() {
       break;
     }
     case ValueType::DateTime:
-      throw IllegalStateException("Internal error. DataWorkers::ResultAccumulator::handleSum() on DateTime");
+      throw IllegalStateException(
+          "Internal error. DataWorkers::ResultAccumulator::handleSum() on DateTime");
   }
   return false;
 }
@@ -425,7 +427,8 @@ bool DataWorkers::ResultAccumulator::handleAverage() {
       break;
     }
     case ValueType::String: {
-      throw IllegalStateException("Internal error. DataWorkers::ResultAccumulator::handleAverage() on string");
+      throw IllegalStateException(
+          "Internal error. DataWorkers::ResultAccumulator::handleAverage() on string");
     }
     case ValueType::Currency: {
       Currency value = reinterpret_cast<DataSets::CurrencyField *>(field)
@@ -434,7 +437,8 @@ bool DataWorkers::ResultAccumulator::handleAverage() {
       break;
     }
     case ValueType::DateTime: {
-      throw IllegalStateException("Internal error. DataWorkers::ResultAccumulator::handleAverage() on DateTime");
+      throw IllegalStateException(
+          "Internal error. DataWorkers::ResultAccumulator::handleAverage() on DateTime");
     }
   }
   return false;
@@ -488,12 +492,9 @@ std::string DataWorkers::ResultAccumulator::resultAverage() {
 
 bool DataWorkers::ResultAccumulator::step() {
   switch (operation) {
-    case Operation::Distinct:
-      return handleDistinct();
-    case Operation::Sum:
-      return handleSum();
-    case Operation::Average:
-      return handleAverage();
+    case Operation::Distinct:return handleDistinct();
+    case Operation::Sum:return handleSum();
+    case Operation::Average:return handleAverage();
     default:
       throw IllegalStateException(
           "Internal error. DataWorkers::ResultAccumulator::step()");
@@ -502,12 +503,9 @@ bool DataWorkers::ResultAccumulator::step() {
 
 std::string DataWorkers::ResultAccumulator::getResult() {
   switch (operation) {
-    case Operation::Distinct:
-      return resultDistinct();
-    case Operation::Sum:
-      return resultSum();
-    case Operation::Average:
-      return resultAverage();
+    case Operation::Distinct:return resultDistinct();
+    case Operation::Sum:return resultSum();
+    case Operation::Average:return resultAverage();
   }
   throw IllegalStateException("Internal error.");
 }

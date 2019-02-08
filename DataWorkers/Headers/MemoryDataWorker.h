@@ -5,14 +5,14 @@
 #ifndef CSV_READER_FINMDATAWORKER_H
 #define CSV_READER_FINMDATAWORKER_H
 
-#include "BaseDataWorker.h"
-#include "Exceptions.h"
-#include "BaseField.h"
-#include "IntegerField.h"
-#include "DoubleField.h"
-#include "CurrencyField.h"
-#include "StringField.h"
-#include "SortStructures.h"
+#include <BaseDataWorker.h>
+#include <Exceptions.h>
+#include <BaseField.h>
+#include <IntegerField.h>
+#include <DoubleField.h>
+#include <CurrencyField.h>
+#include <StringField.h>
+#include <SortStructures.h>
 
 namespace DataWorkers {
 
@@ -78,8 +78,8 @@ class MemoryDataWorker : public BaseDataWorker {
 
  private:
   struct InnerJoinStructure {
-    gsl::index indexAddi;
-    gsl::index indexMain;
+    DataSets::BaseField *fieldAddi;
+    DataSets::BaseField *fieldMain;
 
     std::vector<DataSets::BaseField*> projectFields;
   };

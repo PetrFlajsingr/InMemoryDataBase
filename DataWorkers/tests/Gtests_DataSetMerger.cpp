@@ -58,15 +58,15 @@ class DataSetMerger_tests : public ::testing::Test {
   void SetUp() override {
     dataProvider1A = new ArrayDataProvider(test1A);
     dataSet1A = new MemoryDataSet("A");
-    dataSet1A->setDataProvider(dataProvider1A);
-    dataSet1A->setFieldTypes({StringValue, StringValue, StringValue, StringValue, StringValue});
-    dataSet1A->open();
+    dataSet1A->open(*dataProvider1A,
+                    {ValueType::String, ValueType::String, ValueType::String,
+                     ValueType::String, ValueType::String});
 
     dataProvider1B = new ArrayDataProvider(test1B);
     dataSet1B = new MemoryDataSet("B");
-    dataSet1B->setDataProvider(dataProvider1B);
-    dataSet1B->setFieldTypes({StringValue, StringValue, StringValue, StringValue, StringValue});
-    dataSet1B->open();
+    dataSet1B->open(*dataProvider1B,
+                    {ValueType::String, ValueType::String, ValueType::String,
+                     ValueType::String, ValueType::String});
   }
 
   void TearDown() override {

@@ -9,8 +9,9 @@
 #include <CsvWriter.h>
 #include <BaseDataSet.h>
 #include <FilterStructures.h>
+#include <Logger.h>
+#include <MemoryDataSet.h>
 #include "SQLParser.h"
-
 namespace DataWorkers {
 
 class BaseDataWorker {

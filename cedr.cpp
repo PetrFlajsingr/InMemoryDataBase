@@ -30,7 +30,7 @@ const std::string poskytovatelDotaceCSVName = "poskytovatelDotace.csv";
 
 const std::string
     QUERY =
-    "SELECT main.idDotace, main.projektKod, main.idPrijemce, main.projektNazev, main.iriOperacniProgram, "
+    "SELECT main.idDotace, main.projektIdnetifikator, main.idPrijemce, main.projektNazev, main.iriOperacniProgram, "
     "main.iriGrantoveSchema, main.idRozhodnuti, main.castkaCerpana, main.castkaUvolnena, "
     "main.iriDotacniTitul, main.iriPoskytovatelDotace, main.rozpoctoveObdobi, "
     "prijemce_subjekty.idPrijemce, prijemce_subjekty.ico, prijemce_subjekty.obchodniJmeno, "
@@ -137,70 +137,51 @@ void measure(int index) {
 }
 
 int main(int argc, char **argv) {
-  measure(argc);
-  return 0;
-  writerTest();
-  for (auto i = 0; i < 1; ++i) {
-    Logger::getInstance().startTime();
-    //iterExample();
-    //checkDupl();
-    //dominikKontrola();
-    //countIntersection();
-    Logger::getInstance().endTime();
-    Logger::getInstance().printElapsedTime();
-  }
-  return 0;
   Logger::getInstance().startTime();
   // open input files
-  auto dotaceProvider =
-      new DataProviders::CsvReader(csvPath + dotaceCSVName, ",");
-  auto rozhodnutiProvider =
-      new DataProviders::CsvReader(csvPath + rozhodnutiCSVName, ",");
-  auto obdobiProvider =
-      new DataProviders::CsvReader(csvPath + obdobiCSVName, ",");
-  auto prijemceProvider =
-      new DataProviders::CsvReader(csvPath + prijemceCSVName, ",");
-  auto subjektyProvider =
-      new DataProviders::CsvReader(csvPath + subjektyCSVName, ";");
+  DataProviders::CsvReader dotaceProvider(csvPath + dotaceCSVName, ",");
+  DataProviders::CsvReader rozhodnutiProvider(csvPath + rozhodnutiCSVName, ",");
+  DataProviders::CsvReader obdobiProvider(csvPath + obdobiCSVName, ",");
+  DataProviders::CsvReader prijemceProvider(csvPath + prijemceCSVName, ",");
+  DataProviders::CsvReader subjektyProvider(csvPath + subjektyCSVName, ";");
 
   Logger::getInstance().log(LogLevel::Debug, "Providers prepared", true);
   auto dotaceDataSet = new DataSets::MemoryDataSet("dotace");
-  dotaceDataSet->setDataProvider(dotaceProvider);
-  dotaceDataSet->setFieldTypes({ValueType::String, ValueType::String,
-                                ValueType::String,
-                                ValueType::String, ValueType::String,
-                                ValueType::String});
-  dotaceDataSet->open(<#initializer#>, <#initializer#>);
+  dotaceDataSet->open(dotaceProvider, {ValueType::String, ValueType::String,
+                                       ValueType::String,
+                                       ValueType::String, ValueType::String,
+                                       ValueType::String});
   Logger::getInstance().log(LogLevel::Debug, "Dotace loaded", true);
+
   auto rozhodnutiDataSet = new DataSets::MemoryDataSet("rozhodnuti");
-  rozhodnutiDataSet->setDataProvider(rozhodnutiProvider);
-  rozhodnutiDataSet->setFieldTypes({ValueType::String, ValueType::String,
-                                    ValueType::String});
-  rozhodnutiDataSet->open(<#initializer#>, <#initializer#>);
+  rozhodnutiDataSet->open(rozhodnutiProvider, {ValueType::String,
+                                               ValueType::String,
+                                               ValueType::String});
   Logger::getInstance().log(LogLevel::Debug, "Rozhodnuti loaded", true);
+
   DataWorkers::DataSetMerger merger;
   merger.addDataSet(dotaceDataSet);
   merger.addDataSet(rozhodnutiDataSet);
-
   auto dotace_rozhodnutiDataSet =
       merger.mergeDataSets("dotace", "rozhodnuti", "idDotace", "idDotace");
   Logger::getInstance().log(LogLevel::Debug, "Merged dotace, rozhodnuti", true);
+
   merger.removeDataSet("dotace");
   merger.removeDataSet("rozhodnuti");
   delete dotaceDataSet;
   delete rozhodnutiDataSet;
 
   auto obdobiDataSet = new DataSets::MemoryDataSet("obdobi");
-  obdobiDataSet->setDataProvider(obdobiProvider);
-  obdobiDataSet->setFieldTypes({ValueType::String, ValueType::String,
-                                ValueType::Currency,
-                                ValueType::Currency, ValueType::String,
-                                ValueType::String});
-  obdobiDataSet->open(<#initializer#>, <#initializer#>);
+  obdobiDataSet->open(obdobiProvider, {ValueType::String,
+                                       ValueType::String,
+                                       ValueType::Currency,
+                                       ValueType::Currency,
+                                       ValueType::String,
+                                       ValueType::String});
   Logger::getInstance().log(LogLevel::Debug, "Obdobi loaded", true);
+
   merger.addDataSet(dotace_rozhodnutiDataSet);
   merger.addDataSet(obdobiDataSet);
-
   auto dotace_rozhodnuti_obdobiDataSet =
       merger.mergeDataSets("dotace_rozhodnuti",
                            "obdobi",
@@ -218,20 +199,21 @@ int main(int argc, char **argv) {
       new DataWorkers::MemoryDataWorker(dotace_rozhodnuti_obdobiDataSet);
 
   auto prijemceDataSet = new DataSets::MemoryDataSet("prijemce");
-  prijemceDataSet->setDataProvider(prijemceProvider);
-  prijemceDataSet->setFieldTypes({ValueType::String, ValueType::Integer,
-                                  ValueType::String});
-  prijemceDataSet->open(<#initializer#>, <#initializer#>);
+  prijemceDataSet->open(prijemceProvider, {ValueType::String,
+                                           ValueType::Integer,
+                                           ValueType::String});
   Logger::getInstance().log(LogLevel::Debug, "Prijemce loaded", true);
+
   auto subjektyDataSet = new DataSets::MemoryDataSet("subjekty");
-  subjektyDataSet->setDataProvider(subjektyProvider);
-  subjektyDataSet->setFieldTypes({ValueType::Integer, ValueType::Integer,
-                                  ValueType::Integer,
-                                  ValueType::String, ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String});
-  subjektyDataSet->open(<#initializer#>, <#initializer#>);
+  subjektyDataSet->open(subjektyProvider, {ValueType::Integer,
+                                           ValueType::Integer,
+                                           ValueType::Integer,
+                                           ValueType::String,
+                                           ValueType::String,
+                                           ValueType::String,
+                                           ValueType::String});
   Logger::getInstance().log(LogLevel::Debug, "Subjekty loaded", true);
+
   merger.addDataSet(subjektyDataSet);
   merger.addDataSet(prijemceDataSet);
   auto prijemce_subjektyDataSet =
@@ -240,36 +222,36 @@ int main(int argc, char **argv) {
   delete subjektyDataSet;
   delete prijemceDataSet;
 
-  auto operacniProgramProvider =
-      new DataProviders::CsvReader(csvPath + operacniProgramCSVName, ",");
+  DataProviders::CsvReader
+      operacniProgramProvider(csvPath + operacniProgramCSVName, ",");
   auto operacniProgramDataSet = new DataSets::MemoryDataSet("operacniProgram");
-  operacniProgramDataSet->setDataProvider(operacniProgramProvider);
-  operacniProgramDataSet->setFieldTypes({ValueType::String, ValueType::String});
-  operacniProgramDataSet->open(<#initializer#>, <#initializer#>);
+  operacniProgramDataSet->open(operacniProgramProvider, {ValueType::String,
+                                                         ValueType::String});
   Logger::getInstance().log(LogLevel::Debug, "operacniProgram loaded", true);
-  auto grantoveSchemaProvider =
-      new DataProviders::CsvReader(csvPath + grantoveSchemaCSVName, ",");
+
+  DataProviders::CsvReader
+      grantoveSchemaProvider(csvPath + grantoveSchemaCSVName, ",");
   auto grantoveSchemaDataSet = new DataSets::MemoryDataSet("grantoveSchema");
-  grantoveSchemaDataSet->setDataProvider(grantoveSchemaProvider);
-  grantoveSchemaDataSet->setFieldTypes({ValueType::String, ValueType::String});
-  grantoveSchemaDataSet->open(<#initializer#>, <#initializer#>);
+  grantoveSchemaDataSet->open(grantoveSchemaProvider, {ValueType::String,
+                                                       ValueType::String});
   Logger::getInstance().log(LogLevel::Debug, "grantoveSchema loaded", true);
-  auto dotaceTitulProvider =
-      new DataProviders::CsvReader(csvPath + dotacniTitulCSVName, ",");
+
+  DataProviders::CsvReader
+      dotaceTitulProvider(csvPath + dotacniTitulCSVName, ",");
   auto dotaceTitulDataSet = new DataSets::MemoryDataSet("dotaceTitul");
-  dotaceTitulDataSet->setDataProvider(dotaceTitulProvider);
-  dotaceTitulDataSet->setFieldTypes({ValueType::String, ValueType::String});
-  dotaceTitulDataSet->open(<#initializer#>, <#initializer#>);
+  dotaceTitulDataSet->open(dotaceTitulProvider, {ValueType::String,
+                                                 ValueType::String});
   Logger::getInstance().log(LogLevel::Debug, "dotaceTitul loaded", true);
-  auto poskytovatelDotaceProvider =
-      new DataProviders::CsvReader(csvPath + poskytovatelDotaceCSVName, ",");
+
+  DataProviders::CsvReader
+      poskytovatelDotaceProvider(csvPath + poskytovatelDotaceCSVName, ",");
   auto poskytovatelDotaceDataSet =
       new DataSets::MemoryDataSet("poskytovatelDotace");
-  poskytovatelDotaceDataSet->setDataProvider(poskytovatelDotaceProvider);
-  poskytovatelDotaceDataSet->setFieldTypes({ValueType::String,
-                                            ValueType::String});
-  poskytovatelDotaceDataSet->open(<#initializer#>, <#initializer#>);
+  poskytovatelDotaceDataSet->open(poskytovatelDotaceProvider,
+                                  {ValueType::String,
+                                   ValueType::String});
   Logger::getInstance().log(LogLevel::Debug, "poskytovatelDotace loaded", true);
+
   dataWorker->addDataSet(prijemce_subjektyDataSet);
   dataWorker->addDataSet(operacniProgramDataSet);
   dataWorker->addDataSet(grantoveSchemaDataSet);
@@ -307,11 +289,11 @@ int main(int argc, char **argv) {
   delete dataWriter;
 
   delete dataWorker;
-  delete subjektyProvider;
   delete operacniProgramDataSet;
   delete grantoveSchemaDataSet;
   delete dotaceTitulDataSet;
   delete poskytovatelDotaceDataSet;
+  delete prijemce_subjektyDataSet;
   Logger::getInstance().log(LogLevel::Debug, "Done", true);
   Logger::getInstance().endTime();
   Logger::getInstance().printElapsedTime();

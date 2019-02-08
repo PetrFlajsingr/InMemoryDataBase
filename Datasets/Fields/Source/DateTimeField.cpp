@@ -15,6 +15,7 @@ ValueType DataSets::DateTimeField::getFieldType() const {
 
 void DataSets::DateTimeField::setAsString(std::string_view value) {
   data.fromString(value);
+  setData(&data, ValueType::DateTime);
 }
 
 std::string_view DataSets::DateTimeField::getAsString() const {
@@ -22,11 +23,11 @@ std::string_view DataSets::DateTimeField::getAsString() const {
 }
 
 std::function<int8_t(const DataSets::DataSetRow &,
-                     const DataSets::DataSetRow &)> DataSets::DateTimeField::getCompareFunction() {
+                     const DataSets::DataSetRow &)> DataSets::DateTimeField::getCompareFunction() const {
   return [this](const DataSetRow &a,
                 const DataSetRow &b) {
-    return Utilities::compareDateTime(*a.cells[index]._dateTime,
-                                      *b.cells[index]._dateTime);
+    return Utilities::compareDateTime(*a.cells[getIndex()]._dateTime,
+                                      *b.cells[getIndex()]._dateTime);
   };
 }
 

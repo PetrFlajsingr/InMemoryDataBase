@@ -136,15 +136,23 @@ class DataWorker_tests : public ::testing::Test {
 };
 
 TEST_F(DataWorker_tests, basicCreate) {
-  EXPECT_NO_THROW(worker = new MemoryDataWorker(dataProvider,
-                                                {StringValue, IntegerValue, StringValue, StringValue, StringValue}));
+  EXPECT_NO_THROW(worker = new MemoryDataWorker(*dataProvider,
+                                                {ValueType::String,
+                                                 ValueType::Integer,
+                                                 ValueType::String,
+                                                 ValueType::String,
+                                                 ValueType::String}));
 
   delete worker;
 }
 
 TEST_F(DataWorker_tests, choices) {
-  EXPECT_NO_THROW(worker = new MemoryDataWorker(dataProvider,
-                                                {StringValue, IntegerValue, StringValue, StringValue, StringValue}));
+  EXPECT_NO_THROW(worker = new MemoryDataWorker(*dataProvider,
+                                                {ValueType::String,
+                                                 ValueType::Integer,
+                                                 ValueType::String,
+                                                 ValueType::String,
+                                                 ValueType::String}));
 
   std::vector<std::string> choices {"COLUMN11", "COLUMN13"};
   worker->setColumnChoices(choices);
@@ -161,19 +169,22 @@ TEST_F(DataWorker_tests, choices) {
 TEST_F(DataWorker_tests, basicDistinct) {
   auto provider = new DataProviders::ArrayDataProvider(basicTest);
 
-  EXPECT_NO_THROW(worker = new MemoryDataWorker(provider,
-                                                {StringValue, IntegerValue, StringValue, StringValue, StringValue}));
+  EXPECT_NO_THROW(worker = new MemoryDataWorker(*provider,
+                                                {ValueType::String,
+                                                 ValueType::Integer,
+                                                 ValueType::String,
+                                                 ValueType::String,
+                                                 ValueType::String}));
 
   std::string sql = "SELECT main.0 FROM main";
 
   DataWriters::ArrayWriter writer;
-  writer.result = new std::vector<std::vector<std::string>>();
 
   worker->writeResult(writer, sql);
 
-  EXPECT_EQ((*writer.result)[0][0], "0");
-  for (int i = 1; i < writer.result->size(); ++i) {
-    EXPECT_EQ((*writer.result)[i][0], basicTest[i - 1][0]);
+  EXPECT_EQ((writer.result)[0][0], "0");
+  for (int i = 1; i < writer.result.size(); ++i) {
+    EXPECT_EQ((writer.result)[i][0], basicTest[i - 1][0]);
   }
 
   delete worker;
@@ -181,19 +192,22 @@ TEST_F(DataWorker_tests, basicDistinct) {
 }
 
 TEST_F(DataWorker_tests, advancedDinstinct) {
-  EXPECT_NO_THROW(worker = new MemoryDataWorker(advDataProvider,
-                                                {StringValue, IntegerValue, CurrencyValue, CurrencyValue, IntegerValue,
-                                                 CurrencyValue}));
+  EXPECT_NO_THROW(worker = new MemoryDataWorker(*advDataProvider,
+                                                {ValueType::String,
+                                                 ValueType::Integer,
+                                                 ValueType::Currency,
+                                                 ValueType::Currency,
+                                                 ValueType::Integer,
+                                                 ValueType::Currency}));
 
   std::string sql = "SELECT main.0, main.1, SUM(main.2), SUM(main.3), SUM(main.4), SUM(main.5) FROM main";
 
   DataWriters::ArrayWriter writer;
-  writer.result = new std::vector<std::vector<std::string>>();
 
   worker->writeResult(writer, sql);
 
   for (int i = 0; i < advTest[0].size(); ++i) {
-    EXPECT_EQ((*writer.result)[0][i], advAnswers[0][i]);
+    EXPECT_EQ((writer.result)[0][i], advAnswers[0][i]);
   }
 
   delete worker;
@@ -202,19 +216,22 @@ TEST_F(DataWorker_tests, advancedDinstinct) {
 TEST_F(DataWorker_tests, basicSum) {
   auto provider = new DataProviders::ArrayDataProvider(basicTest);
 
-  EXPECT_NO_THROW(worker = new MemoryDataWorker(provider,
-                                                {StringValue, IntegerValue, StringValue, StringValue, StringValue}));
+  EXPECT_NO_THROW(worker = new MemoryDataWorker(*provider,
+                                                {ValueType::String,
+                                                 ValueType::Integer,
+                                                 ValueType::String,
+                                                 ValueType::String,
+                                                 ValueType::String}));
 
   std::string sql = "SELECT main.0, SUM(main.1) FROM main";
 
   DataWriters::ArrayWriter writer;
-  writer.result = new std::vector<std::vector<std::string>>();
 
   worker->writeResult(writer, sql);
 
-  EXPECT_EQ((*writer.result)[0][1], "1(Sum)");
-  for (int i = 1; i < writer.result->size(); ++i) {
-    EXPECT_EQ((*writer.result)[i][1], basicTest[i - 1][1]);
+  EXPECT_EQ((writer.result)[0][1], "1(Sum)");
+  for (int i = 1; i < writer.result.size(); ++i) {
+    EXPECT_EQ((writer.result)[i][1], basicTest[i - 1][1]);
   }
 
   delete worker;
@@ -222,21 +239,24 @@ TEST_F(DataWorker_tests, basicSum) {
 }
 
 TEST_F(DataWorker_tests, advancedSum) {
-  EXPECT_NO_THROW(worker = new MemoryDataWorker(advDataProvider,
-                                                {StringValue, IntegerValue, CurrencyValue, CurrencyValue, IntegerValue,
-                                                 CurrencyValue}));
+  EXPECT_NO_THROW(worker = new MemoryDataWorker(*advDataProvider,
+                                                {ValueType::String,
+                                                 ValueType::Integer,
+                                                 ValueType::Currency,
+                                                 ValueType::Currency,
+                                                 ValueType::Integer,
+                                                 ValueType::Currency}));
 
 
   std::string sql = "SELECT main.0, main.1, SUM(main.2), SUM(main.3), SUM(main.4), SUM(main.5) FROM main";
 
   DataWriters::ArrayWriter writer;
-  writer.result = new std::vector<std::vector<std::string>>();
 
   worker->writeResult(writer, sql);
 
-  for (int i = 0; i < (*writer.result).size(); ++i) {
-    for (int j = 0; j < (*writer.result)[i].size();++j) {
-      EXPECT_STREQ((*writer.result)[i][j].c_str(), advAnswers[i][j].c_str());
+  for (int i = 0; i < (writer.result).size(); ++i) {
+    for (int j = 0; j < (writer.result)[i].size(); ++j) {
+      EXPECT_STREQ((writer.result)[i][j].c_str(), advAnswers[i][j].c_str());
     }
   }
 
@@ -246,19 +266,22 @@ TEST_F(DataWorker_tests, advancedSum) {
 TEST_F(DataWorker_tests, basicAverage) {
   auto provider = new DataProviders::ArrayDataProvider(basicTest);
 
-  EXPECT_NO_THROW(worker = new MemoryDataWorker(provider,
-                                                {StringValue, IntegerValue, IntegerValue, StringValue, StringValue}));
+  EXPECT_NO_THROW(worker = new MemoryDataWorker(*provider,
+                                                {ValueType::String,
+                                                 ValueType::Integer,
+                                                 ValueType::Integer,
+                                                 ValueType::String,
+                                                 ValueType::String}));
 
   std::string sql = "SELECT main.0, AVG(main.2) FROM main";
 
   DataWriters::ArrayWriter writer;
-  writer.result = new std::vector<std::vector<std::string>>();
 
   worker->writeResult(writer, sql);
 
-  EXPECT_EQ((*writer.result)[0][1], "2(Avg)");
-  for (int i = 1; i < writer.result->size(); ++i) {
-    EXPECT_EQ((*writer.result)[i][1], basicTest[i - 1][2]);
+  EXPECT_EQ((writer.result)[0][1], "2(Avg)");
+  for (int i = 1; i < writer.result.size(); ++i) {
+    EXPECT_EQ((writer.result)[i][1], basicTest[i - 1][2]);
   }
 
   delete worker;
@@ -266,42 +289,48 @@ TEST_F(DataWorker_tests, basicAverage) {
 }
 
 TEST_F(DataWorker_tests, selection) {
-  EXPECT_NO_THROW(worker = new MemoryDataWorker(advDataProvider,
-                                                {StringValue, IntegerValue, CurrencyValue, CurrencyValue, IntegerValue,
-                                                 CurrencyValue}));
+  EXPECT_NO_THROW(worker = new MemoryDataWorker(*advDataProvider,
+                                                {ValueType::String,
+                                                 ValueType::Integer,
+                                                 ValueType::Currency,
+                                                 ValueType::Currency,
+                                                 ValueType::Integer,
+                                                 ValueType::Currency}));
 
   std::string sql = "SELECT main.0, AVG(main.2) FROM main WHERE main.0 = prvni | druhy";
 
   DataWriters::ArrayWriter writer;
-  writer.result = new std::vector<std::vector<std::string>>();
 
   worker->writeResult(writer, sql);
 
-  EXPECT_EQ((*writer.result)[0][0], "0");
-  for (int i = 1; i < writer.result->size(); ++i) {
-    EXPECT_TRUE((*writer.result)[i][0] == "prvni" or
-      (*writer.result)[i][0] == "druhy");
+  EXPECT_EQ((writer.result)[0][0], "0");
+  for (int i = 1; i < writer.result.size(); ++i) {
+    EXPECT_TRUE((writer.result)[i][0] == "prvni" or
+        (writer.result)[i][0] == "druhy");
   }
 
   delete worker;
 }
 
 TEST_F(DataWorker_tests, mix) {
-  EXPECT_NO_THROW(worker = new MemoryDataWorker(dataProvider,
-                                                {StringValue, IntegerValue, IntegerValue, StringValue, StringValue}));
+  EXPECT_NO_THROW(worker = new MemoryDataWorker(*dataProvider,
+                                                {ValueType::String,
+                                                 ValueType::Integer,
+                                                 ValueType::Integer,
+                                                 ValueType::String,
+                                                 ValueType::String}));
 
     std::string sql = "SELECT main.0, main.1, SUM(main.2), main.3, main.4 FROM main";
 
     auto joinProvider = new DataProviders::ArrayDataProvider(joinTest);
 
   DataWriters::ArrayWriter writer;
-    writer.result = new std::vector<std::vector<std::string>>();
 
     worker->writeResult(writer, sql);
 
-    for (int i = 0; i < (*writer.result).size(); ++i) {
-      for (int j = 0; j < (*writer.result)[i].size(); ++j) {
-        EXPECT_STREQ((*writer.result)[i][j].c_str(), mixedTest[i][j].c_str());
+  for (int i = 0; i < (writer.result).size(); ++i) {
+    for (int j = 0; j < (writer.result)[i].size(); ++j) {
+      EXPECT_STREQ((writer.result)[i][j].c_str(), mixedTest[i][j].c_str());
       }
     }
 
@@ -309,29 +338,30 @@ TEST_F(DataWorker_tests, mix) {
 }
 
 TEST_F(DataWorker_tests, join) {
-  EXPECT_NO_THROW(worker = new MemoryDataWorker(dataProvider,
-                                                {StringValue, IntegerValue, IntegerValue, StringValue, StringValue}));
+  EXPECT_NO_THROW(worker = new MemoryDataWorker(*dataProvider,
+                                                {ValueType::String,
+                                                 ValueType::Integer,
+                                                 ValueType::Integer,
+                                                 ValueType::String,
+                                                 ValueType::String}));
 
   std::string sql = "SELECT main.0, main.1, SUM(main.2), main.3, main.4, joinTest.1 FROM main JOIN joinTest ON main.1 = joinTest.0";
 
   auto joinProvider = new DataProviders::ArrayDataProvider(joinTest);
   auto joinDataSet = new DataSets::MemoryDataSet("joinTest");
-  joinDataSet->setDataProvider(joinProvider);
-  joinDataSet->setFieldTypes({IntegerValue, StringValue});
-  joinDataSet->open();
+  joinDataSet->open(*joinProvider, {ValueType::Integer, ValueType::String});
 
   worker->addDataSet(joinDataSet);
 
   DataWriters::ArrayWriter writer;
-  writer.result = new std::vector<std::vector<std::string>>();
 
   worker->writeResult(writer, sql);
 
   writer.print();
 
-  for (int i = 0; i < (*writer.result).size(); ++i) {
-    for (int j = 0; j < (*writer.result)[i].size(); ++j) {
-      EXPECT_STREQ((*writer.result)[i][j].c_str(), joinAnswers[i][j].c_str());
+  for (int i = 0; i < (writer.result).size(); ++i) {
+    for (int j = 0; j < (writer.result)[i].size(); ++j) {
+      EXPECT_STREQ((writer.result)[i][j].c_str(), joinAnswers[i][j].c_str());
     }
   }
 
@@ -339,9 +369,13 @@ TEST_F(DataWorker_tests, join) {
 }
 
 TEST_F(DataWorker_tests, uniqueValues) {
-  EXPECT_NO_THROW(worker = new MemoryDataWorker(advDataProvider,
-                                                {StringValue, IntegerValue, CurrencyValue, CurrencyValue, IntegerValue,
-                                                 CurrencyValue}));
+  EXPECT_NO_THROW(worker = new MemoryDataWorker(*advDataProvider,
+                                                {ValueType::String,
+                                                 ValueType::Integer,
+                                                 ValueType::Currency,
+                                                 ValueType::Currency,
+                                                 ValueType::Integer,
+                                                 ValueType::Currency}));
 
   std::vector<std::string> cols = {"0", "1"};
   worker->setColumnChoices(cols);

@@ -78,13 +78,9 @@ class BaseField {
    *    -1 pokud je prvni mensi
    */
   virtual std::function<int8_t(const DataSetRow &,
-                               const DataSetRow &)> getCompareFunction() = 0;
+                               const DataSetRow &)> getCompareFunction() const = 0;
 
  protected:
-  std::string fieldName;  //< Nazev reprezentovaneho sloupce
-
-  gsl::index index;  //< Index sloupce
-
   friend class BaseDataSet;  //< Pro pristup k primemu nastaveni dat
 
   BaseDataSet *dataSet;
@@ -103,7 +99,13 @@ class BaseField {
    * @param type typ dat
    */
   void setData(void *data, ValueType type);
+
+ private:
+  std::string fieldName;  //< Nazev reprezentovaneho sloupce
+
+  gsl::index index;  //< Index sloupce
 };
+
 }  // namespace DataSets
 
 #endif  // DATASETS_FIELDS_HEADERS_BASEFIELD_H_

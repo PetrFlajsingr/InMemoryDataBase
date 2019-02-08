@@ -214,6 +214,8 @@ class BaseDataSet {
    */
   gsl::index getColumnCount() const;
 
+  virtual gsl::index getCurrentRecord() const = 0;
+
   /**
    * Vytvoreni noveho zaznamu v datasetu
    */

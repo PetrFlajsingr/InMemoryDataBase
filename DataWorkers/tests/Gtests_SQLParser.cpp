@@ -15,13 +15,18 @@ class SQLParser_tests : public ::testing::Test {
   SQLParser_tests() = default;
 
   void SetUp() override {
-    expectedOutput.projections.push_back({"uganda", "table1", DataWorkers::Operation::Distinct});
-    expectedOutput.projections.push_back({"letadlo", "table1", DataWorkers::Operation::Distinct});
-    expectedOutput.projections.push_back({"krava", "table2", DataWorkers::Operation::Distinct});
-    expectedOutput.projections.push_back({"id", "table3", DataWorkers::Operation::Distinct});
+    expectedOutput.projections.push_back({"uganda", "table1",
+                                          Operation::Distinct});
+    expectedOutput.projections.push_back({"letadlo", "table1",
+                                          Operation::Distinct});
+    expectedOutput.projections.push_back({"krava", "table2",
+                                          Operation::Distinct});
+    expectedOutput.projections.push_back({"id", "table3", Operation::Distinct});
 
-    expectedOutput.joins.push_back({DataWorkers::LeftJoin, "table1", "uganda", "table2", "id"});
-    expectedOutput.joins.push_back({DataWorkers::LeftJoin, "table2", "id", "table3", "id"});
+    expectedOutput.joins.push_back({DataWorkers::JoinType::LeftJoin, "table1",
+                                    "uganda", "table2", "id"});
+    expectedOutput.joins.push_back({DataWorkers::JoinType::LeftJoin, "table2",
+                                    "id", "table3", "id"});
 
     expectedOutput.selections.push_back({"table1", "uganda", {"10", "5", "8"}});
     expectedOutput.selections.push_back({"table1", "letadlo", {"22", "23"}});
@@ -70,8 +75,8 @@ TEST_F(SQLParser_tests, parseAggregation) {
   DataWorkers::QueryData data = DataWorkers::SQLParser::parse(
       "SELECT table1.t1, SUM(table1.t2), AVG(table2.t3) FROM table1");
 
-  EXPECT_EQ(data.projections[0].operation, DataWorkers::Distinct);
-  EXPECT_EQ(data.projections[1].operation, DataWorkers::Sum);
-  EXPECT_EQ(data.projections[2].operation, DataWorkers::Average);
+  EXPECT_EQ(data.projections[0].operation, Operation::Distinct);
+  EXPECT_EQ(data.projections[1].operation, Operation::Sum);
+  EXPECT_EQ(data.projections[2].operation, Operation::Average);
 
 }

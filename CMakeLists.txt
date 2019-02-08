@@ -3,6 +3,11 @@ cmake_minimum_required(VERSION 3.8)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "-Wall -Wextra -o3")
 
+if (APPLE)
+    add_definitions(-DGTEST_USE_OWN_TR1_TUPLE)
+    add_definitions(-D__GLIBCXX__)
+endif (APPLE)
+
 include_directories(third_party)
 
 include_directories(Misc/tests)
@@ -44,10 +49,12 @@ FILE(GLOB GoogleMockHeaders third_party/google_test/googlemock/include/*.h)
 FILE(GLOB DataProviderSources DataProviders/Source/*.cpp)
 FILE(GLOB DataProviderHeaders DataProviders/Headers/*.h)
 FILE(GLOB DataProviderTests DataProviders/tests/*catch*.cpp)
+FILE(GLOB DataProviderTestsG DataProviders/tests/Gtests*.cpp)
 
 FILE(GLOB DataSetSources Datasets/Source/*.cpp)
 FILE(GLOB DataSetHeaders Datasets/Headers/*.h)
 FILE(GLOB DataSetTests Datasets/tests/*catch*.cpp)
+FILE(GLOB DataSetTestsG Datasets/tests/Gtests*.cpp)
 
 FILE(GLOB FieldSources Datasets/Fields/Source/*.cpp)
 FILE(GLOB FieldHeaders Datasets/Fields/Headers/*.h)
@@ -55,14 +62,17 @@ FILE(GLOB FieldHeaders Datasets/Fields/Headers/*.h)
 FILE(GLOB DataWorkerSources DataWorkers/Source/*.cpp)
 FILE(GLOB DataWorkerHeaders DataWorkers/Headers/*.h)
 FILE(GLOB DataWorkerTests DataWorkers/tests/*catch*.cpp)
+FILE(GLOB DataWorkerTestsG DataWorkers/tests/Gtests*.cpp)
 
 FILE(GLOB DataWriterSources DataWriters/Source/*.cpp)
 FILE(GLOB DataWriterHeaders DataWriters/Headers/*.h)
 FILE(GLOB DataWriterTests DataWriters/tests/*catch*.cpp)
+FILE(GLOB DataWriterTestsG DataWriters/tests/Gtests*.cpp)
 
 FILE(GLOB MiscSources Misc/Source/*.cpp)
 FILE(GLOB MiscHeaders Misc/Headers/*.h)
 FILE(GLOB MiscTests Misc/tests/*catch*.cpp)
+FILE(GLOB MiscTestsG Misc/tests/Gtests*.cpp)
 
 FILE(GLOB RelationLayerSources RelationLayer/Source/*.cpp)
 FILE(GLOB RelationLayerHeaders RelationLayer/Headers/*.h)
@@ -94,14 +104,28 @@ set(TEST_SOURCE_FILES
         ${MiscTests}
         ${RelationLayerTests})
 
+set(GTEST_SOURCE_FILES
+        ${SOURCE_FILES}
+        ${DataProviderTestsG}
+        ${DataSetTestsG}
+        ${DataWorkerTestsG}
+        ${DataWriterTestsG}
+        ${MiscTestsG})
+
 
 add_executable(cedr cedr.cpp ${SOURCE_FILES})
 add_executable(catch_tests ${TEST_SOURCE_FILES})
+add_executable(google_tests ${GTEST_SOURCE_FILES})
 
 target_link_libraries(cedr xlsxio_read)
 target_link_libraries(cedr xlsxio_write)
 
 target_link_libraries(catch_tests xlsxio_read)
 target_link_libraries(catch_tests xlsxio_write)
+
+target_link_libraries(google_tests xlsxio_read)
+target_link_libraries(google_tests xlsxio_write)
+
+target_link_libraries(google_tests gmock_main gtest)
 
 

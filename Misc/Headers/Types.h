@@ -44,6 +44,7 @@ typedef union {
   double _double;
   Currency *_currency;
   DateTime *_dateTime;
+
 } DataContainer;
 
 enum class Operation {

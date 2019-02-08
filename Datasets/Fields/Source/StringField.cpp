@@ -34,10 +34,10 @@ void DataSets::StringField::setValue(void *data) {
 }
 
 std::function<int8_t(const DataSets::DataSetRow &,
-                     const DataSets::DataSetRow &)> DataSets::StringField::getCompareFunction() {
+                     const DataSets::DataSetRow &)> DataSets::StringField::getCompareFunction() const {
   return [this](const DataSetRow &a,
                 const DataSetRow &b) {
-    return Utilities::compareString(a.cells[index]._string,
-                                    b.cells[index]._string);
+    return Utilities::compareString(a.cells[getIndex()]._string,
+                                    b.cells[getIndex()]._string);
   };
 }

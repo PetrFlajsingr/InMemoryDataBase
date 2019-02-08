@@ -5,6 +5,7 @@
 #include <Exceptions.h>
 #include <vector>
 #include "CsvWriter.h"
+#include <Logger.h>
 
 DataWriters::CsvWriter::CsvWriter(std::string_view filePath,
                                   std::string_view delimiter) {
@@ -22,9 +23,7 @@ void DataWriters::CsvWriter::writeHeader(const std::vector<std::string> &header)
   if (header.empty()) {
     throw InvalidArgumentException("Header can not be empty.");
   }
-
   columnCount = header.size();
-
   writeRow(header);
 }
 
@@ -33,7 +32,6 @@ void DataWriters::CsvWriter::writeRecord(const std::vector<std::string> &record)
     throw InvalidArgumentException(
         "Length of record doesn't match length of header.");
   }
-
   writeRow(record);
 }
 
