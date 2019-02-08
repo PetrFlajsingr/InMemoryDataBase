@@ -28,7 +28,7 @@ include_directories(third_party/Decimal)
 
 include_directories(DataWorkers/Headers)
 
-include_directories(RelationLayer/Headers)
+include_directories(DataBase/Headers)
 
 include_directories(third_party/xlsxio/include)
 
@@ -74,9 +74,9 @@ FILE(GLOB MiscHeaders Misc/Headers/*.h)
 FILE(GLOB MiscTests Misc/tests/*catch*.cpp)
 FILE(GLOB MiscTestsG Misc/tests/Gtests*.cpp)
 
-FILE(GLOB RelationLayerSources RelationLayer/Source/*.cpp)
-FILE(GLOB RelationLayerHeaders RelationLayer/Headers/*.h)
-FILE(GLOB RelationLayerTests RelationLayer/tests/*catch*.cpp)
+FILE(GLOB RelationLayerSources DataBase/Source/*.cpp)
+FILE(GLOB RelationLayerHeaders DataBase/Headers/*.h)
+FILE(GLOB RelationLayerTests DataBase/tests/*catch*.cpp)
 
 FILE(GLOB FileDownloaderSources FileDownloaders/Source/*.cpp)
 FILE(GLOB FileDownloaderHeaders FileDownloaders/Headers/*.h)

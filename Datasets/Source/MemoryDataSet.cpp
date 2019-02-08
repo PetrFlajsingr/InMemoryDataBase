@@ -431,7 +431,7 @@ DataSets::MemoryDataSet::MemoryDataSet(std::string_view dataSetName)
 #pragma ide diagnostic ignored "OCDFAInspection"
 // TODO: predelat na iterator a std::lower_bound
 bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
-  unsigned long min = getFirst(), max = getLast();
+  unsigned long min = getFirst(), max = getLast() + 1;
   currentRecord = (min + max) >> 1;
   //setFieldValues(currentRecord, true);
   bool breakLoop = false;
@@ -548,6 +548,13 @@ bool DataSets::MemoryDataSet::isEnd() const {
 }
 gsl::index DataSets::MemoryDataSet::getCurrentRecord() const {
   return getLast();
+}
+
+void DataSets::MemoryDataSet::resetBegin() {
+  currentRecord = getLast() + 1;
+}
+void DataSets::MemoryDataSet::resetEnd() {
+  currentRecord = 0;
 }
 
 #pragma clang diagnostic pop

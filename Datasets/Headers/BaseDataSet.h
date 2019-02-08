@@ -249,6 +249,9 @@ class BaseDataSet {
    */
   virtual bool findFirst(FilterItem &item) = 0;
 
+  virtual void resetBegin() = 0;
+  virtual void resetEnd() = 0;
+
   std::string getName() const {
     return dataSetName;
   }

@@ -4,17 +4,14 @@
 
 #include <Relation.h>
 
-RelationLayer::RelationContainer::RelationContainer(void *data_FirstDataSet,
-                                                    void *data_SecondDataSet)
-    : data_FirstDataSet(data_FirstDataSet),
-      data_SecondDataSet(data_SecondDataSet) {}
 
 RelationLayer::Relation::Relation(RelationLayer::RelationType relationType)
     : relationType(relationType) {}
 
-void RelationLayer::Relation::addRelation(void *dataFirstDataSet,
-                                          void *dataSecondDataSet) {
-  relations.emplace_back(dataFirstDataSet, dataSecondDataSet);
+void RelationLayer::Relation::addRelation(DataSets::DataSetRow *dataFirstDataSet,
+                                          DataSets::DataSetRow *dataSecondDataSet) {
+  relations.emplace_back(RelationContainer{dataFirstDataSet,
+                                           dataSecondDataSet});
 }
 
 void RelationLayer::Relation::removeRelation(void *dataFirstDataSet,

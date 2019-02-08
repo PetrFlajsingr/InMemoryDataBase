@@ -120,6 +120,9 @@ class MemoryDataSet : public BaseDataSet {
 
   gsl::index getCurrentRecord() const override;
 
+  void resetBegin() override;
+  void resetEnd() override;
+
  protected:
   void setData(void *data, gsl::index index, ValueType type) override;
 

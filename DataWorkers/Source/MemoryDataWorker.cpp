@@ -19,7 +19,7 @@ std::vector<std::string> DataWorkers::MemoryDataWorker::getChoices(std::string c
   sortOptions.addOption(field, SortOrder::Ascending);
   dataset->sort(sortOptions);
 
-  std::string_view value;
+  std::string value;
   std::vector<std::string> result;
 
   while (dataset->next()) {

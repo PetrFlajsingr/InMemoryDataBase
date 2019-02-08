@@ -9,6 +9,7 @@
 #include <vector>
 #include <Types.h>
 #include <mach/machine.h>
+#include <MemoryDataSet.h>
 
 namespace RelationLayer {
 
@@ -23,10 +24,8 @@ enum class RelationType {
  * Kontejner obsahujici odkazy na propojena data
  */
 struct RelationContainer {
-  void *data_FirstDataSet;
-  void *data_SecondDataSet;
-
-  RelationContainer(void *data_FirstDataSet, void *data_SecondDataSet);
+  DataSets::DataSetRow *data_FirstDataSet;
+  DataSets::DataSetRow *data_SecondDataSet;
 };
 
 /**
@@ -265,7 +264,8 @@ class Relation {
    * @param dataFirstDataSet odkaz na zaznam prvniho data setu
    * @param dataSecondDataSet odkaz na zaznam druheho data setu
    */
-  virtual void addRelation(void *dataFirstDataSet, void *dataSecondDataSet);
+  virtual void addRelation(DataSets::DataSetRow *dataFirstDataSet,
+                           DataSets::DataSetRow *dataSecondDataSet);
 
   /**
    * Smazani vybraneho zaznamu ze seznamu
@@ -287,6 +287,6 @@ class Relation {
   const std::vector<RelationContainer> &getRelations() const;
 };
 
-}  // namespace RelationLayer
+}  // namespace DataBase
 
 #endif //CSV_READER_BASERELATION_H
