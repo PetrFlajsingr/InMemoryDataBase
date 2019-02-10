@@ -31,6 +31,8 @@ namespace DataSets {
 struct DataSetRow {
   bool valid;  //< true pokud vyhovuje filtru/neni filtrovat, jinak false
   std::vector<DataContainer> cells;  //< data v pameti
+
+  DataSetRow(bool valid, const std::vector<DataContainer> &cells);
 };
 /**
  * Dataset ukladajici data primo v operacni pameti.
@@ -123,6 +125,127 @@ class MemoryDataSet : public BaseDataSet {
   void resetBegin() override;
   void resetEnd() override;
 
+  class iterator : public std::iterator<std::random_access_iterator_tag, int> {
+   public:
+    iterator() = default;
+
+    explicit iterator(gsl::not_null<MemoryDataSet *> dataSet, gsl::index row)
+        : dataSet(dataSet), currentRecord(row) {}
+
+    iterator(const iterator &other) {
+      dataSet = other.dataSet;
+      currentRecord = other.currentRecord;
+    }
+
+    iterator &operator=(const iterator &other) {
+      if (this != &other) {
+        dataSet = other.dataSet;
+        currentRecord = other.currentRecord;
+      }
+      return *this;
+    }
+
+    iterator &operator=(iterator &&other) noexcept {
+      if (this != &other) {
+        dataSet = other.dataSet;
+        currentRecord = other.currentRecord;
+      }
+      return *this;
+    }
+
+    iterator &operator++() {
+      currentRecord++;
+      return *this;
+    }
+
+    const iterator operator++(int) {
+      iterator result = *this;
+      ++(*this);
+      return result;
+    }
+
+    bool operator==(iterator &rhs) {
+      return currentRecord == rhs.currentRecord;
+    }
+
+    bool operator!=(iterator &other) {
+      return !(*this == other);
+    }
+
+    DataSetRow *operator*() {
+      return dataSet->data[currentRecord];
+    }
+
+    DataSetRow *operator*(int) {
+      return dataSet->data[currentRecord];
+    }
+
+    DataSetRow *operator->() {
+      return dataSet->data[currentRecord];
+    }
+
+    iterator &operator--() {
+      currentRecord--;
+      return *this;
+    }
+
+    const iterator operator--(int) {
+      iterator result = *this;
+      --(*this);
+      return result;
+    }
+
+    iterator operator+(const int rhs) {
+      iterator res = *this;
+      res.currentRecord += rhs;
+      return res;
+    }
+
+    iterator operator-(const int rhs) {
+      iterator res = *this;
+      res.currentRecord -= rhs;
+      return res;
+    }
+
+    bool operator<(const iterator &rhs) {
+      return currentRecord < rhs.currentRecord;
+    }
+
+    bool operator>(const iterator &rhs) {
+      return currentRecord > rhs.currentRecord;
+    }
+
+    bool operator<=(const iterator &rhs) {
+      return currentRecord <= rhs.currentRecord;
+    }
+
+    bool operator>=(const iterator &rhs) {
+      return currentRecord >= rhs.currentRecord;
+    }
+
+    iterator &operator+=(const int rhs) {
+      currentRecord += rhs;
+      return *this;
+    }
+
+    iterator &operator-=(const int rhs) {
+      currentRecord -= rhs;
+      return *this;
+    }
+
+    DataSetRow *operator[](const int index) {
+      return dataSet->data[index];
+    }
+   private:
+    MemoryDataSet *dataSet;
+
+    gsl::index currentRecord;
+  };
+
+  iterator begin();
+
+  iterator end();
+
  protected:
   void setData(void *data, gsl::index index, ValueType type) override;
 
@@ -133,14 +256,14 @@ class MemoryDataSet : public BaseDataSet {
 
   bool isOpen = false;
 
-  const DataSetRow stopItem{true, {}};
+  DataSetRow *stopItem = new DataSetRow{true, {}};
 
   gsl::index currentRecord = 0;  //< Pocitadlo zaznamu
 
   bool dataValidityChanged = false;
   //< Nastaveno pri zmene dat naprikald pomoci find
 
-  std::vector<DataSetRow> data;
+  std::vector<DataSetRow *> data;
 
   inline gsl::index getFirst() const;
   inline gsl::index getLast() const;

@@ -33,11 +33,11 @@ void DataSets::StringField::setValue(void *data) {
   this->data = std::string(reinterpret_cast<gsl::zstring<>>(data));
 }
 
-std::function<int8_t(const DataSets::DataSetRow &,
-                     const DataSets::DataSetRow &)> DataSets::StringField::getCompareFunction() const {
-  return [this](const DataSetRow &a,
-                const DataSetRow &b) {
-    return Utilities::compareString(a.cells[getIndex()]._string,
-                                    b.cells[getIndex()]._string);
+std::function<int8_t(const DataSets::DataSetRow *,
+                     const DataSets::DataSetRow *)> DataSets::StringField::getCompareFunction() const {
+  return [this](const DataSetRow *a,
+                const DataSetRow *b) {
+    return Utilities::compareString(a->cells[getIndex() & 0x00FFFF]._string,
+                                    b->cells[getIndex() & 0x00FFFF]._string);
   };
 }

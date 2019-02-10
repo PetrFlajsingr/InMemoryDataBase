@@ -548,7 +548,7 @@ std::string DataWorkers::ResultAccumulator::resultDistinct() {
 }
 
 std::string_view DataWorkers::ResultAccumulator::getName() {
-  return field->getFieldName();
+  return field->getName();
 }
 
 DataContainer DataWorkers::ResultAccumulator::getContainer() {

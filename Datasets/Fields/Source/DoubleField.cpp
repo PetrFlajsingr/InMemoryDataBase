@@ -36,12 +36,12 @@ double DataSets::DoubleField::getAsDouble() const {
   return data;
 }
 
-std::function<int8_t(const DataSets::DataSetRow &,
-                     const DataSets::DataSetRow &)> DataSets::DoubleField::getCompareFunction() const {
-  return [this](const DataSetRow &a,
-                const DataSetRow &b) {
-    return Utilities::compareDouble(a.cells[getIndex()]._double,
-                                    b.cells[getIndex()]._double);
+std::function<int8_t(const DataSets::DataSetRow *,
+                     const DataSets::DataSetRow *)> DataSets::DoubleField::getCompareFunction() const {
+  return [this](const DataSetRow *a,
+                const DataSetRow *b) {
+    return Utilities::compareDouble(a->cells[getIndex() & 0x00FFFF]._double,
+                                    b->cells[getIndex() & 0x00FFFF]._double);
   };
 }
 

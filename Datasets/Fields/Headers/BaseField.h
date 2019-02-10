@@ -65,7 +65,7 @@ class BaseField {
    *
    * @return Nazev pole
    */
-  std::string_view getFieldName() const {
+  std::string_view getName() const {
     return fieldName;
   }
 
@@ -77,8 +77,8 @@ class BaseField {
    *    1 pokud je prvni vetsi
    *    -1 pokud je prvni mensi
    */
-  virtual std::function<int8_t(const DataSetRow &,
-                               const DataSetRow &)> getCompareFunction() const = 0;
+  virtual std::function<int8_t(const DataSetRow *,
+                               const DataSetRow *)> getCompareFunction() const = 0;
 
  protected:
   friend class BaseDataSet;  //< Pro pristup k primemu nastaveni dat
