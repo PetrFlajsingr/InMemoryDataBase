@@ -42,7 +42,8 @@ int main() {
     std::cout << std::endl;
   }
 
-  std::cout << "____________________________" << std::endl;
+  std::cout << "____________SORT 0 DESC, FILTER 1 2 3________________"
+            << std::endl;
 
   DataSets::FilterOptions options;
   options.addOption(dataSet.fieldByIndex(0),
@@ -52,6 +53,11 @@ int main() {
 
   auto viewFields = view->getFields();
 
+  DataSets::SortOptions sortOptions;
+  sortOptions.addOption(viewFields[0],
+                        SortOrder::Descending);
+  view->sort(sortOptions);
+
   while (view->next()) {
     for (const auto field : viewFields) {
       std::cout << field->getAsString() << " ";
@@ -59,7 +65,7 @@ int main() {
     std::cout << std::endl;
   }
 
-  std::cout << "____________________________" << std::endl;
+  std::cout << "_____________FILTER 1 2 5_______________" << std::endl;
 
   DataSets::FilterOptions options2;
   options2.addOption(view->fieldByIndex(0),
@@ -70,6 +76,31 @@ int main() {
 
   auto view2Fields = view2->getFields();
 
+  while (view2->next()) {
+    for (const auto field : view2Fields) {
+      std::cout << field->getAsString() << " ";
+    }
+    std::cout << std::endl;
+  }
+
+  std::cout << "______________SORT 0 ASC______________" << std::endl;
+
+  DataSets::SortOptions sortOptions2;
+  sortOptions2.addOption(viewFields[0],
+                         SortOrder::Ascending);
+  view->sort(sortOptions2);
+
+  view->resetBegin();
+  while (view->next()) {
+    for (const auto field : viewFields) {
+      std::cout << field->getAsString() << " ";
+    }
+    std::cout << std::endl;
+  }
+
+  std::cout << "_______________FILTER 1 2 5 AGAIN_____________" << std::endl;
+
+  view2->resetBegin();
   while (view2->next()) {
     for (const auto field : view2Fields) {
       std::cout << field->getAsString() << " ";

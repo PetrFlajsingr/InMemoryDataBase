@@ -152,7 +152,8 @@ void DataSets::MemoryViewDataSet::sort(DataSets::SortOptions &options) {
       [this, &optionArray, &compareFunctions](const std::vector<DataSetRow *> &a,
                                               const std::vector<DataSetRow *> &b) {
         for (gsl::index i = 0; i < optionArray.size(); ++i) {
-          auto tableIndex = optionArray[i].field->getIndex() & maskTableIndex;
+          auto tableIndex = optionArray[i].field->getIndex()
+              & maskTableIndex >> maskTableShift;
           int compareResult = compareFunctions[i](a[tableIndex], b[tableIndex]);
           if (compareResult < 0) {
             return optionArray[i].order == SortOrder::Ascending;
