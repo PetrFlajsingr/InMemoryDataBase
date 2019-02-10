@@ -14,13 +14,13 @@ include_directories(Misc/tests)
 
 include_directories(Misc/Headers)
 
-include_directories(Datasets/Headers)
+include_directories(DataSets/Headers)
 
 include_directories(DataProviders/Headers)
 
 include_directories(DataWriters/Headers)
 
-include_directories(Datasets/Fields/Headers)
+include_directories(DataSets/Fields/Headers)
 
 include_directories(FileDownloaders/Headers)
 
@@ -51,13 +51,13 @@ FILE(GLOB DataProviderHeaders DataProviders/Headers/*.h)
 FILE(GLOB DataProviderTests DataProviders/tests/*catch*.cpp)
 FILE(GLOB DataProviderTestsG DataProviders/tests/Gtests*.cpp)
 
-FILE(GLOB DataSetSources Datasets/Source/*.cpp)
-FILE(GLOB DataSetHeaders Datasets/Headers/*.h)
-FILE(GLOB DataSetTests Datasets/tests/*catch*.cpp)
-FILE(GLOB DataSetTestsG Datasets/tests/Gtests*.cpp)
+FILE(GLOB DataSetSources DataSets/Source/*.cpp)
+FILE(GLOB DataSetHeaders DataSets/Headers/*.h)
+FILE(GLOB DataSetTests DataSets/tests/*catch*.cpp)
+FILE(GLOB DataSetTestsG DataSets/tests/Gtests*.cpp)
 
-FILE(GLOB FieldSources Datasets/Fields/Source/*.cpp)
-FILE(GLOB FieldHeaders Datasets/Fields/Headers/*.h)
+FILE(GLOB FieldSources DataSets/Fields/Source/*.cpp)
+FILE(GLOB FieldHeaders DataSets/Fields/Headers/*.h)
 
 FILE(GLOB DataWorkerSources DataWorkers/Source/*.cpp)
 FILE(GLOB DataWorkerHeaders DataWorkers/Headers/*.h)
