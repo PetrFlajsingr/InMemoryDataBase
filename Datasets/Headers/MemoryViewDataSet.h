@@ -8,12 +8,12 @@
 #include <vector>
 #include <string>
 #include <algorithm>
-#include <MemoryDataSet.h>
+#include <ViewDataSet.h>
 #include <FieldFactory.h>
 
 namespace DataSets {
 
-class MemoryViewDataSet : BaseDataSet {
+class MemoryViewDataSet : public ViewDataSet {
  public:
   MemoryViewDataSet(std::string_view dataSetName,
                     const std::vector<std::string> &fieldNames,
@@ -42,7 +42,7 @@ class MemoryViewDataSet : BaseDataSet {
   void append() override;
   void append(DataProviders::BaseDataProvider &dataProvider) override;
   void sort(SortOptions &options) override;
-  void filter(const FilterOptions &options) override;
+  std::shared_ptr<ViewDataSet> filter(const FilterOptions &options) override;
   bool findFirst(FilterItem &item) override;
   void resetBegin() override;
   void resetEnd() override;
@@ -57,6 +57,7 @@ class MemoryViewDataSet : BaseDataSet {
 
   void setFieldValues(gsl::index index);
 
+  const gsl::index maskTableShift = 16;
   const gsl::index maskTableIndex = 0xFF0000;
   const gsl::index maskColumnIndex = 0x00FFFF;
 
@@ -64,6 +65,8 @@ class MemoryViewDataSet : BaseDataSet {
                     const std::vector<ValueType> &types,
                     const std::vector<std::pair<int,
                                                 int>> &fieldIndices);
+
+  friend class MemoryDataSet;
 };
 }  // namespace DataSets
 

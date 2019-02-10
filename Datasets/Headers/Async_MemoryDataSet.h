@@ -28,7 +28,7 @@ class Async_MemoryDataSet : public MemoryDataSet {
   void open(DataProviders::BaseDataProvider &dataProvider,
             const std::vector<ValueType> &fieldTypes) override;
 
-  void filter(const FilterOptions &options) override;
+  std::shared_ptr<ViewDataSet> filter(const FilterOptions &options) override;
 
   void sort(SortOptions &options) override;
 

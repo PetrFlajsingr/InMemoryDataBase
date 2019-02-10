@@ -13,11 +13,9 @@
 #include "FilterStructures.h"
 #include "SortStructures.h"
 
-// TODO: manager na data sety?
-// TODO: relace mezi data sety?
-
 namespace DataSets {
 class BaseField;
+class ViewDataSet;
 /**
  * Rozhrani pro objekt dodavajici data.
  */
@@ -134,7 +132,7 @@ class BaseDataSet {
    *
    * @param options
    */
-  virtual void filter(const FilterOptions &options) = 0;
+  virtual std::shared_ptr<ViewDataSet> filter(const FilterOptions &options) = 0;
 
   /**
    * Najde prvni zaznam odpovidajici zadane polozce.

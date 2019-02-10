@@ -96,7 +96,7 @@ class MemoryDataSet : public BaseDataSet {
 
   void sort(SortOptions &options) override;
 
-  void filter(const FilterOptions &options) override;
+  std::shared_ptr<ViewDataSet> filter(const FilterOptions &options) override;
 
   BaseField *fieldByName(std::string_view name) const override;
 
@@ -260,9 +260,6 @@ class MemoryDataSet : public BaseDataSet {
 
   gsl::index currentRecord = 0;  //< Pocitadlo zaznamu
 
-  bool dataValidityChanged = false;
-  //< Nastaveno pri zmene dat naprikald pomoci find
-
   std::vector<DataSetRow *> data;
 
   inline gsl::index getFirst() const;
@@ -293,7 +290,7 @@ class MemoryDataSet : public BaseDataSet {
    * @param searchForward Smer vyhledavani validniho zaznamu
    * @return
    */
-  bool setFieldValues(gsl::index index, bool searchForward);
+  bool setFieldValues();
 };
 }  // namespace DataSets
 

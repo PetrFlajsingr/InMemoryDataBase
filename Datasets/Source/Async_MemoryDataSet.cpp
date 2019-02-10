@@ -74,7 +74,8 @@ void DataSets::Async_MemoryDataSet::removeObserver(IAsyncMemoryDataSetObserver *
   observers.erase(std::find(observers.begin(), observers.end(), observer));
 }
 
-void DataSets::Async_MemoryDataSet::filter(const FilterOptions &options) {
+std::shared_ptr<DataSets::ViewDataSet> DataSets::Async_MemoryDataSet::filter(
+    const FilterOptions &options) {
   notify(EventType::BeforeFilter);
   auto handle = std::async(std::launch::async,
                            &Async_MemoryDataSet::innerFilter,

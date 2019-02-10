@@ -4,6 +4,7 @@
 
 #include <MemoryDataSet.h>
 #include <FieldFactory.h>
+#include <MemoryViewDataSet.h>
 
 void DataSets::MemoryDataSet::open(DataProviders::BaseDataProvider &dataProvider,
                                    const std::vector<ValueType> &fieldTypes) {
@@ -17,7 +18,6 @@ void DataSets::MemoryDataSet::open(DataProviders::BaseDataProvider &dataProvider
   data.shrink_to_fit();
 
   isOpen = true;
-  setFieldValues(getFirst(), true);
 }
 
 void DataSets::MemoryDataSet::openEmpty(const std::vector<std::string> &fieldNames,
@@ -108,59 +108,29 @@ void DataSets::MemoryDataSet::close() {
 }
 
 // TODO: rework
-bool DataSets::MemoryDataSet::setFieldValues(gsl::index index,
-                                             bool searchForward) {
-  gsl::index iter = index;
-  if (dataValidityChanged) {
-    bool found = false;
-
-    if (searchForward) {
-      for (iter = index; iter <= getLast(); iter++) {
-        if (data[iter]->valid) {
-          found = true;
-          break;
-        }
-      }
-    } else {
-      for (iter = index; iter >= getFirst(); iter--) {
-        if (data[iter]->valid) {
-          found = true;
-          break;
-        }
-      }
-    }
-    if (!found) {
-      if (searchForward) {
-        currentRecord = getLast();
-      } else {
-        currentRecord = getFirst();
-      }
-      return false;
-    }
-    currentRecord = iter;
-  }
-
+bool DataSets::MemoryDataSet::setFieldValues() {
   for (size_t i = 0; i < fields.size(); i++) {
+    auto currentCell = data[currentRecord]->cells[i];
     switch (fields[i]->getFieldType()) {
       case ValueType::Integer:
         setFieldData(fields[i].get(),
-                     &data[iter]->cells[i]._integer);
+                     &currentCell._integer);
         break;
       case ValueType::Double:
         setFieldData(fields[i].get(),
-                     &data[iter]->cells[i]._double);
+                     &currentCell._double);
         break;
       case ValueType::String:
         setFieldData(fields[i].get(),
-                     data[iter]->cells[i]._string);
+                     currentCell._string);
         break;
       case ValueType::Currency:
         setFieldData(fields[i].get(),
-                     data[iter]->cells[i]._currency);
+                     currentCell._currency);
         break;
       case ValueType::DateTime:
         setFieldData(fields[i].get(),
-                     data[iter]->cells[i]._dateTime);
+                     currentCell._dateTime);
         break;
       default:throw IllegalStateException("Internal error.");
     }
@@ -170,12 +140,12 @@ bool DataSets::MemoryDataSet::setFieldValues(gsl::index index,
 
 void DataSets::MemoryDataSet::first() {
   currentRecord = getFirst();
-  setFieldValues(currentRecord, true);
+  setFieldValues();
 }
 
 void DataSets::MemoryDataSet::last() {
   currentRecord = getLast();
-  setFieldValues(currentRecord, false);
+  setFieldValues();
 }
 
 bool DataSets::MemoryDataSet::next() {
@@ -183,7 +153,7 @@ bool DataSets::MemoryDataSet::next() {
   if (currentRecord >= data.size() - 1) {
     return false;
   }
-  setFieldValues(currentRecord, true);
+  setFieldValues();
   return data[currentRecord]->valid;
 }
 
@@ -192,7 +162,7 @@ bool DataSets::MemoryDataSet::previous() {
   if (currentRecord <= 0) {
     return false;
   }
-  setFieldValues(currentRecord, false);
+  setFieldValues();
   return true;
 }
 
@@ -239,33 +209,32 @@ void DataSets::MemoryDataSet::sort(SortOptions &options) {
   currentRecord = 0;
 }
 
-// TODO: rework
-void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
-  if (options.options.empty()) {
-    dataValidityChanged = false;
-    for (auto &iter : data) {
-      iter->valid = true;
-    }
-    first();
-    return;
+std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryDataSet::filter(
+    const FilterOptions &options) {
+  auto fieldNames = getFieldNames();
+  std::vector<ValueType> fieldTypes;
+  std::vector<std::pair<int, int>> fieldIndices;
+  for (const auto &field : fields) {
+    fieldTypes.emplace_back(field->getFieldType());
+    fieldIndices.emplace_back(0, field->getIndex());
   }
-  dataValidityChanged = true;
+  auto resultView = std::make_shared<MemoryViewDataSet>(getName() + "_filtered",
+                                                        fieldNames,
+                                                        fieldTypes,
+                                                        fieldIndices);
+  resultView->data.emplace_back();
 
-  gsl::index i = 0;
-  for (const auto &iter : data) {
+  for (const auto iter : data) {
     if (iter->cells.empty()) {
-      ++i;
       continue;
     }
     bool valid = true;
 
-    gsl::index optionCounter = 0;
     for (const auto &filter : options.options) {
       if (!valid) {
         break;
       }
 
-      // TODO: predelat na objekt?
       if (filter.field->getFieldType() == ValueType::String) {
         std::string toCompare = iter->cells[filter.field->getIndex()]._string;
         for (const auto &search : filter.searchData) {
@@ -310,34 +279,45 @@ void DataSets::MemoryDataSet::filter(const FilterOptions &options) {
         auto toCompare = iter->cells[filter.field->getIndex()]._integer;
         for (const auto &search : filter.searchData) {
           valid = Utilities::compareInt(toCompare, search._integer) == 0;
+          if (valid) {
+            break;
+          }
         }
       } else if (filter.field->getFieldType() == ValueType::Double) {
         auto toCompare = iter->cells[filter.field->getIndex()]._double;
         for (const auto &search : filter.searchData) {
           valid = Utilities::compareDouble(toCompare, search._double) == 0;
+          if (valid) {
+            break;
+          }
         }
       } else if (filter.field->getFieldType() == ValueType::Currency) {
         auto toCompare = iter->cells[filter.field->getIndex()]._currency;
         for (const auto &search : filter.searchData) {
           valid =
               Utilities::compareCurrency(*toCompare, *search._currency) == 0;
+          if (valid) {
+            break;
+          }
         }
       } else if (filter.field->getFieldType() == ValueType::DateTime) {
         auto toCompare = iter->cells[filter.field->getIndex()]._dateTime;
         for (const auto &search : filter.searchData) {
           valid =
               Utilities::compareDateTime(*toCompare, *search._dateTime) == 0;
+          if (valid) {
+            break;
+          }
         }
       }
-
-      optionCounter++;
     }
 
-    data[i]->valid = valid;
-    i++;
+    if (valid) {
+      resultView->data.emplace_back(std::vector<DataSetRow *>{iter});
+    }
   }
-
-  currentRecord = 0;
+  resultView->data.emplace_back();
+  return resultView;
 }
 
 DataSets::BaseField *DataSets::MemoryDataSet::fieldByName(
@@ -484,7 +464,7 @@ bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
         break;
     }
     switch (comparisonResult) {
-      case 0:setFieldValues(currentRecord, true);
+      case 0:setFieldValues();
         return true;
       case -1:min = currentRecord;
         currentRecord = (min + max) >> 1;
@@ -552,10 +532,10 @@ gsl::index DataSets::MemoryDataSet::getCurrentRecord() const {
 }
 
 void DataSets::MemoryDataSet::resetBegin() {
-  currentRecord = getLast() + 1;
+  currentRecord = 0;
 }
 void DataSets::MemoryDataSet::resetEnd() {
-  currentRecord = 0;
+  currentRecord = getLast() + 1;
 }
 
 DataSets::MemoryDataSet::iterator DataSets::MemoryDataSet::begin() {

@@ -3,6 +3,7 @@
 //
 
 #include <MemoryDataSet.h>
+#include <MemoryViewDataSet.h>
 
 int main() {
   DataSets::MemoryDataSet dataSet("test");
@@ -11,22 +12,52 @@ int main() {
 
   auto fields = dataSet.getFields();
 
+  int j = 0;
   for (gsl::index i = 0; i < 20; ++i) {
     dataSet.append();
     for (auto field : fields) {
-      field->setAsString(std::to_string(i));
+      field->setAsString(std::to_string(j));
+    }
+    if (i % 5 == 0) {
+      j++;
     }
   }
 
-  int cnt = 0;
-  for (auto val : dataSet) {
-    std::cout << val[0].cells[0]._string << " hihihi" << std::endl;
-    cnt++;
+  j = 0;
+  for (gsl::index i = 0; i < 20; ++i) {
+    dataSet.append();
+    for (auto field : fields) {
+      field->setAsString(std::to_string(j));
+    }
+    if (i % 5 == 0) {
+      j++;
+    }
   }
 
-  auto tmp = dataSet.begin();
+  dataSet.resetBegin();
+  while (dataSet.next()) {
+    for (const auto field : dataSet.getFields()) {
+      std::cout << field->getAsString() << " ";
+    }
+    std::cout << std::endl;
+  }
 
-  auto wat = tmp[10];
+  std::cout << "____________________________" << std::endl;
+
+  DataSets::FilterOptions options;
+  options.addOption(dataSet.fieldByIndex(0),
+                    {"1"},
+                    DataSets::FilterOption::Equals);
+  auto view = dataSet.filter(options);
+
+  auto viewFields = view->getFields();
+
+  while (view->next()) {
+    for (const auto field : viewFields) {
+      std::cout << field->getAsString() << " ";
+    }
+    std::cout << std::endl;
+  }
 
   return 0;
 }

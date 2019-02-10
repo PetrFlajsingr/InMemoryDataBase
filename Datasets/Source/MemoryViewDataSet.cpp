@@ -9,7 +9,7 @@ DataSets::MemoryViewDataSet::MemoryViewDataSet(std::string_view dataSetName,
                                                const std::vector<ValueType> &fieldTypes,
                                                const std::vector<std::pair<int,
                                                                            int>> &fieldIndices)
-    : BaseDataSet(dataSetName) {
+    : ViewDataSet(dataSetName) {
   createFields(fieldNames, fieldTypes, fieldIndices);
 }
 
@@ -170,7 +170,8 @@ void DataSets::MemoryViewDataSet::sort(DataSets::SortOptions &options) {
   currentRecord = 0;
 }
 
-void DataSets::MemoryViewDataSet::filter(const DataSets::FilterOptions &options) {
+std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryViewDataSet::filter(
+    const DataSets::FilterOptions &options) {
   // TODO
 }
 
@@ -194,28 +195,31 @@ void DataSets::MemoryViewDataSet::setData(void *data,
 
 void DataSets::MemoryViewDataSet::setFieldValues(gsl::index index) {
   for (gsl::index i = 0; i < fields.size(); i++) {
-    const auto tableIndex = maskTableIndex & fields[i]->getIndex();
+    const auto
+        tableIndex = maskTableIndex & fields[i]->getIndex() >> maskTableShift;
     const auto columnIndex = maskColumnIndex & fields[i]->getIndex();
+
+    auto cell = data[currentRecord][tableIndex]->cells[columnIndex];
     switch (fields[i]->getFieldType()) {
       case ValueType::Integer:
         setFieldData(fields[i].get(),
-                     &data[tableIndex][columnIndex]->cells[i]._integer);
+                     &cell._integer);
         break;
       case ValueType::Double:
         setFieldData(fields[i].get(),
-                     &data[tableIndex][columnIndex]->cells[i]._double);
+                     &cell._double);
         break;
       case ValueType::String:
         setFieldData(fields[i].get(),
-                     data[tableIndex][columnIndex]->cells[i]._string);
+                     cell._string);
         break;
       case ValueType::Currency:
         setFieldData(fields[i].get(),
-                     data[tableIndex][columnIndex]->cells[i]._currency);
+                     cell._currency);
         break;
       case ValueType::DateTime:
         setFieldData(fields[i].get(),
-                     data[tableIndex][columnIndex]->cells[i]._dateTime);
+                     cell._dateTime);
         break;
       default:throw IllegalStateException("Internal error.");
     }
