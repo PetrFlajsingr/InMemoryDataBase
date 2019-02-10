@@ -46,7 +46,7 @@ int main() {
 
   DataSets::FilterOptions options;
   options.addOption(dataSet.fieldByIndex(0),
-                    {"1"},
+                    {"1", "2", "3"},
                     DataSets::FilterOption::Equals);
   auto view = dataSet.filter(options);
 
@@ -54,6 +54,24 @@ int main() {
 
   while (view->next()) {
     for (const auto field : viewFields) {
+      std::cout << field->getAsString() << " ";
+    }
+    std::cout << std::endl;
+  }
+
+  std::cout << "____________________________" << std::endl;
+
+  DataSets::FilterOptions options2;
+  options2.addOption(view->fieldByIndex(0),
+                     {"1", "2", "5"},
+                     DataSets::FilterOption::Equals);
+
+  auto view2 = view->filter(options2);
+
+  auto view2Fields = view2->getFields();
+
+  while (view2->next()) {
+    for (const auto field : view2Fields) {
       std::cout << field->getAsString() << " ";
     }
     std::cout << std::endl;

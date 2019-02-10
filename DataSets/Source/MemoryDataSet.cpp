@@ -224,7 +224,7 @@ std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryDataSet::filter(
                                                         fieldIndices);
   resultView->data.emplace_back();
 
-  for (const auto iter : data) {
+  for (const auto &iter : data) {
     if (iter->cells.empty()) {
       continue;
     }
@@ -234,9 +234,10 @@ std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryDataSet::filter(
       if (!valid) {
         break;
       }
+      auto cell = iter->cells[filter.field->getIndex()];
 
       if (filter.field->getFieldType() == ValueType::String) {
-        std::string toCompare = iter->cells[filter.field->getIndex()]._string;
+        std::string toCompare(cell._string);
         for (const auto &search : filter.searchData) {
           switch (filter.filterOption) {
             case FilterOption::Equals:
@@ -276,7 +277,7 @@ std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryDataSet::filter(
         }
 
       } else if (filter.field->getFieldType() == ValueType::Integer) {
-        auto toCompare = iter->cells[filter.field->getIndex()]._integer;
+        auto toCompare = cell._integer;
         for (const auto &search : filter.searchData) {
           valid = Utilities::compareInt(toCompare, search._integer) == 0;
           if (valid) {
@@ -284,7 +285,7 @@ std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryDataSet::filter(
           }
         }
       } else if (filter.field->getFieldType() == ValueType::Double) {
-        auto toCompare = iter->cells[filter.field->getIndex()]._double;
+        auto toCompare = cell._double;
         for (const auto &search : filter.searchData) {
           valid = Utilities::compareDouble(toCompare, search._double) == 0;
           if (valid) {
@@ -292,7 +293,7 @@ std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryDataSet::filter(
           }
         }
       } else if (filter.field->getFieldType() == ValueType::Currency) {
-        auto toCompare = iter->cells[filter.field->getIndex()]._currency;
+        auto toCompare = cell._currency;
         for (const auto &search : filter.searchData) {
           valid =
               Utilities::compareCurrency(*toCompare, *search._currency) == 0;
@@ -301,7 +302,7 @@ std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryDataSet::filter(
           }
         }
       } else if (filter.field->getFieldType() == ValueType::DateTime) {
-        auto toCompare = iter->cells[filter.field->getIndex()]._dateTime;
+        auto toCompare = cell._dateTime;
         for (const auto &search : filter.searchData) {
           valid =
               Utilities::compareDateTime(*toCompare, *search._dateTime) == 0;

@@ -172,7 +172,119 @@ void DataSets::MemoryViewDataSet::sort(DataSets::SortOptions &options) {
 
 std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryViewDataSet::filter(
     const DataSets::FilterOptions &options) {
-  // TODO
+  auto fieldNames = getFieldNames();
+  std::vector<ValueType> fieldTypes;
+  std::vector<std::pair<int, int>> fieldIndices;
+  for (const auto &field : fields) {
+    fieldTypes.emplace_back(field->getFieldType());
+    fieldIndices.emplace_back(0, field->getIndex());
+  }
+  auto resultView = std::make_shared<MemoryViewDataSet>(getName() + "_filtered",
+                                                        fieldNames,
+                                                        fieldTypes,
+                                                        fieldIndices);
+  resultView->data.emplace_back();
+
+  for (const auto &iter : data) {
+    if (iter.empty()) {
+      continue;
+    }
+
+    bool valid = true;
+
+    for (const auto &filter : options.options) {
+      if (!valid) {
+        break;
+      }
+      auto tableIndex =
+          filter.field->getIndex() & maskTableIndex >> maskTableShift;
+      auto columnIndex = filter.field->getIndex() & maskColumnIndex;
+
+      auto cell = iter[tableIndex]->cells[columnIndex];
+
+      if (filter.field->getFieldType() == ValueType::String) {
+        std::string toCompare(cell._string);
+        for (const auto &search : filter.searchData) {
+          switch (filter.filterOption) {
+            case FilterOption::Equals:
+              valid = Utilities::compareString(toCompare,
+                                               search._string) == 0;
+              break;
+            case FilterOption::StartsWith:
+              valid = std::strncmp(toCompare.c_str(),
+                                   search._string,
+                                   strlen(search._string)) == 0;
+              break;
+            case FilterOption::Contains:
+              valid = toCompare.find(search._string)
+                  != std::string::npos;
+              break;
+            case FilterOption::EndsWith:
+              valid = Utilities::endsWith(toCompare,
+                                          search._string);
+              break;
+            case FilterOption::NotContains:
+              valid = toCompare.find(search._string)
+                  == std::string::npos;
+              break;
+            case FilterOption::NotStartsWith:
+              valid = std::strncmp(toCompare.c_str(),
+                                   search._string,
+                                   strlen(search._string)) != 0;
+              break;
+            case FilterOption::NotEndsWith:
+              valid = !Utilities::endsWith(toCompare,
+                                           search._string);
+              break;
+          }
+          if (valid) {
+            break;
+          }
+        }
+
+      } else if (filter.field->getFieldType() == ValueType::Integer) {
+        auto toCompare = cell._integer;
+        for (const auto &search : filter.searchData) {
+          valid = Utilities::compareInt(toCompare, search._integer) == 0;
+          if (valid) {
+            break;
+          }
+        }
+      } else if (filter.field->getFieldType() == ValueType::Double) {
+        auto toCompare = cell._double;
+        for (const auto &search : filter.searchData) {
+          valid = Utilities::compareDouble(toCompare, search._double) == 0;
+          if (valid) {
+            break;
+          }
+        }
+      } else if (filter.field->getFieldType() == ValueType::Currency) {
+        auto toCompare = cell._currency;
+        for (const auto &search : filter.searchData) {
+          valid =
+              Utilities::compareCurrency(*toCompare, *search._currency) == 0;
+          if (valid) {
+            break;
+          }
+        }
+      } else if (filter.field->getFieldType() == ValueType::DateTime) {
+        auto toCompare = cell._dateTime;
+        for (const auto &search : filter.searchData) {
+          valid =
+              Utilities::compareDateTime(*toCompare, *search._dateTime) == 0;
+          if (valid) {
+            break;
+          }
+        }
+      }
+    }
+
+    if (valid) {
+      resultView->data.emplace_back(std::vector<DataSetRow *>{iter});
+    }
+  }
+  resultView->data.emplace_back();
+  return resultView;
 }
 
 bool DataSets::MemoryViewDataSet::findFirst(DataSets::FilterItem &item) {
