@@ -3,9 +3,24 @@
 //
 
 #include <MemoryDataSet.h>
-#include <MemoryViewDataSet.h>
+#include <QueryParser.h>
 
 int main() {
+  DataBase::QueryLexicalAnalyser lexicalAnalyser;
+  lexicalAnalyser.setInput(
+      "select * from table join t2 on table.a = t2.b where t2.b > 10 order by t2.c asc;");
+
+  std::vector<std::tuple<DataBase::Token, std::string, bool>> tokens;
+
+  do {
+    tokens.push_back(lexicalAnalyser.getNextToken());
+  } while (std::get<2>(tokens.back()));
+
+  for (const auto &val : tokens) {
+    std::cout << std::get<1>(val) << " ";
+  }
+
+  return 0;
   DataSets::MemoryDataSet dataSet("test");
 
   dataSet.openEmpty({"1", "2"}, {ValueType::String, ValueType::String});

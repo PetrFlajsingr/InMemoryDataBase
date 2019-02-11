@@ -8,25 +8,40 @@
 #include <exception>
 #include <Exceptions.h>
 #include <vector>
+#include <string>
+
 namespace DataBase {
 class QueryException : public std::exception {
+ private:
+  const gsl::czstring<> errorMessage;
+ public:
+  explicit QueryException(const gsl::czstring<> message)
+      : errorMessage(message) {}
 
+  char const *what() const noexcept override {
+    return errorMessage;
+  }
 };
 
 class LexException : public QueryException {
-
+ public:
+  explicit LexException(const char *message) : QueryException(message) {}
 };
 
 class SyntaxException : public QueryException {
-
+ public:
+  explicit SyntaxException(const char *message) : QueryException(message) {}
 };
 
 class SemanticException : public QueryException {
-
+ public:
+  explicit SemanticException(const char *message) : QueryException(message) {}
 };
 
-class DataBaseQueryException : public QueryException, public DataBaseException {
-
+class DataBaseQueryException : public QueryException {
+ public:
+  explicit DataBaseQueryException(const char *message)
+      : QueryException(message) {}
 };
 
 class StructuredQuery {
@@ -41,6 +56,7 @@ class StructuredQuery {
 enum class Token {
   id,
   number,
+  numberFloat,
   string,
   equal,
   notEqual,
@@ -57,13 +73,15 @@ enum class Token {
   asterisk,
   // keywords:
       select,
+  group,
   from,
   where,
-  orderBy,
+  order,
+  by,
   join,
-  leftJoin,
-  rightJoin,
-  outerJoin,
+  left,
+  right,
+  outer,
   having,
   sum,
   avg,
@@ -73,13 +91,27 @@ enum class Token {
   asc,
   desc,
   orLogic,
-  andLogic
+  andLogic,
+  on
 };
 
 class QueryLexicalAnalyser {
  public:
-  std::vector<Token> analyseCharSequence(std::string_view input);
+  void setInput(const std::string &input);
+
+  std::tuple<Token, std::string, bool> getNextToken();
  private:
+  std::string input;
+
+  gsl::index currentIndex;
+
+  Token keyWordCheck(std::string_view str);
+
+  std::string getErrorPrint();
+
+  enum class LexState {
+    start, num1, numFloat, id, string, exclam, less, greater
+  };
 };
 
 class QuerySyntaxAnalyser {

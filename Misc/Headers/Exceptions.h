@@ -76,7 +76,7 @@ class DataBaseException : public std::exception {
   const gsl::czstring<> errorMessage;
  public:
   explicit DataBaseException(const std::string &errorMessage) : errorMessage(
-      errorMessage.c_str(())) {}
+      errorMessage.c_str()) {}
   explicit DataBaseException(const gsl::czstring<> message)
       : errorMessage(message) {}
 
