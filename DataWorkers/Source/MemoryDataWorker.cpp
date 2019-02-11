@@ -40,7 +40,6 @@ DataWorkers::MemoryDataWorker::MemoryDataWorker(
   dataset->open(dataProvider, fieldTypes);
 }
 
-// TODO: fix pro filter view -- nebo rovnou pozdeji smazat cely data worker...
 void DataWorkers::MemoryDataWorker::writeResult(DataWriters::BaseDataWriter &writer,
                                                 std::string_view sql) {
   queryData = SQLParser::parse(sql);

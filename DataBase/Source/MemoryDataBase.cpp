@@ -25,7 +25,7 @@ void DataBase::MemoryDataBase::removeTable(std::string_view tableName) {
       it != tables.end()) {
     tables.erase(it);
   } else {
-    throw DataBaseException();
+    throw DataBaseException("Table " + std::string(tableName) + " not found.");
   }
 }
 
@@ -49,14 +49,7 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::MemoryDataBase::execSimpl
     bool keepView,
     std::string_view viewName) {
   throw NotImplementedException();
-//  auto view = std::make_shared<DataSets::MemoryViewDataSet>(viewName);
 
-  // ... TODO: implement
-
-  if (keepView) {
-
-  }
-  return nullptr;
 }
 
 std::shared_ptr<DataSets::BaseDataSet> DataBase::MemoryDataBase::execAggregateQuery(

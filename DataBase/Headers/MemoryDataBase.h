@@ -10,12 +10,9 @@
 #include <BaseDataSet.h>
 #include <Relation.h>
 #include <MemoryViewDataSet.h>
+#include <Exceptions.h>
 
 namespace DataBase {
-class DataBaseException : public std::exception {
-
-};
-
 class Rel;
 
 struct Table {

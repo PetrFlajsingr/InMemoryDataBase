@@ -12,7 +12,7 @@ namespace DataSets {
 // read only
 class ViewDataSet : public BaseDataSet {
  public:
-  ViewDataSet(const std::string_view &dataSetName);
+  explicit ViewDataSet(const std::string_view &dataSetName);
 
 };
 }  // namespace DataSets
