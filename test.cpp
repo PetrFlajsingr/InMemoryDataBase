@@ -6,9 +6,10 @@
 #include <QueryParser.h>
 
 int main() {
-  DataBase::QueryLexicalAnalyser lexicalAnalyser;
+  DataBase::LexicalAnalyser lexicalAnalyser;
   lexicalAnalyser.setInput(
-      "select * from table join t2 on table.a = t2.b where t2.b > 10 order by t2.c asc;");
+      "select *.table from table join t2 on table.a = t2.b where t2.b != 10 "
+      "group by table.wat having a.a > 10 order by t2.c asc;");
 
   std::vector<std::tuple<DataBase::Token, std::string, bool>> tokens;
 
@@ -16,9 +17,10 @@ int main() {
     tokens.push_back(lexicalAnalyser.getNextToken());
   } while (std::get<2>(tokens.back()));
 
-  for (const auto &val : tokens) {
-    std::cout << std::get<1>(val) << " ";
-  }
+  DataBase::SyntaxAnalyser syntaxAnalyser;
+  syntaxAnalyser.setInput(tokens);
+
+  syntaxAnalyser.analyse();
 
   return 0;
   DataSets::MemoryDataSet dataSet("test");

@@ -30,6 +30,8 @@ include_directories(DataWorkers/Headers)
 
 include_directories(DataBase/Headers)
 
+include_directories(DataBase/QueryParser/Headers)
+
 include_directories(third_party/xlsxio/include)
 
 include_directories(third_party/catch2)
@@ -81,6 +83,9 @@ FILE(GLOB RelationLayerTests DataBase/tests/*catch*.cpp)
 FILE(GLOB FileDownloaderSources FileDownloaders/Source/*.cpp)
 FILE(GLOB FileDownloaderHeaders FileDownloaders/Headers/*.h)
 
+FILE(GLOB QueryParserSources DataBase/QueryParser/Source/*.cpp)
+FILE(GLOB QueryParserHeaders DataBase/QueryParser/Headers/*.h)
+
 # third party:
 FILE(GLOB xlsxioHeaders third_party/xlsxio/include/*.h)
 FILE(GLOB decimalHeaders third_party/decimal/*.h)
@@ -88,6 +93,7 @@ FILE(GLOB decimalHeaders third_party/decimal/*.h)
 set(SOURCE_FILES
         ${DataProviderSources}
         ${DataSetSources}
+        ${QueryParserSources}
         ${FieldSources}
         ${DataWorkerSources}
         ${DataWriterSources}
