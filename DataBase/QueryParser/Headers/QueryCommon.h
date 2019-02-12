@@ -86,6 +86,7 @@ struct ProjectStructure {
 };
 
 struct StructuredQuery {
+  std::string mainTable;
   WhereStructure where;
   JoinStructure joins;
   AgreStructure agr;

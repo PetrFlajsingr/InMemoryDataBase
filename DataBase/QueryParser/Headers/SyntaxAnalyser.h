@@ -42,7 +42,6 @@ class SyntaxAnalyser {
     joinCond2nd,
     joinCond2ndDot,
     joinCond2ndId,
-    joinNext,
     where,
     group,
     order,
