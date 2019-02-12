@@ -6,11 +6,91 @@
 #define PROJECT_QUERYCOMMON_H
 
 #include <string>
+#include <vector>
+#include <utility>
 
 namespace DataBase {
 
-class StructuredQuery {
-  // where
+enum class CondOperator {
+  greater, greaterEqual, less, lessEqual, equal, notEqual
+};
+
+enum class LogicOperator {
+  logicOr, logicAnd, none
+};
+
+enum class ConstType {
+  integer, floatingPoint, string
+};
+
+enum class AgrOperator {
+  sum, avg, count, min, max, group
+};
+
+enum class OrderDir {
+  asc, desc
+};
+
+struct FieldId {
+  std::string table;
+  std::string column;
+};
+
+struct WhereItem {
+  FieldId field;
+  CondOperator condOperator;
+};
+struct WhereItemConst : public WhereItem {
+  std::vector<std::pair<ConstType, std::string>> values;
+};
+struct WhereItemCol : public WhereItem {
+  std::vector<std::pair<std::string/*table*/, std::string/*column*/>> values;
+};
+struct WhereStructure {
+  std::vector<std::pair<WhereItem, LogicOperator>> data;
+};
+
+struct JoinItem {
+  std::string joinedTable;
+  FieldId firstField;
+  FieldId secondField;
+};
+struct JoinStructure {
+  std::vector<JoinItem> data;
+};
+
+struct AgreItem {
+  AgrOperator op;
+  FieldId field;
+};
+struct AgreStructure {
+  std::vector<AgreItem> data;
+};
+
+struct HavingItem {
+  AgrOperator op;
+  FieldId field;
+  std::vector<std::pair<ConstType, std::string>> values;
+};
+struct HavingStructure {
+  std::vector<HavingItem> data;
+};
+
+struct OrderItem {
+  OrderDir order;
+  FieldId field;
+};
+struct OrderStructure {
+  std::vector<OrderItem> data;
+};
+
+struct ProjectItem : public FieldId {};
+struct ProjectStructure {
+  std::vector<ProjectItem> data;
+};
+
+struct StructuredQuery {
+  WhereStructure where;
   // join
   // agre (+ group by)
   // having

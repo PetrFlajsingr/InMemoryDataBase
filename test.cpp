@@ -3,7 +3,8 @@
 //
 
 #include <MemoryDataSet.h>
-#include <QueryParser.h>
+#include <LexicalAnalyser.h>
+#include <SyntaxAnalyser.h>
 
 int main() {
   DataBase::LexicalAnalyser lexicalAnalyser;

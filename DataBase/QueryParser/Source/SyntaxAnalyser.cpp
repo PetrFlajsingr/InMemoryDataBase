@@ -11,6 +11,8 @@ void DataBase::SyntaxAnalyser::setInput(const std::vector<std::tuple<Token,
 }
 
 DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
+  StructuredQuery result;
+
   auto state = SynState::start;
 
   for (const auto &it : tokens) {
@@ -569,6 +571,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
   if (state != SynState::end) {
     throw SyntaxException("Command not properly ended.");
   }
+  return result;
 }
 
 std::string DataBase::SyntaxAnalyser::getErrorMsg(DataBase::SyntaxAnalyser::SynErrType errType,
