@@ -11,34 +11,36 @@
 namespace DataBase {
 class QueryException : public std::exception {
  private:
-  const gsl::czstring<> errorMessage;
+  const std::string errorMessage;
  public:
-  explicit QueryException(const gsl::czstring<> message)
+  explicit QueryException(const std::string &message)
       : errorMessage(message) {}
 
   char const *what() const noexcept override {
-    return errorMessage;
+    return errorMessage.c_str();
   }
 };
 
 class LexException : public QueryException {
  public:
-  explicit LexException(const char *message) : QueryException(message) {}
+  explicit LexException(const std::string &message) : QueryException(message) {}
 };
 
 class SyntaxException : public QueryException {
  public:
-  explicit SyntaxException(const char *message) : QueryException(message) {}
+  explicit SyntaxException(const std::string &message)
+      : QueryException(message) {}
 };
 
 class SemanticException : public QueryException {
  public:
-  explicit SemanticException(const char *message) : QueryException(message) {}
+  explicit SemanticException(const std::string &message) : QueryException(
+      message) {}
 };
 
 class DataBaseQueryException : public QueryException {
  public:
-  explicit DataBaseQueryException(const char *message)
+  explicit DataBaseQueryException(const std::string &message)
       : QueryException(message) {}
 };
 }

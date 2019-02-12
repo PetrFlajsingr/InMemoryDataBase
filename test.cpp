@@ -5,6 +5,7 @@
 #include <MemoryDataSet.h>
 #include <LexicalAnalyser.h>
 #include <SyntaxAnalyser.h>
+#include <QueryException.h>
 
 int main() {
   DataBase::LexicalAnalyser lexicalAnalyser;
@@ -14,14 +15,18 @@ int main() {
 
   std::vector<std::tuple<DataBase::Token, std::string, bool>> tokens;
 
-  do {
-    tokens.push_back(lexicalAnalyser.getNextToken());
-  } while (std::get<2>(tokens.back()));
+  try {
+    do {
+      tokens.push_back(lexicalAnalyser.getNextToken());
+    } while (std::get<2>(tokens.back()));
 
-  DataBase::SyntaxAnalyser syntaxAnalyser;
-  syntaxAnalyser.setInput(tokens);
+    DataBase::SyntaxAnalyser syntaxAnalyser;
+    syntaxAnalyser.setInput(tokens);
 
-  syntaxAnalyser.analyse();
+    syntaxAnalyser.analyse();
+  } catch (DataBase::QueryException &exc) {
+    std::cerr << exc.what();
+  }
 
   return 0;
   DataSets::MemoryDataSet dataSet("test");

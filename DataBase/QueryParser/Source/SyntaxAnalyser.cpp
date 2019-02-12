@@ -27,7 +27,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::missing,
                                             {Token::select},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::selectList:
@@ -39,7 +39,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::id},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::selectAgrItem:
@@ -48,7 +48,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::leftBracket},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::selectAgrItemId:
@@ -57,7 +57,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::id},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::selectAgrItemIdDot:
@@ -66,7 +66,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::dot},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::selectAgrItemId2:
@@ -75,7 +75,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::id},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::selectAgrItemEnd:
@@ -84,7 +84,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::rightBracket},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::selectItem:
@@ -93,7 +93,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::dot},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::selectItemEnd:
@@ -102,7 +102,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::id},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::selectItemDivide:
@@ -113,7 +113,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::from, Token::colon},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::from:
@@ -122,7 +122,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::id},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::joinList:
@@ -131,7 +131,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::join},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::joinItem:
@@ -140,7 +140,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::id},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::joinOn:
@@ -159,7 +159,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
                                             {Token::on, Token::semicolon,
                                              Token::where, Token::group,
                                              Token::order},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::joinCond1st:
@@ -168,7 +168,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::id},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::joinCond1stDot:
@@ -177,7 +177,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::dot},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::joinCond1stId:
@@ -186,7 +186,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::id},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::joinCondEq:
@@ -195,7 +195,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::id},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::joinCond2nd:
@@ -204,7 +204,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::id},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::joinCond2ndDot:
@@ -213,7 +213,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::dot},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::joinCond2ndId:
@@ -222,7 +222,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::id},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::joinNext:
@@ -241,7 +241,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
                                             {Token::colon, Token::where,
                                              Token::group, Token::order,
                                              Token::semicolon},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::where:
@@ -250,7 +250,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::id},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::whereItemDot:
@@ -259,7 +259,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::dot},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::whereItem2:
@@ -268,7 +268,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::id},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::whereItemCmp:
@@ -277,7 +277,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             cmpFunc,
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::whereItem2nd:
@@ -289,7 +289,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             constants,
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::whereCnst:
@@ -305,7 +305,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::pipe, Token::orLogic,
                                              Token::andLogic},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::whereItem2ndId:
@@ -314,7 +314,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::id},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::whereItem2ndDot:
@@ -323,7 +323,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::dot},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::whereItem2ndId2:
@@ -332,7 +332,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::id},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::whereItemId:
@@ -350,7 +350,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::pipe, Token::orLogic,
                                              Token::andLogic},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::group:
@@ -359,7 +359,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::by},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::groupBy:
@@ -368,7 +368,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::id},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::groupIdDot:
@@ -377,7 +377,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::dot},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::groupId2:
@@ -386,7 +386,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::id},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::groupIdNext:
@@ -400,7 +400,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
           throw SyntaxException(getErrorMsg(SynErrType::missing,
                                             {Token::having, Token::colon,
                                              Token::order},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::havingItem:
@@ -409,7 +409,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::id},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::havingItemDot:
@@ -418,7 +418,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::dot},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::havingItem2:
@@ -427,7 +427,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::id},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::havingItemCmp:
@@ -436,7 +436,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             cmpFunc,
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::havingItem2nd:
@@ -448,7 +448,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             constants,
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::havingCnst:
@@ -462,7 +462,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::pipe, Token::orLogic,
                                              Token::andLogic},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::havingItem2ndId:
@@ -471,7 +471,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::id},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::havingItem2ndDot:
@@ -480,7 +480,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::dot},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::havingItem2ndId2:
@@ -489,7 +489,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::id},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::havingItemId:
@@ -506,7 +506,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
                                             {Token::order, Token::pipe,
                                              Token::orLogic, Token::andLogic,
                                              Token::semicolon},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::order:
@@ -515,7 +515,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::by},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::orderBy:
@@ -524,7 +524,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::id},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::orderId:
@@ -533,7 +533,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::dot},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::orderIdDot:
@@ -542,7 +542,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::id},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::orderIdDir:
@@ -551,7 +551,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::asc, Token::desc},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::orderItemDone:
@@ -562,7 +562,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::semicolon, Token::colon},
-                                            it).c_str());
+                                            it));
         }
         break;
       case SynState::end:throw SyntaxException("Unexpected token after \";\".");

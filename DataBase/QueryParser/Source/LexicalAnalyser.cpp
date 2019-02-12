@@ -82,14 +82,14 @@ std::tuple<DataBase::Token,
         } else if (*it == '!') {
           state = LexState::exclam;
         } else {
-          throw LexException(getErrorPrint().c_str());
+          throw LexException(getErrorPrint());
         }
         break;
       case LexState::negNum:
         if (isdigit(*it)) {
           state = LexState::num1;
         } else {
-          throw LexException(getErrorPrint().c_str());
+          throw LexException(getErrorPrint());
         }
         break;
       case LexState::num1:
@@ -151,7 +151,7 @@ std::tuple<DataBase::Token,
           value += *it;
           goto emit_token_move_iter;
         } else {
-          throw LexException(getErrorPrint().c_str());
+          throw LexException(getErrorPrint());
         }
     }
 
