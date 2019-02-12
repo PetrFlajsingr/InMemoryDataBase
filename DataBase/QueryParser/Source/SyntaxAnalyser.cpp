@@ -31,9 +31,57 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
       case SynState::selectList:
         if (token == Token::id || token == Token::asterisk) {
           state = SynState::selectItem;
+        } else if (std::find(agrFunc.begin(), agrFunc.end(), token)
+            != agrFunc.end()) {
+          state = SynState::selectAgrItem;
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::id},
+                                            it).c_str());
+        }
+        break;
+      case SynState::selectAgrItem:
+        if (token == Token::leftBracket) {
+          state = SynState::selectAgrItemId;
+        } else {
+          throw SyntaxException(getErrorMsg(SynErrType::wrong,
+                                            {Token::leftBracket},
+                                            it).c_str());
+        }
+        break;
+      case SynState::selectAgrItemId:
+        if (token == Token::id) {
+          state = SynState::selectAgrItemIdDot;
+        } else {
+          throw SyntaxException(getErrorMsg(SynErrType::wrong,
+                                            {Token::id},
+                                            it).c_str());
+        }
+        break;
+      case SynState::selectAgrItemIdDot:
+        if (token == Token::dot) {
+          state = SynState::selectAgrItemId2;
+        } else {
+          throw SyntaxException(getErrorMsg(SynErrType::wrong,
+                                            {Token::dot},
+                                            it).c_str());
+        }
+        break;
+      case SynState::selectAgrItemId2:
+        if (token == Token::id) {
+          state = SynState::selectAgrItemEnd;
+        } else {
+          throw SyntaxException(getErrorMsg(SynErrType::wrong,
+                                            {Token::id},
+                                            it).c_str());
+        }
+        break;
+      case SynState::selectAgrItemEnd:
+        if (token == Token::rightBracket) {
+          state = SynState::selectItemDivide;
+        } else {
+          throw SyntaxException(getErrorMsg(SynErrType::wrong,
+                                            {Token::rightBracket},
                                             it).c_str());
         }
         break;

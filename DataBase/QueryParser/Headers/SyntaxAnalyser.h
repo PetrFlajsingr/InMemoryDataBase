@@ -24,6 +24,11 @@ class SyntaxAnalyser {
     start,
     selectList,
     selectItem,
+    selectAgrItem,
+    selectAgrItemId,
+    selectAgrItemIdDot,
+    selectAgrItemId2,
+    selectAgrItemEnd,
     selectItemEnd,
     selectItemDivide,
     from,
@@ -81,6 +86,8 @@ class SyntaxAnalyser {
        Token::equal, Token::notEqual};
   const std::vector<Token>
       constants{Token::number, Token::numberFloat, Token::string};
+  const std::vector<Token>
+      agrFunc{Token::sum, Token::avg, Token::min, Token::max, Token::count};
 
   std::vector<std::tuple<Token, std::string, bool>> tokens;
 
