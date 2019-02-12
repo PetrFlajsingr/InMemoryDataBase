@@ -27,7 +27,7 @@ enum class AgrOperator {
   sum, avg, count, min, max, group
 };
 
-enum class OrderDir {
+enum class Order {
   asc, desc
 };
 
@@ -73,7 +73,7 @@ struct HavingStructure {
 };
 
 struct OrderItem {
-  OrderDir order;
+  Order order;
   FieldId field;
 };
 struct OrderStructure {
@@ -145,6 +145,8 @@ ConstType tokenToConstType(Token token);
 LogicOperator tokenToLogic(Token token);
 
 AgrOperator tokenToAgrOperation(Token token);
+
+Order tokenToOrder(Token token);
 }
 
 #endif //PROJECT_QUERYCOMMON_H

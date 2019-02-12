@@ -15,10 +15,10 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
 
   auto state = SynState::start;
 
-  ProjectItem projectItem;
-  WhereItem whereItem;
+  ProjectItem projectItem; // done
+  WhereItem whereItem; // done
   JoinItem joinItem;
-  AgreItem agrItem;
+  AgreItem agrItem; // done
   HavingItem havingItem;
   OrderItem orderItem;
 
@@ -555,6 +555,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
       case SynState::orderBy:
         if (token == Token::id) {
           state = SynState::orderId;
+          orderItem.field.table = std::get<1>(it);
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::id},
@@ -573,6 +574,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
       case SynState::orderIdDot:
         if (token == Token::id) {
           state = SynState::orderIdDir;
+          orderItem.field.column = std::get<1>(it);
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::id},
@@ -582,6 +584,8 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
       case SynState::orderIdDir:
         if (token == Token::asc || token == Token::desc) {
           state = SynState::orderItemDone;
+          orderItem.order = tokenToOrder(token);
+          result.order.data.emplace_back(orderItem);
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::asc, Token::desc},

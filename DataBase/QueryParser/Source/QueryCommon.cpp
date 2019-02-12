@@ -94,3 +94,12 @@ DataBase::AgrOperator DataBase::tokenToAgrOperation(DataBase::Token token) {
   }
 }
 
+DataBase::Order DataBase::tokenToOrder(DataBase::Token token) {
+  switch (token) {
+    case Token::asc: return Order::asc;
+    case Token::desc: return Order::desc;
+    default:
+      throw IllegalStateException("Internal error: DataBase::tokenToConstType");
+  }
+}
+
