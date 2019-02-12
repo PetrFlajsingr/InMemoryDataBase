@@ -10,7 +10,7 @@
 int main() {
   DataBase::LexicalAnalyser lexicalAnalyser;
   lexicalAnalyser.setInput(
-      "select table.a, sum(t2.c), avg(t2.d) from table join t2 on table.a = t2.b where t2.b != 10 | 15 "
+      "select#tohle je select man# table.a, sum(t2.c), avg(t2.d) from table join t2 on table.a = t2.b where t2.b != 10 | 15 "
       "or t2.c >= 10000 and table.a = table.b | 1000 | -100 "
       "group by table.a having a.a > 10 order by t2.c asc;");
 
