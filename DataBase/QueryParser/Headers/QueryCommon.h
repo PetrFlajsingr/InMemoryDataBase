@@ -39,12 +39,8 @@ struct FieldId {
 struct WhereItem {
   FieldId field;
   CondOperator condOperator;
-};
-struct WhereItemConst : public WhereItem {
-  std::vector<std::pair<ConstType, std::string>> values;
-};
-struct WhereItemCol : public WhereItem {
-  std::vector<std::pair<std::string/*table*/, std::string/*column*/>> values;
+  std::vector<std::pair<ConstType, std::string>> valuesConst;
+  std::vector<FieldId> values;
 };
 struct WhereStructure {
   std::vector<std::pair<WhereItem, LogicOperator>> data;
@@ -91,11 +87,11 @@ struct ProjectStructure {
 
 struct StructuredQuery {
   WhereStructure where;
-  // join
-  // agre (+ group by)
-  // having
-  // order by
-  // proje
+  JoinStructure joins;
+  AgreStructure agr;
+  HavingStructure having;
+  OrderStructure order;
+  ProjectStructure project;
 };
 
 enum class Token {
@@ -135,13 +131,18 @@ enum class Token {
   count,
   asc,
   desc,
-  orLogic,
-  andLogic,
+  logicOr,
+  logicAnd,
   on
 };
 
 std::string tokenToString(Token token);
 
+CondOperator tokenToCondOperator(Token token);
+
+ConstType tokenToConstType(Token token);
+
+LogicOperator tokenToLogic(Token token);
 }
 
 #endif //PROJECT_QUERYCOMMON_H

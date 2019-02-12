@@ -3,6 +3,7 @@
 //
 
 #include <QueryCommon.h>
+#include <Exceptions.h>
 
 std::string DataBase::tokenToString(DataBase::Token token) {
   switch (token) {
@@ -42,9 +43,42 @@ std::string DataBase::tokenToString(DataBase::Token token) {
     case Token::count: return "count";
     case Token::asc: return "asc";
     case Token::desc: return "desc";
-    case Token::orLogic: return "orLogic";
-    case Token::andLogic: return "andLogic";
+    case Token::logicOr: return "orLogic";
+    case Token::logicAnd: return "andLogic";
     case Token::on: return "on";
+  }
+}
+
+DataBase::CondOperator DataBase::tokenToCondOperator(DataBase::Token token) {
+  switch (token) {
+    case Token::greater: return CondOperator::greater;
+    case Token::greaterEqual: return CondOperator::greaterEqual;
+    case Token::less: return CondOperator::less;
+    case Token::lessEqual: return CondOperator::lessEqual;
+    case Token::equal: return CondOperator::equal;
+    case Token::notEqual: return CondOperator::notEqual;
+    default:
+      throw IllegalStateException(
+          "Internal error: DataBase::tokenToCondOperator");
+  }
+}
+
+DataBase::ConstType DataBase::tokenToConstType(DataBase::Token token) {
+  switch (token) {
+    case Token::number: return ConstType::integer;
+    case Token::numberFloat: return ConstType::floatingPoint;
+    case Token::string: return ConstType::string;
+    default:
+      throw IllegalStateException("Internal error: DataBase::tokenToConstType");
+  }
+}
+
+DataBase::LogicOperator DataBase::tokenToLogic(DataBase::Token token) {
+  switch (token) {
+    case Token::logicOr: return LogicOperator::logicOr;
+    case Token::logicAnd: return LogicOperator::logicAnd;
+    default:
+      throw IllegalStateException("Internal error: DataBase::tokenToConstType");
   }
 }
 

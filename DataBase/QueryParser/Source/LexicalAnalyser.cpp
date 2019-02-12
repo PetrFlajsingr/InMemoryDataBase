@@ -136,6 +136,7 @@ std::tuple<DataBase::Token,
           token = Token::less;
           goto emit_token;
         }
+        break;
       case LexState::greater:
         if (*it == '=') {
           token = Token::greaterEqual;
@@ -145,6 +146,7 @@ std::tuple<DataBase::Token,
           token = Token::greater;
           goto emit_token;
         }
+        break;
       case LexState::exclam:
         if (*it == '=') {
           token = Token::notEqual;
@@ -153,6 +155,7 @@ std::tuple<DataBase::Token,
         } else {
           throw LexException(getErrorPrint());
         }
+        break;
     }
 
     value += *it;
@@ -207,9 +210,9 @@ DataBase::Token DataBase::LexicalAnalyser::keyWordCheck(std::string_view str) {
   } else if (Utilities::compareString(str, "desc") == 0) {
     return Token::desc;
   } else if (Utilities::compareString(str, "or") == 0) {
-    return Token::orLogic;
+    return Token::logicOr;
   } else if (Utilities::compareString(str, "and") == 0) {
-    return Token::andLogic;
+    return Token::logicAnd;
   } else if (Utilities::compareString(str, "on") == 0) {
     return Token::on;
   } else {

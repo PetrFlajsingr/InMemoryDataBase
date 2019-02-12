@@ -53,7 +53,6 @@ class SyntaxAnalyser {
     whereCnst,
     whereItem2ndId,
     whereItem2ndDot,
-    whereItem2ndId2,
     whereItemId,
     groupBy,
     groupIdDot,
