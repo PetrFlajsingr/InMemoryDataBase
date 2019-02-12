@@ -5,16 +5,16 @@
 #include <MemoryDataSet.h>
 #include <LexicalAnalyser.h>
 #include <SyntaxAnalyser.h>
-#include <QueryException.h>
 
 int main() {
   DataBase::LexicalAnalyser lexicalAnalyser;
+
+  std::vector<std::tuple<DataBase::Token, std::string, bool>> tokens;
+
   lexicalAnalyser.setInput(
       "select#tohle je select man# table.a, sum(t2.c), avg(t2.d) from table join t2 on table.a = t2.b where t2.b != 10 | 15 "
       "or t2.c >= 10000 and table.a = table.b | 1000 | -100 "
       "group by table.a having a.a > 10 order by t2.c asc;");
-
-  std::vector<std::tuple<DataBase::Token, std::string, bool>> tokens;
 
   try {
     do {
@@ -26,10 +26,12 @@ int main() {
 
     auto strQuery = syntaxAnalyser.analyse();
 
-    std::cout << "Success";
+    std::cout << "Success\n";
   } catch (DataBase::QueryException &exc) {
     std::cerr << exc.what();
   }
+
+  tokens.clear();
 
   return 0;
   DataSets::MemoryDataSet dataSet("test");

@@ -82,3 +82,15 @@ DataBase::LogicOperator DataBase::tokenToLogic(DataBase::Token token) {
   }
 }
 
+DataBase::AgrOperator DataBase::tokenToAgrOperation(DataBase::Token token) {
+  switch (token) {
+    case Token::sum: return AgrOperator::sum;
+    case Token::avg: return AgrOperator::avg;
+    case Token::min: return AgrOperator::min;
+    case Token::max: return AgrOperator::max;
+    case Token::count: return AgrOperator::count;
+    default:
+      throw IllegalStateException("Internal error: DataBase::tokenToConstType");
+  }
+}
+

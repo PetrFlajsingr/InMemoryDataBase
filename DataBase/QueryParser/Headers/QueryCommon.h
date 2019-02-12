@@ -143,6 +143,8 @@ CondOperator tokenToCondOperator(Token token);
 ConstType tokenToConstType(Token token);
 
 LogicOperator tokenToLogic(Token token);
+
+AgrOperator tokenToAgrOperation(Token token);
 }
 
 #endif //PROJECT_QUERYCOMMON_H
