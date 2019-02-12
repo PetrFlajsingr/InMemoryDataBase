@@ -21,7 +21,8 @@ std::tuple<DataBase::Token,
   Token token;
 
   while (it != input.end()) {
-    if (isComment && *it == '#') {
+    if (isComment && (*it == '#' || *it == '\0' || *it == '\n'
+        || it == input.end() - 1)) {
       isComment = false;
       it++;
     } else if (*it == '#') {

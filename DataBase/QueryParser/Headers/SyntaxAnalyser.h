@@ -32,6 +32,9 @@ class SyntaxAnalyser {
     selectItemEnd,
     selectItemDivide,
     from,
+    joinLeft,
+    joinRight,
+    joinOuter,
     joinList,
     joinItem,
     joinOn,
@@ -58,7 +61,10 @@ class SyntaxAnalyser {
     groupId2,
     groupIdNext,
     havingItem,
+    havingLeftBracket,
     havingItemDot,
+    havingItemIdIn,
+    havingRightBracket,
     havingItem2,
     havingItemCmp,
     havingItem2nd,
@@ -78,6 +84,8 @@ class SyntaxAnalyser {
   enum class SynErrType {
     missing, wrong
   };
+
+  gsl::index currentToken = 0;
 
   const std::vector<Token> cmpFunc
       {Token::less, Token::lessEqual, Token::greater, Token::greaterEqual,

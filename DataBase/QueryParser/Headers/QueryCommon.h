@@ -31,6 +31,10 @@ enum class Order {
   asc, desc
 };
 
+enum class JoinType {
+  innerJoin, leftJoin, rightJoin, outerJoin
+};
+
 struct FieldId {
   std::string table;
   std::string column;
@@ -39,7 +43,7 @@ struct FieldId {
 struct WhereItem {
   FieldId field;
   CondOperator condOperator;
-  std::vector<std::pair<ConstType, std::string>> valuesConst;
+  std::vector<std::pair<ConstType, std::string>> constValues;
   std::vector<FieldId> values;
 };
 struct WhereStructure {
@@ -50,6 +54,7 @@ struct JoinItem {
   std::string joinedTable;
   FieldId firstField;
   FieldId secondField;
+  JoinType type;
 };
 struct JoinStructure {
   std::vector<JoinItem> data;
@@ -64,12 +69,13 @@ struct AgreStructure {
 };
 
 struct HavingItem {
-  AgrOperator op;
-  FieldId field;
-  std::vector<std::pair<ConstType, std::string>> values;
+  AgreItem agreItem;
+  CondOperator condOperator;
+  std::vector<std::pair<ConstType, std::string>> constValues;
+  std::vector<FieldId> values;
 };
 struct HavingStructure {
-  std::vector<HavingItem> data;
+  std::vector<std::pair<HavingItem, LogicOperator>> data;
 };
 
 struct OrderItem {
@@ -134,7 +140,8 @@ enum class Token {
   desc,
   logicOr,
   logicAnd,
-  on
+  on,
+  unknown
 };
 
 std::string tokenToString(Token token);

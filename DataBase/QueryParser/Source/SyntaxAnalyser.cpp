@@ -11,21 +11,23 @@ void DataBase::SyntaxAnalyser::setInput(const std::vector<std::tuple<Token,
 }
 
 DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
+  currentToken = 0;
   StructuredQuery result;
 
   auto state = SynState::start;
 
-  ProjectItem projectItem; // done
-  WhereItem whereItem; // done
-  JoinItem joinItem; // TODO: left/right/outer join
-  AgreItem agrItem; // done
+  ProjectItem projectItem;
+  WhereItem whereItem;
+  JoinItem joinItem;
+  AgreItem agrItem;
   HavingItem havingItem; // TODO: brackets
-  OrderItem orderItem; // done
+  OrderItem orderItem;
 
   FieldId fieldId;
   for (const auto &it : tokens) {
     auto token = std::get<0>(it);
     if (token == Token::space) {
+      currentToken++;
       continue;
     }
     switch (state) {
@@ -144,6 +146,16 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
       case SynState::joinList: // TODO: sem dat prechod do where atd
         if (token == Token::join) {
           state = SynState::joinItem;
+          joinItem.type = JoinType::innerJoin;
+        } else if (token == Token::left) {
+          state = SynState::joinLeft;
+          joinItem.type = JoinType::leftJoin;
+        } else if (token == Token::right) {
+          state = SynState::joinRight;
+          joinItem.type = JoinType::rightJoin;
+        } else if (token == Token::outer) {
+          state = SynState::joinOuter;
+          joinItem.type = JoinType::outerJoin;
         } else if (token == Token::where) {
           state = SynState::where;
         } else if (token == Token::group) {
@@ -152,6 +164,39 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
           state = SynState::order;
         } else if (token == Token::semicolon) {
           state = SynState::end;
+        } else {
+          throw SyntaxException(getErrorMsg(SynErrType::wrong,
+                                            {Token::join, Token::where,
+                                             Token::group, Token::order,
+                                             Token::semicolon},
+                                            it));
+        }
+        break;
+      case SynState::joinLeft:
+        if (token == Token::join) {
+          state = SynState::joinItem;
+        } else {
+          throw SyntaxException(getErrorMsg(SynErrType::wrong,
+                                            {Token::join, Token::where,
+                                             Token::group, Token::order,
+                                             Token::semicolon},
+                                            it));
+        }
+        break;
+      case SynState::joinRight:
+        if (token == Token::join) {
+          state = SynState::joinItem;
+        } else {
+          throw SyntaxException(getErrorMsg(SynErrType::wrong,
+                                            {Token::join, Token::where,
+                                             Token::group, Token::order,
+                                             Token::semicolon},
+                                            it));
+        }
+        break;
+      case SynState::joinOuter:
+        if (token == Token::join) {
+          state = SynState::joinItem;
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::join, Token::where,
@@ -261,7 +306,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         if (token == Token::id) {
           state = SynState::whereItemDot;
           whereItem.values.clear();
-          whereItem.valuesConst.clear();
+          whereItem.constValues.clear();
           whereItem.field.table = std::get<1>(it);
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
@@ -302,7 +347,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         if (std::find(constants.begin(), constants.end(), token)
             != constants.end()) {
           state = SynState::whereCnst;
-          whereItem.valuesConst.emplace_back(std::make_pair(tokenToConstType(
+          whereItem.constValues.emplace_back(std::make_pair(tokenToConstType(
               token), std::get<1>(it)));
         } else if (token == Token::id) {
           state = SynState::whereItem2ndId;
@@ -436,8 +481,28 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         }
         break;
       case SynState::havingItem:
+        if (std::find(agrFunc.begin(), agrFunc.end(), token) != agrFunc.end()) {
+          state = SynState::havingLeftBracket;
+          havingItem.agreItem.op = tokenToAgrOperation(token);
+        } else {
+          throw SyntaxException(getErrorMsg(SynErrType::wrong,
+                                            agrFunc,
+                                            it));
+        }
+        break;
+      case SynState::havingLeftBracket:
+        if (token == Token::leftBracket) {
+          state = SynState::havingItemIdIn;
+        } else {
+          throw SyntaxException(getErrorMsg(SynErrType::wrong,
+                                            {Token::leftBracket},
+                                            it));
+        }
+        break;
+      case SynState::havingItemIdIn:
         if (token == Token::id) {
           state = SynState::havingItemDot;
+          havingItem.agreItem.field.table = std::get<1>(it);
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::id},
@@ -455,16 +520,28 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         break;
       case SynState::havingItem2:
         if (token == Token::id) {
-          state = SynState::havingItemCmp;
+          state = SynState::havingRightBracket;
+          havingItem.agreItem.field.column = std::get<1>(it);
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::id},
                                             it));
         }
         break;
+      case SynState::havingRightBracket:
+        if (token == Token::rightBracket) {
+          state = SynState::havingItemCmp;
+          havingItem.agreItem.field.column = std::get<1>(it);
+        } else {
+          throw SyntaxException(getErrorMsg(SynErrType::wrong,
+                                            {Token::rightBracket},
+                                            it));
+        }
+        break;
       case SynState::havingItemCmp:
         if (std::find(cmpFunc.begin(), cmpFunc.end(), token) != cmpFunc.end()) {
           state = SynState::havingItem2nd;
+          havingItem.condOperator = tokenToCondOperator(token);
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             cmpFunc,
@@ -475,6 +552,8 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         if (std::find(constants.begin(), constants.end(), token)
             != constants.end()) {
           state = SynState::havingCnst;
+          havingItem.constValues.emplace_back(tokenToConstType(token),
+                                              std::get<1>(it));
         } else if (token == Token::id) {
           state = SynState::havingItem2ndId;
         } else {
@@ -500,6 +579,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
       case SynState::havingItem2ndId:
         if (token == Token::id) {
           state = SynState::havingItem2ndDot;
+          fieldId.table = std::get<1>(it);
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::id},
@@ -518,6 +598,8 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
       case SynState::havingItem2ndId2:
         if (token == Token::id) {
           state = SynState::havingItemId;
+          fieldId.column = std::get<1>(it);
+          havingItem.values.emplace_back(fieldId);
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::id},
@@ -527,12 +609,15 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
       case SynState::havingItemId:
         if (token == Token::logicOr || token == Token::logicAnd) {
           state = SynState::havingItem;
+          result.having.data.emplace_back(havingItem, tokenToLogic(token));
         } else if (token == Token::pipe) {
           state = SynState::havingItem2nd;
         } else if (token == Token::order) {
           state = SynState::order;
+          result.having.data.emplace_back(havingItem, LogicOperator::none);
         } else if (token == Token::semicolon) {
           state = SynState::end;
+          result.having.data.emplace_back(havingItem, LogicOperator::none);
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::order, Token::pipe,
@@ -603,12 +688,12 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         break;
       case SynState::end:throw SyntaxException("Unexpected token after \";\".");
     }
+    currentToken++;
   }
   if (state != SynState::end) {
     throw SyntaxException("Command not properly ended.");
   }
-  return
-      result;
+  return result;
 }
 
 std::string DataBase::SyntaxAnalyser::getErrorMsg(DataBase::SyntaxAnalyser::SynErrType errType,
@@ -624,12 +709,28 @@ std::string DataBase::SyntaxAnalyser::getErrorMsg(DataBase::SyntaxAnalyser::SynE
   }
   auto tok2Info =
       tokenToString(std::get<0>(token2)) + " \"" + std::get<1>(token2) + "\"";
+
+  std::string query;
+  gsl::index i = 0;
+  gsl::index lenLimit = 130;
+  for (const auto &val : this->tokens) {
+    if (i == currentToken) {
+      query += ">>" + std::get<1>(val) + "<<";
+    } else {
+      query += std::get<1>(val);
+    }
+    if (query.size() > lenLimit) {
+      lenLimit += query.size();
+      query += "\n";
+    }
+    ++i;
+  }
   switch (errType) {
     case SynErrType::missing:
       return header + "Missing token: " + tok1Info + ", replaced by: "
-          + tok2Info;
+          + tok2Info + "\n" + query;
     case SynErrType::wrong:
       return header + "Unexpected token: " + tok2Info + ", expected: "
-          + tok1Info;
+          + tok1Info + "\n" + query;
   }
 }
