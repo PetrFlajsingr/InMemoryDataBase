@@ -12,12 +12,14 @@ int main() {
   std::vector<std::tuple<DataBase::Token, std::string, bool>> tokens;
 
   lexicalAnalyser.setInput(
-      "select#tohle je select# table.a, sum(t2.c), avg(t2.d) from table join t2 on table.a = t2.b "
+      "select#tohle je select# table.a as letadlo, sum(t2.c) as suma, avg(t2.d) as aver "
+      "from table "
+      "join t2 on table.a = t2.b "
       "outer join t3 on table.b = t3.b "
-      "where t2.b != 10 | 15 "
-      "or t2.c >= 10000 and table.a = table.b | 1000 | -100 "
+      "where t2.b != 10 | 15 or t2.c >= 10000 and letadlo = table.b | 1000 | -100 "
       "group by table.a "
-      "having sum(a.a) > 10 order by t2.c asc, t2.d desc;");
+      "having sum(a.a) > 10 and aver > 0.1 "
+      "order by t2.c asc, t2.d desc;");
 
   try {
     do {

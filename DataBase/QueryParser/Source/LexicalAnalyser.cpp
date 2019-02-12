@@ -21,6 +21,7 @@ std::tuple<DataBase::Token,
   Token token;
 
   while (it != input.end()) {
+    // comment skip
     if (isComment && (*it == '#' || *it == '\0' || *it == '\n'
         || it == input.end() - 1)) {
       isComment = false;
@@ -32,6 +33,7 @@ std::tuple<DataBase::Token,
       it++;
       continue;
     }
+    //\ comment skip
     switch (state) {
       case LexState::start:
         if (*it == ' ') {
@@ -139,7 +141,6 @@ std::tuple<DataBase::Token,
           token = Token::less;
           goto emit_token;
         }
-        break;
       case LexState::greater:
         if (*it == '=') {
           token = Token::greaterEqual;
@@ -149,7 +150,6 @@ std::tuple<DataBase::Token,
           token = Token::greater;
           goto emit_token;
         }
-        break;
       case LexState::exclam:
         if (*it == '=') {
           token = Token::notEqual;
@@ -158,7 +158,6 @@ std::tuple<DataBase::Token,
         } else {
           throw LexException(getErrorPrint());
         }
-        break;
     }
 
     value += *it;
@@ -167,7 +166,7 @@ std::tuple<DataBase::Token,
   emit_token_move_iter:
   it++;
   emit_token:
-  if (*it == '\0' || it == input.end()) {
+  if (it == input.end() || *it == '\0') {
     notLast = false;
   }
 
@@ -218,6 +217,8 @@ DataBase::Token DataBase::LexicalAnalyser::keyWordCheck(std::string_view str) {
     return Token::logicAnd;
   } else if (Utilities::compareString(str, "on") == 0) {
     return Token::on;
+  } else if (Utilities::compareString(str, "as") == 0) {
+    return Token::as;
   } else {
     return Token::id;
   }

@@ -31,6 +31,7 @@ class SyntaxAnalyser {
     selectAgrItemEnd,
     selectItemEnd,
     selectItemDivide,
+    selectAs,
     from,
     joinLeft,
     joinRight,

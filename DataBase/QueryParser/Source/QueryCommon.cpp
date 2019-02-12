@@ -46,6 +46,8 @@ std::string DataBase::tokenToString(DataBase::Token token) {
     case Token::logicOr: return "orLogic";
     case Token::logicAnd: return "andLogic";
     case Token::on: return "on";
+    case Token::as: return "as";
+    case Token::unknown: return "unknown";
   }
 }
 

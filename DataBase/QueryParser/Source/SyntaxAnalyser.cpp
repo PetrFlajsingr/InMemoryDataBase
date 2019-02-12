@@ -20,7 +20,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
   WhereItem whereItem;
   JoinItem joinItem;
   AgreItem agrItem;
-  HavingItem havingItem; // TODO: brackets
+  HavingItem havingItem;
   OrderItem orderItem;
 
   FieldId fieldId;
@@ -123,13 +123,26 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         }
         break;
       case SynState::selectItemDivide:
-        if (token == Token::colon) {
+        if (token == Token::as) {
+          state = SynState::selectAs;
+        } else if (token == Token::colon) {
           state = SynState::selectList;
         } else if (token == Token::from) {
           state = SynState::from;
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
-                                            {Token::from, Token::colon},
+                                            {Token::as, Token::from,
+                                             Token::colon},
+                                            it));
+        }
+        break;
+      case SynState::selectAs:
+        if (token == Token::id) {
+          state = SynState::selectItemDivide;
+          // TODO: alias
+        } else {
+          throw SyntaxException(getErrorMsg(SynErrType::wrong,
+                                            {Token::id},
                                             it));
         }
         break;
@@ -317,6 +330,11 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
       case SynState::whereItemDot:
         if (token == Token::dot) {
           state = SynState::whereItem2;
+        } else if (std::find(cmpFunc.begin(), cmpFunc.end(), token)
+            != cmpFunc.end()) {
+          state = SynState::whereItem2nd;
+          whereItem.condOperator = tokenToCondOperator(token);
+          // TODO: alias
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::dot},
@@ -481,7 +499,11 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         }
         break;
       case SynState::havingItem:
-        if (std::find(agrFunc.begin(), agrFunc.end(), token) != agrFunc.end()) {
+        if (token == Token::id) {
+          state = SynState::havingItemCmp;
+          // TODO: id
+        } else if (std::find(agrFunc.begin(), agrFunc.end(), token)
+            != agrFunc.end()) {
           state = SynState::havingLeftBracket;
           havingItem.agreItem.op = tokenToAgrOperation(token);
         } else {

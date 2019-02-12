@@ -86,7 +86,7 @@ struct OrderStructure {
   std::vector<OrderItem> data;
 };
 
-struct ProjectItem : public FieldId {};
+using ProjectItem = FieldId;
 struct ProjectStructure {
   std::vector<ProjectItem> data;
 };
@@ -141,6 +141,7 @@ enum class Token {
   logicOr,
   logicAnd,
   on,
+  as,
   unknown
 };
 
