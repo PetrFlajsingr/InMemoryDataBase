@@ -5,6 +5,7 @@
 #include <MemoryDataSet.h>
 #include <LexicalAnalyser.h>
 #include <SyntaxAnalyser.h>
+#include <SemanticAnalyser.h>
 
 int main() {
   DataBase::LexicalAnalyser lexicalAnalyser;
@@ -15,11 +16,11 @@ int main() {
       "select#tohle je select# table.a as letadlo, sum(t2.c) as suma, avg(t2.d) as aver "
       "from table "
       "join t2 on table.a = t2.b "
-      "outer join t3 on table.b = t3.b "
+      "outer join t3 on t2.b = t3.b "
       "where t2.b != 10 | 15 or t2.c >= 10000 and letadlo = table.b | 1000 | -100 "
       "group by table.a "
-      "having sum(a.a) > 10 and aver > 0.1 "
-      "order by t2.c asc, t2.d desc;");
+      "having sum(table.a) > 10 and aver > 0.1 "
+      "order by t2.c asc, t2.d desc, letadlo asc;");
 
   try {
     do {
@@ -31,6 +32,9 @@ int main() {
 
     auto strQuery = syntaxAnalyser.analyse();
 
+    DataBase::SemanticAnalyser semanticAnalyser;
+    semanticAnalyser.setInput(strQuery);
+    semanticAnalyser.analyse();
     std::cout << "Success\n";
   } catch (DataBase::QueryException &exc) {
     std::cerr << exc.what();

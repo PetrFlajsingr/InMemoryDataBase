@@ -390,22 +390,24 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
       case SynState::whereCnst:
         if (token == Token::logicOr || token == Token::logicAnd) {
           state = SynState::where;
-          result.where.data.push_back(std::make_pair(whereItem,
-                                                     tokenToLogic(token)));
+          result.where.data.emplace_back(whereItem,
+                                         tokenToLogic(token));
         } else if (token == Token::pipe) {
           state = SynState::whereItem2nd;
         } else if (token == Token::group) {
           state = SynState::group;
-          result.where.data.push_back(std::make_pair(whereItem,
-                                                     LogicOperator::none));
+          result.where.data.emplace_back(whereItem,
+                                         LogicOperator::none);
         } else if (token == Token::order) {
           state = SynState::order;
-          result.where.data.push_back(std::make_pair(whereItem,
-                                                     LogicOperator::none));
+          result.where.data.emplace_back(whereItem,
+                                         LogicOperator::none);
+        } else if (token == Token::semicolon) {
+          state = SynState::end;
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::pipe, Token::logicOr,
-                                             Token::logicAnd},
+                                             Token::logicAnd, Token::group},
                                             it));
         }
         break;
@@ -502,6 +504,8 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
           state = SynState::havingItem;
         } else if (token == Token::order) {
           state = SynState::order;
+        } else if (token == Token::semicolon) {
+          state = SynState::end;
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::missing,
                                             {Token::having, Token::colon,
@@ -605,6 +609,8 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         } else if (token == Token::order) {
           state = SynState::order;
           result.having.data.emplace_back(havingItem, LogicOperator::none);
+        } else if (token == Token::semicolon) {
+          state = SynState::end;
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::pipe, Token::logicOr,
@@ -684,9 +690,17 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
       case SynState::orderId:
         if (token == Token::dot) {
           state = SynState::orderIdDot;
+        } else if (token == Token::asc || token == Token::desc) {
+          orderItem.field.alias = orderItem.field.table;
+          orderItem.field.table = "";
+          orderItem.field.column = "";
+          state = SynState::orderItemDone;
+          orderItem.order = tokenToOrder(token);
+          result.order.data.emplace_back(orderItem);
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
-                                            {Token::dot},
+                                            {Token::dot, Token::asc,
+                                             Token::desc},
                                             it));
         }
         break;
