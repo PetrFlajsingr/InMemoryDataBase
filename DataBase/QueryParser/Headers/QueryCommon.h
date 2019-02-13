@@ -36,6 +36,7 @@ enum class JoinType {
 };
 
 struct FieldId {
+  std::string alias;
   std::string table;
   std::string column;
 };
