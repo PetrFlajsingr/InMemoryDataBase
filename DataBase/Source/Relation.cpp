@@ -4,18 +4,17 @@
 
 #include <Relation.h>
 
-
-RelationLayer::Relation::Relation(RelationLayer::RelationType relationType)
+DataBase::Relation::Relation(DataBase::RelationType relationType)
     : relationType(relationType) {}
 
-void RelationLayer::Relation::addRelation(DataSets::DataSetRow *dataFirstDataSet,
-                                          DataSets::DataSetRow *dataSecondDataSet) {
+void DataBase::Relation::addRelation(DataSets::DataSetRow *dataFirstDataSet,
+                                     DataSets::DataSetRow *dataSecondDataSet) {
   relations.emplace_back(RelationContainer{dataFirstDataSet,
                                            dataSecondDataSet});
 }
 
-void RelationLayer::Relation::removeRelation(void *dataFirstDataSet,
-                                             void *dataSecondDataSet) {
+void DataBase::Relation::removeRelation(void *dataFirstDataSet,
+                                        void *dataSecondDataSet) {
   auto result = std::find_if(relations.begin(),
                              relations.end(),
                              [dataFirstDataSet, dataSecondDataSet](
@@ -31,7 +30,7 @@ void RelationLayer::Relation::removeRelation(void *dataFirstDataSet,
   }
 }
 
-const std::vector<RelationLayer::RelationContainer> *RelationLayer::Relation::findRelations(
+const std::vector<DataBase::RelationContainer> *DataBase::Relation::findRelations(
     void *pointerToData) const {
   auto result = new std::vector<RelationContainer>();
   std::copy_if(relations.begin(),
@@ -45,10 +44,10 @@ const std::vector<RelationLayer::RelationContainer> *RelationLayer::Relation::fi
   return result;
 }
 
-RelationLayer::RelationType RelationLayer::Relation::getRelationType() const {
+DataBase::RelationType DataBase::Relation::getRelationType() const {
   return relationType;
 }
 
-const std::vector<RelationLayer::RelationContainer> &RelationLayer::Relation::getRelations() const {
+const std::vector<DataBase::RelationContainer> &DataBase::Relation::getRelations() const {
   return relations;
 }

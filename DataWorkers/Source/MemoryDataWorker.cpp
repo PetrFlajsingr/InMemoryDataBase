@@ -2,9 +2,8 @@
 // Created by Petr Flajsingr on 12/11/2018.
 //
 #include <MemoryDataWorker.h>
-#include <MemoryDataSet.h>
 
-DataWorkers::MemoryDataWorker::MemoryDataWorker(gsl::not_null<DataSets::BaseDataSet *> dataSet) {
+DataWorkers::MemoryDataWorker::MemoryDataWorker(std::shared_ptr<DataSets::BaseDataSet> dataSet) {
   this->dataset = dataSet;
 }
 
@@ -36,7 +35,7 @@ DataWorkers::MemoryDataWorker::MemoryDataWorker(
     DataProviders::BaseDataProvider &dataProvider,
     const std::vector<ValueType> &fieldTypes)
     : BaseDataWorker() {
-  dataset = new DataSets::MemoryDataSet("main");
+  dataset = std::make_shared<DataSets::MemoryDataSet>("main");
 
   dataset->open(dataProvider, fieldTypes);
 }
@@ -59,6 +58,12 @@ void DataWorkers::MemoryDataWorker::writeResult(DataWriters::BaseDataWriter &wri
           dataset->fieldByName(queryData.projections[i].columnName),
           SortOrder::Ascending);
     }
+  }
+
+  auto tmpDataSet = dataset;
+  //  vyfiltrovani nechtenych zaznamu
+  if (!queryData.selections.empty()) {
+    dataset = std::dynamic_pointer_cast<DataSets::BaseDataSet>(filterDataSet());
   }
 
   std::thread mainDataSetSortThread
@@ -113,11 +118,6 @@ void DataWorkers::MemoryDataWorker::writeResult(DataWriters::BaseDataWriter &wri
 
   mainDataSetSortThread.join();
 
-  //  vyfiltrovani nechtenych zaznamu
-  if (!queryData.selections.empty()) {
-    filterDataSet();
-  }
-
   bool savedResults = false, writeResults = false;
   std::vector<std::string> results;
   results.reserve(queryData.projections.size());
@@ -155,6 +155,8 @@ void DataWorkers::MemoryDataWorker::writeResult(DataWriters::BaseDataWriter &wri
               }
             }
           }
+        } else {
+          writeResults = true;
         }
 
         if (writeResults) {
@@ -212,6 +214,8 @@ void DataWorkers::MemoryDataWorker::writeResult(DataWriters::BaseDataWriter &wri
   for (auto *acc : accumulators) {
     delete acc;
   }
+
+  dataset = tmpDataSet;
 }
 
 void DataWorkers::MemoryDataWorker::writeHeaders(DataWriters::BaseDataWriter &writer) {
@@ -227,7 +231,7 @@ void DataWorkers::MemoryDataWorker::writeHeaders(DataWriters::BaseDataWriter &wr
   writer.writeHeader(header);
 }
 
-void DataWorkers::MemoryDataWorker::filterDataSet() {
+std::shared_ptr<DataSets::ViewDataSet> DataWorkers::MemoryDataWorker::filterDataSet() {
   DataSets::FilterOptions filterOptions;
 
   for (auto &selection : queryData.selections) {
@@ -263,7 +267,7 @@ void DataWorkers::MemoryDataWorker::filterDataSet() {
     }
   }
 
-  dataset->filter(filterOptions);
+  return dataset->filter(filterOptions);
 }
 
 void DataWorkers::MemoryDataWorker::T_ThreadSort(DataSets::SortOptions &sortOptions) {
@@ -548,7 +552,7 @@ std::string DataWorkers::ResultAccumulator::resultDistinct() {
 }
 
 std::string_view DataWorkers::ResultAccumulator::getName() {
-  return field->getFieldName();
+  return field->getName();
 }
 
 DataContainer DataWorkers::ResultAccumulator::getContainer() {

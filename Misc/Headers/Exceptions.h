@@ -70,4 +70,18 @@ class UnsupportedOperationException : public std::exception {
     return errorMessage;
   }
 };
+
+class DataBaseException : public std::exception {
+ private:
+  const gsl::czstring<> errorMessage;
+ public:
+  explicit DataBaseException(const std::string &errorMessage) : errorMessage(
+      errorMessage.c_str()) {}
+  explicit DataBaseException(const gsl::czstring<> message)
+      : errorMessage(message) {}
+
+  char const *what() const noexcept override {
+    return errorMessage;
+  }
+};
 #endif  //  MISC_HEADERS_EXCEPTIONS_H_
