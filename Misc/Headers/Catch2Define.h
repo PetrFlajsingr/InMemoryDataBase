@@ -1,5 +1,5 @@
 //
-// Created by Petr Flajsingr on 2019-01-30.
+// Created by Petr Flajsingr on 2019-02-15.
 //
 
 #ifndef PROJECT_CATCH2DEFINE_H

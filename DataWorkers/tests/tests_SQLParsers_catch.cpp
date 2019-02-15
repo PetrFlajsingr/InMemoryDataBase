@@ -2,7 +2,7 @@
 // Created by Petr Flajsingr on 2019-02-08.
 //
 
-#include <catch.hpp>
+#include <catch2/catch.hpp>
 #include <SQLParser.h>
 
 TEST_CASE("Typical parse", "[SQLParser]") {

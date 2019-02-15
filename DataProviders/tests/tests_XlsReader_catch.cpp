@@ -2,7 +2,7 @@
 // Created by Petr Flajsingr on 2019-01-29.
 //
 
-#include <catch.hpp>
+#include <catch2/catch.hpp>
 #include <XlsReader.h>
 #include <ArrayWriter.h>
 

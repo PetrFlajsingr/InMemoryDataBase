@@ -2,7 +2,7 @@
 // Created by Petr Flajsingr on 2019-01-31.
 //
 
-#include <catch.hpp>
+#include <catch2/catch.hpp>
 #include <Utilities.h>
 #include <DateTimeUtils.h>
 #include <map>

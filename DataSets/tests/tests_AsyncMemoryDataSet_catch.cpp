@@ -2,7 +2,7 @@
 // Created by Petr Flajsingr on 2019-02-04.
 //
 
-#include <catch.hpp>
+#include <catch2/catch.hpp>
 #include <Async_MemoryDataSet.h>
 
 class MockAsyncMemoryDatasetObserver

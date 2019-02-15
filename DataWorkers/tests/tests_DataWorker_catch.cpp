@@ -2,7 +2,7 @@
 // Created by Petr Flajsingr on 2019-02-08.
 //
 
-#include <catch.hpp>
+#include <catch2/catch.hpp>
 #include <MemoryDataWorker.h>
 #include <ArrayDataProvider.h>
 #include <ArrayWriter.h>

@@ -3,6 +3,9 @@ cmake_minimum_required(VERSION 3.8)
 set(CMAKE_CXX_STANDARD 17)
 #set(CMAKE_CXX_FLAGS "-Wall -Wextra -o3")
 
+find_package(Catch2 REQUIRED)
+enable_testing()
+
 if (APPLE)
     add_definitions(-DGTEST_USE_OWN_TR1_TUPLE)
     add_definitions(-D__GLIBCXX__)
@@ -106,6 +109,8 @@ set(GTEST_SOURCE_FILES
         ${DataWriterTestsG}
         ${MiscTestsG})
 
+enable_testing()
+
 
 add_executable(cedr cedr.cpp ${SOURCE_FILES})
 add_executable(testovaci test.cpp ${SOURCE_FILES})
@@ -116,5 +121,9 @@ target_link_libraries(cedr xlsxio_write)
 
 target_link_libraries(catch_tests xlsxio_read)
 target_link_libraries(catch_tests xlsxio_write)
+
+include(CTest)
+include(Catch)
+catch_discover_tests(catch_tests)
 
 
