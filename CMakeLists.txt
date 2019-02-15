@@ -36,18 +36,6 @@ include_directories(third_party/xlsxio/include)
 
 include_directories(third_party/catch2)
 
-# TODO: replace with catch2:
-include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
-include_directories(${gmock_SOURCE_DIR}/include ${gmock_SOURCE_DIR})
-
-add_subdirectory(third_party/google_test)
-
-include_directories(third_party/google_test/googlemock/include)
-include_directories(third_party/google_test/googletest/include)
-FILE(GLOB GoogleTestHeaders third_party/google_test/googletest/include/*.h)
-FILE(GLOB GoogleMockHeaders third_party/google_test/googlemock/include/*.h)
-########################
-
 FILE(GLOB DataProviderSources DataProviders/Source/*.cpp)
 FILE(GLOB DataProviderHeaders DataProviders/Headers/*.h)
 FILE(GLOB DataProviderTests DataProviders/tests/*catch*.cpp)
@@ -122,20 +110,11 @@ set(GTEST_SOURCE_FILES
 add_executable(cedr cedr.cpp ${SOURCE_FILES})
 add_executable(test test.cpp ${SOURCE_FILES})
 add_executable(catch_tests ${TEST_SOURCE_FILES})
-add_executable(google_tests ${GTEST_SOURCE_FILES})
 
 target_link_libraries(cedr xlsxio_read)
 target_link_libraries(cedr xlsxio_write)
 
 target_link_libraries(catch_tests xlsxio_read)
 target_link_libraries(catch_tests xlsxio_write)
-
-target_link_libraries(google_tests xlsxio_read)
-target_link_libraries(google_tests xlsxio_write)
-
-target_link_libraries(test xlsxio_read)
-target_link_libraries(test xlsxio_write)
-
-target_link_libraries(google_tests gmock_main gtest)
 
 
