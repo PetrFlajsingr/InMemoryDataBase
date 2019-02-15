@@ -13,7 +13,7 @@ install:
   - mkdir -p opt/include
   - cp -r ../single_include/catch2 opt/include/
   - export INCLUDE_PATH="${PWD}"/opt/include:"${INCLUDE_PATH}"
-  - cd ../..
+  - cd ..
   - cmake ..
 
 before_script:
