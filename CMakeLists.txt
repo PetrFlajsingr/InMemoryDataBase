@@ -108,7 +108,7 @@ set(GTEST_SOURCE_FILES
 
 
 add_executable(cedr cedr.cpp ${SOURCE_FILES})
-add_executable(test test.cpp ${SOURCE_FILES})
+add_executable(testovaci test.cpp ${SOURCE_FILES})
 add_executable(catch_tests ${TEST_SOURCE_FILES})
 
 target_link_libraries(cedr xlsxio_read)
