@@ -6,21 +6,39 @@
 #include <LexicalAnalyser.h>
 #include <SyntaxAnalyser.h>
 #include <SemanticAnalyser.h>
+#include <MockDataSet.h>
+#include <MemoryDataBase.h>
 
 int main() {
+  DataBase::MemoryDataBase dataBase("testDB");
+  auto ds1 = std::make_shared<MockDataSet>("t1");
+  ds1->openEmpty({"c1", "c2", "c3"},
+                 {ValueType::String, ValueType::Integer, ValueType::Integer});
+  dataBase.addTable(ds1);
+  ds1 = std::make_shared<MockDataSet>("t2");
+  ds1->openEmpty({"c1", "c2", "c3"},
+                 {ValueType::String, ValueType::Integer, ValueType::Integer});
+  dataBase.addTable(ds1);
+  ds1 = std::make_shared<MockDataSet>("t3");
+  ds1->openEmpty({"c1", "c2", "c3"},
+                 {ValueType::String, ValueType::Integer, ValueType::Integer});
+  dataBase.addTable(ds1);
+  ds1.reset();
+
+
   DataBase::LexicalAnalyser lexicalAnalyser;
 
   std::vector<std::tuple<DataBase::Token, std::string, bool>> tokens;
 
   lexicalAnalyser.setInput(
-      "select#tohle je select# table.a as letadlo, sum(t2.c) as suma, avg(t2.d) as aver "
-      "from table "
-      "join t2 on table.a = t2.b "
-      "outer join t3 on t2.b = t3.b "
-      "where t2.b != 10 | 15 or t2.c >= 10000 and letadlo = table.b | 1000 | -100 "
-      "group by table.a "
-      "having sum(table.a) > 10 and aver > 0.1 "
-      "order by t2.c asc, t2.d desc, letadlo asc;");
+      "select#tohle je select# t1.c1 as letadlo, sum(t2.c3) as suma, avg(t3.c2) as aver "
+      "from t1 "
+      "join t2 on t1.c1 = t2.c1 "
+      "outer join t3 on t2.c2 = t3.c2 "
+      "where t2.c2 != 10 | 15 or t2.c3 >= 10000 and letadlo = t1.c2 | 1000 | -100 "
+      "group by t1.c1 "
+      "having sum(t2.c3) > 10 and aver > 0.1 "
+      "order by letadlo asc;");
 
   try {
     do {
@@ -36,6 +54,8 @@ int main() {
     semanticAnalyser.setInput(strQuery);
     semanticAnalyser.analyse();
     std::cout << "Success\n";
+
+    dataBase.validateQuery(strQuery);
   } catch (DataBase::QueryException &exc) {
     std::cerr << exc.what();
   }

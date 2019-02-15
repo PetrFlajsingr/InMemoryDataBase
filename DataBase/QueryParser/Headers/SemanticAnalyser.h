@@ -9,6 +9,7 @@
 #include <QueryException.h>
 #include <string>
 
+// TODO: kontrola, jestli jsou sloupce v group by, order by v projekci
 namespace DataBase {
 class SemanticAnalyser {
  public:

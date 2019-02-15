@@ -11,6 +11,7 @@
 #include <Relation.h>
 #include <MemoryViewDataSet.h>
 #include <Exceptions.h>
+#include <QueryCommon.h>
 
 namespace DataBase {
 class Rel;
@@ -42,6 +43,7 @@ class Rel {
 
 class MemoryDataBase {
  public:
+  MemoryDataBase(const std::string &name);
 
   void addTable(std::shared_ptr<DataSets::BaseDataSet> dataSet);
 
@@ -64,6 +66,8 @@ class MemoryDataBase {
       std::string_view viewName);
 
   std::string_view getName() const;
+
+  void validateQuery(StructuredQuery query) const;
 
  private:
   std::vector<Table> tables;

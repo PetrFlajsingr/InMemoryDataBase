@@ -3,7 +3,9 @@
 //
 
 #include <utility>
+#include <map>
 #include <MemoryDataBase.h>
+#include <QueryException.h>
 
 std::string_view DataBase::MemoryDataBase::getName() const {
   return name;
@@ -61,4 +63,82 @@ std::shared_ptr<DataSets::BaseDataSet> DataBase::MemoryDataBase::execAggregateQu
   // ... TODO: implement
 
   return view;
+}
+DataBase::MemoryDataBase::MemoryDataBase(const std::string &name)
+    : name(name) {}
+
+void DataBase::MemoryDataBase::validateQuery(DataBase::StructuredQuery query) const {
+  std::vector<std::pair<std::string, bool>> tables;
+  tables.emplace_back(query.mainTable, false);
+
+  std::vector<std::string> savedTables;
+  std::transform(this->tables.begin(),
+                 this->tables.end(),
+                 std::back_inserter(savedTables),
+                 [](const Table &table) {
+                   return table.dataSet->getName();
+                 });
+
+  for (auto &val : tables) {
+    val.second = std::find(savedTables.begin(), savedTables.end(), val.first)
+        != savedTables.end();
+  }
+
+  for (const auto &val : query.joins.data) {
+    tables.emplace_back(val.joinedTable, false);
+  }
+  std::string errMsg;
+  for (auto &val : tables) {
+    val.second = std::find(savedTables.begin(), savedTables.end(), val.first)
+        != savedTables.end();
+    if (!val.second) {
+      errMsg += "Unknown table: " + val.first + "\n";
+    }
+  }
+  if (!errMsg.empty()) {
+    throw DataBaseQueryException("DataBase exception: " + errMsg);
+  }
+
+  std::vector<std::pair<FieldId, bool>> fields;
+  for (const auto &val : query.project.data) {
+    fields.emplace_back(val, false);
+  }
+
+  for (const auto &val : query.joins.data) {
+    fields.emplace_back(val.firstField, false);
+    fields.emplace_back(val.secondField, false);
+  }
+  for (const auto &val : query.having.data) {
+    fields.emplace_back(val.first.agreItem.field, false);
+  }
+  for (const auto &val : query.agr.data) {
+    fields.emplace_back(val.field, false);
+  }
+  for (const auto &val : query.order.data) {
+    fields.emplace_back(val.field, false);
+  }
+  for (const auto &val : query.where.data) {
+    fields.emplace_back(val.first.field, false);
+  }
+
+  std::map<std::string, std::vector<std::string>> savedFields;
+  for (const auto &table : this->tables) {
+    savedFields[table.dataSet->getName()] = table.dataSet->getFieldNames();
+  }
+
+  for (auto &val : fields) {
+    val.second = std::find(savedFields[val.first.table].begin(),
+                           savedFields[val.first.table].end(), val.first.column)
+        != savedFields[val.first.table].end();
+    if (!val.second && !val.first.column.empty()) {
+      errMsg +=
+          "Unknown field: " + val.first.column + " in table: " + val.first.table
+              + "\n";
+    }
+  }
+  if (!errMsg.empty()) {
+    throw DataBaseQueryException("DataBase exception: " + errMsg);
+  }
+
+  // TODO: datove typy
 }
