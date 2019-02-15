@@ -87,7 +87,7 @@ gsl::not_null<DataSets::BaseDataSet *> DataWorkers::DataSetMerger::mergeDataSets
   }
 
   if (mergeField1->getFieldType() != ValueType::Integer
-      & mergeField1->getFieldType() != ValueType::String) {
+      && mergeField1->getFieldType() != ValueType::String) {
     std::string errMsg = "Unsupported field type for merging (not integer nor string).";
     throw InvalidArgumentException(errMsg.c_str());
   }
