@@ -1,0 +1,25 @@
+language: cpp
+
+compiler:
+  - gcc
+  - clang
+
+install:
+  # install catch
+  - git clone https://github.com/catchorg/Catch2.git
+  - cd Catch2
+  - mkdir build
+  - cd build
+  - mkdir -p opt/include
+  - cp -r ../single_include/catch2 opt/include/
+  - export INCLUDE_PATH="${PWD}"/opt/include:"${INCLUDE_PATH}"
+  - cd ../..
+  - cmake ..
+
+before_script:
+  - mkdir build
+  - cd build
+  - cmake ..
+
+script:
+  make && make test
