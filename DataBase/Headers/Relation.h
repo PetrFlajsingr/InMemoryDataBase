@@ -11,7 +11,7 @@
 #include <mach/machine.h>
 #include <MemoryDataSet.h>
 
-namespace RelationLayer {
+namespace DataBase {
 
 /**
  * Typy relaci, podobne jako v SQL databazich

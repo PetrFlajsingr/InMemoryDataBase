@@ -5,6 +5,7 @@
 #ifndef CSV_READER_FINMDATAWORKER_H
 #define CSV_READER_FINMDATAWORKER_H
 
+#include <memory>
 #include <BaseDataWorker.h>
 #include <Exceptions.h>
 #include <BaseField.h>
@@ -67,7 +68,7 @@ class MemoryDataWorker : public BaseDataWorker {
   MemoryDataWorker(DataProviders::BaseDataProvider &dataProvider,
                    const std::vector<ValueType> &fieldTypes);
 
-  explicit MemoryDataWorker(gsl::not_null<DataSets::BaseDataSet *> dataSet);
+  explicit MemoryDataWorker(std::shared_ptr<DataSets::BaseDataSet> dataSet);
 
   std::vector<std::string> getMultiChoiceNames() override;
 
@@ -86,7 +87,7 @@ class MemoryDataWorker : public BaseDataWorker {
 
   void writeHeaders(DataWriters::BaseDataWriter &writer);
 
-  void filterDataSet();
+  std::shared_ptr<DataSets::ViewDataSet> filterDataSet();
 
   void T_ThreadSort(DataSets::SortOptions &sortOptions);
 };

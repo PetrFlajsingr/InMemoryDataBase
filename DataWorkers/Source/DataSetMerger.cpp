@@ -63,15 +63,15 @@ gsl::not_null<DataSets::BaseDataSet *> DataWorkers::DataSetMerger::mergeDataSets
 
   for (auto field : dataSet1->getFields()) {
     fieldTypes.emplace_back(field->getFieldType());
-    fieldNames.emplace_back(field->getFieldName());
+    fieldNames.emplace_back(field->getName());
     sourceFields.emplace_back(field);
   }
   for (auto field : dataSet2->getFields()) {
-    if (field->getFieldName() == columnName2) {
+    if (field->getName() == columnName2) {
       continue;
     }
     fieldTypes.emplace_back(field->getFieldType());
-    fieldNames.emplace_back(field->getFieldName());
+    fieldNames.emplace_back(field->getName());
     sourceFields.emplace_back(field);
   }
 

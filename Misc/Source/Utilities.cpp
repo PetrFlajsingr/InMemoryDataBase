@@ -164,3 +164,9 @@ std::string Utilities::getRandomString(size_t length) {
   std::generate_n(str.begin(), length, randChar);
   return str;
 }
+
+std::string Utilities::toLower(const std::string &str) {
+  std::string result;
+  std::transform(str.begin(), str.end(), std::back_inserter(result), ::tolower);
+  return result;
+}

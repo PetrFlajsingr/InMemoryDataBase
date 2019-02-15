@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.8)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -o3")
+#set(CMAKE_CXX_FLAGS "-Wall -Wextra -o3")
 
 if (APPLE)
     add_definitions(-DGTEST_USE_OWN_TR1_TUPLE)
@@ -14,13 +14,13 @@ include_directories(Misc/tests)
 
 include_directories(Misc/Headers)
 
-include_directories(Datasets/Headers)
+include_directories(DataSets/Headers)
 
 include_directories(DataProviders/Headers)
 
 include_directories(DataWriters/Headers)
 
-include_directories(Datasets/Fields/Headers)
+include_directories(DataSets/Fields/Headers)
 
 include_directories(FileDownloaders/Headers)
 
@@ -29,6 +29,8 @@ include_directories(third_party/Decimal)
 include_directories(DataWorkers/Headers)
 
 include_directories(DataBase/Headers)
+
+include_directories(DataBase/QueryParser/Headers)
 
 include_directories(third_party/xlsxio/include)
 
@@ -39,13 +41,13 @@ FILE(GLOB DataProviderHeaders DataProviders/Headers/*.h)
 FILE(GLOB DataProviderTests DataProviders/tests/*catch*.cpp)
 FILE(GLOB DataProviderTestsG DataProviders/tests/Gtests*.cpp)
 
-FILE(GLOB DataSetSources Datasets/Source/*.cpp)
-FILE(GLOB DataSetHeaders Datasets/Headers/*.h)
-FILE(GLOB DataSetTests Datasets/tests/*catch*.cpp)
-FILE(GLOB DataSetTestsG Datasets/tests/Gtests*.cpp)
+FILE(GLOB DataSetSources DataSets/Source/*.cpp)
+FILE(GLOB DataSetHeaders DataSets/Headers/*.h)
+FILE(GLOB DataSetTests DataSets/tests/*catch*.cpp)
+FILE(GLOB DataSetTestsG DataSets/tests/Gtests*.cpp)
 
-FILE(GLOB FieldSources Datasets/Fields/Source/*.cpp)
-FILE(GLOB FieldHeaders Datasets/Fields/Headers/*.h)
+FILE(GLOB FieldSources DataSets/Fields/Source/*.cpp)
+FILE(GLOB FieldHeaders DataSets/Fields/Headers/*.h)
 
 FILE(GLOB DataWorkerSources DataWorkers/Source/*.cpp)
 FILE(GLOB DataWorkerHeaders DataWorkers/Headers/*.h)
@@ -69,6 +71,9 @@ FILE(GLOB RelationLayerTests DataBase/tests/*catch*.cpp)
 FILE(GLOB FileDownloaderSources FileDownloaders/Source/*.cpp)
 FILE(GLOB FileDownloaderHeaders FileDownloaders/Headers/*.h)
 
+FILE(GLOB QueryParserSources DataBase/QueryParser/Source/*.cpp)
+FILE(GLOB QueryParserHeaders DataBase/QueryParser/Headers/*.h)
+
 # third party:
 FILE(GLOB xlsxioHeaders third_party/xlsxio/include/*.h)
 FILE(GLOB decimalHeaders third_party/decimal/*.h)
@@ -76,6 +81,7 @@ FILE(GLOB decimalHeaders third_party/decimal/*.h)
 set(SOURCE_FILES
         ${DataProviderSources}
         ${DataSetSources}
+        ${QueryParserSources}
         ${FieldSources}
         ${DataWorkerSources}
         ${DataWriterSources}
@@ -102,6 +108,7 @@ set(GTEST_SOURCE_FILES
 
 
 add_executable(cedr cedr.cpp ${SOURCE_FILES})
+add_executable(test test.cpp ${SOURCE_FILES})
 add_executable(catch_tests ${TEST_SOURCE_FILES})
 
 target_link_libraries(cedr xlsxio_read)

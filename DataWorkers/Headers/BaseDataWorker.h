@@ -11,7 +11,9 @@
 #include <FilterStructures.h>
 #include <Logger.h>
 #include <MemoryDataSet.h>
+#include <MemoryViewDataSet.h>
 #include "SQLParser.h"
+
 namespace DataWorkers {
 
 class BaseDataWorker {
@@ -40,7 +42,7 @@ class BaseDataWorker {
  protected:
   std::vector<std::string> columnChoices;
 
-  DataSets::BaseDataSet *dataset = nullptr;
+  std::shared_ptr<DataSets::BaseDataSet> dataset;
 
   QueryData queryData;
 
