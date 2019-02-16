@@ -12,6 +12,9 @@
 #include <MemoryViewDataSet.h>
 #include <Exceptions.h>
 #include <QueryCommon.h>
+#include <LexicalAnalyser.h>
+#include <SyntaxAnalyser.h>
+#include <SemanticAnalyser.h>
 
 namespace DataBase {
 class Rel;
@@ -77,6 +80,9 @@ class MemoryDataBase {
 
   std::string name;
 
+  LexicalAnalyser lexicalAnalyser;
+  SyntaxAnalyser syntaxAnalyser;
+  SemanticAnalyser semanticAnalyser;
 };
 
 }  // namespace DataBase

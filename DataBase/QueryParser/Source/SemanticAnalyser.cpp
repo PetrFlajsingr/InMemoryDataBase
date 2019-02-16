@@ -8,7 +8,7 @@ void DataBase::SemanticAnalyser::setInput(StructuredQuery &structuredQuery) {
   this->structuredQuery = structuredQuery;
 }
 
-void DataBase::SemanticAnalyser::analyse() {
+DataBase::StructuredQuery DataBase::SemanticAnalyser::analyse() {
   std::vector<std::string> tables;
   tables.emplace_back(structuredQuery.mainTable);
   for (const auto &val : structuredQuery.joins.data) {
@@ -96,6 +96,8 @@ void DataBase::SemanticAnalyser::analyse() {
     }
     joinTables.emplace_back(val.joinedTable);
   }
+
+  return structuredQuery;
 }
 
 std::string DataBase::SemanticAnalyser::getErrorMsg(DataBase::SemanticAnalyser::SemErrType errType,

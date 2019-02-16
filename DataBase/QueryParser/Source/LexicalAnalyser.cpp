@@ -233,3 +233,16 @@ std::string DataBase::LexicalAnalyser::getErrorPrint() {
   return "Lexical error: Character #" + std::to_string(currentIndex) + "\n"
       + input + "\n" + fill;
 }
+
+std::vector<std::tuple<DataBase::Token,
+                       std::string,
+                       bool>> DataBase::LexicalAnalyser::getAllTokens() {
+  std::vector<std::tuple<DataBase::Token,
+                         std::string,
+                         bool>> tokens;
+  do {
+    tokens.push_back(getNextToken());
+  } while (std::get<2>(tokens.back()));
+
+  return tokens;
+}

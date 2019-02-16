@@ -26,41 +26,22 @@ int main() {
   ds1.reset();
 
 
-  DataBase::LexicalAnalyser lexicalAnalyser;
-
-  std::vector<std::tuple<DataBase::Token, std::string, bool>> tokens;
-
-  lexicalAnalyser.setInput(
-      "select#tohle je select# t1.c1 as letadlo, sum(t2.c3) as suma, avg(t3.c2) as aver "
-      "from t1 "
-      "join t2 on t1.c1 = t2.c1 "
-      "outer join t3 on t2.c2 = t3.c2 "
-      "where t2.c2 != 10 | 15 or t2.c3 >= 10000 and letadlo = t1.c2 | 1000 | -100 "
-      "group by t1.c1 "
-      "having sum(t2.c3) > 10 and aver > 0.1 "
-      "order by letadlo asc;");
-
   try {
-    do {
-      tokens.push_back(lexicalAnalyser.getNextToken());
-    } while (std::get<2>(tokens.back()));
-
-    DataBase::SyntaxAnalyser syntaxAnalyser;
-    syntaxAnalyser.setInput(tokens);
-
-    auto strQuery = syntaxAnalyser.analyse();
-
-    DataBase::SemanticAnalyser semanticAnalyser;
-    semanticAnalyser.setInput(strQuery);
-    semanticAnalyser.analyse();
-    std::cout << "Success\n";
-
-    dataBase.validateQuery(strQuery);
+    dataBase.execSimpleQuery(
+        "select#tohle je select# t1.c1 as letadlo, sum(t2.c3) as suma, avg(t3.c2) as aver "
+        "from t1 "
+        "join t2 on t1.c1 = t2.c1 "
+        "outer join t3 on t2.c2 = t3.c2 "
+        "where t2.c2 != 10 | 15 or t2.c3 >= 10000 and letadlo = t1.c2 | 1000 | -100 "
+        "group by t1.c1 "
+        "having sum(t2.c3) > 10 and aver > 0.1 "
+        "order by letadlo asc;",
+        false,
+        "tmp");
   } catch (DataBase::QueryException &exc) {
     std::cerr << exc.what();
   }
 
-  tokens.clear();
 
   return 0;
   DataSets::MemoryDataSet dataSet("test");

@@ -53,14 +53,38 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::MemoryDataBase::execSimpl
     std::string_view query,
     bool keepView,
     std::string_view viewName) {
-  throw NotImplementedException();
+  lexicalAnalyser.setInput(std::string(query));
+  syntaxAnalyser.setInput(lexicalAnalyser.getAllTokens());
+  auto strQuery = syntaxAnalyser.analyse();
+  semanticAnalyser.setInput(strQuery);
+  auto semQuery = semanticAnalyser.analyse();
+  validateQuery(semQuery);
 
+  if (!semQuery.agr.data.empty()) {
+    throw DataBaseException("Provided query is not \"simple\", "
+                            "use DataBase::MemoryDataBase::execAggregateQuery "
+                            "for queries using aggregation");
+  }
+
+  return nullptr;
 }
 
 std::shared_ptr<DataSets::BaseDataSet> DataBase::MemoryDataBase::execAggregateQuery(
     std::string_view query,
     std::string_view viewName) {
-  throw NotImplementedException();
+  lexicalAnalyser.setInput(std::string(query));
+  syntaxAnalyser.setInput(lexicalAnalyser.getAllTokens());
+  auto strQuery = syntaxAnalyser.analyse();
+  semanticAnalyser.setInput(strQuery);
+  auto semQuery = semanticAnalyser.analyse();
+  validateQuery(semQuery);
+
+  if (semQuery.agr.data.empty()) {
+    throw DataBaseException("Provided query is \"simple\", "
+                            "use DataBase::MemoryDataBase::execSimpleQuery "
+                            "for queries not using aggregation");
+  }
+  return nullptr;
 }
 
 void DataBase::MemoryDataBase::validateQuery(DataBase::StructuredQuery query) const {
