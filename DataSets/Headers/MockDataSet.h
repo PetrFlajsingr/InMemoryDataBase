@@ -51,12 +51,22 @@ class MockDataSet : public DataSets::BaseDataSet {
   bool isEnd() const override {
     throw NotImplementedException();
   }
+
   DataSets::BaseField *fieldByName(std::string_view name) const override {
-
+    for (auto &field : fields) {
+      if (Utilities::compareString(field->getName(), name) == 0) {
+        return field.get();
+      }
+    }
+    std::string errMsg = "Field named \"" + std::string(name)
+        + "\" not found. DataSets::MemoryDataSet::fieldByName";
+    throw InvalidArgumentException(errMsg.c_str());
   }
+
   DataSets::BaseField *fieldByIndex(gsl::index index) const override {
-
+    throw NotImplementedException();
   }
+
   std::vector<DataSets::BaseField *> getFields() const override {
     std::vector<DataSets::BaseField *> result;
     for (const auto &field : fields) {

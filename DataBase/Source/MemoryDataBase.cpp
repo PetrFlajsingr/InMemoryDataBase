@@ -7,6 +7,9 @@
 #include <MemoryDataBase.h>
 #include <QueryException.h>
 
+DataBase::MemoryDataBase::MemoryDataBase(const std::string &name)
+    : name(name) {}
+
 std::string_view DataBase::MemoryDataBase::getName() const {
   return name;
 }
@@ -58,14 +61,7 @@ std::shared_ptr<DataSets::BaseDataSet> DataBase::MemoryDataBase::execAggregateQu
     std::string_view query,
     std::string_view viewName) {
   throw NotImplementedException();
-  auto view = std::make_shared<DataSets::MemoryDataSet>(viewName);
-
-  // ... TODO: implement
-
-  return view;
 }
-DataBase::MemoryDataBase::MemoryDataBase(const std::string &name)
-    : name(name) {}
 
 void DataBase::MemoryDataBase::validateQuery(DataBase::StructuredQuery query) const {
   std::vector<std::pair<std::string, bool>> tables;
@@ -140,5 +136,27 @@ void DataBase::MemoryDataBase::validateQuery(DataBase::StructuredQuery query) co
     throw DataBaseQueryException("DataBase exception: " + errMsg);
   }
 
-  // TODO: datove typy
+  for (const auto &val : query.joins.data) {
+    auto field1Type =
+        tableByName(val.firstField.table).dataSet->fieldByName(val.firstField.column)->getFieldType();
+    auto field2Type =
+        tableByName(val.secondField.table).dataSet->fieldByName(val.secondField.column)->getFieldType();
+    if (field1Type != field2Type) {
+      errMsg = "Field " + val.firstField.table + "." + val.firstField.column
+          + " has different data type than field" + val.secondField.table + "."
+          + val.secondField.column;
+      throw DataBaseQueryException("DataBase exception: " + errMsg);
+    }
+  }
+}
+
+const DataBase::Table &DataBase::MemoryDataBase::tableByName(std::string_view tableName) const {
+  for (auto &table : tables) {
+    if (table.dataSet->getName() == tableName) {
+      return table;
+    }
+  }
+  std::string errMsg = "Table named \"" + std::string(name)
+      + "\" not found. DataBase::MemoryDataBase::tableByName";
+  throw InvalidArgumentException(errMsg.c_str());
 }

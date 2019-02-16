@@ -43,11 +43,13 @@ class Rel {
 
 class MemoryDataBase {
  public:
-  MemoryDataBase(const std::string &name);
+  explicit MemoryDataBase(const std::string &name);
 
   void addTable(std::shared_ptr<DataSets::BaseDataSet> dataSet);
 
   void removeTable(std::string_view tableName);
+
+  const Table &tableByName(std::string_view tableName) const;
 
   void addRelation(std::string_view relationName,
                    RelationType type,
