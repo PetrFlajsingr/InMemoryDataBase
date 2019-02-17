@@ -95,6 +95,8 @@ bool endsWith(std::string_view value, std::string_view ending);
  */
 gsl::zstring<> copyStringToNewChar(std::string_view str);
 
+template<typename T>
+int8_t compare(T &a, T &b);
 /**
  * Srovnani integer hodnot
  * @param a
@@ -135,6 +137,11 @@ int8_t compareString(std::string_view a, std::string_view b);
  */
 int8_t compareDateTime(const DateTime &a, const DateTime &b);
 
+/**
+ * Generates a string with given length. The string contains alphanumeric symbols
+ * @param length desired length of the string
+ * @return
+ */
 std::string getRandomString(size_t length);
 
 std::string toLower(const std::string &str);

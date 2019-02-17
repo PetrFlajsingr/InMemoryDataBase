@@ -12,6 +12,7 @@ std::string OperationToString(Operation op) {
     case Operation::Average:return "(Avg)";
   }
 }
+
 int compareDataContainers(DataContainer &data1,
                           DataContainer &data2,
                           ValueType valueType) {

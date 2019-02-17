@@ -151,6 +151,8 @@ int8_t Utilities::compareDateTime(const DateTime &a, const DateTime &b) {
   return 1;
 }
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "cert-msc30-c"
 std::string Utilities::getRandomString(size_t length) {
   auto randChar = []() -> char {
     const char charset[] =
@@ -164,9 +166,21 @@ std::string Utilities::getRandomString(size_t length) {
   std::generate_n(str.begin(), length, randChar);
   return str;
 }
+#pragma clang diagnostic pop
 
 std::string Utilities::toLower(const std::string &str) {
   std::string result;
   std::transform(str.begin(), str.end(), std::back_inserter(result), ::tolower);
   return result;
+}
+
+template<typename T>
+int8_t Utilities::compare(T &a, T &b) {
+  if (a == b) {
+    return 0;
+  }
+  if (a > b) {
+    return 1;
+  }
+  return -1;
 }
