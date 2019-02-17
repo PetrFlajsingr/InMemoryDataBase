@@ -6,6 +6,7 @@
 #define PROJECT_MEMORYVIEWDATASET_H
 
 #include <vector>
+#include <utility>
 #include <string>
 #include <algorithm>
 #include <ViewDataSet.h>
@@ -48,23 +49,151 @@ class MemoryViewDataSet : public ViewDataSet {
   void resetEnd() override;
   void setData(void *data, gsl::index index, ValueType type) override;
 
- private:
-  std::vector<std::vector<DataSetRow *>> data;
+  std::vector<std::vector<DataSetRow *>> *rawData();
 
-  const std::vector<DataSetRow *> stopItem{};
+  class iterator : public std::iterator<std::random_access_iterator_tag, int> {
+   public:
+    iterator() = default;
 
-  gsl::index currentRecord = 0;
+    iterator(gsl::not_null<MemoryViewDataSet *> dataSet, gsl::index row)
+        : dataSet(dataSet), currentRecord(row) {}
 
-  void setFieldValues(gsl::index index);
+    iterator(const iterator &other) : dataSet(other.dataSet),
+                                      currentRecord(other.currentRecord) {}
+
+    iterator &operator=(const iterator &other) {
+      if (this != &other) {
+        dataSet = other.dataSet;
+        currentRecord = other.currentRecord;
+      }
+      return *this;
+    }
+
+    iterator &operator=(iterator &&other) noexcept {
+      if (this != &other) {
+        dataSet = other.dataSet;
+        currentRecord = other.currentRecord;
+      }
+      return *this;
+    }
+
+    iterator &operator++() {
+      currentRecord++;
+      return *this;
+    }
+
+    const iterator operator++(int) {
+      iterator result = *this;
+      ++(*this);
+      return result;
+    }
+
+    bool operator==(const iterator &rhs) const {
+      return currentRecord == rhs.currentRecord;
+    }
+
+    bool operator!=(const iterator &other) const {
+      return !(*this == other);
+    }
+
+    std::vector<DataSetRow *> &operator*() {
+      return dataSet->data[currentRecord];
+    }
+
+    std::vector<DataSetRow *> &operator*(int) {
+      return dataSet->data[currentRecord];
+    }
+
+    std::vector<DataSetRow *> &operator->() {
+      return dataSet->data[currentRecord];
+    }
+
+    iterator &operator--() {
+      currentRecord--;
+      return *this;
+    }
+
+    const iterator operator--(int) {
+      iterator result = *this;
+      --(*this);
+      return result;
+    }
+
+    iterator operator+(const int rhs) {
+      iterator res = *this;
+      res.currentRecord += rhs;
+      return res;
+    }
+
+    iterator operator-(const int rhs) {
+      iterator res = *this;
+      res.currentRecord -= rhs;
+      return res;
+    }
+
+    bool operator<(const iterator &rhs) {
+      return currentRecord < rhs.currentRecord;
+    }
+
+    bool operator>(const iterator &rhs) {
+      return currentRecord > rhs.currentRecord;
+    }
+
+    bool operator<=(const iterator &rhs) {
+      return currentRecord <= rhs.currentRecord;
+    }
+
+    bool operator>=(const iterator &rhs) {
+      return currentRecord >= rhs.currentRecord;
+    }
+
+    iterator &operator+=(const int rhs) {
+      currentRecord += rhs;
+      return *this;
+    }
+
+    iterator &operator-=(const int rhs) {
+      currentRecord -= rhs;
+      return *this;
+    }
+
+    std::vector<DataSetRow *> &operator[](const int index) {
+      return dataSet->data[index];
+    }
+
+   private:
+    MemoryViewDataSet *dataSet;
+
+    gsl::index currentRecord;
+  };
+
+  iterator begin();
+
+  iterator end();
+
+  DataSetRow *getNullRow(gsl::index tableIndex);
 
   const gsl::index maskTableShift = 16;
   const gsl::index maskTableIndex = 0xFF0000;
   const gsl::index maskColumnIndex = 0x00FFFF;
 
+ private:
+  std::vector<std::vector<DataSetRow *>> data;
+
+  std::vector<DataSetRow *> nullRecords;
+
+  gsl::index currentRecord = 0;
+
+  void setFieldValues(gsl::index index);
+
   void createFields(const std::vector<std::string> &columns,
                     const std::vector<ValueType> &types,
                     const std::vector<std::pair<int,
                                                 int>> &fieldIndices);
+
+  void createNullRows(const std::vector<std::pair<int,
+                                                  int>> &fieldIndices,
+                      const std::vector<ValueType> &fieldTypes);
 
   friend class MemoryDataSet;
 };

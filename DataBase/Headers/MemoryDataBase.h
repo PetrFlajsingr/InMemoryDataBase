@@ -15,19 +15,23 @@
 #include <LexicalAnalyser.h>
 #include <SyntaxAnalyser.h>
 #include <SemanticAnalyser.h>
+#include <MemoryDataSet.h>
 
 namespace DataBase {
 class Rel;
 
 struct Table {
-  std::shared_ptr<DataSets::BaseDataSet> dataSet;
+  std::shared_ptr<DataSets::MemoryDataSet> dataSet;
   std::vector<Rel> relations;
+
+  explicit Table(const std::shared_ptr<DataSets::MemoryDataSet> &dataSet);
 };
 
 struct View {
-  Table *table;
   std::shared_ptr<DataSets::MemoryViewDataSet> dataSet;
   std::vector<Rel> relations;
+
+  explicit View(const std::shared_ptr<DataSets::MemoryViewDataSet> &dataSet);
 };
 
 class Rel {
@@ -48,7 +52,7 @@ class MemoryDataBase {
  public:
   explicit MemoryDataBase(const std::string &name);
 
-  void addTable(std::shared_ptr<DataSets::BaseDataSet> dataSet);
+  void addTable(std::shared_ptr<DataSets::MemoryDataSet> dataSet);
 
   void removeTable(std::string_view tableName);
 
@@ -61,7 +65,7 @@ class MemoryDataBase {
 
   void cancelRelation(std::string_view relationName);
 
-  std::shared_ptr<DataSets::MemoryViewDataSet> execSimpleQuery(
+  std::shared_ptr<View> execSimpleQuery(
       std::string_view query,
       bool keepView,
       std::string_view viewName);

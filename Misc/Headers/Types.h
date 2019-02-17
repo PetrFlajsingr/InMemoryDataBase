@@ -47,6 +47,10 @@ typedef union {
 
 } DataContainer;
 
+int compareDataContainers(DataContainer &data1,
+                          DataContainer &data2,
+                          ValueType valueType);
+
 enum class Operation {
   Distinct, Sum, Average
 };

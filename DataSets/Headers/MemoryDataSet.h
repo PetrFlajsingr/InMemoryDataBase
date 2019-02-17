@@ -129,13 +129,11 @@ class MemoryDataSet : public BaseDataSet {
    public:
     iterator() = default;
 
-    explicit iterator(gsl::not_null<MemoryDataSet *> dataSet, gsl::index row)
+    iterator(gsl::not_null<MemoryDataSet *> dataSet, gsl::index row)
         : dataSet(dataSet), currentRecord(row) {}
 
-    iterator(const iterator &other) {
-      dataSet = other.dataSet;
-      currentRecord = other.currentRecord;
-    }
+    iterator(const iterator &other) : dataSet(other.dataSet),
+                                      currentRecord(other.currentRecord) {}
 
     iterator &operator=(const iterator &other) {
       if (this != &other) {
@@ -164,11 +162,11 @@ class MemoryDataSet : public BaseDataSet {
       return result;
     }
 
-    bool operator==(iterator &rhs) {
+    bool operator==(const iterator &rhs) const {
       return currentRecord == rhs.currentRecord;
     }
 
-    bool operator!=(iterator &other) {
+    bool operator!=(const iterator &other) const {
       return !(*this == other);
     }
 

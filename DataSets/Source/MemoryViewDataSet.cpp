@@ -17,9 +17,10 @@ void DataSets::MemoryViewDataSet::createFields(const std::vector<std::string> &c
                                                const std::vector<ValueType> &types,
                                                const std::vector<std::pair<int,
                                                                            int>> &fieldIndices) {
+  createNullRows(fieldIndices, types);
   for (gsl::index i = 0; i < columns.size(); ++i) {
     auto index =
-        (fieldIndices[i].first + maskTableIndex) + fieldIndices[i].second;
+        (fieldIndices[i].first << maskTableShift) + fieldIndices[i].second;
     fields.emplace_back(FieldFactory::Get().CreateField(
         columns[i],
         index,
@@ -152,8 +153,8 @@ void DataSets::MemoryViewDataSet::sort(DataSets::SortOptions &options) {
       [this, &optionArray, &compareFunctions](const std::vector<DataSetRow *> &a,
                                               const std::vector<DataSetRow *> &b) {
         for (gsl::index i = 0; i < optionArray.size(); ++i) {
-          auto tableIndex = optionArray[i].field->getIndex()
-              & maskTableIndex >> maskTableShift;
+          auto tableIndex = (optionArray[i].field->getIndex()
+              & maskTableIndex) >> maskTableShift;;
           int compareResult = compareFunctions[i](a[tableIndex], b[tableIndex]);
           if (compareResult < 0) {
             return optionArray[i].order == SortOrder::Ascending;
@@ -309,7 +310,7 @@ void DataSets::MemoryViewDataSet::setData(void *data,
 void DataSets::MemoryViewDataSet::setFieldValues(gsl::index index) {
   for (gsl::index i = 0; i < fields.size(); i++) {
     const auto
-        tableIndex = maskTableIndex & fields[i]->getIndex() >> maskTableShift;
+        tableIndex = (fields[i]->getIndex() & maskTableIndex) >> maskTableShift;
     const auto columnIndex = maskColumnIndex & fields[i]->getIndex();
 
     auto cell = data[currentRecord][tableIndex]->cells[columnIndex];
@@ -337,4 +338,50 @@ void DataSets::MemoryViewDataSet::setFieldValues(gsl::index index) {
       default:throw IllegalStateException("Internal error.");
     }
   }
+}
+
+std::vector<std::vector<DataSets::DataSetRow *>> *DataSets::MemoryViewDataSet::rawData() {
+  return &data;
+}
+
+DataSets::MemoryViewDataSet::iterator DataSets::MemoryViewDataSet::begin() {
+  return iterator(this, 1);
+}
+
+DataSets::MemoryViewDataSet::iterator DataSets::MemoryViewDataSet::end() {
+  return iterator(this, data.size() - 2);
+}
+void DataSets::MemoryViewDataSet::createNullRows(const std::vector<std::pair<int,
+                                                                             int>> &fieldIndices,
+                                                 const std::vector<ValueType> &fieldTypes) {
+  static gsl::zstring<> nullStr = "null";
+  int last = fieldIndices[0].first;
+  std::vector<DataContainer> nullData;
+  for (gsl::index i = 0; i < fieldIndices.size(); ++i) {
+    if (fieldIndices[i].first == last) {
+      switch (fieldTypes[i]) {
+        case ValueType::Integer:nullData.emplace_back(DataContainer{._integer = 0});
+          break;
+        case ValueType::Double:nullData.emplace_back(DataContainer{._double = 0.0});
+          break;
+        case ValueType::String:nullData.emplace_back(DataContainer{._string = nullStr});
+          break;
+        case ValueType::Currency:
+          nullData.emplace_back(DataContainer{._currency = new Currency(0)});
+          break;
+        case ValueType::DateTime:nullData.emplace_back(DataContainer{._dateTime = new DateTime()});
+          break;
+      }
+    } else {
+      nullRecords.emplace_back(new DataSetRow(true, nullData));
+      nullData.clear();
+      last = fieldIndices[i].first;
+      --i;
+    }
+  }
+  nullRecords.emplace_back(new DataSetRow(true, nullData));
+}
+
+DataSets::DataSetRow *DataSets::MemoryViewDataSet::getNullRow(gsl::index tableIndex) {
+  return nullRecords[tableIndex];
 }

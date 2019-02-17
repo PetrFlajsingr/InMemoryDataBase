@@ -14,8 +14,8 @@ std::string_view DataBase::MemoryDataBase::getName() const {
   return name;
 }
 
-void DataBase::MemoryDataBase::addTable(std::shared_ptr<DataSets::BaseDataSet> dataSet) {
-  tables.emplace_back(Table{std::move(dataSet), {}});
+void DataBase::MemoryDataBase::addTable(std::shared_ptr<DataSets::MemoryDataSet> dataSet) {
+  tables.emplace_back(dataSet);
 }
 
 void DataBase::MemoryDataBase::removeTable(std::string_view tableName) {
@@ -49,7 +49,7 @@ void DataBase::MemoryDataBase::cancelRelation(std::string_view relationName) {
   // TODO
 }
 
-std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::MemoryDataBase::execSimpleQuery(
+std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::execSimpleQuery(
     std::string_view query,
     bool keepView,
     std::string_view viewName) {
@@ -66,7 +66,14 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::MemoryDataBase::execSimpl
                             "for queries using aggregation");
   }
 
-  return nullptr;
+  /*auto resultView = std::make_shared<DataSets::MemoryViewDataSet>(viewName);
+  if (keepView) {
+    views.emplace_back(resultView);
+  }
+
+
+  return resultView;*/
+  return std::make_shared<View>(nullptr);
 }
 
 std::shared_ptr<DataSets::BaseDataSet> DataBase::MemoryDataBase::execAggregateQuery(
@@ -84,6 +91,7 @@ std::shared_ptr<DataSets::BaseDataSet> DataBase::MemoryDataBase::execAggregateQu
                             "use DataBase::MemoryDataBase::execSimpleQuery "
                             "for queries not using aggregation");
   }
+
   return nullptr;
 }
 
@@ -184,3 +192,8 @@ const DataBase::Table &DataBase::MemoryDataBase::tableByName(std::string_view ta
       + "\" not found. DataBase::MemoryDataBase::tableByName";
   throw InvalidArgumentException(errMsg.c_str());
 }
+
+DataBase::Table::Table(const std::shared_ptr<DataSets::MemoryDataSet> &dataSet)
+    : dataSet(dataSet) {}
+DataBase::View::View(const std::shared_ptr<DataSets::MemoryViewDataSet> &dataSet)
+    : dataSet(dataSet) {}
