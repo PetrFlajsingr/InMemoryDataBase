@@ -349,7 +349,7 @@ DataSets::MemoryViewDataSet::iterator DataSets::MemoryViewDataSet::begin() {
 }
 
 DataSets::MemoryViewDataSet::iterator DataSets::MemoryViewDataSet::end() {
-  return iterator(this, data.size() - 2);
+  return iterator(this, data.size() - 1);
 }
 void DataSets::MemoryViewDataSet::createNullRows(const std::vector<std::pair<int,
                                                                              int>> &fieldIndices,

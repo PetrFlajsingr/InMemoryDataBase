@@ -62,6 +62,11 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::prepareResultV
   std::vector<ValueType> fieldTypes;
   std::vector<std::pair<int, int>> fieldIndices;
   auto fields1 = dataSet1->getFields();
+  gsl::index offset = 1;
+  if (auto view = dynamic_cast<DataSets::MemoryViewDataSet *>(dataSet1); view
+      != nullptr) {
+    offset = view->rawData()[1].size();
+  }
   std::for_each(fields1.begin(),
                 fields1.end(),
                 [&fieldNames, &fieldTypes, &fieldIndices](const DataSets::BaseField *field) {
@@ -72,10 +77,10 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::prepareResultV
   auto fields2 = dataSet2->getFields();
   std::for_each(fields2.begin(),
                 fields2.end(),
-                [&fieldNames, &fieldTypes, &fieldIndices](const DataSets::BaseField *field) {
+                [&offset, &fieldNames, &fieldTypes, &fieldIndices](const DataSets::BaseField *field) {
                   fieldNames.emplace_back(field->getName());
                   fieldTypes.emplace_back(field->getFieldType());
-                  fieldIndices.emplace_back(1, field->getIndex());
+                  fieldIndices.emplace_back(offset, field->getIndex());
                 });
 
   auto result = std::make_shared<DataSets::MemoryViewDataSet>(
@@ -182,6 +187,7 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::innerJoin_View
     if (found) {
       found = false;
       iter2 -= diff;
+      diff = 0;
     }
   }
   result->rawData()->emplace_back();
@@ -240,6 +246,7 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::innerJoin_View
     if (found) {
       found = false;
       iter2 -= diff;
+      diff = 0;
     }
   }
   result->rawData()->emplace_back();
@@ -294,6 +301,7 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::leftJoin_DataS
     if (found) {
       found = false;
       iter2 -= diff;
+      diff = 0;
     }
   }
   result->rawData()->emplace_back();
@@ -354,6 +362,7 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::leftJoin_ViewD
     if (found) {
       found = false;
       iter2 -= diff;
+      diff = 0;
     }
   }
   result->rawData()->emplace_back();
@@ -421,6 +430,7 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::leftJoin_ViewV
     if (found) {
       found = false;
       iter2 -= diff;
+      diff = 0;
     }
   }
   result->rawData()->emplace_back();

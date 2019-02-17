@@ -23,9 +23,17 @@ int main() {
 
   auto table1 = std::make_shared<DataBase::Table>(ds1);
   auto table2 = std::make_shared<DataBase::Table>(ds2);
-  DataBase::JoinMaker joinMaker(table1, "A", table2, "A");
+  DataBase::JoinMaker joinMaker(table1, "A1", table2, "A");
 
   auto joinResult = joinMaker.leftJoin();
+  auto view = std::make_shared<DataBase::View>(joinResult);
+
+  DataBase::JoinMaker joinMaker1(view, "A1", table2, "A");
+  joinResult = joinMaker1.leftJoin();
+  view = std::make_shared<DataBase::View>(joinResult);
+
+  DataBase::JoinMaker joinMaker2(view, "A1", table1, "A1");
+  joinResult = joinMaker2.leftJoin();
 
   auto writer = DataWriters::CsvWriter(outFile);
 
