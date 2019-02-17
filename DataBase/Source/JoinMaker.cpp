@@ -103,41 +103,27 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::innerJoin() {
 std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::innerJoin_DataSetDataSet() {
   auto result = prepareResultView();
 
-  auto iter1 = t1->dataSet->begin();
   const gsl::index fieldIndex1 = t1->dataSet->fieldByName(col1)->getIndex();
   const auto type1 = t1->dataSet->fieldByName(col1)->getFieldType();
-
-  auto iter2 = t2->dataSet->begin();
   const gsl::index fieldIndex2 = t2->dataSet->fieldByName(col2)->getIndex();
 
-  bool found = false;
-  int diff = 0;
-  while (iter1 != t1->dataSet->end()) {
-    while (iter2 != t2->dataSet->end()) {
-      auto cmpResult = compareDataContainers((*(*iter1))[fieldIndex1],
-                                             (*(*iter2))[fieldIndex2],
-                                             type1);
-      switch (cmpResult) {
-        case 0: {
-          result->rawData()->emplace_back(std::vector<DataSetRow *>{
-              *iter1, *iter2});
-          found = true;
-          ++diff;
-          break;
-        }
-        case -1: goto outer_loop;
-      }
+  auto cmpFunc = [&result]
+      (int8_t cmpResult,
+       bool _,
+       DataSets::MemoryDataSet::iterator &iter1,
+       DataSets::MemoryDataSet::iterator &iter2) {
+    if (cmpResult == 0) {
+      result->rawData()->emplace_back(std::vector<DataSetRow *>{
+          *iter1, *iter2});
+    }
+  };
 
-      ++iter2;
-    }
-    outer_loop:
-    ++iter1;
-    if (found) {
-      found = false;
-      iter2 -= diff;
-      diff = 0;
-    }
-  }
+  iterAndCompare(t1->dataSet, t2->dataSet,
+                 std::make_pair(fieldIndex1, 0),
+                 std::make_pair(fieldIndex2, 0),
+                 cmpFunc,
+                 type1);
+
   result->rawData()->emplace_back();
   return result;
 }
@@ -145,7 +131,6 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::innerJoin_Data
 std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::innerJoin_ViewDataSet() {
   auto result = prepareResultView();
 
-  auto iter1 = view1->dataSet->begin();
   const gsl::index field1TableIndex =
       (view1->dataSet->fieldByName(col1)->getIndex()
           & view1->dataSet->maskTableIndex) >> view1->dataSet->maskTableShift;
@@ -154,42 +139,29 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::innerJoin_View
           & view1->dataSet->maskColumnIndex;
   const auto type1 = view1->dataSet->fieldByName(col1)->getFieldType();
 
-  auto iter2 = t2->dataSet->begin();
   const gsl::index fieldIndex2 = t2->dataSet->fieldByName(col2)->getIndex();
 
-  bool found = false;
-  int diff = 0;
-  while (iter1 != view1->dataSet->end()) {
-    while (iter2 != t2->dataSet->end()) {
-      auto cmpResult =
-          compareDataContainers((*(*iter1)[field1TableIndex])[field1FieldIndex],
-                                (*(*iter2))[fieldIndex2],
-                                type1);
-      switch (cmpResult) {
-        case 0: {
-          std::vector<DataSetRow *> newRecord;
-          std::copy((*iter1).begin(),
-                    (*iter1).end(),
-                    std::back_inserter(newRecord));
-          newRecord.emplace_back(*iter2);
-          result->rawData()->emplace_back(newRecord);
-          found = true;
-          ++diff;
-          break;
-        }
-        case -1: goto outer_loop;
-      }
+  auto cmpFunc = [&result]
+      (int8_t cmpResult,
+       bool _,
+       DataSets::MemoryViewDataSet::iterator &iter1,
+       DataSets::MemoryDataSet::iterator &iter2) {
+    if (cmpResult == 0) {
+      std::vector<DataSetRow *> newRecord;
+      std::copy((*iter1).begin(),
+                (*iter1).end(),
+                std::back_inserter(newRecord));
+      newRecord.emplace_back(*iter2);
+      result->rawData()->emplace_back(newRecord);
+    }
+  };
 
-      ++iter2;
-    }
-    outer_loop:
-    ++iter1;
-    if (found) {
-      found = false;
-      iter2 -= diff;
-      diff = 0;
-    }
-  }
+  iterAndCompare(view1->dataSet, t2->dataSet,
+                 std::make_pair(field1TableIndex, field1FieldIndex),
+                 std::make_pair(fieldIndex2, 0),
+                 cmpFunc,
+                 type1);
+
   result->rawData()->emplace_back();
   return result;
 }
@@ -197,7 +169,6 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::innerJoin_View
 std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::innerJoin_ViewView() {
   auto result = prepareResultView();
 
-  auto iter1 = view1->dataSet->begin();
   const gsl::index field1TableIndex =
       (view1->dataSet->fieldByName(col1)->getIndex()
           & view1->dataSet->maskTableIndex) >> view1->dataSet->maskTableShift;
@@ -206,7 +177,6 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::innerJoin_View
           & view1->dataSet->maskColumnIndex;
   const auto type1 = view1->dataSet->fieldByName(col1)->getFieldType();
 
-  auto iter2 = view2->dataSet->begin();
   const gsl::index field2TableIndex =
       (view2->dataSet->fieldByName(col2)->getIndex()
           & view2->dataSet->maskTableIndex) >> view2->dataSet->maskTableShift;
@@ -214,41 +184,29 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::innerJoin_View
       view2->dataSet->fieldByName(col2)->getIndex()
           & view2->dataSet->maskColumnIndex;
 
-  bool found = false;
-  int diff = 0;
-  while (iter1 != view1->dataSet->end()) {
-    while (iter2 != view2->dataSet->end()) {
-      auto cmpResult =
-          compareDataContainers((*(*iter1)[field1TableIndex])[field1FieldIndex],
-                                (*(*iter2)[field2TableIndex])[field2FieldIndex],
-                                type1);
-      switch (cmpResult) {
-        case 0: {
-          std::vector<DataSetRow *> newRecord;
-          std::copy((*iter1).begin(),
-                    (*iter1).end(),
-                    std::back_inserter(newRecord));
-          std::copy((*iter2).begin(),
-                    (*iter2).end(),
-                    std::back_inserter(newRecord));
-          result->rawData()->emplace_back(newRecord);
-          found = true;
-          ++diff;
-          break;
-        }
-        case -1: goto outer_loop;
-      }
+  auto cmpFunc = [&result]
+      (int8_t cmpResult,
+       bool _,
+       DataSets::MemoryViewDataSet::iterator &iter1,
+       DataSets::MemoryViewDataSet::iterator &iter2) {
+    if (cmpResult == 0) {
+      std::vector<DataSetRow *> newRecord;
+      std::copy((*iter1).begin(),
+                (*iter1).end(),
+                std::back_inserter(newRecord));
+      std::copy((*iter2).begin(),
+                (*iter2).end(),
+                std::back_inserter(newRecord));
+      result->rawData()->emplace_back(newRecord);
+    }
+  };
 
-      ++iter2;
-    }
-    outer_loop:
-    ++iter1;
-    if (found) {
-      found = false;
-      iter2 -= diff;
-      diff = 0;
-    }
-  }
+  iterAndCompare(view1->dataSet, view2->dataSet,
+                 std::make_pair(field1TableIndex, field1FieldIndex),
+                 std::make_pair(field2TableIndex, field2FieldIndex),
+                 cmpFunc,
+                 type1);
+
   result->rawData()->emplace_back();
   return result;
 }
@@ -264,46 +222,31 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::leftJoin() {
 std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::leftJoin_DataSetDataSet() {
   auto result = prepareResultView();
 
-  auto iter1 = t1->dataSet->begin();
   const gsl::index fieldIndex1 = t1->dataSet->fieldByName(col1)->getIndex();
   const auto type1 = t1->dataSet->fieldByName(col1)->getFieldType();
 
-  auto iter2 = t2->dataSet->begin();
   const gsl::index fieldIndex2 = t2->dataSet->fieldByName(col2)->getIndex();
 
-  bool found = false;
-  int diff = 0;
-  while (iter1 != t1->dataSet->end()) {
-    while (iter2 != t2->dataSet->end()) {
-      auto cmpResult = compareDataContainers((*(*iter1))[fieldIndex1],
-                                             (*(*iter2))[fieldIndex2],
-                                             type1);
-      switch (cmpResult) {
-        case 0: {
-          result->rawData()->emplace_back(std::vector<DataSetRow *>{
-              *iter1, *iter2});
-          found = true;
-          ++diff;
-          break;
-        }
-        case -1:
-          if (!found) {
-            result->rawData()->emplace_back(std::vector<DataSetRow *>{
-                *iter1, result->getNullRow(1)});
-          }
-          goto outer_loop;
-      }
+  auto cmpFunc = [&result]
+      (int8_t cmpResult,
+       bool found,
+       DataSets::MemoryDataSet::iterator &iter1,
+       DataSets::MemoryDataSet::iterator &iter2) {
+    if (cmpResult == 0) {
+      result->rawData()->emplace_back(std::vector<DataSetRow *>{
+          *iter1, *iter2});
+    } else if (cmpResult == -1 && !found) {
+      result->rawData()->emplace_back(std::vector<DataSetRow *>{
+          *iter1, result->getNullRow(1)});
+    }
+  };
 
-      ++iter2;
-    }
-    outer_loop:
-    ++iter1;
-    if (found) {
-      found = false;
-      iter2 -= diff;
-      diff = 0;
-    }
-  }
+  iterAndCompare(t1->dataSet, t2->dataSet,
+                 std::make_pair(fieldIndex1, 0),
+                 std::make_pair(fieldIndex2, 0),
+                 cmpFunc,
+                 type1);
+
   result->rawData()->emplace_back();
   return result;
 }
@@ -311,7 +254,6 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::leftJoin_DataS
 std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::leftJoin_ViewDataSet() {
   auto result = prepareResultView();
 
-  auto iter1 = view1->dataSet->begin();
   const gsl::index field1TableIndex =
       (view1->dataSet->fieldByName(col1)->getIndex()
           & view1->dataSet->maskTableIndex) >> view1->dataSet->maskTableShift;
@@ -320,51 +262,36 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::leftJoin_ViewD
           & view1->dataSet->maskColumnIndex;
   const auto type1 = view1->dataSet->fieldByName(col1)->getFieldType();
 
-  auto iter2 = t2->dataSet->begin();
   const gsl::index fieldIndex2 = t2->dataSet->fieldByName(col2)->getIndex();
 
-  bool found = false;
-  int diff = 0;
-  while (iter1 != view1->dataSet->end()) {
-    while (iter2 != t2->dataSet->end()) {
-      auto cmpResult =
-          compareDataContainers((*(*iter1)[field1TableIndex])[field1FieldIndex],
-                                (*(*iter2))[fieldIndex2],
-                                type1);
-      switch (cmpResult) {
-        case 0: {
-          std::vector<DataSetRow *> newRecord;
-          std::copy((*iter1).begin(),
-                    (*iter1).end(),
-                    std::back_inserter(newRecord));
-          newRecord.emplace_back(*iter2);
-          result->rawData()->emplace_back(newRecord);
-          found = true;
-          ++diff;
-          break;
-        }
-        case -1:
-          if (!found) {
-            std::vector<DataSetRow *> newRecord;
-            std::copy((*iter1).begin(),
-                      (*iter1).end(),
-                      std::back_inserter(newRecord));
-            newRecord.emplace_back(result->getNullRow(1));
-            result->rawData()->emplace_back(newRecord);
-          }
-          goto outer_loop;
-      }
+  auto cmpFunc = [&result]
+      (int8_t cmpResult,
+       bool found,
+       DataSets::MemoryViewDataSet::iterator &iter1,
+       DataSets::MemoryDataSet::iterator &iter2) {
+    if (cmpResult == 0) {
+      std::vector<DataSetRow *> newRecord;
+      std::copy((*iter1).begin(),
+                (*iter1).end(),
+                std::back_inserter(newRecord));
+      newRecord.emplace_back(*iter2);
+      result->rawData()->emplace_back(newRecord);
+    } else if (cmpResult == -1 && !found) {
+      std::vector<DataSetRow *> newRecord;
+      std::copy((*iter1).begin(),
+                (*iter1).end(),
+                std::back_inserter(newRecord));
+      newRecord.emplace_back(result->getNullRow(1));
+      result->rawData()->emplace_back(newRecord);
+    }
+  };
 
-      ++iter2;
-    }
-    outer_loop:
-    ++iter1;
-    if (found) {
-      found = false;
-      iter2 -= diff;
-      diff = 0;
-    }
-  }
+  iterAndCompare(view1->dataSet, t2->dataSet,
+                 std::make_pair(field1TableIndex, field1FieldIndex),
+                 std::make_pair(fieldIndex2, 0),
+                 cmpFunc,
+                 type1);
+
   result->rawData()->emplace_back();
   return result;
 }
@@ -372,7 +299,6 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::leftJoin_ViewD
 std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::leftJoin_ViewView() {
   auto result = prepareResultView();
 
-  auto iter1 = view1->dataSet->begin();
   const gsl::index field1TableIndex =
       (view1->dataSet->fieldByName(col1)->getIndex()
           & view1->dataSet->maskTableIndex) >> view1->dataSet->maskTableShift;
@@ -381,7 +307,6 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::leftJoin_ViewV
           & view1->dataSet->maskColumnIndex;
   const auto type1 = view1->dataSet->fieldByName(col1)->getFieldType();
 
-  auto iter2 = view2->dataSet->begin();
   const gsl::index field2TableIndex =
       (view2->dataSet->fieldByName(col2)->getIndex()
           & view2->dataSet->maskTableIndex) >> view2->dataSet->maskTableShift;
@@ -389,50 +314,36 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::leftJoin_ViewV
       view2->dataSet->fieldByName(col2)->getIndex()
           & view2->dataSet->maskColumnIndex;
 
-  bool found = false;
-  int diff = 0;
-  while (iter1 != view1->dataSet->end()) {
-    while (iter2 != view2->dataSet->end()) {
-      auto cmpResult =
-          compareDataContainers((*(*iter1)[field1TableIndex])[field1FieldIndex],
-                                (*(*iter2)[field2TableIndex])[field2FieldIndex],
-                                type1);
-      switch (cmpResult) {
-        case 0: {
-          std::vector<DataSetRow *> newRecord;
-          std::copy((*iter1).begin(),
-                    (*iter1).end(),
-                    std::back_inserter(newRecord));
-          std::copy((*iter2).begin(),
-                    (*iter2).end(),
-                    std::back_inserter(newRecord));
-          result->rawData()->emplace_back(newRecord);
-          found = true;
-          ++diff;
-          break;
-        }
-        case -1:
-          if (!found) {
-            std::vector<DataSetRow *> newRecord;
-            std::copy((*iter1).begin(),
-                      (*iter1).end(),
-                      std::back_inserter(newRecord));
-            newRecord.emplace_back(result->getNullRow(1));
-            result->rawData()->emplace_back(newRecord);
-          }
-          goto outer_loop;
-      }
+  auto cmpFunc = [&result]
+      (int8_t cmpResult,
+       bool found,
+       DataSets::MemoryViewDataSet::iterator &iter1,
+       DataSets::MemoryViewDataSet::iterator &iter2) {
+    if (cmpResult == 0) {
+      std::vector<DataSetRow *> newRecord;
+      std::copy((*iter1).begin(),
+                (*iter1).end(),
+                std::back_inserter(newRecord));
+      std::copy((*iter2).begin(),
+                (*iter2).end(),
+                std::back_inserter(newRecord));
+      result->rawData()->emplace_back(newRecord);
+    } else if (cmpResult == -1 && !found) {
+      std::vector<DataSetRow *> newRecord;
+      std::copy((*iter1).begin(),
+                (*iter1).end(),
+                std::back_inserter(newRecord));
+      newRecord.emplace_back(result->getNullRow(1));
+      result->rawData()->emplace_back(newRecord);
+    }
+  };
 
-      ++iter2;
-    }
-    outer_loop:
-    ++iter1;
-    if (found) {
-      found = false;
-      iter2 -= diff;
-      diff = 0;
-    }
-  }
+  iterAndCompare(view1->dataSet, view2->dataSet,
+                 std::make_pair(field1TableIndex, field1FieldIndex),
+                 std::make_pair(field2TableIndex, field2FieldIndex),
+                 cmpFunc,
+                 type1);
+
   result->rawData()->emplace_back();
   return result;
 }
@@ -455,3 +366,62 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::outerJoin_View
 std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::outerJoin_ViewView() {
   throw NotImplementedException();
 }
+
+template<typename T, typename T2, typename CompFunc>
+void DataBase::JoinMaker::iterAndCompare(std::shared_ptr<T> first,
+                                         std::shared_ptr<T2> second,
+                                         std::pair<gsl::index,
+                                                   gsl::index> firstIndex,
+                                         std::pair<gsl::index,
+                                                   gsl::index> secondIndex,
+                                         CompFunc cmpFunc,
+                                         ValueType valueType) {
+  static_assert(std::is_same<T, DataSets::MemoryDataSet>{}
+                    || std::is_same<T, DataSets::MemoryViewDataSet>{});
+  static_assert(std::is_same<T2, DataSets::MemoryDataSet>{}
+                    || std::is_same<T2, DataSets::MemoryViewDataSet>{});
+
+  auto begin1 = first->begin();
+  auto end1 = first->end();
+  auto begin2 = second->begin();
+  auto end2 = second->end();
+
+  DataContainer container1, container2;
+  bool found = false;
+  int diff = 0;
+  while (begin1 != end1) {
+    while (begin2 != end2) {
+      if constexpr(std::is_same<T, DataSets::MemoryViewDataSet>{}) {
+        container1 = (*(*begin1)[firstIndex.first])[firstIndex.second];
+      } else if constexpr(std::is_same<T, DataSets::MemoryDataSet>{}) {
+        container1 = (*(*begin1))[firstIndex.first];
+      }
+
+      if constexpr(std::is_same<T2, DataSets::MemoryViewDataSet>{}) {
+        container2 = (*(*begin2)[secondIndex.first])[secondIndex.second];
+      } else if constexpr(std::is_same<T2, DataSets::MemoryDataSet>{}) {
+        container2 = (*(*begin2))[secondIndex.first];
+      }
+
+      auto cmpResult = compareDataContainers(container1, container2, valueType);
+
+      cmpFunc(cmpResult, found, begin1, begin2);
+      if (cmpResult == 0) {
+        found = true;
+        ++diff;
+      } else if (cmpResult == -1) {
+        goto outer_loop;
+      }
+
+      ++begin2;
+    }
+    outer_loop:
+    ++begin1;
+    if (found) {
+      found = false;
+      begin2 -= diff;
+      diff = 0;
+    }
+  }
+}
+

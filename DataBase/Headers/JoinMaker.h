@@ -49,6 +49,16 @@ class JoinMaker {
   std::shared_ptr<DataSets::MemoryViewDataSet> outerJoin_ViewDataSet();
   std::shared_ptr<DataSets::MemoryViewDataSet> outerJoin_ViewView();
 
+  template<typename T, typename T2, typename CompFnc>
+  void iterAndCompare(std::shared_ptr<T> first,
+                      std::shared_ptr<T2> second,
+                      std::pair<gsl::index,
+                                gsl::index> firstIndex,
+                      std::pair<gsl::index,
+                                gsl::index> secondIndex,
+                      CompFnc cmpFunc,
+                      ValueType valueType);
+
   enum class JoinMode {
     DataSetDataSet, ViewDataSet, ViewView
   };
