@@ -7,8 +7,8 @@
 DataBase::Relation::Relation(DataBase::RelationType relationType)
     : relationType(relationType) {}
 
-void DataBase::Relation::addRelation(DataSets::DataSetRow *dataFirstDataSet,
-                                     DataSets::DataSetRow *dataSecondDataSet) {
+void DataBase::Relation::addRelation(DataSetRow *dataFirstDataSet,
+                                     DataSetRow *dataSecondDataSet) {
   relations.emplace_back(RelationContainer{dataFirstDataSet,
                                            dataSecondDataSet});
 }

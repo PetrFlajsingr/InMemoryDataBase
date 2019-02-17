@@ -96,7 +96,7 @@ bool endsWith(std::string_view value, std::string_view ending);
 gsl::zstring<> copyStringToNewChar(std::string_view str);
 
 template<typename T>
-int8_t compare(T &a, T &b);
+int8_t compare(const T &a, const T &b);
 /**
  * Srovnani integer hodnot
  * @param a

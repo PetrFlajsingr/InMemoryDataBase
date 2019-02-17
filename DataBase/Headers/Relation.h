@@ -24,8 +24,8 @@ enum class RelationType {
  * Kontejner obsahujici odkazy na propojena data
  */
 struct RelationContainer {
-  DataSets::DataSetRow *data_FirstDataSet;
-  DataSets::DataSetRow *data_SecondDataSet;
+  DataSetRow *data_FirstDataSet;
+  DataSetRow *data_SecondDataSet;
 };
 
 /**
@@ -264,8 +264,8 @@ class Relation {
    * @param dataFirstDataSet odkaz na zaznam prvniho data setu
    * @param dataSecondDataSet odkaz na zaznam druheho data setu
    */
-  virtual void addRelation(DataSets::DataSetRow *dataFirstDataSet,
-                           DataSets::DataSetRow *dataSecondDataSet);
+  virtual void addRelation(DataSetRow *dataFirstDataSet,
+                           DataSetRow *dataSecondDataSet);
 
   /**
    * Smazani vybraneho zaznamu ze seznamu

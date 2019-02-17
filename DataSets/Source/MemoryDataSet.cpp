@@ -12,8 +12,8 @@ void DataSets::MemoryDataSet::open(DataProviders::BaseDataProvider &dataProvider
     throw IllegalStateException("Dataset is already open.");
   }
   createFields(dataProvider.getHeader(), fieldTypes);
-  data.emplace_back(new DataSetRow{true, {}});
-  data.emplace_back(new DataSetRow{true, {}});
+  data.emplace_back(new DataSetRow());
+  data.emplace_back(new DataSetRow());
   loadData(dataProvider);
   data.shrink_to_fit();
 
@@ -26,8 +26,8 @@ void DataSets::MemoryDataSet::openEmpty(const std::vector<std::string> &fieldNam
     throw IllegalStateException("Dataset is already open.");
   }
   createFields(fieldNames, fieldTypes);
-  data.emplace_back(new DataSetRow{true, {}});
-  data.emplace_back(new DataSetRow{true, {}});
+  data.emplace_back(new DataSetRow());
+  data.emplace_back(new DataSetRow());
   isOpen = true;
 }
 
@@ -36,7 +36,7 @@ void DataSets::MemoryDataSet::loadData(DataProviders::BaseDataProvider &dataProv
   while (dataProvider.next()) {
     addRecord(dataProvider);
   }
-  data.emplace_back(new DataSetRow{true, {}});
+  data.emplace_back(new DataSetRow());
 }
 
 void DataSets::MemoryDataSet::createFields(std::vector<std::string> columns,
@@ -54,28 +54,28 @@ void DataSets::MemoryDataSet::createFields(std::vector<std::string> columns,
 
 void DataSets::MemoryDataSet::addRecord(DataProviders::BaseDataProvider &dataProvider) {
   auto record = dataProvider.getRow();
-  data.emplace_back(new DataSetRow(true, {}));
+  data.emplace_back(new DataSetRow());
 
-  data.back()->cells.reserve(columnCount);
+  data.back()->reserve(columnCount);
   for (gsl::index i = 0; i < record.size(); ++i) {
     switch (fields[i]->getFieldType()) {
       case ValueType::Integer:
-        data.back()->cells.emplace_back(DataContainer{._integer = Utilities::stringToInt(
+        data.back()->emplace_back(DataContainer{._integer = Utilities::stringToInt(
             record[i])});
         break;
       case ValueType::Double:
-        data.back()->cells.emplace_back(DataContainer{._double = Utilities::stringToDouble(
+        data.back()->emplace_back(DataContainer{._double = Utilities::stringToDouble(
             record[i])});
         break;
       case ValueType::String:
-        data.back()->cells.emplace_back(DataContainer{._string = strdup(record[i].c_str())});
+        data.back()->emplace_back(DataContainer{._string = strdup(record[i].c_str())});
         break;
       case ValueType::Currency:
-        data.back()->cells.emplace_back(DataContainer{._currency = new Currency(
+        data.back()->emplace_back(DataContainer{._currency = new Currency(
             record[i])});
         break;
       case ValueType::DateTime:
-        data.back()->cells.emplace_back(DataContainer{._dateTime = new DateTime(
+        data.back()->emplace_back(DataContainer{._dateTime = new DateTime(
             record[i])});
         break;
       default:
@@ -90,7 +90,7 @@ void DataSets::MemoryDataSet::close() {
   if (!data.empty()) {
     for (auto level1 : data) {
       gsl::index iter = 0;
-      for (auto level2 : level1->cells) {
+      for (auto level2 : *level1) {
         if (fields[iter]->getFieldType() == ValueType::String) {
           delete level2._string;
         } else if (fields[iter]->getFieldType() == ValueType::Currency) {
@@ -100,7 +100,7 @@ void DataSets::MemoryDataSet::close() {
         }
         iter++;
       }
-      level1->cells.clear();
+      level1->clear();
       delete level1;
     }
     data.clear();
@@ -110,7 +110,7 @@ void DataSets::MemoryDataSet::close() {
 // TODO: rework
 bool DataSets::MemoryDataSet::setFieldValues() {
   for (size_t i = 0; i < fields.size(); i++) {
-    auto currentCell = data[currentRecord]->cells[i];
+    auto currentCell = getCell(currentRecord, i);
     switch (fields[i]->getFieldType()) {
       case ValueType::Integer:
         setFieldData(fields[i].get(),
@@ -154,7 +154,7 @@ bool DataSets::MemoryDataSet::next() {
     return false;
   }
   setFieldValues();
-  return data[currentRecord]->valid;
+  return true;
 }
 
 bool DataSets::MemoryDataSet::previous() {
@@ -225,7 +225,7 @@ std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryDataSet::filter(
   resultView->data.emplace_back();
 
   for (const auto &iter : data) {
-    if (iter->cells.empty()) {
+    if (iter->empty()) {
       continue;
     }
     bool valid = true;
@@ -234,7 +234,7 @@ std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryDataSet::filter(
       if (!valid) {
         break;
       }
-      auto cell = iter->cells[filter.field->getIndex()];
+      auto cell = (*iter)[filter.field->getIndex()];
 
       if (filter.field->getFieldType() == ValueType::String) {
         std::string toCompare(cell._string);
@@ -350,23 +350,21 @@ void DataSets::MemoryDataSet::setData(void *data,
                                       ValueType type) {
   switch (type) {
     case ValueType::Integer:
-      this->data[currentRecord]->cells[index]._integer
-          = *reinterpret_cast<int *>(data);
+      getCell(currentRecord, index)._integer = *reinterpret_cast<int *>(data);
       break;
     case ValueType::Double:
-      this->data[currentRecord]->cells[index]._double
-          = *reinterpret_cast<int *>(data);
+      getCell(currentRecord, index)._double = *reinterpret_cast<int *>(data);
       break;
-    case ValueType::String:delete[] this->data[currentRecord]->cells[index]._string;
-      this->data[currentRecord]->cells[index]._string
+    case ValueType::String:delete[] getCell(currentRecord, index)._string;
+      getCell(currentRecord, index)._string
           = reinterpret_cast<gsl::zstring<>>(data);
       break;
     case ValueType::Currency:
-      *(this->data[currentRecord]->cells[index]._currency)
+      *(getCell(currentRecord, index)._currency)
           = *(reinterpret_cast<Currency *>(data));
       break;
     case ValueType::DateTime:
-      *(this->data[currentRecord]->cells[index]._dateTime)
+      *(getCell(currentRecord, index)._dateTime)
           = *(reinterpret_cast<DateTime *>(data));
       break;
     default:throw IllegalStateException("Invalid value type.");
@@ -375,25 +373,25 @@ void DataSets::MemoryDataSet::setData(void *data,
 
 void DataSets::MemoryDataSet::append() {
   data.pop_back();
-  data.emplace_back(new DataSetRow{true, {}});
+  data.emplace_back(new DataSetRow());
   for (auto &field : fields) {
     switch (field->getFieldType()) {
-      case ValueType::Integer:data.back()->cells.emplace_back(DataContainer{._integer = 0});
+      case ValueType::Integer:data.back()->emplace_back(DataContainer{._integer = 0});
         break;
-      case ValueType::Double:data.back()->cells.emplace_back(DataContainer{._double = 0});
+      case ValueType::Double:data.back()->emplace_back(DataContainer{._double = 0});
         break;
-      case ValueType::String:data.back()->cells.emplace_back(DataContainer{._string = nullptr});
+      case ValueType::String:data.back()->emplace_back(DataContainer{._string = nullptr});
         break;
-      case ValueType::Currency:data.back()->cells.emplace_back(DataContainer{._currency = new Currency()});
+      case ValueType::Currency:data.back()->emplace_back(DataContainer{._currency = new Currency()});
         break;
-      case ValueType::DateTime:data.back()->cells.emplace_back(DataContainer{._dateTime = new DateTime()});
+      case ValueType::DateTime:data.back()->emplace_back(DataContainer{._dateTime = new DateTime()});
         break;
       default:
         throw IllegalStateException(
             "Internal error DataSets::MemoryDataSet::append().");
     }
   }
-  data.emplace_back(new DataSetRow{true, {}});
+  data.emplace_back(new DataSetRow());
   last();
 }
 
@@ -415,7 +413,7 @@ DataSets::MemoryDataSet::MemoryDataSet(std::string_view dataSetName)
 bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
   unsigned long min = getFirst(), max = getLast() + 1;
   currentRecord = (min + max) >> 1;
-  //setFieldValues(currentRecord, true);
+
   bool breakLoop = false;
 
   do {
@@ -423,45 +421,31 @@ bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
     switch (item.field->getFieldType()) {
       case ValueType::String:
         comparisonResult = Utilities::compareString(
-            data[currentRecord]->cells[item.field->getIndex()]._string,
+            getCell(currentRecord, item.field->getIndex())._string,
             item.searchData[0]._string);
-        //item.field->getAsString(),
-        //item.searchData[0]._string);
         break;
       case ValueType::Integer:
         comparisonResult = Utilities::compareInt(
-            data[currentRecord]->cells[item.field->getIndex()]._integer,
+            getCell(currentRecord, item.field->getIndex())._integer,
             item.searchData[0]._integer);
-        //reinterpret_cast<const IntegerField *>(item.field)->getAsInteger(),
-        //item.searchData[0]._integer);
         break;
       case ValueType::Double:
         comparisonResult = Utilities::compareDouble(
-            data[currentRecord]->cells[item.field->getIndex()]._double,
+            getCell(currentRecord, item.field->getIndex())._double,
             item.searchData[0]._double);
-        //reinterpret_cast<const DoubleField *>(item.field)->getAsDouble(),
-        //item.searchData[0]._double);
         break;
       case ValueType::Currency: {
-        //auto cur =
-        //    reinterpret_cast<const CurrencyField *>(item.field)->getAsCurrency();
         comparisonResult = Utilities::compareCurrency(
-            *data[currentRecord]->cells[item.field->getIndex()]._currency,
+            *getCell(currentRecord, item.field->getIndex())._currency,
             *item.searchData[0]._currency);
-        //cur,
-        //*item.searchData[0]._currency);
         break;
       }
         break;
       case ValueType::DateTime:
-        //auto dateTime =
-        //    reinterpret_cast<const DateTimeField *>(item.field)->getAsDateTime();
         comparisonResult =
             Utilities::compareDateTime(
-                *data[currentRecord]->cells[item.field->getIndex()]._dateTime,
+                *getCell(currentRecord, item.field->getIndex())._dateTime,
                 *item.searchData[0]._dateTime);
-        //dateTime,
-        //*item.searchData[0]._dateTime);
         break;
     }
     switch (comparisonResult) {
@@ -547,7 +531,9 @@ DataSets::MemoryDataSet::iterator DataSets::MemoryDataSet::end() {
   return iterator(this, getLast() + 1);
 }
 
+DataContainer &DataSets::MemoryDataSet::getCell(gsl::index row,
+                                                gsl::index column) {
+  return (*data[row])[column];
+}
+
 #pragma clang diagnostic pop
-DataSets::DataSetRow::DataSetRow(bool valid,
-                                 const std::vector<DataContainer> &cells)
-    : valid(valid), cells(cells) {}

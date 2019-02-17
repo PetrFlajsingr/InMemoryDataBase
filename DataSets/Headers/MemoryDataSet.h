@@ -26,15 +26,6 @@
 
 namespace DataSets {
 /**
- * Struktura pro jeden zaznam v data setu.
- */
-struct DataSetRow {
-  bool valid;  //< true pokud vyhovuje filtru/neni filtrovat, jinak false
-  std::vector<DataContainer> cells;  //< data v pameti
-
-  DataSetRow(bool valid, const std::vector<DataContainer> &cells);
-};
-/**
  * Dataset ukladajici data primo v operacni pameti.
  *
  *
@@ -254,7 +245,7 @@ class MemoryDataSet : public BaseDataSet {
 
   bool isOpen = false;
 
-  DataSetRow *stopItem = new DataSetRow{true, {}};
+  DataSetRow *stopItem = new DataSetRow();
 
   gsl::index currentRecord = 0;  //< Pocitadlo zaznamu
 
@@ -289,6 +280,8 @@ class MemoryDataSet : public BaseDataSet {
    * @return
    */
   bool setFieldValues();
+
+  inline DataContainer &getCell(gsl::index row, gsl::index column);
 };
 }  // namespace DataSets
 

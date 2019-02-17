@@ -114,12 +114,12 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::innerJoin_Data
   int diff = 0;
   while (iter1 != t1->dataSet->end()) {
     while (iter2 != t2->dataSet->end()) {
-      auto cmpResult = compareDataContainers(iter1->cells[fieldIndex1],
-                                             iter2->cells[fieldIndex2],
+      auto cmpResult = compareDataContainers((*(*iter1))[fieldIndex1],
+                                             (*(*iter2))[fieldIndex2],
                                              type1);
       switch (cmpResult) {
         case 0: {
-          result->rawData()->emplace_back(std::vector<DataSets::DataSetRow *>{
+          result->rawData()->emplace_back(std::vector<DataSetRow *>{
               *iter1, *iter2});
           found = true;
           ++diff;
@@ -162,12 +162,12 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::innerJoin_View
   while (iter1 != view1->dataSet->end()) {
     while (iter2 != t2->dataSet->end()) {
       auto cmpResult =
-          compareDataContainers((*iter1)[field1TableIndex]->cells[field1FieldIndex],
-                                iter2->cells[fieldIndex2],
+          compareDataContainers((*(*iter1)[field1TableIndex])[field1FieldIndex],
+                                (*(*iter2))[fieldIndex2],
                                 type1);
       switch (cmpResult) {
         case 0: {
-          std::vector<DataSets::DataSetRow *> newRecord;
+          std::vector<DataSetRow *> newRecord;
           std::copy((*iter1).begin(),
                     (*iter1).end(),
                     std::back_inserter(newRecord));
@@ -219,12 +219,12 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::innerJoin_View
   while (iter1 != view1->dataSet->end()) {
     while (iter2 != view2->dataSet->end()) {
       auto cmpResult =
-          compareDataContainers((*iter1)[field1TableIndex]->cells[field1FieldIndex],
-                                (*iter2)[field2TableIndex]->cells[field2FieldIndex],
+          compareDataContainers((*(*iter1)[field1TableIndex])[field1FieldIndex],
+                                (*(*iter2)[field2TableIndex])[field2FieldIndex],
                                 type1);
       switch (cmpResult) {
         case 0: {
-          std::vector<DataSets::DataSetRow *> newRecord;
+          std::vector<DataSetRow *> newRecord;
           std::copy((*iter1).begin(),
                     (*iter1).end(),
                     std::back_inserter(newRecord));
@@ -275,12 +275,12 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::leftJoin_DataS
   int diff = 0;
   while (iter1 != t1->dataSet->end()) {
     while (iter2 != t2->dataSet->end()) {
-      auto cmpResult = compareDataContainers(iter1->cells[fieldIndex1],
-                                             iter2->cells[fieldIndex2],
+      auto cmpResult = compareDataContainers((*(*iter1))[fieldIndex1],
+                                             (*(*iter2))[fieldIndex2],
                                              type1);
       switch (cmpResult) {
         case 0: {
-          result->rawData()->emplace_back(std::vector<DataSets::DataSetRow *>{
+          result->rawData()->emplace_back(std::vector<DataSetRow *>{
               *iter1, *iter2});
           found = true;
           ++diff;
@@ -288,7 +288,7 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::leftJoin_DataS
         }
         case -1:
           if (!found) {
-            result->rawData()->emplace_back(std::vector<DataSets::DataSetRow *>{
+            result->rawData()->emplace_back(std::vector<DataSetRow *>{
                 *iter1, result->getNullRow(1)});
           }
           goto outer_loop;
@@ -328,12 +328,12 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::leftJoin_ViewD
   while (iter1 != view1->dataSet->end()) {
     while (iter2 != t2->dataSet->end()) {
       auto cmpResult =
-          compareDataContainers((*iter1)[field1TableIndex]->cells[field1FieldIndex],
-                                iter2->cells[fieldIndex2],
+          compareDataContainers((*(*iter1)[field1TableIndex])[field1FieldIndex],
+                                (*(*iter2))[fieldIndex2],
                                 type1);
       switch (cmpResult) {
         case 0: {
-          std::vector<DataSets::DataSetRow *> newRecord;
+          std::vector<DataSetRow *> newRecord;
           std::copy((*iter1).begin(),
                     (*iter1).end(),
                     std::back_inserter(newRecord));
@@ -345,7 +345,7 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::leftJoin_ViewD
         }
         case -1:
           if (!found) {
-            std::vector<DataSets::DataSetRow *> newRecord;
+            std::vector<DataSetRow *> newRecord;
             std::copy((*iter1).begin(),
                       (*iter1).end(),
                       std::back_inserter(newRecord));
@@ -394,12 +394,12 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::leftJoin_ViewV
   while (iter1 != view1->dataSet->end()) {
     while (iter2 != view2->dataSet->end()) {
       auto cmpResult =
-          compareDataContainers((*iter1)[field1TableIndex]->cells[field1FieldIndex],
-                                (*iter2)[field2TableIndex]->cells[field2FieldIndex],
+          compareDataContainers((*(*iter1)[field1TableIndex])[field1FieldIndex],
+                                (*(*iter2)[field2TableIndex])[field2FieldIndex],
                                 type1);
       switch (cmpResult) {
         case 0: {
-          std::vector<DataSets::DataSetRow *> newRecord;
+          std::vector<DataSetRow *> newRecord;
           std::copy((*iter1).begin(),
                     (*iter1).end(),
                     std::back_inserter(newRecord));
@@ -413,7 +413,7 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::leftJoin_ViewV
         }
         case -1:
           if (!found) {
-            std::vector<DataSets::DataSetRow *> newRecord;
+            std::vector<DataSetRow *> newRecord;
             std::copy((*iter1).begin(),
                       (*iter1).end(),
                       std::back_inserter(newRecord));

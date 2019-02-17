@@ -174,8 +174,8 @@ std::string Utilities::toLower(const std::string &str) {
   return result;
 }
 
-template<typename T>
-int8_t Utilities::compare(T &a, T &b) {
+template<class T>
+int8_t Utilities::compare(const T &a, const T &b) {
   if (a == b) {
     return 0;
   }

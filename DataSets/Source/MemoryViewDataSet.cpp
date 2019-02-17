@@ -202,7 +202,7 @@ std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryViewDataSet::filter(
           filter.field->getIndex() & maskTableIndex >> maskTableShift;
       auto columnIndex = filter.field->getIndex() & maskColumnIndex;
 
-      auto cell = iter[tableIndex]->cells[columnIndex];
+      auto cell = (*iter[tableIndex])[columnIndex];
 
       if (filter.field->getFieldType() == ValueType::String) {
         std::string toCompare(cell._string);
@@ -313,7 +313,7 @@ void DataSets::MemoryViewDataSet::setFieldValues(gsl::index index) {
         tableIndex = (fields[i]->getIndex() & maskTableIndex) >> maskTableShift;
     const auto columnIndex = maskColumnIndex & fields[i]->getIndex();
 
-    auto cell = data[currentRecord][tableIndex]->cells[columnIndex];
+    auto cell = (*data[currentRecord][tableIndex])[columnIndex];
     switch (fields[i]->getFieldType()) {
       case ValueType::Integer:
         setFieldData(fields[i].get(),
@@ -340,7 +340,7 @@ void DataSets::MemoryViewDataSet::setFieldValues(gsl::index index) {
   }
 }
 
-std::vector<std::vector<DataSets::DataSetRow *>> *DataSets::MemoryViewDataSet::rawData() {
+std::vector<std::vector<DataSetRow *>> *DataSets::MemoryViewDataSet::rawData() {
   return &data;
 }
 
@@ -373,15 +373,15 @@ void DataSets::MemoryViewDataSet::createNullRows(const std::vector<std::pair<int
           break;
       }
     } else {
-      nullRecords.emplace_back(new DataSetRow(true, nullData));
+      nullRecords.emplace_back(new DataSetRow(nullData));
       nullData.clear();
       last = fieldIndices[i].first;
       --i;
     }
   }
-  nullRecords.emplace_back(new DataSetRow(true, nullData));
+  nullRecords.emplace_back(new DataSetRow(nullData));
 }
 
-DataSets::DataSetRow *DataSets::MemoryViewDataSet::getNullRow(gsl::index tableIndex) {
+DataSetRow *DataSets::MemoryViewDataSet::getNullRow(gsl::index tableIndex) {
   return nullRecords[tableIndex];
 }

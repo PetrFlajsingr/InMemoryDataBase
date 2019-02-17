@@ -47,6 +47,11 @@ typedef union {
 
 } DataContainer;
 
+/**
+ * Struktura pro jeden zaznam v data setu.
+ */
+using DataSetRow = std::vector<DataContainer>;
+
 int compareDataContainers(DataContainer &data1,
                           DataContainer &data2,
                           ValueType valueType);

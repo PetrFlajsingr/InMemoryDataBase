@@ -42,7 +42,7 @@ class Rel {
 
   std::string name;
 
-  std::vector<std::pair<DataSets::DataSetRow *, DataSets::DataSetRow *>>
+  std::vector<std::pair<DataSetRow *, DataSetRow *>>
       connectedData;
 
   void rebuildConnections();

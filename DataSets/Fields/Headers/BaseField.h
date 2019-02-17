@@ -13,7 +13,6 @@
 
 namespace DataSets {
 class BaseDataSet;
-struct DataSetRow;
 
 /**
  * Interface pro fields datasetu.
