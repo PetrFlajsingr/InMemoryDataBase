@@ -3,51 +3,20 @@
 //
 
 #include <JoinMaker.h>
+/*
+template<typename T1, typename T2>
+DataBase::JoinMaker<T1, T2>::JoinMaker(const std::shared_ptr<T1> &t1,
+                                       const std::string &field1,
+                                       const std::shared_ptr<T2> &t2,
+                                       const std::string &field2)
+                                       : t1(t1), t2(t2), col1(field1), col2(field2) {}
 
-DataBase::JoinMaker::JoinMaker(const std::shared_ptr<DataBase::Table> &t1,
-                               const std::string &field1,
-                               const std::shared_ptr<DataBase::Table> &t2,
-                               const std::string &field2)
-    : t1(t1),
-      col1(field1),
-      t2(t2),
-      col2(field2),
-      mode(JoinMode::DataSetDataSet) {}
+template<typename T1, typename T2>
+std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker<T1,
+                                                                 T2>::prepareResultView() {
+  DataSets::BaseDataSet *dataSet1 = t1->dataSet.get();
+  DataSets::BaseDataSet *dataSet2 = t1->dataSet.get();
 
-DataBase::JoinMaker::JoinMaker(const std::shared_ptr<DataBase::View> &view1,
-                               const std::string &field1,
-                               const std::shared_ptr<DataBase::Table> &t2,
-                               const std::string &field2)
-    : view1(view1),
-      col1(field1),
-      t2(t2),
-      col2(field2),
-      mode(JoinMode::ViewDataSet) {}
-
-DataBase::JoinMaker::JoinMaker(const std::shared_ptr<DataBase::View> &view1,
-                               const std::string &field1,
-                               const std::shared_ptr<DataBase::View> &view2,
-                               const std::string &field2)
-    : view1(view1),
-      col1(field1),
-      view2(view2),
-      col2(field2),
-      mode(JoinMode::ViewView) {}
-
-std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::prepareResultView() {
-  DataSets::BaseDataSet *dataSet1;
-  DataSets::BaseDataSet *dataSet2;
-  switch (mode) {
-    case JoinMode::DataSetDataSet:dataSet1 = t1->dataSet.get();
-      dataSet2 = t2->dataSet.get();
-      break;
-    case JoinMode::ViewDataSet:dataSet1 = view1->dataSet.get();
-      dataSet2 = t2->dataSet.get();
-      break;
-    case JoinMode::ViewView:dataSet1 = view1->dataSet.get();
-      dataSet2 = view2->dataSet.get();
-      break;
-  }
   const auto field1 = dataSet1->fieldByName(col1);
   DataSets::SortOptions options1;
   options1.addOption(field1, SortOrder::Ascending);
@@ -92,295 +61,29 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::prepareResultV
   return result;
 }
 
-std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::innerJoin() {
-  switch (mode) {
-    case JoinMode::DataSetDataSet:return innerJoin_DataSetDataSet();
-    case JoinMode::ViewDataSet:return innerJoin_ViewDataSet();
-    case JoinMode::ViewView:return innerJoin_ViewView();
-  }
-}
-
-std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::innerJoin_DataSetDataSet() {
+template<typename T1, typename T2>
+std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker<T1, T2>::join(DataBase::JoinType joinType) {
   auto result = prepareResultView();
-
-  const gsl::index fieldIndex1 = t1->dataSet->fieldByName(col1)->getIndex();
-  const auto type1 = t1->dataSet->fieldByName(col1)->getFieldType();
-  const gsl::index fieldIndex2 = t2->dataSet->fieldByName(col2)->getIndex();
-
-  auto cmpFunc = [&result]
-      (int8_t cmpResult,
-       bool _,
-       DataSets::MemoryDataSet::iterator &iter1,
-       DataSets::MemoryDataSet::iterator &iter2) {
-    if (cmpResult == 0) {
-      result->rawData()->emplace_back(std::vector<DataSetRow *>{
-          *iter1, *iter2});
-    }
-  };
-
   iterAndCompare(t1->dataSet, t2->dataSet,
-                 std::make_pair(fieldIndex1, 0),
-                 std::make_pair(fieldIndex2, 0),
-                 cmpFunc,
-                 type1);
+                 getFirstIndices(),
+                 getSecondIndices(),
+                 getJoinFunction(result, joinType),
+                 getValueType());
 
   result->rawData()->emplace_back();
   return result;
 }
 
-std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::innerJoin_ViewDataSet() {
-  auto result = prepareResultView();
-
-  const gsl::index field1TableIndex =
-      (view1->dataSet->fieldByName(col1)->getIndex()
-          & view1->dataSet->maskTableIndex) >> view1->dataSet->maskTableShift;
-  const gsl::index field1FieldIndex =
-      view1->dataSet->fieldByName(col1)->getIndex()
-          & view1->dataSet->maskColumnIndex;
-  const auto type1 = view1->dataSet->fieldByName(col1)->getFieldType();
-
-  const gsl::index fieldIndex2 = t2->dataSet->fieldByName(col2)->getIndex();
-
-  auto cmpFunc = [&result]
-      (int8_t cmpResult,
-       bool _,
-       DataSets::MemoryViewDataSet::iterator &iter1,
-       DataSets::MemoryDataSet::iterator &iter2) {
-    if (cmpResult == 0) {
-      std::vector<DataSetRow *> newRecord;
-      std::copy((*iter1).begin(),
-                (*iter1).end(),
-                std::back_inserter(newRecord));
-      newRecord.emplace_back(*iter2);
-      result->rawData()->emplace_back(newRecord);
-    }
-  };
-
-  iterAndCompare(view1->dataSet, t2->dataSet,
-                 std::make_pair(field1TableIndex, field1FieldIndex),
-                 std::make_pair(fieldIndex2, 0),
-                 cmpFunc,
-                 type1);
-
-  result->rawData()->emplace_back();
-  return result;
-}
-
-std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::innerJoin_ViewView() {
-  auto result = prepareResultView();
-
-  const gsl::index field1TableIndex =
-      (view1->dataSet->fieldByName(col1)->getIndex()
-          & view1->dataSet->maskTableIndex) >> view1->dataSet->maskTableShift;
-  const gsl::index field1FieldIndex =
-      view1->dataSet->fieldByName(col1)->getIndex()
-          & view1->dataSet->maskColumnIndex;
-  const auto type1 = view1->dataSet->fieldByName(col1)->getFieldType();
-
-  const gsl::index field2TableIndex =
-      (view2->dataSet->fieldByName(col2)->getIndex()
-          & view2->dataSet->maskTableIndex) >> view2->dataSet->maskTableShift;
-  const gsl::index field2FieldIndex =
-      view2->dataSet->fieldByName(col2)->getIndex()
-          & view2->dataSet->maskColumnIndex;
-
-  auto cmpFunc = [&result]
-      (int8_t cmpResult,
-       bool _,
-       DataSets::MemoryViewDataSet::iterator &iter1,
-       DataSets::MemoryViewDataSet::iterator &iter2) {
-    if (cmpResult == 0) {
-      std::vector<DataSetRow *> newRecord;
-      std::copy((*iter1).begin(),
-                (*iter1).end(),
-                std::back_inserter(newRecord));
-      std::copy((*iter2).begin(),
-                (*iter2).end(),
-                std::back_inserter(newRecord));
-      result->rawData()->emplace_back(newRecord);
-    }
-  };
-
-  iterAndCompare(view1->dataSet, view2->dataSet,
-                 std::make_pair(field1TableIndex, field1FieldIndex),
-                 std::make_pair(field2TableIndex, field2FieldIndex),
-                 cmpFunc,
-                 type1);
-
-  result->rawData()->emplace_back();
-  return result;
-}
-
-std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::leftJoin() {
-  switch (mode) {
-    case JoinMode::DataSetDataSet:return leftJoin_DataSetDataSet();
-    case JoinMode::ViewDataSet:return leftJoin_ViewDataSet();
-    case JoinMode::ViewView:return leftJoin_ViewView();
-  }
-}
-
-std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::leftJoin_DataSetDataSet() {
-  auto result = prepareResultView();
-
-  const gsl::index fieldIndex1 = t1->dataSet->fieldByName(col1)->getIndex();
-  const auto type1 = t1->dataSet->fieldByName(col1)->getFieldType();
-
-  const gsl::index fieldIndex2 = t2->dataSet->fieldByName(col2)->getIndex();
-
-  auto cmpFunc = [&result]
-      (int8_t cmpResult,
-       bool found,
-       DataSets::MemoryDataSet::iterator &iter1,
-       DataSets::MemoryDataSet::iterator &iter2) {
-    if (cmpResult == 0) {
-      result->rawData()->emplace_back(std::vector<DataSetRow *>{
-          *iter1, *iter2});
-    } else if (cmpResult == -1 && !found) {
-      result->rawData()->emplace_back(std::vector<DataSetRow *>{
-          *iter1, result->getNullRow(1)});
-    }
-  };
-
-  iterAndCompare(t1->dataSet, t2->dataSet,
-                 std::make_pair(fieldIndex1, 0),
-                 std::make_pair(fieldIndex2, 0),
-                 cmpFunc,
-                 type1);
-
-  result->rawData()->emplace_back();
-  return result;
-}
-
-std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::leftJoin_ViewDataSet() {
-  auto result = prepareResultView();
-
-  const gsl::index field1TableIndex =
-      (view1->dataSet->fieldByName(col1)->getIndex()
-          & view1->dataSet->maskTableIndex) >> view1->dataSet->maskTableShift;
-  const gsl::index field1FieldIndex =
-      view1->dataSet->fieldByName(col1)->getIndex()
-          & view1->dataSet->maskColumnIndex;
-  const auto type1 = view1->dataSet->fieldByName(col1)->getFieldType();
-
-  const gsl::index fieldIndex2 = t2->dataSet->fieldByName(col2)->getIndex();
-
-  auto cmpFunc = [&result]
-      (int8_t cmpResult,
-       bool found,
-       DataSets::MemoryViewDataSet::iterator &iter1,
-       DataSets::MemoryDataSet::iterator &iter2) {
-    if (cmpResult == 0) {
-      std::vector<DataSetRow *> newRecord;
-      std::copy((*iter1).begin(),
-                (*iter1).end(),
-                std::back_inserter(newRecord));
-      newRecord.emplace_back(*iter2);
-      result->rawData()->emplace_back(newRecord);
-    } else if (cmpResult == -1 && !found) {
-      std::vector<DataSetRow *> newRecord;
-      std::copy((*iter1).begin(),
-                (*iter1).end(),
-                std::back_inserter(newRecord));
-      newRecord.emplace_back(result->getNullRow(1));
-      result->rawData()->emplace_back(newRecord);
-    }
-  };
-
-  iterAndCompare(view1->dataSet, t2->dataSet,
-                 std::make_pair(field1TableIndex, field1FieldIndex),
-                 std::make_pair(fieldIndex2, 0),
-                 cmpFunc,
-                 type1);
-
-  result->rawData()->emplace_back();
-  return result;
-}
-
-std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::leftJoin_ViewView() {
-  auto result = prepareResultView();
-
-  const gsl::index field1TableIndex =
-      (view1->dataSet->fieldByName(col1)->getIndex()
-          & view1->dataSet->maskTableIndex) >> view1->dataSet->maskTableShift;
-  const gsl::index field1FieldIndex =
-      view1->dataSet->fieldByName(col1)->getIndex()
-          & view1->dataSet->maskColumnIndex;
-  const auto type1 = view1->dataSet->fieldByName(col1)->getFieldType();
-
-  const gsl::index field2TableIndex =
-      (view2->dataSet->fieldByName(col2)->getIndex()
-          & view2->dataSet->maskTableIndex) >> view2->dataSet->maskTableShift;
-  const gsl::index field2FieldIndex =
-      view2->dataSet->fieldByName(col2)->getIndex()
-          & view2->dataSet->maskColumnIndex;
-
-  auto cmpFunc = [&result]
-      (int8_t cmpResult,
-       bool found,
-       DataSets::MemoryViewDataSet::iterator &iter1,
-       DataSets::MemoryViewDataSet::iterator &iter2) {
-    if (cmpResult == 0) {
-      std::vector<DataSetRow *> newRecord;
-      std::copy((*iter1).begin(),
-                (*iter1).end(),
-                std::back_inserter(newRecord));
-      std::copy((*iter2).begin(),
-                (*iter2).end(),
-                std::back_inserter(newRecord));
-      result->rawData()->emplace_back(newRecord);
-    } else if (cmpResult == -1 && !found) {
-      std::vector<DataSetRow *> newRecord;
-      std::copy((*iter1).begin(),
-                (*iter1).end(),
-                std::back_inserter(newRecord));
-      newRecord.emplace_back(result->getNullRow(1));
-      result->rawData()->emplace_back(newRecord);
-    }
-  };
-
-  iterAndCompare(view1->dataSet, view2->dataSet,
-                 std::make_pair(field1TableIndex, field1FieldIndex),
-                 std::make_pair(field2TableIndex, field2FieldIndex),
-                 cmpFunc,
-                 type1);
-
-  result->rawData()->emplace_back();
-  return result;
-}
-
-std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::rightJoin_DataSetDataSet() {
-  throw NotImplementedException();
-}
-std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::rightJoin_ViewDataSet() {
-  throw NotImplementedException();
-}
-std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::rightJoin_ViewView() {
-  throw NotImplementedException();
-}
-std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::outerJoin_DataSetDataSet() {
-  throw NotImplementedException();
-}
-std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::outerJoin_ViewDataSet() {
-  throw NotImplementedException();
-}
-std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::JoinMaker::outerJoin_ViewView() {
-  throw NotImplementedException();
-}
-
-template<typename T, typename T2, typename CompFunc>
-void DataBase::JoinMaker::iterAndCompare(std::shared_ptr<T> first,
-                                         std::shared_ptr<T2> second,
-                                         std::pair<gsl::index,
-                                                   gsl::index> firstIndex,
-                                         std::pair<gsl::index,
-                                                   gsl::index> secondIndex,
-                                         CompFunc cmpFunc,
-                                         ValueType valueType) {
-  static_assert(std::is_same<T, DataSets::MemoryDataSet>{}
-                    || std::is_same<T, DataSets::MemoryViewDataSet>{});
-  static_assert(std::is_same<T2, DataSets::MemoryDataSet>{}
-                    || std::is_same<T2, DataSets::MemoryViewDataSet>{});
-
+template<typename T1, typename T2>
+template<typename CompFnc>
+void DataBase::JoinMaker<T1, T2>::iterAndCompare(std::shared_ptr<decltype(T1::dataSet)> first,
+                                                 std::shared_ptr<decltype(T2::dataSet)> second,
+                                                 std::pair<gsl::index,
+                                                           gsl::index> firstIndex,
+                                                 std::pair<gsl::index,
+                                                           gsl::index> secondIndex,
+                                                 CompFnc cmpFunc,
+                                                 ValueType valueType) {
   auto begin1 = first->begin();
   auto end1 = first->end();
   auto begin2 = second->begin();
@@ -391,15 +94,17 @@ void DataBase::JoinMaker::iterAndCompare(std::shared_ptr<T> first,
   int diff = 0;
   while (begin1 != end1) {
     while (begin2 != end2) {
-      if constexpr(std::is_same<T, DataSets::MemoryViewDataSet>{}) {
+      if constexpr(std::is_same<decltype(T1::dataSet), DataSets::MemoryViewDataSet>{}) {
         container1 = (*(*begin1)[firstIndex.first])[firstIndex.second];
-      } else if constexpr(std::is_same<T, DataSets::MemoryDataSet>{}) {
+      }
+      if constexpr(std::is_same<decltype(T1::dataSet), DataSets::MemoryDataSet>{}) {
         container1 = (*(*begin1))[firstIndex.first];
       }
 
-      if constexpr(std::is_same<T2, DataSets::MemoryViewDataSet>{}) {
+      if constexpr(std::is_same<decltype(T2::dataSet), DataSets::MemoryViewDataSet>{}) {
         container2 = (*(*begin2)[secondIndex.first])[secondIndex.second];
-      } else if constexpr(std::is_same<T2, DataSets::MemoryDataSet>{}) {
+      }
+      if constexpr(std::is_same<decltype(T2::dataSet), DataSets::MemoryDataSet>{}) {
         container2 = (*(*begin2))[secondIndex.first];
       }
 
@@ -425,3 +130,167 @@ void DataBase::JoinMaker::iterAndCompare(std::shared_ptr<T> first,
   }
 }
 
+template<typename T1, typename T2>
+std::pair<gsl::index, gsl::index> DataBase::JoinMaker<T1, T2>::getFirstIndices() {
+  if constexpr (std::is_same<decltype(T1::dataSet),std::shared_ptr<DataSets::MemoryDataSet>>{}) {
+    return std::make_pair(t1->dataSet->fieldByName(col1)->getIndex(), 0);
+  }
+
+  if constexpr (std::is_same<decltype(T1::dataSet), std::shared_ptr<DataSets::MemoryViewDataSet>>{}) {
+    return DataSets::MemoryViewDataSet::convertIndex(t1->dataSet->fieldByName(
+        col1)->getIndex());
+  }
+}
+
+template<typename T1, typename T2>
+std::pair<gsl::index, gsl::index> DataBase::JoinMaker<T1, T2>::getSecondIndices() {
+  if constexpr (std::is_same<decltype(T2::dataSet), std::shared_ptr<DataSets::MemoryDataSet>>{}) {
+    return std::make_pair(t2->dataSet->fieldByName(col2)->getIndex(), 0);
+  }
+
+  if constexpr (std::is_same<decltype(T2::dataSet), std::shared_ptr<DataSets::MemoryViewDataSet>>{}) {
+    return DataSets::MemoryViewDataSet::convertIndex(t2->dataSet->fieldByName(
+        col2)->getIndex());
+  }
+}
+
+template<typename T1, typename T2>
+ValueType DataBase::JoinMaker<T1, T2>::getValueType() {
+  return t1->dataSet->fieldByName(col1)->getFieldType();
+}
+
+template<typename T1, typename T2>
+std::function<void(int8_t, bool,
+                   typename std::remove_reference<decltype(*T1::dataSet)>::type::iterator&,
+                   typename std::remove_reference<decltype(*T2::dataSet)>::type::iterator&)>
+    DataBase::JoinMaker<T1, T2>::getJoinFunction(std::shared_ptr<DataSets::MemoryViewDataSet> result,
+                                          DataBase::JoinType joinType) {
+  if constexpr (std::is_same<T1, DataSets::MemoryDataSet>{}) {
+    if constexpr (std::is_same<T2, DataSets::MemoryDataSet>{}) {
+      switch (joinType) {
+        case JoinType::innerJoin:
+          return [&result]
+              (int8_t cmpResult,
+               bool,
+               typename T1::iterator &iter1,
+               typename T2::iterator &iter2) {
+            if (cmpResult == 0) {
+              result->rawData()->emplace_back(std::vector<DataSetRow *>{
+                  *iter1, *iter2});
+            }
+          };
+        case JoinType::leftJoin:
+          return [&result]
+              (int8_t cmpResult,
+               bool found,
+               DataSets::MemoryDataSet::iterator &iter1,
+               DataSets::MemoryDataSet::iterator &iter2) {
+            if (cmpResult == 0) {
+              result->rawData()->emplace_back(std::vector<DataSetRow *>{
+                  *iter1, *iter2});
+            } else if (cmpResult == -1 && !found) {
+              result->rawData()->emplace_back(std::vector<DataSetRow *>{
+                  *iter1, result->getNullRow(1)});
+            }
+          };
+        case JoinType::rightJoin:break;
+        case JoinType::outerJoin:break;
+      }
+    }
+    if constexpr (std::is_same<T2, DataSets::MemoryViewDataSet>{}) {
+      switch (joinType) {
+        case JoinType::innerJoin:
+          return [&result]
+              (int8_t cmpResult,
+               bool,
+               typename T1::iterator &iter1,
+               typename T2::iterator &iter2) {
+            if (cmpResult == 0) {
+              std::vector<DataSetRow *> newRecord;
+              std::copy((*iter1).begin(),
+                        (*iter1).end(),
+                        std::back_inserter(newRecord));
+              newRecord.emplace_back(*iter2);
+              result->rawData()->emplace_back(newRecord);
+            }
+          };
+        case JoinType::leftJoin:
+          return [&result]
+              (int8_t cmpResult,
+               bool found,
+               typename T1::iterator &iter1,
+               typename T2::iterator &iter2) {
+            if (cmpResult == 0) {
+              std::vector<DataSetRow *> newRecord;
+              std::copy((*iter1).begin(),
+                        (*iter1).end(),
+                        std::back_inserter(newRecord));
+              newRecord.emplace_back(*iter2);
+              result->rawData()->emplace_back(newRecord);
+            } else if (cmpResult == -1 && !found) {
+              std::vector<DataSetRow *> newRecord;
+              std::copy((*iter1).begin(),
+                        (*iter1).end(),
+                        std::back_inserter(newRecord));
+              newRecord.emplace_back(result->getNullRow(1));
+              result->rawData()->emplace_back(newRecord);
+            }
+          };
+        case JoinType::rightJoin:break;
+        case JoinType::outerJoin:break;
+      }
+    }
+  }
+  if constexpr (std::is_same<T1, DataSets::MemoryViewDataSet>{}) {
+    if constexpr (std::is_same<T2, DataSets::MemoryViewDataSet>{}) {
+      switch (joinType) {
+        case JoinType::innerJoin:
+          return [&result]
+              (int8_t cmpResult,
+               bool,
+               typename T1::iterator &iter1,
+               typename T2::iterator &iter2) {
+            if (cmpResult == 0) {
+              std::vector<DataSetRow *> newRecord;
+              std::copy((*iter1).begin(),
+                        (*iter1).end(),
+                        std::back_inserter(newRecord));
+              std::copy((*iter2).begin(),
+                        (*iter2).end(),
+                        std::back_inserter(newRecord));
+              result->rawData()->emplace_back(newRecord);
+            }
+          };
+        case JoinType::leftJoin:
+          return [&result]
+              (int8_t cmpResult,
+               bool found,
+               typename T1::iterator &iter1,
+               typename T2::iterator &iter2) {
+            if (cmpResult == 0) {
+              std::vector<DataSetRow *> newRecord;
+              std::copy((*iter1).begin(),
+                        (*iter1).end(),
+                        std::back_inserter(newRecord));
+              std::copy((*iter2).begin(),
+                        (*iter2).end(),
+                        std::back_inserter(newRecord));
+              result->rawData()->emplace_back(newRecord);
+            } else if (cmpResult == -1 && !found) {
+              std::vector<DataSetRow *> newRecord;
+              std::copy((*iter1).begin(),
+                        (*iter1).end(),
+                        std::back_inserter(newRecord));
+              newRecord.emplace_back(result->getNullRow(1));
+              result->rawData()->emplace_back(newRecord);
+            }
+          };
+        case JoinType::rightJoin:break;
+        case JoinType::outerJoin:break;
+      }
+    }
+  }
+  throw std::exception();
+}
+
+*/

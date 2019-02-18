@@ -385,3 +385,9 @@ void DataSets::MemoryViewDataSet::createNullRows(const std::vector<std::pair<int
 DataSetRow *DataSets::MemoryViewDataSet::getNullRow(gsl::index tableIndex) {
   return nullRecords[tableIndex];
 }
+
+std::pair<gsl::index,
+          gsl::index> DataSets::MemoryViewDataSet::convertIndex(gsl::index index) {
+  return std::make_pair((index & maskTableIndex) >> maskTableShift,
+                        index & maskColumnIndex);
+}
