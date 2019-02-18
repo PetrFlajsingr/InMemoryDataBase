@@ -217,51 +217,51 @@ class JoinMaker {
           case JoinType::outerJoin:break;
         }
       }
-      if constexpr (std::is_same<T2, View>{}) {
-        switch (joinType) {
-          case JoinType::innerJoin:
-            return [&result]
-                (int8_t cmpResult,
-                 bool,
-                 IteratorType1 &iter1,
-                 IteratorType2 &iter2) {
-              if (cmpResult == 0) {
-                std::vector<DataSetRow *> newRecord;
-                std::copy((*iter1).begin(),
-                          (*iter1).end(),
-                          std::back_inserter(newRecord));
-                newRecord.emplace_back(*iter2);
-                result->rawData()->emplace_back(newRecord);
-              }
-            };
-          case JoinType::leftJoin:
-            return [&result]
-                (int8_t cmpResult,
-                 bool found,
-                 IteratorType1 &iter1,
-                 IteratorType2 &iter2) {
-              if (cmpResult == 0) {
-                std::vector<DataSetRow *> newRecord;
-                std::copy((*iter1).begin(),
-                          (*iter1).end(),
-                          std::back_inserter(newRecord));
-                newRecord.emplace_back(*iter2);
-                result->rawData()->emplace_back(newRecord);
-              } else if (cmpResult == -1 && !found) {
-                std::vector<DataSetRow *> newRecord;
-                std::copy((*iter1).begin(),
-                          (*iter1).end(),
-                          std::back_inserter(newRecord));
-                newRecord.emplace_back(result->getNullRow(1));
-                result->rawData()->emplace_back(newRecord);
-              }
-            };
-          case JoinType::rightJoin:break;
-          case JoinType::outerJoin:break;
-        }
-      }
     }
     if constexpr (std::is_same<T1, View>{}) {
+      if constexpr (std::is_same<T2, Table>{}) {
+        switch (joinType) {
+          case JoinType::innerJoin:
+            return [&result]
+                (int8_t cmpResult,
+                 bool,
+                 IteratorType1 &iter1,
+                 IteratorType2 &iter2) {
+              if (cmpResult == 0) {
+                std::vector<DataSetRow *> newRecord;
+                std::copy((*iter1).begin(),
+                          (*iter1).end(),
+                          std::back_inserter(newRecord));
+                newRecord.emplace_back(*iter2);
+                result->rawData()->emplace_back(newRecord);
+              }
+            };
+          case JoinType::leftJoin:
+            return [&result]
+                (int8_t cmpResult,
+                 bool found,
+                 IteratorType1 &iter1,
+                 IteratorType2 &iter2) {
+              if (cmpResult == 0) {
+                std::vector<DataSetRow *> newRecord;
+                std::copy((*iter1).begin(),
+                          (*iter1).end(),
+                          std::back_inserter(newRecord));
+                newRecord.emplace_back(*iter2);
+                result->rawData()->emplace_back(newRecord);
+              } else if (cmpResult == -1 && !found) {
+                std::vector<DataSetRow *> newRecord;
+                std::copy((*iter1).begin(),
+                          (*iter1).end(),
+                          std::back_inserter(newRecord));
+                newRecord.emplace_back(result->getNullRow(1));
+                result->rawData()->emplace_back(newRecord);
+              }
+            };
+          case JoinType::rightJoin:break;
+          case JoinType::outerJoin:break;
+        }
+      }
       if constexpr (std::is_same<T2, View>{}) {
         switch (joinType) {
           case JoinType::innerJoin:
@@ -310,6 +310,7 @@ class JoinMaker {
         }
       }
     }
+    throw std::exception();
   }
 };
 }
