@@ -391,3 +391,7 @@ std::pair<gsl::index,
   return std::make_pair((index & maskTableIndex) >> maskTableShift,
                         index & maskColumnIndex);
 }
+
+gsl::index DataSets::MemoryViewDataSet::getTableCount() {
+  return nullRecords.size();
+}

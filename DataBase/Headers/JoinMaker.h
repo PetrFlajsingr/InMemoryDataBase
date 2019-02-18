@@ -16,6 +16,7 @@ class JoinMaker {
   using IteratorType2 = typename std::remove_reference<decltype(*T2::dataSet)>::type::iterator;
   using DataSetType1 = decltype(T1::dataSet);
   using DataSetType2 = decltype(T2::dataSet);
+
  public:
   JoinMaker(const std::shared_ptr<T1> &t1,
             const std::string &field1,
@@ -26,6 +27,11 @@ class JoinMaker {
     static_assert(std::is_same<T2, Table>{} || std::is_same<T2, View>{});
   }
 
+  /**
+   * Apply desired join operation on provided data
+   * @param joinType type of join
+   * @return view to joined data
+   */
   std::shared_ptr<DataSets::MemoryViewDataSet> join(JoinType joinType) {
     auto result = prepareResultView();
     iterAndCompare(t1->dataSet, t2->dataSet,
@@ -44,6 +50,16 @@ class JoinMaker {
   std::string col1;
   std::string col2;
 
+  /**
+   * Iterate through both datasets and compare its values.
+   * @tparam CompFnc function to call on compare
+   * @param first first data set
+   * @param second second data set
+   * @param firstIndex index of field in first data set
+   * @param secondIndex index of field in second data set
+   * @param cmpFunc compare function
+   * @param valueType type of value to compare
+   */
   template<typename CompFnc>
   void iterAndCompare(DataSetType1 first,
                       DataSetType2 second,
@@ -104,6 +120,10 @@ class JoinMaker {
     }
   }
 
+  /**
+   * Creates fields for result of join. Sorts data sets before joining them.
+   * @return empty MemoryViewDataSet
+   */
   std::shared_ptr<DataSets::MemoryViewDataSet> prepareResultView() {
     DataSets::BaseDataSet *dataSet1 = t1->dataSet.get();
     DataSets::BaseDataSet *dataSet2 = t2->dataSet.get();
@@ -125,7 +145,7 @@ class JoinMaker {
     gsl::index offset = 1;
     if (auto view = dynamic_cast<DataSets::MemoryViewDataSet *>(dataSet1); view
         != nullptr) {
-      offset = view->rawData()[1].size();
+      offset = (*view->rawData())[1].size();
     }
     std::for_each(fields1.begin(),
                   fields1.end(),
@@ -152,6 +172,10 @@ class JoinMaker {
     return result;
   }
 
+  /**
+   * Get converted indices of first field <tableIndex, columnIndex> or <columnIndex, 0>
+   * @return indices of first field
+   */
   std::pair<gsl::index, gsl::index> getFirstIndices() {
     if constexpr (std::is_same<DataSetType1,
                                std::shared_ptr<DataSets::MemoryDataSet>>{}) {
@@ -164,6 +188,11 @@ class JoinMaker {
           col1)->getIndex());
     }
   }
+
+  /**
+   * Get converted indices of second field <tableIndex, columnIndex> or <columnIndex, 0>
+   * @return indices of second field
+   */
   std::pair<gsl::index, gsl::index> getSecondIndices() {
     if constexpr (std::is_same<DataSetType2,
                                std::shared_ptr<DataSets::MemoryDataSet>>{}) {
@@ -176,10 +205,17 @@ class JoinMaker {
           col2)->getIndex());
     }
   }
+
   ValueType getValueType() {
     return t1->dataSet->fieldByName(col1)->getFieldType();
   }
 
+  /**
+   * Get join function based on template type and join type
+   * @param result result view to capture in lambda
+   * @param joinType type of join operation
+   * @return
+   */
   std::function<void(int8_t, bool,
                      IteratorType1 &,
                      IteratorType2 &)>
@@ -210,7 +246,7 @@ class JoinMaker {
                     *iter1, *iter2});
               } else if (cmpResult == -1 && !found) {
                 result->rawData()->emplace_back(std::vector<DataSetRow *>{
-                    *iter1, result->getNullRow(1)});
+                    *iter1, result->getNullRow(result->getTableCount() - 1)});
               }
             };
           case JoinType::rightJoin:break;
@@ -254,7 +290,8 @@ class JoinMaker {
                 std::copy((*iter1).begin(),
                           (*iter1).end(),
                           std::back_inserter(newRecord));
-                newRecord.emplace_back(result->getNullRow(1));
+                newRecord.emplace_back(result->getNullRow(
+                    result->getTableCount() - 1));
                 result->rawData()->emplace_back(newRecord);
               }
             };
@@ -301,7 +338,8 @@ class JoinMaker {
                 std::copy((*iter1).begin(),
                           (*iter1).end(),
                           std::back_inserter(newRecord));
-                newRecord.emplace_back(result->getNullRow(1));
+                newRecord.emplace_back(result->getNullRow(
+                    result->getTableCount() - 1));
                 result->rawData()->emplace_back(newRecord);
               }
             };
@@ -310,7 +348,6 @@ class JoinMaker {
         }
       }
     }
-    throw std::exception();
   }
 };
 }

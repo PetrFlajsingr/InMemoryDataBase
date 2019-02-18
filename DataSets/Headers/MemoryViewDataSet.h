@@ -51,6 +51,8 @@ class MemoryViewDataSet : public ViewDataSet {
 
   std::vector<std::vector<DataSetRow *>> *rawData();
 
+  gsl::index getTableCount();
+
   class iterator : public std::iterator<std::random_access_iterator_tag, int> {
    public:
     iterator() = default;
