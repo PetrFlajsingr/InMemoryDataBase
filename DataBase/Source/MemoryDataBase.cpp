@@ -61,7 +61,6 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::execSimpleQuery(
     bool keepView,
     std::string_view viewName) {
   auto structQuery = parseQuery(query);
-
   if (!structQuery.agr.data.empty()) {
     throw DataBaseException("Provided query is not \"simple\", "
                             "use DataBase::MemoryDataBase::execAggregateQuery "
@@ -72,21 +71,17 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::execSimpleQuery(
   if (!structQuery.joins.data.empty()) {
     result = doJoin(structQuery);
   }
-
   if (!structQuery.where.data.empty()) {
-    result = doWhere(structQuery, result->dataSet);
+    result = doWhere(structQuery, result);
   }
-
   if (!structQuery.order.data.empty()) {
     result = doOrder(structQuery, result);
   }
 
   result->dataSet->setName(std::string(viewName));
-
   if (keepView) {
     views.emplace_back(result);
   }
-
   return result;
 }
 
@@ -94,8 +89,7 @@ std::shared_ptr<DataSets::BaseDataSet> DataBase::MemoryDataBase::execAggregateQu
     std::string_view query,
     std::string_view viewName) {
   auto structQuery = parseQuery(query);
-
-  return nullptr;
+  throw NotImplementedException();
 }
 
 DataBase::StructuredQuery DataBase::MemoryDataBase::validateQuery(
@@ -250,10 +244,10 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doJoin(
 
 std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doWhere(
     const DataBase::StructuredQuery &query,
-    std::shared_ptr<DataSets::MemoryViewDataSet> &view) {
+    std::shared_ptr<View> &view) {
   DataSets::FilterOptions filterOptions;
   for (const auto &whereItem : query.where.data) {
-    auto field = view->fieldByName(whereItem.first.field.column);
+    auto field = view->dataSet->fieldByName(whereItem.first.field.column);
     std::vector<std::string> values;
     std::transform(whereItem.first.constValues.begin(),
                    whereItem.first.constValues.end(),
@@ -269,7 +263,7 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doWhere(
                             DataSets::condOpToFilterOp(whereItem.first.condOperator));
   }
   return std::make_shared<View>(std::dynamic_pointer_cast<DataSets::MemoryViewDataSet>(
-      view->filter(filterOptions)));
+      view->dataSet->filter(filterOptions)));
 }
 
 std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doOrder(
