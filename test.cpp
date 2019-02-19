@@ -40,22 +40,14 @@ int main() {
   auto ds2 = std::make_shared<DataSets::MemoryDataSet>("test2");
   ds2->open(prov2, {ValueType::String, ValueType::String, ValueType::Integer});
 
-  /*auto table1 = std::make_shared<DataBase::Table>(ds1);
-  auto table2 = std::make_shared<DataBase::Table>(ds2);
-  DataBase::JoinMaker joinMaker(table1, "A1", table2, "A");
-  auto joinResult = joinMaker.join(DataBase::JoinType::leftJoin);
-
-  DataBase::JoinMaker joinMaker1(joinResult, "A1", table2, "A");
-  joinResult = joinMaker1.join(DataBase::JoinType::innerJoin);*/
-
   DataBase::MemoryDataBase db("testDB");
   db.addTable(ds1);
   db.addTable(ds2);
 
   const std::string query = "select test1.A1, test1.B1, test1.C1, "
                             "test2.A, test2.B, test2.C "
-                            "from test1 join test2 on test1.A1 = test2.A "
-                            "where test1.A1 = \"A\" | \"H\";";
+                            "from test1 left join test2 on test1.A1 = test2.A "
+                            "where test1.A1 = \"A\" | \"B\" and test1.C1 = 11 | 22 | 33 | 44;";
 
   auto view = db.execSimpleQuery(query, false, "tmpView");
 
@@ -64,6 +56,7 @@ int main() {
   writer.writeHeader(view->dataSet->getFieldNames());
 
   auto fields = view->dataSet->getFields();
+
   while (view->dataSet->next()) {
     std::vector<std::string> record;
     std::transform(fields.begin(),

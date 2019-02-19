@@ -153,8 +153,7 @@ void DataSets::MemoryViewDataSet::sort(DataSets::SortOptions &options) {
       [this, &optionArray, &compareFunctions](const std::vector<DataSetRow *> &a,
                                               const std::vector<DataSetRow *> &b) {
         for (gsl::index i = 0; i < optionArray.size(); ++i) {
-          auto tableIndex = (optionArray[i].field->getIndex()
-              & maskTableIndex) >> maskTableShift;;
+          auto[tableIndex, _] = convertIndex(optionArray[i].field->getIndex());
           int compareResult = compareFunctions[i](a[tableIndex], b[tableIndex]);
           if (compareResult < 0) {
             return optionArray[i].order == SortOrder::Ascending;
@@ -198,9 +197,8 @@ std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryViewDataSet::filter(
       if (!valid) {
         break;
       }
-      auto tableIndex =
-          filter.field->getIndex() & maskTableIndex >> maskTableShift;
-      auto columnIndex = filter.field->getIndex() & maskColumnIndex;
+
+      auto[tableIndex, columnIndex] = convertIndex(filter.field->getIndex());
 
       auto cell = (*iter[tableIndex])[columnIndex];
 
@@ -309,9 +307,7 @@ void DataSets::MemoryViewDataSet::setData(void *data,
 
 void DataSets::MemoryViewDataSet::setFieldValues(gsl::index index) {
   for (gsl::index i = 0; i < fields.size(); i++) {
-    const auto
-        tableIndex = (fields[i]->getIndex() & maskTableIndex) >> maskTableShift;
-    const auto columnIndex = maskColumnIndex & fields[i]->getIndex();
+    auto[tableIndex, columnIndex] = convertIndex(fields[i]->getIndex());
 
     auto cell = (*data[currentRecord][tableIndex])[columnIndex];
     switch (fields[i]->getFieldType()) {
