@@ -10,7 +10,26 @@
 #include <JoinMaker.h>
 #include <CsvReader.h>
 
+void terminate_handler() {
+  try {
+    auto unknown = std::current_exception();
+    if (unknown) {
+      std::rethrow_exception(unknown);
+    } else {
+      std::cerr << "normal termination" << std::endl;
+    }
+  } catch (const std::exception &e) {
+    std::cerr << "Exc type: " << typeid(e).name() << "\nExc.what: " << e.what()
+              << std::endl;
+  } catch (...) {
+    std::cerr << "Unknown exception of type" << std::endl;
+  }
+  abort();
+}
+
 int main() {
+  std::set_terminate(terminate_handler);
+
   const std::string file1 = "/Users/petr/Desktop/join_test_1.csv";
   const std::string file2 = "/Users/petr/Desktop/join_test_2.csv";
   const std::string outFile = "/Users/petr/Desktop/join_test_out.csv";

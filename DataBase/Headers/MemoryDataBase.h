@@ -8,7 +8,6 @@
 #include <vector>
 #include <string>
 #include <BaseDataSet.h>
-#include <Relation.h>
 #include <MemoryViewDataSet.h>
 #include <Exceptions.h>
 #include <QueryCommon.h>
@@ -18,34 +17,17 @@
 #include <MemoryDataSet.h>
 
 namespace DataBase {
-class Rel;
 
 struct Table {
   std::shared_ptr<DataSets::MemoryDataSet> dataSet;
-  std::vector<Rel> relations;
 
   explicit Table(const std::shared_ptr<DataSets::MemoryDataSet> &dataSet);
 };
 
 struct View {
   std::shared_ptr<DataSets::MemoryViewDataSet> dataSet;
-  std::vector<Rel> relations;
 
   explicit View(const std::shared_ptr<DataSets::MemoryViewDataSet> &dataSet);
-};
-
-class Rel {
- public:
-  Table secondary;
-  std::shared_ptr<DataSets::BaseField> primaryField;
-  std::shared_ptr<DataSets::BaseField> secondaryField;
-
-  std::string name;
-
-  std::vector<std::pair<DataSetRow *, DataSetRow *>>
-      connectedData;
-
-  void rebuildConnections();
 };
 
 class MemoryDataBase {
@@ -57,13 +39,6 @@ class MemoryDataBase {
   void removeTable(std::string_view tableName);
 
   const Table &tableByName(std::string_view tableName) const;
-
-  void addRelation(std::string_view relationName,
-                   RelationType type,
-                   std::string_view table1Name,
-                   std::string_view table2Name);
-
-  void cancelRelation(std::string_view relationName);
 
   std::shared_ptr<View> execSimpleQuery(
       std::string_view query,
@@ -82,11 +57,16 @@ class MemoryDataBase {
   std::vector<Table> tables;
   std::vector<std::shared_ptr<View>> views;
 
+  StructuredQuery parseQuery(std::string_view query);
+
   std::string name;
 
   LexicalAnalyser lexicalAnalyser;
   SyntaxAnalyser syntaxAnalyser;
   SemanticAnalyser semanticAnalyser;
+
+  std::shared_ptr<DataSets::MemoryViewDataSet> doJoin(StructuredQuery query);
+  std::shared_ptr<DataSets::MemoryDataSet> doAggregation(StructuredQuery query);
 };
 
 }  // namespace DataBase

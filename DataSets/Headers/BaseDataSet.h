@@ -147,6 +147,10 @@ class BaseDataSet {
   virtual void resetBegin() = 0;
   virtual void resetEnd() = 0;
 
+  void setName(const std::string &name) {
+    dataSetName = name;
+  }
+
   std::string getName() const {
     return dataSetName;
   }

@@ -34,63 +34,26 @@ void DataBase::MemoryDataBase::removeTable(std::string_view tableName) {
   }
 }
 
-void DataBase::MemoryDataBase::addRelation(std::string_view relationName,
-                                           DataBase::RelationType type,
-                                           std::string_view table1Name,
-                                           std::string_view table2Name) {
-
-}
-
-void DataBase::MemoryDataBase::cancelRelation(std::string_view relationName) {
-  const auto fncFindByName = [relationName]
-      (const Rel &relation) {
-    return relation.name == relationName;
-  };
-  // TODO
-}
-
 std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::execSimpleQuery(
     std::string_view query,
     bool keepView,
     std::string_view viewName) {
-  lexicalAnalyser.setInput(std::string(query));
-  syntaxAnalyser.setInput(lexicalAnalyser.getAllTokens());
-  auto strQuery = syntaxAnalyser.analyse();
-  semanticAnalyser.setInput(strQuery);
-  auto semQuery = semanticAnalyser.analyse();
-  validateQuery(semQuery);
+  auto structQuery = parseQuery(query);
 
-  if (!semQuery.agr.data.empty()) {
+  if (!structQuery.agr.data.empty()) {
     throw DataBaseException("Provided query is not \"simple\", "
                             "use DataBase::MemoryDataBase::execAggregateQuery "
                             "for queries using aggregation");
   }
 
-  /*auto resultView = std::make_shared<DataSets::MemoryViewDataSet>(viewName);
-  if (keepView) {
-    views.emplace_back(resultView);
-  }
-
-
-  return resultView;*/
-  return std::make_shared<View>(nullptr);
+  return nullptr;
 }
 
 std::shared_ptr<DataSets::BaseDataSet> DataBase::MemoryDataBase::execAggregateQuery(
     std::string_view query,
     std::string_view viewName) {
-  lexicalAnalyser.setInput(std::string(query));
-  syntaxAnalyser.setInput(lexicalAnalyser.getAllTokens());
-  auto strQuery = syntaxAnalyser.analyse();
-  semanticAnalyser.setInput(strQuery);
-  auto semQuery = semanticAnalyser.analyse();
-  validateQuery(semQuery);
+  auto structQuery = parseQuery(query);
 
-  if (semQuery.agr.data.empty()) {
-    throw DataBaseException("Provided query is \"simple\", "
-                            "use DataBase::MemoryDataBase::execSimpleQuery "
-                            "for queries not using aggregation");
-  }
 
   return nullptr;
 }
@@ -191,6 +154,16 @@ const DataBase::Table &DataBase::MemoryDataBase::tableByName(std::string_view ta
   std::string errMsg = "Table named \"" + std::string(name)
       + "\" not found. DataBase::MemoryDataBase::tableByName";
   throw InvalidArgumentException(errMsg.c_str());
+}
+
+DataBase::StructuredQuery DataBase::MemoryDataBase::parseQuery(std::string_view query) {
+  lexicalAnalyser.setInput(std::string(query));
+  syntaxAnalyser.setInput(lexicalAnalyser.getAllTokens());
+  auto strQuery = syntaxAnalyser.analyse();
+  semanticAnalyser.setInput(strQuery);
+  auto semQuery = semanticAnalyser.analyse();
+  validateQuery(semQuery);
+  return semQuery;
 }
 
 DataBase::Table::Table(const std::shared_ptr<DataSets::MemoryDataSet> &dataSet)
