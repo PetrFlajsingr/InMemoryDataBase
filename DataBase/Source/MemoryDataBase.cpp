@@ -5,7 +5,7 @@
 #include <utility>
 #include <map>
 #include <MemoryDataBase.h>
-#include <QueryException.h>
+#include <JoinMaker.h>
 
 DataBase::Table::Table(const std::shared_ptr<DataSets::MemoryDataSet> &dataSet)
     : dataSet(dataSet) {}
@@ -20,13 +20,13 @@ std::string_view DataBase::MemoryDataBase::getName() const {
 }
 
 void DataBase::MemoryDataBase::addTable(std::shared_ptr<DataSets::MemoryDataSet> dataSet) {
-  tables.emplace_back(dataSet);
+  tables.emplace_back(std::make_shared<Table>(dataSet));
 }
 
 void DataBase::MemoryDataBase::removeTable(std::string_view tableName) {
   const auto fncFindByName = [tableName]
-      (const Table &table) {
-    return table.dataSet->getName() == tableName;
+      (const std::shared_ptr<Table> &table) {
+    return table->dataSet->getName() == tableName;
   };
 
   if (auto it = std::find_if(tables.begin(),
@@ -51,7 +51,16 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::execSimpleQuery(
                             "for queries using aggregation");
   }
 
-  return nullptr;
+  std::shared_ptr<View> result;
+  if (!structQuery.joins.data.empty()) {
+    result = doJoin(structQuery);
+  }
+
+  if (!structQuery.where.data.empty()) {
+    result = doWhere(structQuery, result->dataSet);
+  }
+
+  return result;
 }
 
 std::shared_ptr<DataSets::BaseDataSet> DataBase::MemoryDataBase::execAggregateQuery(
@@ -59,11 +68,10 @@ std::shared_ptr<DataSets::BaseDataSet> DataBase::MemoryDataBase::execAggregateQu
     std::string_view viewName) {
   auto structQuery = parseQuery(query);
 
-
   return nullptr;
 }
 
-void DataBase::MemoryDataBase::validateQuery(DataBase::StructuredQuery query) const {
+void DataBase::MemoryDataBase::validateQuery(const StructuredQuery &query) const {
   std::vector<std::pair<std::string, bool>> tables;
   tables.emplace_back(query.mainTable, false);
 
@@ -71,8 +79,8 @@ void DataBase::MemoryDataBase::validateQuery(DataBase::StructuredQuery query) co
   std::transform(this->tables.begin(),
                  this->tables.end(),
                  std::back_inserter(savedTables),
-                 [](const Table &table) {
-                   return table.dataSet->getName();
+                 [](const std::shared_ptr<Table> &table) {
+                   return table->dataSet->getName();
                  });
 
   for (auto &val : tables) {
@@ -119,7 +127,7 @@ void DataBase::MemoryDataBase::validateQuery(DataBase::StructuredQuery query) co
 
   std::map<std::string, std::vector<std::string>> savedFields;
   for (const auto &table : this->tables) {
-    savedFields[table.dataSet->getName()] = table.dataSet->getFieldNames();
+    savedFields[table->dataSet->getName()] = table->dataSet->getFieldNames();
   }
 
   for (auto &val : fields) {
@@ -138,9 +146,9 @@ void DataBase::MemoryDataBase::validateQuery(DataBase::StructuredQuery query) co
 
   for (const auto &val : query.joins.data) {
     auto field1Type =
-        tableByName(val.firstField.table).dataSet->fieldByName(val.firstField.column)->getFieldType();
+        tableByName(val.firstField.table)->dataSet->fieldByName(val.firstField.column)->getFieldType();
     auto field2Type =
-        tableByName(val.secondField.table).dataSet->fieldByName(val.secondField.column)->getFieldType();
+        tableByName(val.secondField.table)->dataSet->fieldByName(val.secondField.column)->getFieldType();
     if (field1Type != field2Type) {
       errMsg = "Field " + val.firstField.table + "." + val.firstField.column
           + " has different data type than field" + val.secondField.table + "."
@@ -148,17 +156,6 @@ void DataBase::MemoryDataBase::validateQuery(DataBase::StructuredQuery query) co
       throw DataBaseQueryException("DataBase exception: " + errMsg);
     }
   }
-}
-
-const DataBase::Table &DataBase::MemoryDataBase::tableByName(std::string_view tableName) const {
-  for (auto &table : tables) {
-    if (table.dataSet->getName() == tableName) {
-      return table;
-    }
-  }
-  std::string errMsg = "Table named \"" + std::string(name)
-      + "\" not found. DataBase::MemoryDataBase::tableByName";
-  throw InvalidArgumentException(errMsg.c_str());
 }
 
 DataBase::StructuredQuery DataBase::MemoryDataBase::parseQuery(std::string_view query) {
@@ -170,21 +167,74 @@ DataBase::StructuredQuery DataBase::MemoryDataBase::parseQuery(std::string_view 
   validateQuery(semQuery);
   return semQuery;
 }
-std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::MemoryDataBase::doJoin(
-    const DataBase::StructuredQuery &query) {
-  throw NotImplementedException();
+
+std::shared_ptr<DataBase::Table> DataBase::MemoryDataBase::tableByName(std::string_view tableName) const {
+  for (auto &table : tables) {
+    if (table->dataSet->getName() == tableName) {
+      return table;
+    }
+  }
+  std::string errMsg = "Table named \"" + std::string(name)
+      + "\" not found. DataBase::MemoryDataBase::tableByName";
+  throw InvalidArgumentException(errMsg.c_str());
 }
 
-std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::MemoryDataBase::doWhere(
+std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doJoin(
+    const DataBase::StructuredQuery &query) {
+  auto joinItem1 = query.joins.data[0];
+  auto table1 = tableByName(joinItem1.firstField.table);
+  auto table2 = tableByName(joinItem1.secondField.table);
+  JoinMaker joinMaker(table1, joinItem1.firstField.column,
+                      table2, joinItem1.secondField.column);
+  auto joinResult = joinMaker.join(joinItem1.type);
+
+  for (gsl::index i = 1; i < query.joins.data.size(); ++i) {
+    auto joinItem = query.joins.data[i];
+    JoinMaker maker(joinResult,
+                    joinItem.firstField.column,
+                    tableByName(joinItem.secondField.table),
+                    joinItem.secondField.column);
+    joinResult = maker.join(query.joins.data[i].type);
+  }
+
+  return joinResult;
+}
+
+std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doWhere(
     const DataBase::StructuredQuery &query,
     std::shared_ptr<DataSets::MemoryViewDataSet> &view) {
-  throw NotImplementedException();
+  DataSets::FilterOptions filterOptions;
+  for (const auto &whereItem : query.where.data) {
+    auto field = view->fieldByName(whereItem.first.field.column);
+    std::vector<std::string> values;
+    std::transform(whereItem.first.constValues.begin(),
+                   whereItem.first.constValues.end(),
+                   std::back_inserter(values),
+                   [](const std::pair<ConstType, std::string> &value) {
+                     if (value.first == ConstType::string) {
+                       return value.second.substr(1, value.second.size() - 2);
+                     } else {
+                       return value.second;
+                     }
+                   });
+    filterOptions.addOption(field, values,
+                            DataSets::condOpToFilterOp(whereItem.first.condOperator));
+  }
+  return std::make_shared<View>(std::dynamic_pointer_cast<DataSets::MemoryViewDataSet>(
+      view->filter(filterOptions)));
 }
 
 std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::MemoryDataBase::doOrder(
     const DataBase::StructuredQuery &query,
     std::shared_ptr<DataSets::MemoryViewDataSet> &view) {
-  throw NotImplementedException();
+  DataSets::SortOptions sortOptions;
+  for (const auto &option : query.order.data) {
+    sortOptions.addOption(view->fieldByName(option.field.column),
+                          option.order == Order::asc ? SortOrder::Ascending
+                                                     : SortOrder::Descending);
+  }
+  view->sort(sortOptions);
+  return view;
 }
 
 std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::MemoryDataBase::doProject(
@@ -210,7 +260,14 @@ std::shared_ptr<DataSets::MemoryDataSet> DataBase::MemoryDataBase::doHaving(
 std::shared_ptr<DataSets::MemoryDataSet> DataBase::MemoryDataBase::doOrder(const DataBase::StructuredQuery &query,
                                                                            std::shared_ptr<
                                                                                DataSets::MemoryDataSet> &table) {
-  throw NotImplementedException();
+  DataSets::SortOptions sortOptions;
+  for (const auto &option : query.order.data) {
+    sortOptions.addOption(table->fieldByName(option.field.column),
+                          option.order == Order::asc ? SortOrder::Ascending
+                                                     : SortOrder::Descending);
+  }
+  table->sort(sortOptions);
+  return table;
 }
 
 std::shared_ptr<DataSets::MemoryDataSet> DataBase::MemoryDataBase::doProject(

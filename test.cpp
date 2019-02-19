@@ -28,7 +28,7 @@ void terminate_handler() {
 }
 
 int main() {
-  std::set_terminate(terminate_handler);
+  //std::set_terminate(terminate_handler);
 
   const std::string file1 = "/Users/petr/Desktop/join_test_1.csv";
   const std::string file2 = "/Users/petr/Desktop/join_test_2.csv";
@@ -40,22 +40,31 @@ int main() {
   auto ds2 = std::make_shared<DataSets::MemoryDataSet>("test2");
   ds2->open(prov2, {ValueType::String, ValueType::String, ValueType::Integer});
 
-  auto table1 = std::make_shared<DataBase::Table>(ds1);
+  /*auto table1 = std::make_shared<DataBase::Table>(ds1);
   auto table2 = std::make_shared<DataBase::Table>(ds2);
   DataBase::JoinMaker joinMaker(table1, "A1", table2, "A");
   auto joinResult = joinMaker.join(DataBase::JoinType::leftJoin);
 
-  auto view = std::make_shared<DataBase::View>(joinResult);
+  DataBase::JoinMaker joinMaker1(joinResult, "A1", table2, "A");
+  joinResult = joinMaker1.join(DataBase::JoinType::innerJoin);*/
 
-  DataBase::JoinMaker joinMaker1(view, "A1", table2, "A");
-  joinResult = joinMaker1.join(DataBase::JoinType::innerJoin);
+  DataBase::MemoryDataBase db("testDB");
+  db.addTable(ds1);
+  db.addTable(ds2);
+
+  const std::string query = "select test1.A1, test1.B1, test1.C1, "
+                            "test2.A, test2.B, test2.C "
+                            "from test1 join test2 on test1.A1 = test2.A "
+                            "where test1.A1 = \"A\" | \"H\";";
+
+  auto view = db.execSimpleQuery(query, false, "tmpView");
 
   auto writer = DataWriters::CsvWriter(outFile);
 
-  writer.writeHeader(joinResult->getFieldNames());
+  writer.writeHeader(view->dataSet->getFieldNames());
 
-  auto fields = joinResult->getFields();
-  while (joinResult->next()) {
+  auto fields = view->dataSet->getFields();
+  while (view->dataSet->next()) {
     std::vector<std::string> record;
     std::transform(fields.begin(),
                    fields.end(),

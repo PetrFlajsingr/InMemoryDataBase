@@ -32,7 +32,7 @@ class JoinMaker {
    * @param joinType type of join
    * @return view to joined data
    */
-  std::shared_ptr<DataSets::MemoryViewDataSet> join(JoinType joinType) {
+  std::shared_ptr<View> join(JoinType joinType) {
     auto result = prepareResultView();
     iterAndCompare(t1->dataSet, t2->dataSet,
                    getFirstIndices(),
@@ -41,7 +41,7 @@ class JoinMaker {
                    getValueType());
 
     result->rawData()->emplace_back();
-    return result;
+    return std::make_shared<View>(result);
   }
 
  private:

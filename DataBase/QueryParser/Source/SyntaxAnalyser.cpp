@@ -404,6 +404,8 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
                                          LogicOperator::none);
         } else if (token == Token::semicolon) {
           state = SynState::end;
+          result.where.data.emplace_back(whereItem,
+                                         LogicOperator::none);
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::pipe, Token::logicOr,

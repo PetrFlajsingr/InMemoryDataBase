@@ -38,7 +38,7 @@ class MemoryDataBase {
 
   void removeTable(std::string_view tableName);
 
-  const Table &tableByName(std::string_view tableName) const;
+  std::shared_ptr<Table> tableByName(std::string_view tableName) const;
 
   std::shared_ptr<View> execSimpleQuery(
       std::string_view query,
@@ -51,11 +51,13 @@ class MemoryDataBase {
 
   std::string_view getName() const;
 
-  void validateQuery(StructuredQuery query) const;
+
 
  private:
-  std::vector<Table> tables;
+  std::vector<std::shared_ptr<Table>> tables;
   std::vector<std::shared_ptr<View>> views;
+
+  void validateQuery(const StructuredQuery &query) const;
 
   StructuredQuery parseQuery(std::string_view query);
 
@@ -66,9 +68,9 @@ class MemoryDataBase {
   SemanticAnalyser semanticAnalyser;
 
   // operations on views
-  std::shared_ptr<DataSets::MemoryViewDataSet> doJoin(const StructuredQuery &query);
-  std::shared_ptr<DataSets::MemoryViewDataSet> doWhere(const StructuredQuery &query,
-                                                       std::shared_ptr<DataSets::MemoryViewDataSet> &view);
+  std::shared_ptr<View> doJoin(const StructuredQuery &query);
+  std::shared_ptr<View> doWhere(const StructuredQuery &query,
+                                std::shared_ptr<DataSets::MemoryViewDataSet> &view);
   std::shared_ptr<DataSets::MemoryViewDataSet> doOrder(const StructuredQuery &query,
                                                        std::shared_ptr<DataSets::MemoryViewDataSet> &view);
   std::shared_ptr<DataSets::MemoryViewDataSet> doProject(const StructuredQuery &query,
