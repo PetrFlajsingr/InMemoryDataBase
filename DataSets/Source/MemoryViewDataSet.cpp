@@ -105,23 +105,36 @@ DataSets::BaseField *DataSets::MemoryViewDataSet::fieldByIndex(gsl::index index)
 
 std::vector<DataSets::BaseField *> DataSets::MemoryViewDataSet::getFields() const {
   std::vector<BaseField *> result;
-  std::transform(fields.begin(),
-                 fields.end(),
-                 std::back_inserter(result),
-                 [](const std::shared_ptr<BaseField> field) {
-                   return field.get();
-                 });
+  if (allowedFields.empty()) {
+    std::transform(fields.begin(),
+                   fields.end(),
+                   std::back_inserter(result),
+                   [](const std::shared_ptr<BaseField> field) {
+                     return field.get();
+                   });
+  } else {
+    return allowedFields;
+  }
   return result;
 }
 
 std::vector<std::string> DataSets::MemoryViewDataSet::getFieldNames() const {
   std::vector<std::string> result;
-  std::transform(fields.begin(),
-                 fields.end(),
-                 std::back_inserter(result),
-                 [](const std::shared_ptr<BaseField> field) {
-                   return std::string(field->getName());
-                 });
+  if (allowedFields.empty()) {
+    std::transform(fields.begin(),
+                   fields.end(),
+                   std::back_inserter(result),
+                   [](const std::shared_ptr<BaseField> field) {
+                     return std::string(field->getName());
+                   });
+  } else {
+    std::transform(allowedFields.begin(),
+                   allowedFields.end(),
+                   std::back_inserter(result),
+                   [](const BaseField *field) {
+                     return std::string(field->getName());
+                   });
+  }
   return result;
 }
 
@@ -391,4 +404,14 @@ std::pair<gsl::index,
 
 gsl::index DataSets::MemoryViewDataSet::getTableCount() {
   return nullRecords.size();
+}
+
+void DataSets::MemoryViewDataSet::setAllowedFields(const std::vector<std::string> &fieldNames) {
+  allowedFields.clear();
+  std::transform(fieldNames.begin(),
+                 fieldNames.end(),
+                 std::back_inserter(allowedFields),
+                 [this](std::string_view fieldName) {
+                   return fieldByName(fieldName);
+                 });
 }

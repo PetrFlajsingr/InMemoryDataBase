@@ -12,6 +12,10 @@
 #include <ViewDataSet.h>
 #include <FieldFactory.h>
 
+namespace DataBase {
+class MemoryDataBase;
+}
+
 namespace DataSets {
 
 class MemoryViewDataSet : public ViewDataSet {
@@ -182,6 +186,10 @@ class MemoryViewDataSet : public ViewDataSet {
   static const gsl::index maskColumnIndex = 0x00FFFF;
 
  private:
+  friend class DataBase::MemoryDataBase;
+  std::vector<BaseField *> allowedFields;
+  void setAllowedFields(const std::vector<std::string> &fieldNames);
+
   std::vector<std::vector<DataSetRow *>> data;
 
   std::vector<DataSetRow *> nullRecords;

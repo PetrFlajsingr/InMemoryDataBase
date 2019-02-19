@@ -77,6 +77,7 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::execSimpleQuery(
   if (!structQuery.order.data.empty()) {
     result = doOrder(structQuery, result);
   }
+  result = doProject(structQuery, result);
 
   result->dataSet->setName(std::string(viewName));
   if (keepView) {
@@ -279,11 +280,19 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doOrder(
   return view;
 }
 
-std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::MemoryDataBase::doProject(
+std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doProject(
     const DataBase::StructuredQuery &query,
-    std::shared_ptr<
-        DataSets::MemoryViewDataSet> &view) {
-  throw NotImplementedException();
+    std::shared_ptr<View> &view) {
+  std::vector<std::string> allowedFields;
+  std::transform(query.project.data.begin(),
+                 query.project.data.end(),
+                 std::back_inserter(allowedFields),
+                 [](const ProjectItem &item) {
+                   return item.column;
+                 });
+  view->dataSet->setAllowedFields(allowedFields);
+
+  return view;
 }
 
 std::shared_ptr<DataSets::MemoryDataSet> DataBase::MemoryDataBase::doAggregation(

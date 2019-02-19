@@ -76,9 +76,8 @@ class MemoryDataBase {
                                 std::shared_ptr<View> &view);
   std::shared_ptr<View> doOrder(const StructuredQuery &query,
                                 std::shared_ptr<View> &view);
-  std::shared_ptr<DataSets::MemoryViewDataSet> doProject(const StructuredQuery &query,
-                                                         std::shared_ptr<
-                                                             DataSets::MemoryViewDataSet> &view);
+  std::shared_ptr<View> doProject(const StructuredQuery &query,
+                                  std::shared_ptr<View> &view);
 
   // operations on datasets (aggregation needs to create new table)
   std::shared_ptr<DataSets::MemoryDataSet> doAggregation(const StructuredQuery &query,
