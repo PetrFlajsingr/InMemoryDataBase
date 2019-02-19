@@ -7,6 +7,11 @@
 #include <MemoryDataBase.h>
 #include <QueryException.h>
 
+DataBase::Table::Table(const std::shared_ptr<DataSets::MemoryDataSet> &dataSet)
+    : dataSet(dataSet) {}
+DataBase::View::View(const std::shared_ptr<DataSets::MemoryViewDataSet> &dataSet)
+    : dataSet(dataSet) {}
+
 DataBase::MemoryDataBase::MemoryDataBase(const std::string &name)
     : name(name) {}
 
@@ -165,8 +170,51 @@ DataBase::StructuredQuery DataBase::MemoryDataBase::parseQuery(std::string_view 
   validateQuery(semQuery);
   return semQuery;
 }
+std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::MemoryDataBase::doJoin(
+    const DataBase::StructuredQuery &query) {
+  throw NotImplementedException();
+}
 
-DataBase::Table::Table(const std::shared_ptr<DataSets::MemoryDataSet> &dataSet)
-    : dataSet(dataSet) {}
-DataBase::View::View(const std::shared_ptr<DataSets::MemoryViewDataSet> &dataSet)
-    : dataSet(dataSet) {}
+std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::MemoryDataBase::doWhere(
+    const DataBase::StructuredQuery &query,
+    std::shared_ptr<DataSets::MemoryViewDataSet> &view) {
+  throw NotImplementedException();
+}
+
+std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::MemoryDataBase::doOrder(
+    const DataBase::StructuredQuery &query,
+    std::shared_ptr<DataSets::MemoryViewDataSet> &view) {
+  throw NotImplementedException();
+}
+
+std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::MemoryDataBase::doProject(
+    const DataBase::StructuredQuery &query,
+    std::shared_ptr<
+        DataSets::MemoryViewDataSet> &view) {
+  throw NotImplementedException();
+}
+
+std::shared_ptr<DataSets::MemoryDataSet> DataBase::MemoryDataBase::doAggregation(
+    const DataBase::StructuredQuery &query,
+    std::shared_ptr<
+        DataSets::MemoryDataSet> &table) {
+  throw NotImplementedException();
+}
+
+std::shared_ptr<DataSets::MemoryDataSet> DataBase::MemoryDataBase::doHaving(
+    const DataBase::StructuredQuery &query,
+    std::shared_ptr<DataSets::MemoryDataSet> &table) {
+  throw NotImplementedException();
+}
+
+std::shared_ptr<DataSets::MemoryDataSet> DataBase::MemoryDataBase::doOrder(const DataBase::StructuredQuery &query,
+                                                                           std::shared_ptr<
+                                                                               DataSets::MemoryDataSet> &table) {
+  throw NotImplementedException();
+}
+
+std::shared_ptr<DataSets::MemoryDataSet> DataBase::MemoryDataBase::doProject(
+    const DataBase::StructuredQuery &query,
+    std::shared_ptr<DataSets::MemoryDataSet> &table) {
+  throw NotImplementedException();
+}

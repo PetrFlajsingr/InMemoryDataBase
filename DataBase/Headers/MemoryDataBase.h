@@ -65,8 +65,26 @@ class MemoryDataBase {
   SyntaxAnalyser syntaxAnalyser;
   SemanticAnalyser semanticAnalyser;
 
-  std::shared_ptr<DataSets::MemoryViewDataSet> doJoin(StructuredQuery query);
-  std::shared_ptr<DataSets::MemoryDataSet> doAggregation(StructuredQuery query);
+  // operations on views
+  std::shared_ptr<DataSets::MemoryViewDataSet> doJoin(const StructuredQuery &query);
+  std::shared_ptr<DataSets::MemoryViewDataSet> doWhere(const StructuredQuery &query,
+                                                       std::shared_ptr<DataSets::MemoryViewDataSet> &view);
+  std::shared_ptr<DataSets::MemoryViewDataSet> doOrder(const StructuredQuery &query,
+                                                       std::shared_ptr<DataSets::MemoryViewDataSet> &view);
+  std::shared_ptr<DataSets::MemoryViewDataSet> doProject(const StructuredQuery &query,
+                                                         std::shared_ptr<
+                                                             DataSets::MemoryViewDataSet> &view);
+
+  // operations on datasets (aggregation needs to create new table)
+  std::shared_ptr<DataSets::MemoryDataSet> doAggregation(const StructuredQuery &query,
+                                                         std::shared_ptr<
+                                                             DataSets::MemoryDataSet> &table);
+  std::shared_ptr<DataSets::MemoryDataSet> doHaving(const StructuredQuery &query,
+                                                    std::shared_ptr<DataSets::MemoryDataSet> &table);
+  std::shared_ptr<DataSets::MemoryDataSet> doOrder(const StructuredQuery &query,
+                                                   std::shared_ptr<DataSets::MemoryDataSet> &table);
+  std::shared_ptr<DataSets::MemoryDataSet> doProject(const StructuredQuery &query,
+                                                     std::shared_ptr<DataSets::MemoryDataSet> &table);
 };
 
 }  // namespace DataBase
