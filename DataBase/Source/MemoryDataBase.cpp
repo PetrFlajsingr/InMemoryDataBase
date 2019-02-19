@@ -77,6 +77,10 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::execSimpleQuery(
     result = doWhere(structQuery, result->dataSet);
   }
 
+  if (!structQuery.order.data.empty()) {
+    result = doOrder(structQuery, result);
+  }
+
   result->dataSet->setName(std::string(viewName));
 
   if (keepView) {
@@ -268,16 +272,16 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doWhere(
       view->filter(filterOptions)));
 }
 
-std::shared_ptr<DataSets::MemoryViewDataSet> DataBase::MemoryDataBase::doOrder(
+std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doOrder(
     const DataBase::StructuredQuery &query,
-    std::shared_ptr<DataSets::MemoryViewDataSet> &view) {
+    std::shared_ptr<View> &view) {
   DataSets::SortOptions sortOptions;
   for (const auto &option : query.order.data) {
-    sortOptions.addOption(view->fieldByName(option.field.column),
+    sortOptions.addOption(view->dataSet->fieldByName(option.field.column),
                           option.order == Order::asc ? SortOrder::Ascending
                                                      : SortOrder::Descending);
   }
-  view->sort(sortOptions);
+  view->dataSet->sort(sortOptions);
   return view;
 }
 

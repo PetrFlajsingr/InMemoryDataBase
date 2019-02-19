@@ -74,8 +74,8 @@ class MemoryDataBase {
   // TODO: implement and/or
   std::shared_ptr<View> doWhere(const StructuredQuery &query,
                                 std::shared_ptr<DataSets::MemoryViewDataSet> &view);
-  std::shared_ptr<DataSets::MemoryViewDataSet> doOrder(const StructuredQuery &query,
-                                                       std::shared_ptr<DataSets::MemoryViewDataSet> &view);
+  std::shared_ptr<View> doOrder(const StructuredQuery &query,
+                                std::shared_ptr<View> &view);
   std::shared_ptr<DataSets::MemoryViewDataSet> doProject(const StructuredQuery &query,
                                                          std::shared_ptr<
                                                              DataSets::MemoryViewDataSet> &view);

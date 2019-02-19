@@ -46,8 +46,9 @@ int main() {
 
   const std::string
       query = "select test1.*, test2.* "
-              "from test1 left join test2 on test1.A1 = test2.A "
-              "where test1.A1 = \"A\" | \"B\" and test1.C1 = 11 | 22 | 33 | 44;";
+              "from test1 join test2 on test1.A1 = test2.A left join test2 on test1.A1 = test2.A "
+              //"where test1.A1 = \"A\" | \"B\" and test1.C1 = 11 | 22 | 33 | 44 and test2.A = \"A\" "
+              "order by test2.A asc, test2.C desc;";
 
   auto view = db.execSimpleQuery(query, false, "tmpView");
 
