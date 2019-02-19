@@ -44,8 +44,9 @@ int main() {
   db.addTable(ds1);
   db.addTable(ds2);
 
-  const std::string query = "select test1.A1, test1.B1, test1.C1, "
-                            "test2.A, test2.B, test2.C "
+  const std::string
+      query = "select test1.*, test2.* "//test1.A1, test1.B1, test1.C1, "
+              //"test2.A, test2.B, test2.C "
                             "from test1 left join test2 on test1.A1 = test2.A "
                             "where test1.A1 = \"A\" | \"B\" and test1.C1 = 11 | 22 | 33 | 44;";
 

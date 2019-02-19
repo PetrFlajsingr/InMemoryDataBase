@@ -43,7 +43,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         }
         break;
       case SynState::selectList:
-        if (token == Token::id || token == Token::asterisk) {
+        if (token == Token::id) {
           state = SynState::selectItem;
           projectItem.table = std::get<1>(it);
           projectItem.alias = "";
@@ -116,14 +116,14 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         }
         break;
       case SynState::selectItemEnd:
-        if (token == Token::id) {
+        if (token == Token::id || token == Token::asterisk) {
           state = SynState::selectItemDivide;
           projectItem.column = std::get<1>(it);
           result.project.data.emplace_back(projectItem);
           selectTrueAgrFalse = true;
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
-                                            {Token::id},
+                                            {Token::id, Token::asterisk},
                                             it));
         }
         break;

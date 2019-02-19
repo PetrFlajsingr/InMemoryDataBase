@@ -71,7 +71,8 @@ std::shared_ptr<DataSets::BaseDataSet> DataBase::MemoryDataBase::execAggregateQu
   return nullptr;
 }
 
-void DataBase::MemoryDataBase::validateQuery(const StructuredQuery &query) const {
+DataBase::StructuredQuery DataBase::MemoryDataBase::validateQuery(
+    StructuredQuery &query) const {
   std::vector<std::pair<std::string, bool>> tables;
   tables.emplace_back(query.mainTable, false);
 
@@ -102,6 +103,24 @@ void DataBase::MemoryDataBase::validateQuery(const StructuredQuery &query) const
   if (!errMsg.empty()) {
     throw DataBaseQueryException("DataBase exception: " + errMsg);
   }
+
+  std::vector<ProjectItem> transformedProjects;
+  for (const auto &i : query.project.data) {
+    if (i.column == "*") {
+      auto tableName = i.table;
+      auto table = tableByName(tableName);
+      auto fieldNames = table->dataSet->getFieldNames();
+      std::transform(fieldNames.begin(),
+                     fieldNames.end(),
+                     std::back_inserter(transformedProjects),
+                     [&tableName](const std::string &str) {
+                       return ProjectItem{.table = tableName, .column = str};
+                     });
+    } else {
+      transformedProjects.emplace_back(i);
+    }
+  }
+  query.project.data = transformedProjects;
 
   std::vector<std::pair<FieldId, bool>> fields;
   for (const auto &val : query.project.data) {
@@ -156,6 +175,8 @@ void DataBase::MemoryDataBase::validateQuery(const StructuredQuery &query) const
       throw DataBaseQueryException("DataBase exception: " + errMsg);
     }
   }
+
+  return query;
 }
 
 DataBase::StructuredQuery DataBase::MemoryDataBase::parseQuery(std::string_view query) {

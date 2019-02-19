@@ -57,7 +57,7 @@ class MemoryDataBase {
   std::vector<std::shared_ptr<Table>> tables;
   std::vector<std::shared_ptr<View>> views;
 
-  void validateQuery(const StructuredQuery &query) const;
+  StructuredQuery validateQuery(StructuredQuery &query) const;
 
   StructuredQuery parseQuery(std::string_view query);
 
