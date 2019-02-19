@@ -171,6 +171,7 @@ void DataSets::MemoryViewDataSet::sort(DataSets::SortOptions &options) {
   currentRecord = 0;
 }
 
+// TODO: implement more filter functions
 std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryViewDataSet::filter(
     const DataSets::FilterOptions &options) {
   auto fieldNames = getFieldNames();

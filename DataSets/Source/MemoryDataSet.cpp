@@ -409,7 +409,7 @@ DataSets::MemoryDataSet::MemoryDataSet(std::string_view dataSetName)
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCDFAInspection"
-// TODO: predelat na iterator a std::lower_bound
+// TODO: implement more filter functions
 bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
   unsigned long min = getFirst(), max = getLast() + 1;
   currentRecord = (min + max) >> 1;
@@ -434,12 +434,10 @@ bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
             getCell(currentRecord, item.field->getIndex())._double,
             item.searchData[0]._double);
         break;
-      case ValueType::Currency: {
+      case ValueType::Currency:
         comparisonResult = Utilities::compareCurrency(
             *getCell(currentRecord, item.field->getIndex())._currency,
             *item.searchData[0]._currency);
-        break;
-      }
         break;
       case ValueType::DateTime:
         comparisonResult =

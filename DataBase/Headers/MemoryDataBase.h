@@ -38,6 +38,8 @@ class MemoryDataBase {
 
   void removeTable(std::string_view tableName);
 
+  void removeView(std::string_view viewName);
+
   std::shared_ptr<Table> tableByName(std::string_view tableName) const;
 
   std::shared_ptr<View> execSimpleQuery(
@@ -69,6 +71,7 @@ class MemoryDataBase {
 
   // operations on views
   std::shared_ptr<View> doJoin(const StructuredQuery &query);
+  // TODO: implement and/or
   std::shared_ptr<View> doWhere(const StructuredQuery &query,
                                 std::shared_ptr<DataSets::MemoryViewDataSet> &view);
   std::shared_ptr<DataSets::MemoryViewDataSet> doOrder(const StructuredQuery &query,

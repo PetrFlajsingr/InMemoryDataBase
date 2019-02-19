@@ -39,6 +39,23 @@ void DataBase::MemoryDataBase::removeTable(std::string_view tableName) {
   }
 }
 
+void DataBase::MemoryDataBase::removeView(std::string_view viewName) {
+  const auto fncFindByName = [viewName]
+      (const std::shared_ptr<View> &view) {
+    return view->dataSet->getName() == viewName;
+  };
+
+  if (auto it = std::find_if(views.begin(),
+                             views.end(),
+                             fncFindByName);
+      it != views.end()) {
+    views.erase(it);
+  } else {
+    throw DataBaseException("View " + std::string(viewName) + " not found.");
+  }
+}
+
+
 std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::execSimpleQuery(
     std::string_view query,
     bool keepView,
@@ -58,6 +75,12 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::execSimpleQuery(
 
   if (!structQuery.where.data.empty()) {
     result = doWhere(structQuery, result->dataSet);
+  }
+
+  result->dataSet->setName(std::string(viewName));
+
+  if (keepView) {
+    views.emplace_back(result);
   }
 
   return result;
