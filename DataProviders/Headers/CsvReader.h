@@ -80,7 +80,7 @@ class CsvReader : public BaseDataProvider {
    */
   enum class ParseState { Read, QuotMark1, QuotMark2 };
 
-  const uint32_t BUFFER_SIZE = 4096;
+  const uint32_t BUFFER_SIZE = 65536;
 
   std::string delimiter;
 

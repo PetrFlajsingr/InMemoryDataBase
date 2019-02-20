@@ -66,7 +66,6 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::execSimpleQuery(
                             "use DataBase::MemoryDataBase::execAggregateQuery "
                             "for queries using aggregation");
   }
-
   std::shared_ptr<View> result;
   if (!structQuery.joins.data.empty()) {
     result = doJoin(structQuery);

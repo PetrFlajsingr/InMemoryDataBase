@@ -9,6 +9,7 @@
 #include <MemoryDataBase.h>
 #include <JoinMaker.h>
 #include <CsvReader.h>
+#include <XlsxWriter.h>
 
 void terminate_handler() {
   try {
@@ -30,7 +31,101 @@ void terminate_handler() {
 int main() {
   //std::set_terminate(terminate_handler);
 
-  const std::string file1 = "/Users/petr/Desktop/join_test_1.csv";
+  const std::string registr = "/Users/petr/Desktop/registr.csv";
+  const std::string nno = "/Users/petr/Desktop/csvs/NNO_subjekty6ver2.4.csv";
+
+  auto prov1 = DataProviders::CsvReader(registr, ",");
+  auto prov2 = DataProviders::CsvReader(nno, ";");
+
+  auto ds1 = std::make_shared<DataSets::MemoryDataSet>("registr");
+  ds1->open(prov1, {ValueType::Integer,
+                    ValueType::Integer,
+                    ValueType::Integer,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::Integer,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::Integer,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String});
+  auto ds2 = std::make_shared<DataSets::MemoryDataSet>("nno");
+  ds2->open(prov2, {ValueType::Integer,
+                    ValueType::Integer,
+                    ValueType::Integer,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String});
+
+  DataBase::MemoryDataBase db("testDB");
+  db.addTable(ds1);
+  db.addTable(ds2);
+
+  const std::string
+      query = "select nno.*, registr.id, registr.pcz, registr.pcdp, "
+              "registr.nazev, registr.typ, registr.adresa_nazev_obce, "
+              "registr.adresa_psc, registr.adresa_nazev_ulice, "
+              "registr.adresa_cislo_domovni, registr.adresa_nazev_kraje, "
+              "registr.adresa_kod_kraje, registr.adresa_nazev_okresu, "
+              "registr.adresa_kod_okresu, registr.spravni_obvod, registr.nazev_zkraceny, "
+              "registr.poskytovatel_ic, registr.poskytovatel_pravni_forma_osoba, "
+              "registr.poskytovatel_pravni_forma, registr.sidlo_adresa_kod_kraje, "
+              "registr.sidlo_adresa_nazev_kraje, registr.sidlo_adresa_kod_okresu, "
+              "registr.sidlo_adresa_nazev_okresu, registr.sidlo_adresa_psc, "
+              "registr.sidlo_adresa_nazev_obce, registr.sidlo_adresa_nazev_ulice, "
+              "registr.sidlo_adresa_cislo_domovni, registr.obor_pece, "
+              "registr.forma_pece, registr.druh_pece, registr.poskytovatel_souradnice "
+              "from nno "
+              "join registr on nno.ICO_num = registr.poskytovatel_ic;";
+
+  auto view = db.execSimpleQuery(query, false, "wat");
+
+  auto writer = DataWriters::XlsxWriter("/Users/petr/Desktop/wow.xlsx");
+  writer.writeHeader(view->dataSet->getFieldNames());
+  auto fields = view->dataSet->getFields();
+  while (view->dataSet->next()) {
+    std::vector<std::string> record;
+    std::transform(fields.begin(),
+                   fields.end(),
+                   std::back_inserter(record),
+                   [](const DataSets::BaseField *field) {
+                     return std::string(field->getAsString());
+                   });
+    writer.writeRecord(record);
+  }
+
+  return 0;
+
+
+  /*const std::string file1 = "/Users/petr/Desktop/join_test_1.csv";
   const std::string file2 = "/Users/petr/Desktop/join_test_2.csv";
   const std::string outFile = "/Users/petr/Desktop/join_test_out.csv";
   auto prov1 = DataProviders::CsvReader(file1);
@@ -69,6 +164,6 @@ int main() {
     writer.writeRecord(record);
   }
 
-  return 0;
+  return 0;*/
 
 }
