@@ -92,7 +92,36 @@ std::shared_ptr<DataSets::BaseDataSet> DataBase::MemoryDataBase::execAggregateQu
     std::string_view query,
     std::string_view viewName) {
   auto structQuery = parseQuery(query);
-  throw NotImplementedException();
+  std::shared_ptr<View> result;
+  if (!structQuery.joins.data.empty()) {
+    result = doJoin(structQuery);
+  } else {
+    result =
+        std::make_shared<View>(tableByName(structQuery.mainTable)->dataSet->fullView());
+  }
+  if (!structQuery.where.data.empty()) {
+    result = doWhere(structQuery, result);
+  }
+
+  if (!structQuery.agr.data.empty()) {
+    AggregationMaker agrMaker(result);
+    throw NotImplementedException();
+  }
+
+  if (!structQuery.having.data.empty()) {
+    throw NotImplementedException();
+  }
+
+  if (!structQuery.order.data.empty()) {
+    result = doOrder(structQuery, result);
+  }
+  result = doProject(structQuery, result);
+
+  result->dataSet->setName(std::string(viewName));
+  if (keepView) {
+    views.emplace_back(result);
+  }
+  return result;
 }
 
 DataBase::StructuredQuery DataBase::MemoryDataBase::validateQuery(

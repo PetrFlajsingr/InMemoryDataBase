@@ -15,6 +15,7 @@
 #include <SyntaxAnalyser.h>
 #include <SemanticAnalyser.h>
 #include <MemoryDataSet.h>
+#include <AggregationMaker.h>
 
 namespace DataBase {
 
