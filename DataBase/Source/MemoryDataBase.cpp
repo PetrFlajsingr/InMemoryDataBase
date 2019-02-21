@@ -69,6 +69,9 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::execSimpleQuery(
   std::shared_ptr<View> result;
   if (!structQuery.joins.data.empty()) {
     result = doJoin(structQuery);
+  } else {
+    result =
+        std::make_shared<View>(tableByName(structQuery.mainTable)->dataSet->fullView());
   }
   if (!structQuery.where.data.empty()) {
     result = doWhere(structQuery, result);
