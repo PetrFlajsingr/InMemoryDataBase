@@ -534,4 +534,29 @@ DataContainer &DataSets::MemoryDataSet::getCell(gsl::index row,
   return (*data[row])[column];
 }
 
+std::shared_ptr<DataSets::MemoryViewDataSet> DataSets::MemoryDataSet::fullView() {
+  std::vector<std::string> fieldNames;
+  std::vector<ValueType> fieldTypes;
+  std::vector<std::pair<int, int>> fieldIndices;
+  auto fields1 = getFields();
+  std::for_each(fields1.begin(),
+                fields1.end(),
+                [&fieldNames, &fieldTypes, &fieldIndices](const DataSets::BaseField *field) {
+                  fieldNames.emplace_back(field->getName());
+                  fieldTypes.emplace_back(field->getFieldType());
+                  fieldIndices.emplace_back(0, field->getIndex());
+                });
+  auto result = std::make_shared<DataSets::MemoryViewDataSet>(
+      getName(),
+      fieldNames,
+      fieldTypes,
+      fieldIndices);
+  result->rawData()->emplace_back();
+  for (auto val : *this) {
+    result->rawData()->emplace_back(std::vector<DataSetRow *>{val});
+  }
+  result->rawData()->emplace_back();
+  return result;
+}
+
 #pragma clang diagnostic pop
