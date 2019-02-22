@@ -13,8 +13,8 @@ std::string OperationToString(Operation op) {
   }
 }
 
-int compareDataContainers(DataContainer &data1,
-                          DataContainer &data2,
+int compareDataContainers(const DataContainer &data1,
+                          const DataContainer &data2,
                           ValueType valueType) {
   switch (valueType) {
     case ValueType::Integer:
@@ -34,4 +34,30 @@ int compareDataContainers(DataContainer &data1,
                                         *data2._dateTime);
   }
   throw IllegalStateException("Internal error. compareDataContainers");
+}
+DataContainer &DataContainer::operator=(gsl::zstring<> val) {
+  _string = val;
+  return *this;
+}
+DataContainer &DataContainer::operator=(int val) {
+  _integer = val;
+  return *this;
+}
+DataContainer &DataContainer::operator=(double val) {
+  _double = val;
+  return *this;
+}
+DataContainer &DataContainer::operator=(Currency &val) {
+  if (_currency == nullptr) {
+    _currency = new Currency();
+  }
+  *_currency = val;
+  return *this;
+}
+DataContainer &DataContainer::operator=(DateTime &val) {
+  if (_dateTime == nullptr) {
+    _dateTime = new DateTime();
+  }
+  *_dateTime = val;
+  return *this;
 }

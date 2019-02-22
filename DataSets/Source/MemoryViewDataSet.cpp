@@ -415,3 +415,13 @@ void DataSets::MemoryViewDataSet::setAllowedFields(const std::vector<std::string
                    return fieldByName(fieldName);
                  });
 }
+void DataSets::MemoryViewDataSet::addParent(std::shared_ptr<MemoryDataSet> &parent) {
+  parents.emplace_back(parent);
+}
+void DataSets::MemoryViewDataSet::addParents(const std::vector<std::shared_ptr<
+    DataSets::MemoryDataSet>> &parents) {
+  std::copy(parents.begin(), parents.end(), std::back_inserter(this->parents));
+}
+const std::vector<std::shared_ptr<DataSets::MemoryDataSet>> &DataSets::MemoryViewDataSet::getParents() const {
+  return parents;
+}

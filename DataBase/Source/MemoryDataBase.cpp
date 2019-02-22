@@ -88,7 +88,7 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::execSimpleQuery(
   return result;
 }
 
-std::shared_ptr<DataSets::BaseDataSet> DataBase::MemoryDataBase::execAggregateQuery(
+std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::execAggregateQuery(
     std::string_view query,
     std::string_view viewName) {
   auto structQuery = parseQuery(query);
@@ -102,25 +102,26 @@ std::shared_ptr<DataSets::BaseDataSet> DataBase::MemoryDataBase::execAggregateQu
   if (!structQuery.where.data.empty()) {
     result = doWhere(structQuery, result);
   }
-
   if (!structQuery.agr.data.empty()) {
     AggregationMaker agrMaker(result);
-    throw NotImplementedException();
+    auto tmp = agrMaker.aggregate(structQuery);
+    result = std::make_shared<View>(tmp->dataSet->fullView());
+    result->dataSet->addParent(tmp->dataSet);
+  } else {
+    throw DataBaseException("Provided query is \"simple\", "
+                            "use DataBase::MemoryDataBase::execSimpleQuery "
+                            "for queries not using aggregation");
   }
-
   if (!structQuery.having.data.empty()) {
-    throw NotImplementedException();
+    result = doHaving(structQuery, result);
   }
-
   if (!structQuery.order.data.empty()) {
     result = doOrder(structQuery, result);
   }
   result = doProject(structQuery, result);
 
   result->dataSet->setName(std::string(viewName));
-  if (keepView) {
-    views.emplace_back(result);
-  }
+
   return result;
 }
 
@@ -261,14 +262,19 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doJoin(
   JoinMaker joinMaker(table1, joinItem1.firstField.column,
                       table2, joinItem1.secondField.column);
   auto joinResult = joinMaker.join(joinItem1.type);
+  joinResult->dataSet->addParents({table1->dataSet, table2->dataSet});
 
   for (gsl::index i = 1; i < query.joins.data.size(); ++i) {
+    auto parents = joinResult->dataSet->getParents();
     auto joinItem = query.joins.data[i];
+    auto joinTable = tableByName(joinItem.secondField.table);
     JoinMaker maker(joinResult,
                     joinItem.firstField.column,
-                    tableByName(joinItem.secondField.table),
+                    joinTable,
                     joinItem.secondField.column);
     joinResult = maker.join(query.joins.data[i].type);
+    joinResult->dataSet->addParents(parents);
+    joinResult->dataSet->addParent(joinTable->dataSet);
   }
 
   return joinResult;
@@ -326,34 +332,27 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doProject(
   return view;
 }
 
-std::shared_ptr<DataSets::MemoryDataSet> DataBase::MemoryDataBase::doAggregation(
+std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doHaving(
     const DataBase::StructuredQuery &query,
-    std::shared_ptr<
-        DataSets::MemoryDataSet> &table) {
-  throw NotImplementedException();
-}
-
-std::shared_ptr<DataSets::MemoryDataSet> DataBase::MemoryDataBase::doHaving(
-    const DataBase::StructuredQuery &query,
-    std::shared_ptr<DataSets::MemoryDataSet> &table) {
-  throw NotImplementedException();
-}
-
-std::shared_ptr<DataSets::MemoryDataSet> DataBase::MemoryDataBase::doOrder(const DataBase::StructuredQuery &query,
-                                                                           std::shared_ptr<
-                                                                               DataSets::MemoryDataSet> &table) {
-  DataSets::SortOptions sortOptions;
-  for (const auto &option : query.order.data) {
-    sortOptions.addOption(table->fieldByName(option.field.column),
-                          option.order == Order::asc ? SortOrder::Ascending
-                                                     : SortOrder::Descending);
+    std::shared_ptr<View> &view) {
+  DataSets::FilterOptions filterOptions;
+  for (const auto &havingItem : query.having.data) {
+    auto field =
+        view->dataSet->fieldByName(havingItem.first.agreItem.field.column);
+    std::vector<std::string> values;
+    std::transform(havingItem.first.constValues.begin(),
+                   havingItem.first.constValues.end(),
+                   std::back_inserter(values),
+                   [](const std::pair<ConstType, std::string> &value) {
+                     if (value.first == ConstType::string) {
+                       return value.second.substr(1, value.second.size() - 2);
+                     } else {
+                       return value.second;
+                     }
+                   });
+    filterOptions.addOption(field, values,
+                            DataSets::condOpToFilterOp(havingItem.first.condOperator));
   }
-  table->sort(sortOptions);
-  return table;
-}
-
-std::shared_ptr<DataSets::MemoryDataSet> DataBase::MemoryDataBase::doProject(
-    const DataBase::StructuredQuery &query,
-    std::shared_ptr<DataSets::MemoryDataSet> &table) {
-  throw NotImplementedException();
+  return std::make_shared<View>(std::dynamic_pointer_cast<DataSets::MemoryViewDataSet>(
+      view->dataSet->filter(filterOptions)));
 }

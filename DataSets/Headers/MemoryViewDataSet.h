@@ -17,6 +17,7 @@ class MemoryDataBase;
 }
 
 namespace DataSets {
+class MemoryDataSet;
 
 class MemoryViewDataSet : public ViewDataSet {
  public:
@@ -56,6 +57,10 @@ class MemoryViewDataSet : public ViewDataSet {
   std::vector<std::vector<DataSetRow *>> *rawData();
 
   gsl::index getTableCount();
+
+  void addParent(std::shared_ptr<MemoryDataSet> &parent);
+  void addParents(const std::vector<std::shared_ptr<MemoryDataSet>> &parents);
+  const std::vector<std::shared_ptr<MemoryDataSet>> &getParents() const;
 
   class iterator : public std::iterator<std::random_access_iterator_tag, int> {
    public:
@@ -208,6 +213,7 @@ class MemoryViewDataSet : public ViewDataSet {
                       const std::vector<ValueType> &fieldTypes);
 
   friend class MemoryDataSet;
+  std::vector<std::shared_ptr<MemoryDataSet>> parents;
 };
 }  // namespace DataSets
 

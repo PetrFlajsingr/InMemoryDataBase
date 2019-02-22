@@ -4,6 +4,7 @@
 
 #include <Utilities.h>
 #include <DateTimeUtils.h>
+#include <Types.h>
 
 std::vector<std::string> Utilities::splitStringByDelimiter(std::string_view str,
                                                            std::string_view delimiter) {
@@ -77,16 +78,6 @@ bool Utilities::isDouble(std::string_view value) {
   std::regex doubleRegex("[+-]?([0-9]*[.])?[0-9]+");
 
   return std::regex_match(std::string(value), doubleRegex);
-}
-
-ValueType Utilities::getType(std::string_view value) {
-  if (isInteger(value)) {
-    return ValueType::Integer;
-  } else if (isDouble(value)) {
-    return ValueType::Double;
-  } else {
-    return ValueType::String;
-  }
 }
 
 bool Utilities::endsWith(std::string_view value, std::string_view ending) {

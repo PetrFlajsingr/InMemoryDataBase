@@ -10,9 +10,10 @@
 #include <regex>
 #include <string>
 #include <vector>
-#include "Types.h"
 #include "Exceptions.h"
+#include <decimal.h>
 
+typedef dec::decimal<2> Currency;
 class DateTime;
 
 /**
@@ -71,13 +72,6 @@ bool isInteger(std::string_view value);
  * @return
  */
 bool isDouble(std::string_view value);
-
-/**
- * Ziskani typu hodnoty za pomoci regex
- * @param value
- * @return
- */
-ValueType getType(std::string_view value);
 
 /**
  * Kontrola, jestli string konci jinym stringem

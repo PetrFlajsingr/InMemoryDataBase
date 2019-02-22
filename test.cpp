@@ -31,7 +31,7 @@ void terminate_handler() {
 int main() {
   //std::set_terminate(terminate_handler);
 
-  const std::string registr = "/Users/petr/Desktop/registr.csv";
+  /*const std::string registr = "/Users/petr/Desktop/registr.csv";
   const std::string nno = "/Users/petr/Desktop/csvs/NNO_subjekty6ver2.4.csv";
 
   auto prov1 = DataProviders::CsvReader(registr, ",");
@@ -122,7 +122,7 @@ int main() {
     writer.writeRecord(record);
   }
 
-  return 0;
+  return 0;*/
 
 
   /*const std::string file1 = "/Users/petr/Desktop/join_test_1.csv";

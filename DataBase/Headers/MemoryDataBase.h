@@ -48,7 +48,7 @@ class MemoryDataBase {
       bool keepView,
       std::string_view viewName);
 
-  std::shared_ptr<DataSets::BaseDataSet> execAggregateQuery(
+  std::shared_ptr<View> execAggregateQuery(
       std::string_view query,
       std::string_view viewName);
 
@@ -80,16 +80,8 @@ class MemoryDataBase {
   std::shared_ptr<View> doProject(const StructuredQuery &query,
                                   std::shared_ptr<View> &view);
 
-  // operations on datasets (aggregation needs to create new table)
-  std::shared_ptr<DataSets::MemoryDataSet> doAggregation(const StructuredQuery &query,
-                                                         std::shared_ptr<
-                                                             DataSets::MemoryDataSet> &table);
-  std::shared_ptr<DataSets::MemoryDataSet> doHaving(const StructuredQuery &query,
-                                                    std::shared_ptr<DataSets::MemoryDataSet> &table);
-  std::shared_ptr<DataSets::MemoryDataSet> doOrder(const StructuredQuery &query,
-                                                   std::shared_ptr<DataSets::MemoryDataSet> &table);
-  std::shared_ptr<DataSets::MemoryDataSet> doProject(const StructuredQuery &query,
-                                                     std::shared_ptr<DataSets::MemoryDataSet> &table);
+  std::shared_ptr<View> doHaving(const StructuredQuery &query,
+                                 std::shared_ptr<View> &view);
 };
 
 }  // namespace DataBase
