@@ -54,8 +54,6 @@ class MemoryDataBase {
 
   std::string_view getName() const;
 
-
-
  private:
   std::vector<std::shared_ptr<Table>> tables;
   std::vector<std::shared_ptr<View>> views;

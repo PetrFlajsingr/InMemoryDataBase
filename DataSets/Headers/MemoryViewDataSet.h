@@ -184,12 +184,6 @@ class MemoryViewDataSet : public ViewDataSet {
 
   DataSetRow *getNullRow(gsl::index tableIndex);
 
-  static std::pair<gsl::index, gsl::index> convertIndex(gsl::index index);
-
-  static const gsl::index maskTableShift = 16;
-  static const gsl::index maskTableIndex = 0xFF0000;
-  static const gsl::index maskColumnIndex = 0x00FFFF;
-
  private:
   friend class DataBase::MemoryDataBase;
   std::vector<BaseField *> allowedFields;

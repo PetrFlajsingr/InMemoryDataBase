@@ -10,6 +10,7 @@
 #include <decimal.h>
 #include <DateTimeUtils.h>
 #include <Utilities.h>
+#include <iostream>
 
 class DateTime;
 /**
@@ -58,10 +59,8 @@ union DataContainer {
   DataContainer &operator=(gsl::zstring<> val);
   DataContainer &operator=(int val);
   DataContainer &operator=(double val);
-  DataContainer &operator=(Currency &val);
-  DataContainer &operator=(DateTime &val);
-  template<typename T>
-  DataContainer &operator=(T) { return *this; }
+  DataContainer &operator=(const Currency &val);
+  DataContainer &operator=(const DateTime &val);
 
   template<typename T>
   bool operator==(T &rhs) {

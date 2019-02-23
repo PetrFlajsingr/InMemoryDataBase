@@ -10,11 +10,17 @@
 #include <MemoryDataSet.h>
 
 namespace DataBase {
-class Table;
-class View;
+struct Table;
+struct View;
 
-struct Unique {
+struct BaseAgr {
+  std::pair<gsl::index, gsl::index> fieldIndex;
   DataSets::BaseField *field;
+
+  explicit BaseAgr(DataSets::BaseField *field);
+};
+
+struct Unique : public BaseAgr {
   DataContainer lastVal;
 
   explicit Unique(DataSets::BaseField *field);
@@ -22,8 +28,7 @@ struct Unique {
   bool check(const DataContainer &newVal);
 };
 
-struct Sum {
-  DataSets::BaseField *field;
+struct Sum : public BaseAgr {
   DataContainer sum;
 
   explicit Sum(DataSets::BaseField *field);
@@ -44,14 +49,16 @@ class AggregationMaker {
 
   std::shared_ptr<DataSets::MemoryDataSet> prepareDataSet(const DataBase::StructuredQuery &structuredQuery);
 
-  std::shared_ptr<DataSets::MemoryDataSet> aggregateDataSet(DataSets::MemoryDataSet *ds,
-                                                            DataSets::MemoryDataSet *result);
-  std::shared_ptr<DataSets::MemoryDataSet> aggregateView(DataSets::MemoryViewDataSet *ds,
-                                                         DataSets::MemoryDataSet *result);
+  void aggregateDataSet(DataSets::MemoryDataSet *ds,
+                        DataSets::MemoryDataSet *result);
+  void aggregateView(DataSets::MemoryViewDataSet *ds,
+                     DataSets::MemoryDataSet *result);
 
   std::vector<Unique> groupByFields;
   std::vector<Sum> sumFields;
   std::vector<std::pair<AgrOperator, gsl::index>> writeOrder;
+
+  std::vector<std::pair<gsl::index, gsl::index>> fieldIndices;
 };
 }
 

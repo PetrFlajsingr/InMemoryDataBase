@@ -14,3 +14,9 @@ void DataSets::BaseDataSet::setFieldData(BaseField *field, void *data) {
 gsl::index DataSets::BaseDataSet::getColumnCount() const {
   return fields.size();
 }
+
+std::pair<gsl::index,
+          gsl::index> DataSets::BaseField::convertIndex(const BaseField &field) {
+  return std::make_pair((field.getIndex() & maskTableIndex) >> maskTableShift,
+                        field.getIndex() & maskColumnIndex);
+}

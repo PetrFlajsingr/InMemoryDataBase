@@ -47,14 +47,14 @@ DataContainer &DataContainer::operator=(double val) {
   _double = val;
   return *this;
 }
-DataContainer &DataContainer::operator=(Currency &val) {
+DataContainer &DataContainer::operator=(const Currency &val) {
   if (_currency == nullptr) {
     _currency = new Currency();
   }
   *_currency = val;
   return *this;
 }
-DataContainer &DataContainer::operator=(DateTime &val) {
+DataContainer &DataContainer::operator=(const DateTime &val) {
   if (_dateTime == nullptr) {
     _dateTime = new DateTime();
   }

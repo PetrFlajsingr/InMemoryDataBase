@@ -184,8 +184,7 @@ class JoinMaker {
 
     if constexpr (std::is_same<DataSetType1,
                                std::shared_ptr<DataSets::MemoryViewDataSet>>{}) {
-      return DataSets::MemoryViewDataSet::convertIndex(t1->dataSet->fieldByName(
-          col1)->getIndex());
+      return DataSets::BaseField::convertIndex(*t1->dataSet->fieldByName(col1));
     }
   }
 
@@ -201,8 +200,7 @@ class JoinMaker {
 
     if constexpr (std::is_same<DataSetType2,
                                std::shared_ptr<DataSets::MemoryViewDataSet>>{}) {
-      return DataSets::MemoryViewDataSet::convertIndex(t2->dataSet->fieldByName(
-          col2)->getIndex());
+      return DataSets::BaseField::convertIndex(*t2->dataSet->fieldByName(col2));
     }
   }
 

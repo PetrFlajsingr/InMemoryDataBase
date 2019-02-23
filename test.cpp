@@ -28,7 +28,53 @@ void terminate_handler() {
   abort();
 }
 
+void agrTest() {
+  const std::string file1 = "/Users/petr/Desktop/agr test/test.csv";
+  const std::string file2 = "/Users/petr/Desktop/agr test/test2.csv";
+  const std::string outFile = "/Users/petr/Desktop/agr_test_out.csv";
+  auto prov1 = DataProviders::CsvReader(file1);
+  auto prov2 = DataProviders::CsvReader(file2);
+  auto ds1 = std::make_shared<DataSets::MemoryDataSet>("t1");
+  ds1->open(prov1,
+            {ValueType::Integer, ValueType::Currency, ValueType::Integer,
+             ValueType::Integer});
+  auto ds2 = std::make_shared<DataSets::MemoryDataSet>("t2");
+  ds2->open(prov2,
+            {ValueType::Integer, ValueType::Currency, ValueType::Integer,
+             ValueType::Integer});
+
+  DataBase::MemoryDataBase db("testDB");
+  db.addTable(ds1);
+  db.addTable(ds2);
+
+  const std::string
+      query = "select t1.group1, t1.group2, sum(t1.suma)"
+              " from t1 "
+              "group by t1.group1, t1.group2;";
+
+  auto view = db.execAggregateQuery(query, "tmpView");
+
+  auto writer = DataWriters::CsvWriter(outFile);
+
+  writer.writeHeader(view->dataSet->getFieldNames());
+
+  auto fields = view->dataSet->getFields();
+
+  while (view->dataSet->next()) {
+    std::vector<std::string> record;
+    std::transform(fields.begin(),
+                   fields.end(),
+                   std::back_inserter(record),
+                   [](const DataSets::BaseField *field) {
+                     return std::string(field->getAsString());
+                   });
+    writer.writeRecord(record);
+  }
+}
+
 int main() {
+  agrTest();
+  return 0;
   //std::set_terminate(terminate_handler);
 
   /*const std::string registr = "/Users/petr/Desktop/registr.csv";

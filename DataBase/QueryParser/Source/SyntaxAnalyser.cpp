@@ -69,6 +69,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
       case SynState::selectAgrItemId:
         if (token == Token::id) {
           state = SynState::selectAgrItemIdDot;
+          projectItem.table = std::get<1>(it);
           agrItem.field.table = std::get<1>(it);
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
@@ -88,6 +89,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
       case SynState::selectAgrItemId2:
         if (token == Token::id) {
           state = SynState::selectAgrItemEnd;
+          projectItem.column = std::get<1>(it);
           agrItem.field.column = std::get<1>(it);
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
@@ -98,6 +100,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
       case SynState::selectAgrItemEnd:
         if (token == Token::rightBracket) {
           state = SynState::selectItemDivide;
+          result.project.data.emplace_back(projectItem);
           result.agr.data.emplace_back(agrItem);
           selectTrueAgrFalse = false;
         } else {

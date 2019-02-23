@@ -79,6 +79,12 @@ class BaseField {
   virtual std::function<int8_t(const DataSetRow *,
                                const DataSetRow *)> getCompareFunction() const = 0;
 
+  static std::pair<gsl::index,
+                   gsl::index> convertIndex(const BaseField &field);
+  static const gsl::index maskTableShift = 16;
+  static const gsl::index maskTableIndex = 0xFF0000;
+  static const gsl::index maskColumnIndex = 0x00FFFF;
+
  protected:
   friend class BaseDataSet;  //< Pro pristup k primemu nastaveni dat
 

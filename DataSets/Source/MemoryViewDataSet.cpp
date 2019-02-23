@@ -20,7 +20,8 @@ void DataSets::MemoryViewDataSet::createFields(const std::vector<std::string> &c
   createNullRows(fieldIndices, types);
   for (gsl::index i = 0; i < columns.size(); ++i) {
     auto index =
-        (fieldIndices[i].first << maskTableShift) + fieldIndices[i].second;
+        (fieldIndices[i].first << BaseField::maskTableShift)
+            + fieldIndices[i].second;
     fields.emplace_back(FieldFactory::Get().CreateField(
         columns[i],
         index,
@@ -166,7 +167,7 @@ void DataSets::MemoryViewDataSet::sort(DataSets::SortOptions &options) {
       [this, &optionArray, &compareFunctions](const std::vector<DataSetRow *> &a,
                                               const std::vector<DataSetRow *> &b) {
         for (gsl::index i = 0; i < optionArray.size(); ++i) {
-          auto[tableIndex, _] = convertIndex(optionArray[i].field->getIndex());
+          auto[tableIndex, _] = BaseField::convertIndex(*optionArray[i].field);
           int compareResult = compareFunctions[i](a[tableIndex], b[tableIndex]);
           if (compareResult < 0) {
             return optionArray[i].order == SortOrder::Ascending;
@@ -212,7 +213,7 @@ std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryViewDataSet::filter(
         break;
       }
 
-      auto[tableIndex, columnIndex] = convertIndex(filter.field->getIndex());
+      auto[tableIndex, columnIndex] = BaseField::convertIndex(*filter.field);
 
       auto cell = (*iter[tableIndex])[columnIndex];
 
@@ -321,7 +322,7 @@ void DataSets::MemoryViewDataSet::setData(void *data,
 
 void DataSets::MemoryViewDataSet::setFieldValues(gsl::index index) {
   for (gsl::index i = 0; i < fields.size(); i++) {
-    auto[tableIndex, columnIndex] = convertIndex(fields[i]->getIndex());
+    auto[tableIndex, columnIndex] = BaseField::convertIndex(*fields[i]);
 
     auto cell = (*data[currentRecord][tableIndex])[columnIndex];
     switch (fields[i]->getFieldType()) {
@@ -394,12 +395,6 @@ void DataSets::MemoryViewDataSet::createNullRows(const std::vector<std::pair<int
 
 DataSetRow *DataSets::MemoryViewDataSet::getNullRow(gsl::index tableIndex) {
   return nullRecords[tableIndex];
-}
-
-std::pair<gsl::index,
-          gsl::index> DataSets::MemoryViewDataSet::convertIndex(gsl::index index) {
-  return std::make_pair((index & maskTableIndex) >> maskTableShift,
-                        index & maskColumnIndex);
 }
 
 gsl::index DataSets::MemoryViewDataSet::getTableCount() {
