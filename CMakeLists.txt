@@ -9,31 +9,19 @@ if (APPLE)
 endif (APPLE)
 
 include_directories(third_party)
-
 include_directories(Misc/tests)
-
 include_directories(Misc/Headers)
-
 include_directories(DataSets/Headers)
-
 include_directories(DataProviders/Headers)
-
 include_directories(DataWriters/Headers)
-
 include_directories(DataSets/Fields/Headers)
-
 include_directories(FileDownloaders/Headers)
-
 include_directories(third_party/Decimal)
-
+include_directories(CLI/Headers)
 include_directories(DataWorkers/Headers)
-
 include_directories(DataBase/Headers)
-
 include_directories(DataBase/QueryParser/Headers)
-
 include_directories(third_party/xlsxio/include)
-
 include_directories(third_party/catch2)
 
 FILE(GLOB DataProviderSources DataProviders/Source/*.cpp)
@@ -74,6 +62,9 @@ FILE(GLOB FileDownloaderHeaders FileDownloaders/Headers/*.h)
 FILE(GLOB QueryParserSources DataBase/QueryParser/Source/*.cpp)
 FILE(GLOB QueryParserHeaders DataBase/QueryParser/Headers/*.h)
 
+FILE(GLOB CLISources CLI/Source/*.cpp)
+FILE(GLOB CLIHeaders CLI/Headers/*.h)
+
 # third party:
 FILE(GLOB xlsxioHeaders third_party/xlsxio/include/*.h)
 FILE(GLOB decimalHeaders third_party/decimal/*.h)
@@ -87,7 +78,8 @@ set(SOURCE_FILES
         ${DataWriterSources}
         ${MiscSources}
         ${RelationLayerSources}
-        ${FileDownloaderSources})
+        ${FileDownloaderSources}
+        ${CLISources})
 
 set(TEST_SOURCE_FILES
         ${SOURCE_FILES}
