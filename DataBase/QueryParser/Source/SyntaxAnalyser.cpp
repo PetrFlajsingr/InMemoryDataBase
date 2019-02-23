@@ -616,6 +616,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
           result.having.data.emplace_back(havingItem, LogicOperator::none);
         } else if (token == Token::semicolon) {
           state = SynState::end;
+          result.having.data.emplace_back(havingItem, LogicOperator::none);
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::pipe, Token::logicOr,

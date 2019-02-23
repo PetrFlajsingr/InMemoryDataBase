@@ -68,6 +68,10 @@ class BaseField {
     return fieldName;
   }
 
+  void setName(std::string_view name) {
+    fieldName = name;
+  }
+
   /**
    * Funkce pro razeni polozek datasetu podle jejich datoveho typu
    * @param order poradi (ascending nebo descending)

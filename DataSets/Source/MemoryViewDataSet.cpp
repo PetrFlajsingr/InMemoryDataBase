@@ -193,7 +193,7 @@ std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryViewDataSet::filter(
   std::vector<std::pair<int, int>> fieldIndices;
   for (const auto &field : fields) {
     fieldTypes.emplace_back(field->getFieldType());
-    fieldIndices.emplace_back(0, field->getIndex());
+    fieldIndices.emplace_back(BaseField::convertIndex(*field));
   }
   auto resultView = std::make_shared<MemoryViewDataSet>(getName() + "_filtered",
                                                         fieldNames,
@@ -251,6 +251,11 @@ std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryViewDataSet::filter(
               valid = !Utilities::endsWith(toCompare,
                                            search._string);
               break;
+            case FilterOption::NotEquals:break;
+            case FilterOption::Greater:break;
+            case FilterOption::GreaterEqual:break;
+            case FilterOption::Less:break;
+            case FilterOption::LessEqual:break;
           }
           if (valid) {
             break;
@@ -295,7 +300,7 @@ std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryViewDataSet::filter(
     }
 
     if (valid) {
-      resultView->data.emplace_back(std::vector<DataSetRow *>{iter});
+      resultView->data.emplace_back(iter);
     }
   }
   resultView->data.emplace_back();
@@ -303,7 +308,7 @@ std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryViewDataSet::filter(
 }
 
 bool DataSets::MemoryViewDataSet::findFirst(DataSets::FilterItem &item) {
-  // TODO
+  throw NotImplementedException();
 }
 
 void DataSets::MemoryViewDataSet::resetBegin() {
@@ -321,29 +326,29 @@ void DataSets::MemoryViewDataSet::setData(void *data,
 }
 
 void DataSets::MemoryViewDataSet::setFieldValues(gsl::index index) {
-  for (gsl::index i = 0; i < fields.size(); i++) {
-    auto[tableIndex, columnIndex] = BaseField::convertIndex(*fields[i]);
+  for (auto &field : fields) {
+    auto[tableIndex, columnIndex] = BaseField::convertIndex(*field);
 
     auto cell = (*data[currentRecord][tableIndex])[columnIndex];
-    switch (fields[i]->getFieldType()) {
+    switch (field->getFieldType()) {
       case ValueType::Integer:
-        setFieldData(fields[i].get(),
+        setFieldData(field.get(),
                      &cell._integer);
         break;
       case ValueType::Double:
-        setFieldData(fields[i].get(),
+        setFieldData(field.get(),
                      &cell._double);
         break;
       case ValueType::String:
-        setFieldData(fields[i].get(),
+        setFieldData(field.get(),
                      cell._string);
         break;
       case ValueType::Currency:
-        setFieldData(fields[i].get(),
+        setFieldData(field.get(),
                      cell._currency);
         break;
       case ValueType::DateTime:
-        setFieldData(fields[i].get(),
+        setFieldData(field.get(),
                      cell._dateTime);
         break;
       default:throw IllegalStateException("Internal error.");

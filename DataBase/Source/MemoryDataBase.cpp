@@ -353,6 +353,9 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doHaving(
     filterOptions.addOption(field, values,
                             DataSets::condOpToFilterOp(havingItem.first.condOperator));
   }
-  return std::make_shared<View>(std::dynamic_pointer_cast<DataSets::MemoryViewDataSet>(
+  auto result =
+      std::make_shared<View>(std::dynamic_pointer_cast<DataSets::MemoryViewDataSet>(
       view->dataSet->filter(filterOptions)));
+  result->dataSet->addParents(view->dataSet->getParents());
+  return result;
 }

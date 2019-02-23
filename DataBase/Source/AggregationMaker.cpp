@@ -435,3 +435,8 @@ void DataBase::Sum::reset() {
 DataBase::BaseAgr::BaseAgr(DataSets::BaseField *field) : field(field) {
   fieldIndex = DataSets::BaseField::convertIndex(*field);
 }
+DataBase::Min::Min(DataSets::BaseField *field) : BaseAgr(field) {}
+DataBase::Max::Max(DataSets::BaseField *field) : BaseAgr(field) {}
+DataBase::Count::Count(DataSets::BaseField *field) : BaseAgr(field) {}
+DataBase::Avg::Avg(DataSets::BaseField *field, DataSets::BaseField *field1)
+    : Sum(field), Count(field1) {}

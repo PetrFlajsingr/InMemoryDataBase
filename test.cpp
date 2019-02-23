@@ -29,10 +29,10 @@ void terminate_handler() {
 }
 
 void agrTest() {
-  const std::string file1 = "/Users/petr/Desktop/agr test/test.csv";
+  const std::string file1 = "/Users/petr/Desktop/agr test/big.csv";
   const std::string file2 = "/Users/petr/Desktop/agr test/test2.csv";
   const std::string outFile = "/Users/petr/Desktop/agr_test_out.csv";
-  auto prov1 = DataProviders::CsvReader(file1);
+  auto prov1 = DataProviders::CsvReader(file1, ";");
   auto prov2 = DataProviders::CsvReader(file2);
   auto ds1 = std::make_shared<DataSets::MemoryDataSet>("t1");
   ds1->open(prov1,
@@ -48,9 +48,10 @@ void agrTest() {
   db.addTable(ds2);
 
   const std::string
-      query = "select t1.group1, t1.group2, sum(t1.suma)"
-              " from t1 "
-              "group by t1.group1, t1.group2;";
+      query = "select t1.gr1, t1.gr2, sum(t1.suma) "
+              "from t1 "
+              "group by t1.gr1, t1.gr2 "
+              "having sum(t1.suma) = 1;";
 
   auto view = db.execAggregateQuery(query, "tmpView");
 
