@@ -4,6 +4,7 @@
 
 #include <Utilities.h>
 #include <DateTimeUtils.h>
+#include <Types.h>
 
 std::vector<std::string> Utilities::splitStringByDelimiter(std::string_view str,
                                                            std::string_view delimiter) {
@@ -79,16 +80,6 @@ bool Utilities::isDouble(std::string_view value) {
   return std::regex_match(std::string(value), doubleRegex);
 }
 
-ValueType Utilities::getType(std::string_view value) {
-  if (isInteger(value)) {
-    return ValueType::Integer;
-  } else if (isDouble(value)) {
-    return ValueType::Double;
-  } else {
-    return ValueType::String;
-  }
-}
-
 bool Utilities::endsWith(std::string_view value, std::string_view ending) {
   if (ending.size() > value.size())
     return false;
@@ -151,6 +142,8 @@ int8_t Utilities::compareDateTime(const DateTime &a, const DateTime &b) {
   return 1;
 }
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "cert-msc30-c"
 std::string Utilities::getRandomString(size_t length) {
   auto randChar = []() -> char {
     const char charset[] =
@@ -164,9 +157,21 @@ std::string Utilities::getRandomString(size_t length) {
   std::generate_n(str.begin(), length, randChar);
   return str;
 }
+#pragma clang diagnostic pop
 
 std::string Utilities::toLower(const std::string &str) {
   std::string result;
   std::transform(str.begin(), str.end(), std::back_inserter(result), ::tolower);
   return result;
+}
+
+template<class T>
+int8_t Utilities::compare(const T &a, const T &b) {
+  if (a == b) {
+    return 0;
+  }
+  if (a > b) {
+    return 1;
+  }
+  return -1;
 }

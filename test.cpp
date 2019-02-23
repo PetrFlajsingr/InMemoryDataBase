@@ -6,164 +6,211 @@
 #include <LexicalAnalyser.h>
 #include <SyntaxAnalyser.h>
 #include <SemanticAnalyser.h>
-#include <MockDataSet.h>
 #include <MemoryDataBase.h>
+#include <JoinMaker.h>
+#include <CsvReader.h>
+#include <XlsxWriter.h>
+
+void terminate_handler() {
+  try {
+    auto unknown = std::current_exception();
+    if (unknown) {
+      std::rethrow_exception(unknown);
+    } else {
+      std::cerr << "normal termination" << std::endl;
+    }
+  } catch (const std::exception &e) {
+    std::cerr << "Exc type: " << typeid(e).name() << "\nExc.what: " << e.what()
+              << std::endl;
+  } catch (...) {
+    std::cerr << "Unknown exception of type" << std::endl;
+  }
+  abort();
+}
+
+void agrTest() {
+  const std::string file1 = "/Users/petr/Desktop/agr test/big.csv";
+  const std::string file2 = "/Users/petr/Desktop/agr test/test2.csv";
+  const std::string outFile = "/Users/petr/Desktop/agr_test_out.csv";
+  auto prov1 = DataProviders::CsvReader(file1, ";");
+  auto prov2 = DataProviders::CsvReader(file2);
+  auto ds1 = std::make_shared<DataSets::MemoryDataSet>("t1");
+  ds1->open(prov1,
+            {ValueType::Integer, ValueType::Currency, ValueType::Integer,
+             ValueType::Integer});
+  auto ds2 = std::make_shared<DataSets::MemoryDataSet>("t2");
+  ds2->open(prov2,
+            {ValueType::Integer, ValueType::Currency, ValueType::Integer,
+             ValueType::Integer});
+
+  DataBase::MemoryDataBase db("testDB");
+  db.addTable(ds1);
+  db.addTable(ds2);
+
+  const std::string
+      query = "select t1.gr1, t1.gr2, sum(t1.suma) "
+              "from t1 "
+              "group by t1.gr1, t1.gr2 "
+              "having sum(t1.suma) = 1;";
+
+  auto view = db.execAggregateQuery(query, "tmpView");
+
+  auto writer = DataWriters::CsvWriter(outFile);
+
+  writer.writeHeader(view->dataSet->getFieldNames());
+
+  auto fields = view->dataSet->getFields();
+
+  while (view->dataSet->next()) {
+    std::vector<std::string> record;
+    std::transform(fields.begin(),
+                   fields.end(),
+                   std::back_inserter(record),
+                   [](const DataSets::BaseField *field) {
+                     return std::string(field->getAsString());
+                   });
+    writer.writeRecord(record);
+  }
+}
 
 int main() {
-  DataBase::MemoryDataBase dataBase("testDB");
-  auto ds1 = std::make_shared<MockDataSet>("t1");
-  ds1->openEmpty({"c1", "c2", "c3"},
-                 {ValueType::String, ValueType::Integer, ValueType::Integer});
-  dataBase.addTable(ds1);
-  ds1 = std::make_shared<MockDataSet>("t2");
-  ds1->openEmpty({"c1", "c2", "c3"},
-                 {ValueType::String, ValueType::Integer, ValueType::Integer});
-  dataBase.addTable(ds1);
-  ds1 = std::make_shared<MockDataSet>("t3");
-  ds1->openEmpty({"c1", "c2", "c3"},
-                 {ValueType::String, ValueType::Integer, ValueType::Integer});
-  dataBase.addTable(ds1);
-  ds1.reset();
-
-
-  DataBase::LexicalAnalyser lexicalAnalyser;
-
-  std::vector<std::tuple<DataBase::Token, std::string, bool>> tokens;
-
-  lexicalAnalyser.setInput(
-      "select#tohle je select# t1.c1 as letadlo, sum(t2.c3) as suma, avg(t3.c2) as aver "
-      "from t1 "
-      "join t2 on t1.c1 = t2.c1 "
-      "outer join t3 on t2.c2 = t3.c2 "
-      "where t2.c2 != 10 | 15 or t2.c3 >= 10000 and letadlo = t1.c2 | 1000 | -100 "
-      "group by t1.c1 "
-      "having sum(t2.c3) > 10 and aver > 0.1 "
-      "order by letadlo asc;");
-
-  try {
-    do {
-      tokens.push_back(lexicalAnalyser.getNextToken());
-    } while (std::get<2>(tokens.back()));
-
-    DataBase::SyntaxAnalyser syntaxAnalyser;
-    syntaxAnalyser.setInput(tokens);
-
-    auto strQuery = syntaxAnalyser.analyse();
-
-    DataBase::SemanticAnalyser semanticAnalyser;
-    semanticAnalyser.setInput(strQuery);
-    semanticAnalyser.analyse();
-    std::cout << "Success\n";
-
-    dataBase.validateQuery(strQuery);
-  } catch (DataBase::QueryException &exc) {
-    std::cerr << exc.what();
-  }
-
-  tokens.clear();
-
+  agrTest();
   return 0;
-  DataSets::MemoryDataSet dataSet("test");
+  //std::set_terminate(terminate_handler);
 
-  dataSet.openEmpty({"1", "2"}, {ValueType::String, ValueType::String});
+  /*const std::string registr = "/Users/petr/Desktop/registr.csv";
+  const std::string nno = "/Users/petr/Desktop/csvs/NNO_subjekty6ver2.4.csv";
 
-  auto fields = dataSet.getFields();
+  auto prov1 = DataProviders::CsvReader(registr, ",");
+  auto prov2 = DataProviders::CsvReader(nno, ";");
 
-  int j = 0;
-  for (gsl::index i = 0; i < 20; ++i) {
-    dataSet.append();
-    for (auto field : fields) {
-      field->setAsString(std::to_string(j));
-    }
-    if (i % 5 == 0) {
-      j++;
-    }
+  auto ds1 = std::make_shared<DataSets::MemoryDataSet>("registr");
+  ds1->open(prov1, {ValueType::Integer,
+                    ValueType::Integer,
+                    ValueType::Integer,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::Integer,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::Integer,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String});
+  auto ds2 = std::make_shared<DataSets::MemoryDataSet>("nno");
+  ds2->open(prov2, {ValueType::Integer,
+                    ValueType::Integer,
+                    ValueType::Integer,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String,
+                    ValueType::String});
+
+  DataBase::MemoryDataBase db("testDB");
+  db.addTable(ds1);
+  db.addTable(ds2);
+
+  const std::string
+      query = "select nno.*, registr.id, registr.pcz, registr.pcdp, "
+              "registr.nazev, registr.typ, registr.adresa_nazev_obce, "
+              "registr.adresa_psc, registr.adresa_nazev_ulice, "
+              "registr.adresa_cislo_domovni, registr.adresa_nazev_kraje, "
+              "registr.adresa_kod_kraje, registr.adresa_nazev_okresu, "
+              "registr.adresa_kod_okresu, registr.spravni_obvod, registr.nazev_zkraceny, "
+              "registr.poskytovatel_ic, registr.poskytovatel_pravni_forma_osoba, "
+              "registr.poskytovatel_pravni_forma, registr.sidlo_adresa_kod_kraje, "
+              "registr.sidlo_adresa_nazev_kraje, registr.sidlo_adresa_kod_okresu, "
+              "registr.sidlo_adresa_nazev_okresu, registr.sidlo_adresa_psc, "
+              "registr.sidlo_adresa_nazev_obce, registr.sidlo_adresa_nazev_ulice, "
+              "registr.sidlo_adresa_cislo_domovni, registr.obor_pece, "
+              "registr.forma_pece, registr.druh_pece, registr.poskytovatel_souradnice "
+              "from nno "
+              "join registr on nno.ICO_num = registr.poskytovatel_ic;";
+
+  auto view = db.execSimpleQuery(query, false, "wat");
+
+  auto writer = DataWriters::XlsxWriter("/Users/petr/Desktop/wow.xlsx");
+  writer.writeHeader(view->dataSet->getFieldNames());
+  auto fields = view->dataSet->getFields();
+  while (view->dataSet->next()) {
+    std::vector<std::string> record;
+    std::transform(fields.begin(),
+                   fields.end(),
+                   std::back_inserter(record),
+                   [](const DataSets::BaseField *field) {
+                     return std::string(field->getAsString());
+                   });
+    writer.writeRecord(record);
   }
 
-  j = 0;
-  for (gsl::index i = 0; i < 20; ++i) {
-    dataSet.append();
-    for (auto field : fields) {
-      field->setAsString(std::to_string(j));
-    }
-    if (i % 5 == 0) {
-      j++;
-    }
+  return 0;*/
+
+
+  /*const std::string file1 = "/Users/petr/Desktop/join_test_1.csv";
+  const std::string file2 = "/Users/petr/Desktop/join_test_2.csv";
+  const std::string outFile = "/Users/petr/Desktop/join_test_out.csv";
+  auto prov1 = DataProviders::CsvReader(file1);
+  auto prov2 = DataProviders::CsvReader(file2);
+  auto ds1 = std::make_shared<DataSets::MemoryDataSet>("test1");
+  ds1->open(prov1, {ValueType::String, ValueType::String, ValueType::Integer});
+  auto ds2 = std::make_shared<DataSets::MemoryDataSet>("test2");
+  ds2->open(prov2, {ValueType::String, ValueType::String, ValueType::Integer});
+
+  DataBase::MemoryDataBase db("testDB");
+  db.addTable(ds1);
+  db.addTable(ds2);
+
+  const std::string
+      query = "select test1.*, test2.B, test2.C "
+              "from test1 join test2 on test1.A1 = test2.A left join test2 on test1.A1 = test2.A "
+              //"where test1.A1 = \"A\" | \"B\" and test1.C1 = 11 | 22 | 33 | 44 and test2.A = \"A\" "
+              "order by test2.A asc, test2.C desc;";
+
+  auto view = db.execSimpleQuery(query, false, "tmpView");
+
+  auto writer = DataWriters::CsvWriter(outFile);
+
+  writer.writeHeader(view->dataSet->getFieldNames());
+
+  auto fields = view->dataSet->getFields();
+
+  while (view->dataSet->next()) {
+    std::vector<std::string> record;
+    std::transform(fields.begin(),
+                   fields.end(),
+                   std::back_inserter(record),
+                   [](const DataSets::BaseField *field) {
+                     return std::string(field->getAsString());
+                   });
+    writer.writeRecord(record);
   }
 
-  dataSet.resetBegin();
-  while (dataSet.next()) {
-    for (const auto field : dataSet.getFields()) {
-      std::cout << field->getAsString() << " ";
-    }
-    std::cout << std::endl;
-  }
+  return 0;*/
 
-  std::cout << "____________SORT 0 DESC, FILTER 1 2 3________________"
-            << std::endl;
-
-  DataSets::FilterOptions options;
-  options.addOption(dataSet.fieldByIndex(0),
-                    {"1", "2", "3"},
-                    DataSets::FilterOption::Equals);
-  auto view = dataSet.filter(options);
-
-  auto viewFields = view->getFields();
-
-  DataSets::SortOptions sortOptions;
-  sortOptions.addOption(viewFields[0],
-                        SortOrder::Descending);
-  view->sort(sortOptions);
-
-  while (view->next()) {
-    for (const auto field : viewFields) {
-      std::cout << field->getAsString() << " ";
-    }
-    std::cout << std::endl;
-  }
-
-  std::cout << "_____________FILTER 1 2 5_______________" << std::endl;
-
-  DataSets::FilterOptions options2;
-  options2.addOption(view->fieldByIndex(0),
-                     {"1", "2", "5"},
-                     DataSets::FilterOption::Equals);
-
-  auto view2 = view->filter(options2);
-
-  auto view2Fields = view2->getFields();
-
-  while (view2->next()) {
-    for (const auto field : view2Fields) {
-      std::cout << field->getAsString() << " ";
-    }
-    std::cout << std::endl;
-  }
-
-  std::cout << "______________SORT 0 ASC______________" << std::endl;
-
-  DataSets::SortOptions sortOptions2;
-  sortOptions2.addOption(viewFields[0],
-                         SortOrder::Ascending);
-  view->sort(sortOptions2);
-
-  view->resetBegin();
-  while (view->next()) {
-    for (const auto field : viewFields) {
-      std::cout << field->getAsString() << " ";
-    }
-    std::cout << std::endl;
-  }
-
-  std::cout << "_______________FILTER 1 2 5 AGAIN_____________" << std::endl;
-
-  view2->resetBegin();
-  while (view2->next()) {
-    for (const auto field : view2Fields) {
-      std::cout << field->getAsString() << " ";
-    }
-    std::cout << std::endl;
-  }
-
-  return 0;
 }

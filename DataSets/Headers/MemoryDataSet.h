@@ -25,15 +25,7 @@
 #include <DateTimeField.h>
 
 namespace DataSets {
-/**
- * Struktura pro jeden zaznam v data setu.
- */
-struct DataSetRow {
-  bool valid;  //< true pokud vyhovuje filtru/neni filtrovat, jinak false
-  std::vector<DataContainer> cells;  //< data v pameti
-
-  DataSetRow(bool valid, const std::vector<DataContainer> &cells);
-};
+class MemoryViewDataSet;
 /**
  * Dataset ukladajici data primo v operacni pameti.
  *
@@ -75,67 +67,45 @@ struct DataSetRow {
 class MemoryDataSet : public BaseDataSet {
  public:
   explicit MemoryDataSet(std::string_view dataSetName);
-
   ~MemoryDataSet() override;
 
   void open(DataProviders::BaseDataProvider &dataProvider,
             const std::vector<ValueType> &fieldTypes) override;
-
   void openEmpty(const std::vector<std::string> &fieldNames,
                  const std::vector<ValueType> &fieldTypes) override;
-
   void close() override;
-
   void first() override;
-
   void last() override;
-
   bool next() override;
-
   bool previous() override;
-
   void sort(SortOptions &options) override;
-
   std::shared_ptr<ViewDataSet> filter(const FilterOptions &options) override;
-
   BaseField *fieldByName(std::string_view name) const override;
-
   BaseField *fieldByIndex(gsl::index index) const override;
-
   std::vector<BaseField *> getFields() const override;
-
   bool isFirst() const override;
-
   bool isLast() const override;
-
   std::vector<std::string> getFieldNames() const override;
-
   void append() override;
-
   void append(DataProviders::BaseDataProvider &dataProvider) override;
-
   bool findFirst(FilterItem &item) override;
-
   bool isBegin() const override;
-
   bool isEnd() const override;
-
   gsl::index getCurrentRecord() const override;
-
   void resetBegin() override;
   void resetEnd() override;
+
+  std::shared_ptr<MemoryViewDataSet> fullView();
 
   class iterator : public std::iterator<std::random_access_iterator_tag, int> {
    public:
     iterator() = default;
 
-    explicit iterator(gsl::not_null<MemoryDataSet *> dataSet, gsl::index row)
+    iterator(gsl::not_null<MemoryDataSet *> dataSet, gsl::index row)
         : dataSet(dataSet), currentRecord(row) {}
 
-    iterator(const iterator &other) {
-      dataSet = other.dataSet;
-      currentRecord = other.currentRecord;
-    }
+    iterator(const iterator &other) : dataSet(other.dataSet),
+                                      currentRecord(other.currentRecord) {}
 
     iterator &operator=(const iterator &other) {
       if (this != &other) {
@@ -164,11 +134,11 @@ class MemoryDataSet : public BaseDataSet {
       return result;
     }
 
-    bool operator==(iterator &rhs) {
+    bool operator==(const iterator &rhs) const {
       return currentRecord == rhs.currentRecord;
     }
 
-    bool operator!=(iterator &other) {
+    bool operator!=(const iterator &other) const {
       return !(*this == other);
     }
 
@@ -243,7 +213,6 @@ class MemoryDataSet : public BaseDataSet {
   };
 
   iterator begin();
-
   iterator end();
 
  protected:
@@ -256,32 +225,26 @@ class MemoryDataSet : public BaseDataSet {
 
   bool isOpen = false;
 
-  DataSetRow *stopItem = new DataSetRow{true, {}};
-
   gsl::index currentRecord = 0;  //< Pocitadlo zaznamu
 
   std::vector<DataSetRow *> data;
 
   inline gsl::index getFirst() const;
   inline gsl::index getLast() const;
-
   /**
    * Nacteni dat do this->data
    */
   void loadData(DataProviders::BaseDataProvider &dataProvider);
-
   /**
    * Pridani zaznamu do this->data()
    */
   void addRecord(DataProviders::BaseDataProvider &dataProvider);
-
   /**
    * Vytvoreni Fields se jmeny podle nazvu sloupcu.
    * @param columns nazvy sloupcu
    */
   void createFields(std::vector<std::string> columns,
                     std::vector<ValueType> types);
-
   /**
    * Nastaveni hodnot this->fields.
    *
@@ -291,6 +254,8 @@ class MemoryDataSet : public BaseDataSet {
    * @return
    */
   bool setFieldValues();
+
+  inline DataContainer &getCell(gsl::index row, gsl::index column);
 };
 }  // namespace DataSets
 

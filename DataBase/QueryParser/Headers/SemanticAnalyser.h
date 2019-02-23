@@ -15,7 +15,7 @@ class SemanticAnalyser {
  public:
   void setInput(StructuredQuery &structuredQuery);
 
-  void analyse();
+  StructuredQuery analyse();
  private:
   StructuredQuery structuredQuery;
 

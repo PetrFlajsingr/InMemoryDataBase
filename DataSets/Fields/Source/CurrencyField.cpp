@@ -28,14 +28,12 @@ std::string_view DataSets::CurrencyField::getAsString() const {
   return dec::toString(data);
 }
 
-std::function<int8_t(const DataSets::DataSetRow *,
-                     const DataSets::DataSetRow *)> DataSets::CurrencyField::getCompareFunction() const {
+std::function<int8_t(const DataSetRow *,
+                     const DataSetRow *)> DataSets::CurrencyField::getCompareFunction() const {
   return [this](const DataSetRow *a,
                 const DataSetRow *b) {
-    return Utilities::compareCurrency(*a->cells[getIndex()
-                                          & 0x00FFFF]._currency,
-                                      *b->cells[getIndex()
-                                          & 0x00FFFF]._currency);
+    return Utilities::compareCurrency(*(*a)[getIndex() & 0x00FFFF]._currency,
+                                      *(*b)[getIndex() & 0x00FFFF]._currency);
   };
 }
 

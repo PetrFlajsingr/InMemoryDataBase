@@ -12,6 +12,7 @@
 #include <Utilities.h>
 #include "Types.h"
 #include <DateTimeUtils.h>
+#include <QueryCommon.h>
 
 // TODO: predelat tak, aby podporoval double, integer, currency...
 // TODO: predelat pro prehlednost - vytvorit DataContainer for FilterOptions uvnitr automaticky
@@ -19,13 +20,20 @@
 namespace DataSets {
 enum class FilterOption {
   Equals,
+  NotEquals,
   StartsWith,
   Contains,
   EndsWith,
   NotContains,
   NotStartsWith,
-  NotEndsWith
+  NotEndsWith,
+  Greater,
+  GreaterEqual,
+  Less,
+  LessEqual,
 };
+
+FilterOption condOpToFilterOp(DataBase::CondOperator op);
 
 struct FilterItem {
   const DataSets::BaseField *field;
@@ -34,28 +42,7 @@ struct FilterItem {
 
   FilterItem(const BaseField *field,
              const std::vector<DataContainer> &searchData,
-             FilterOption filterOption)
-      : field(field), searchData(searchData), filterOption(filterOption) {}
-
-  virtual ~FilterItem() {
-    /*switch (field->getFieldType()) {
-      case ValueType::String:
-        for (const auto &data : searchData) {
-          delete[] data._string;
-        }
-        break;
-      case ValueType::Currency:
-        for (const auto &data : searchData) {
-          delete data._currency;
-        }
-        break;
-      case ValueType::DateTime:
-        for (const auto &data : searchData) {
-          delete data._currency;
-        }
-        break;
-    }*/
-  }
+             FilterOption filterOption);
 };
 
 struct FilterOptions {
@@ -63,44 +50,11 @@ struct FilterOptions {
 
   void addOption(const DataSets::BaseField *field,
                  const std::vector<DataContainer> &searchString,
-                 const FilterOption filterOption) {
-    options.emplace_back(FilterItem{field,
-                                    searchString,
-                                    filterOption});
-  }
+                 const FilterOption filterOption);
 
   void addOption(const DataSets::BaseField *field,
                  const std::vector<std::string> &values,
-                 const FilterOption filterOption) {
-    std::vector<DataContainer> searchVals;
-
-    std::transform(values.begin(),
-                   values.end(),
-                   std::back_inserter(searchVals),
-                   [field](std::string_view str) {
-                     switch (field->getFieldType()) {
-                       case ValueType::Integer:
-                         return DataContainer{._integer = Utilities::stringToInt(
-                             str)};
-                       case ValueType::Double:
-                         return DataContainer{._double = Utilities::stringToDouble(
-                             str)};
-                       case ValueType::String:
-                         return DataContainer{._string = Utilities::copyStringToNewChar(
-                             str)};
-                       case ValueType::Currency:
-                         return DataContainer{._currency = new Currency(std::string(
-                             str))};
-                       case ValueType::DateTime:
-                         return DataContainer{._dateTime = new DateTime(str)};
-                       default:
-                         throw IllegalStateException(
-                             "Internal error. FilterOptions::addOption");
-                     }
-                   });
-
-    options.emplace_back(field, searchVals, filterOption);
-  }
+                 const FilterOption filterOption);
 };
 }  // namespace DataSets
 

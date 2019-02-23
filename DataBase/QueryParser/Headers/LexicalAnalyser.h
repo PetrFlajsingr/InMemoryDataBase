@@ -19,6 +19,8 @@ class LexicalAnalyser {
 
   std::tuple<Token, std::string, bool> getNextToken();
 
+  std::vector<std::tuple<Token, std::string, bool>> getAllTokens();
+
  private:
   std::string input;
 

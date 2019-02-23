@@ -17,9 +17,11 @@ void DataSets::MemoryViewDataSet::createFields(const std::vector<std::string> &c
                                                const std::vector<ValueType> &types,
                                                const std::vector<std::pair<int,
                                                                            int>> &fieldIndices) {
+  createNullRows(fieldIndices, types);
   for (gsl::index i = 0; i < columns.size(); ++i) {
     auto index =
-        (fieldIndices[i].first + maskTableIndex) + fieldIndices[i].second;
+        (fieldIndices[i].first << BaseField::maskTableShift)
+            + fieldIndices[i].second;
     fields.emplace_back(FieldFactory::Get().CreateField(
         columns[i],
         index,
@@ -104,23 +106,36 @@ DataSets::BaseField *DataSets::MemoryViewDataSet::fieldByIndex(gsl::index index)
 
 std::vector<DataSets::BaseField *> DataSets::MemoryViewDataSet::getFields() const {
   std::vector<BaseField *> result;
-  std::transform(fields.begin(),
-                 fields.end(),
-                 std::back_inserter(result),
-                 [](const std::shared_ptr<BaseField> field) {
-                   return field.get();
-                 });
+  if (allowedFields.empty()) {
+    std::transform(fields.begin(),
+                   fields.end(),
+                   std::back_inserter(result),
+                   [](const std::shared_ptr<BaseField> field) {
+                     return field.get();
+                   });
+  } else {
+    return allowedFields;
+  }
   return result;
 }
 
 std::vector<std::string> DataSets::MemoryViewDataSet::getFieldNames() const {
   std::vector<std::string> result;
-  std::transform(fields.begin(),
-                 fields.end(),
-                 std::back_inserter(result),
-                 [](const std::shared_ptr<BaseField> field) {
-                   return std::string(field->getName());
-                 });
+  if (allowedFields.empty()) {
+    std::transform(fields.begin(),
+                   fields.end(),
+                   std::back_inserter(result),
+                   [](const std::shared_ptr<BaseField> field) {
+                     return std::string(field->getName());
+                   });
+  } else {
+    std::transform(allowedFields.begin(),
+                   allowedFields.end(),
+                   std::back_inserter(result),
+                   [](const BaseField *field) {
+                     return std::string(field->getName());
+                   });
+  }
   return result;
 }
 
@@ -152,8 +167,7 @@ void DataSets::MemoryViewDataSet::sort(DataSets::SortOptions &options) {
       [this, &optionArray, &compareFunctions](const std::vector<DataSetRow *> &a,
                                               const std::vector<DataSetRow *> &b) {
         for (gsl::index i = 0; i < optionArray.size(); ++i) {
-          auto tableIndex = optionArray[i].field->getIndex()
-              & maskTableIndex >> maskTableShift;
+          auto[tableIndex, _] = BaseField::convertIndex(*optionArray[i].field);
           int compareResult = compareFunctions[i](a[tableIndex], b[tableIndex]);
           if (compareResult < 0) {
             return optionArray[i].order == SortOrder::Ascending;
@@ -171,6 +185,7 @@ void DataSets::MemoryViewDataSet::sort(DataSets::SortOptions &options) {
   currentRecord = 0;
 }
 
+// TODO: implement more filter functions
 std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryViewDataSet::filter(
     const DataSets::FilterOptions &options) {
   auto fieldNames = getFieldNames();
@@ -178,7 +193,7 @@ std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryViewDataSet::filter(
   std::vector<std::pair<int, int>> fieldIndices;
   for (const auto &field : fields) {
     fieldTypes.emplace_back(field->getFieldType());
-    fieldIndices.emplace_back(0, field->getIndex());
+    fieldIndices.emplace_back(BaseField::convertIndex(*field));
   }
   auto resultView = std::make_shared<MemoryViewDataSet>(getName() + "_filtered",
                                                         fieldNames,
@@ -197,11 +212,10 @@ std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryViewDataSet::filter(
       if (!valid) {
         break;
       }
-      auto tableIndex =
-          filter.field->getIndex() & maskTableIndex >> maskTableShift;
-      auto columnIndex = filter.field->getIndex() & maskColumnIndex;
 
-      auto cell = iter[tableIndex]->cells[columnIndex];
+      auto[tableIndex, columnIndex] = BaseField::convertIndex(*filter.field);
+
+      auto cell = (*iter[tableIndex])[columnIndex];
 
       if (filter.field->getFieldType() == ValueType::String) {
         std::string toCompare(cell._string);
@@ -237,6 +251,11 @@ std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryViewDataSet::filter(
               valid = !Utilities::endsWith(toCompare,
                                            search._string);
               break;
+            case FilterOption::NotEquals:break;
+            case FilterOption::Greater:break;
+            case FilterOption::GreaterEqual:break;
+            case FilterOption::Less:break;
+            case FilterOption::LessEqual:break;
           }
           if (valid) {
             break;
@@ -281,7 +300,7 @@ std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryViewDataSet::filter(
     }
 
     if (valid) {
-      resultView->data.emplace_back(std::vector<DataSetRow *>{iter});
+      resultView->data.emplace_back(iter);
     }
   }
   resultView->data.emplace_back();
@@ -289,7 +308,7 @@ std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryViewDataSet::filter(
 }
 
 bool DataSets::MemoryViewDataSet::findFirst(DataSets::FilterItem &item) {
-  // TODO
+  throw NotImplementedException();
 }
 
 void DataSets::MemoryViewDataSet::resetBegin() {
@@ -307,34 +326,102 @@ void DataSets::MemoryViewDataSet::setData(void *data,
 }
 
 void DataSets::MemoryViewDataSet::setFieldValues(gsl::index index) {
-  for (gsl::index i = 0; i < fields.size(); i++) {
-    const auto
-        tableIndex = maskTableIndex & fields[i]->getIndex() >> maskTableShift;
-    const auto columnIndex = maskColumnIndex & fields[i]->getIndex();
+  for (auto &field : fields) {
+    auto[tableIndex, columnIndex] = BaseField::convertIndex(*field);
 
-    auto cell = data[currentRecord][tableIndex]->cells[columnIndex];
-    switch (fields[i]->getFieldType()) {
+    auto cell = (*data[currentRecord][tableIndex])[columnIndex];
+    switch (field->getFieldType()) {
       case ValueType::Integer:
-        setFieldData(fields[i].get(),
+        setFieldData(field.get(),
                      &cell._integer);
         break;
       case ValueType::Double:
-        setFieldData(fields[i].get(),
+        setFieldData(field.get(),
                      &cell._double);
         break;
       case ValueType::String:
-        setFieldData(fields[i].get(),
+        setFieldData(field.get(),
                      cell._string);
         break;
       case ValueType::Currency:
-        setFieldData(fields[i].get(),
+        setFieldData(field.get(),
                      cell._currency);
         break;
       case ValueType::DateTime:
-        setFieldData(fields[i].get(),
+        setFieldData(field.get(),
                      cell._dateTime);
         break;
       default:throw IllegalStateException("Internal error.");
     }
   }
+}
+
+std::vector<std::vector<DataSetRow *>> *DataSets::MemoryViewDataSet::rawData() {
+  return &data;
+}
+
+DataSets::MemoryViewDataSet::iterator DataSets::MemoryViewDataSet::begin() {
+  return iterator(this, 1);
+}
+
+DataSets::MemoryViewDataSet::iterator DataSets::MemoryViewDataSet::end() {
+  return iterator(this, data.size() - 1);
+}
+void DataSets::MemoryViewDataSet::createNullRows(const std::vector<std::pair<int,
+                                                                             int>> &fieldIndices,
+                                                 const std::vector<ValueType> &fieldTypes) {
+  static gsl::zstring<> nullStr = "null";
+  int last = fieldIndices[0].first;
+  std::vector<DataContainer> nullData;
+  for (gsl::index i = 0; i < fieldIndices.size(); ++i) {
+    if (fieldIndices[i].first == last) {
+      switch (fieldTypes[i]) {
+        case ValueType::Integer:nullData.emplace_back(DataContainer{._integer = 0});
+          break;
+        case ValueType::Double:nullData.emplace_back(DataContainer{._double = 0.0});
+          break;
+        case ValueType::String:nullData.emplace_back(DataContainer{._string = nullStr});
+          break;
+        case ValueType::Currency:
+          nullData.emplace_back(DataContainer{._currency = new Currency(0)});
+          break;
+        case ValueType::DateTime:nullData.emplace_back(DataContainer{._dateTime = new DateTime()});
+          break;
+      }
+    } else {
+      nullRecords.emplace_back(new DataSetRow(nullData));
+      nullData.clear();
+      last = fieldIndices[i].first;
+      --i;
+    }
+  }
+  nullRecords.emplace_back(new DataSetRow(nullData));
+}
+
+DataSetRow *DataSets::MemoryViewDataSet::getNullRow(gsl::index tableIndex) {
+  return nullRecords[tableIndex];
+}
+
+gsl::index DataSets::MemoryViewDataSet::getTableCount() {
+  return nullRecords.size();
+}
+
+void DataSets::MemoryViewDataSet::setAllowedFields(const std::vector<std::string> &fieldNames) {
+  allowedFields.clear();
+  std::transform(fieldNames.begin(),
+                 fieldNames.end(),
+                 std::back_inserter(allowedFields),
+                 [this](std::string_view fieldName) {
+                   return fieldByName(fieldName);
+                 });
+}
+void DataSets::MemoryViewDataSet::addParent(std::shared_ptr<MemoryDataSet> &parent) {
+  parents.emplace_back(parent);
+}
+void DataSets::MemoryViewDataSet::addParents(const std::vector<std::shared_ptr<
+    DataSets::MemoryDataSet>> &parents) {
+  std::copy(parents.begin(), parents.end(), std::back_inserter(this->parents));
+}
+const std::vector<std::shared_ptr<DataSets::MemoryDataSet>> &DataSets::MemoryViewDataSet::getParents() const {
+  return parents;
 }

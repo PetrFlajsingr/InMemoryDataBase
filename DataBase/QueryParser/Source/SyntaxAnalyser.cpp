@@ -43,7 +43,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         }
         break;
       case SynState::selectList:
-        if (token == Token::id || token == Token::asterisk) {
+        if (token == Token::id) {
           state = SynState::selectItem;
           projectItem.table = std::get<1>(it);
           projectItem.alias = "";
@@ -69,6 +69,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
       case SynState::selectAgrItemId:
         if (token == Token::id) {
           state = SynState::selectAgrItemIdDot;
+          projectItem.table = std::get<1>(it);
           agrItem.field.table = std::get<1>(it);
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
@@ -88,6 +89,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
       case SynState::selectAgrItemId2:
         if (token == Token::id) {
           state = SynState::selectAgrItemEnd;
+          projectItem.column = std::get<1>(it);
           agrItem.field.column = std::get<1>(it);
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
@@ -98,6 +100,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
       case SynState::selectAgrItemEnd:
         if (token == Token::rightBracket) {
           state = SynState::selectItemDivide;
+          result.project.data.emplace_back(projectItem);
           result.agr.data.emplace_back(agrItem);
           selectTrueAgrFalse = false;
         } else {
@@ -116,14 +119,14 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
         }
         break;
       case SynState::selectItemEnd:
-        if (token == Token::id) {
+        if (token == Token::id || token == Token::asterisk) {
           state = SynState::selectItemDivide;
           projectItem.column = std::get<1>(it);
           result.project.data.emplace_back(projectItem);
           selectTrueAgrFalse = true;
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
-                                            {Token::id},
+                                            {Token::id, Token::asterisk},
                                             it));
         }
         break;
@@ -404,6 +407,8 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
                                          LogicOperator::none);
         } else if (token == Token::semicolon) {
           state = SynState::end;
+          result.where.data.emplace_back(whereItem,
+                                         LogicOperator::none);
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::pipe, Token::logicOr,
@@ -611,6 +616,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
           result.having.data.emplace_back(havingItem, LogicOperator::none);
         } else if (token == Token::semicolon) {
           state = SynState::end;
+          result.having.data.emplace_back(havingItem, LogicOperator::none);
         } else {
           throw SyntaxException(getErrorMsg(SynErrType::wrong,
                                             {Token::pipe, Token::logicOr,

@@ -10,9 +10,10 @@
 #include <regex>
 #include <string>
 #include <vector>
-#include "Types.h"
 #include "Exceptions.h"
+#include <decimal.h>
 
+typedef dec::decimal<2> Currency;
 class DateTime;
 
 /**
@@ -73,13 +74,6 @@ bool isInteger(std::string_view value);
 bool isDouble(std::string_view value);
 
 /**
- * Ziskani typu hodnoty za pomoci regex
- * @param value
- * @return
- */
-ValueType getType(std::string_view value);
-
-/**
  * Kontrola, jestli string konci jinym stringem
  * @param value Kontrolovany string
  * @param ending Hledany konec
@@ -95,6 +89,8 @@ bool endsWith(std::string_view value, std::string_view ending);
  */
 gsl::zstring<> copyStringToNewChar(std::string_view str);
 
+template<typename T>
+int8_t compare(const T &a, const T &b);
 /**
  * Srovnani integer hodnot
  * @param a
@@ -135,6 +131,11 @@ int8_t compareString(std::string_view a, std::string_view b);
  */
 int8_t compareDateTime(const DateTime &a, const DateTime &b);
 
+/**
+ * Generates a string with given length. The string contains alphanumeric symbols
+ * @param length desired length of the string
+ * @return
+ */
 std::string getRandomString(size_t length);
 
 std::string toLower(const std::string &str);

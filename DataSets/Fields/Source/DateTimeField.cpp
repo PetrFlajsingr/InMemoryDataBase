@@ -22,14 +22,12 @@ std::string_view DataSets::DateTimeField::getAsString() const {
   return data.toString();
 }
 
-std::function<int8_t(const DataSets::DataSetRow *,
-                     const DataSets::DataSetRow *)> DataSets::DateTimeField::getCompareFunction() const {
+std::function<int8_t(const DataSetRow *,
+                     const DataSetRow *)> DataSets::DateTimeField::getCompareFunction() const {
   return [this](const DataSetRow *a,
                 const DataSetRow *b) {
-    return Utilities::compareDateTime(*a->cells[getIndex()
-                                          & 0x00FFFF]._dateTime,
-                                      *b->cells[getIndex()
-                                          & 0x00FFFF]._dateTime);
+    return Utilities::compareDateTime(*(*a)[getIndex() & 0x00FFFF]._dateTime,
+                                      *(*b)[getIndex() & 0x00FFFF]._dateTime);
   };
 }
 

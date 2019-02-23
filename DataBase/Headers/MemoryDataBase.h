@@ -8,73 +8,78 @@
 #include <vector>
 #include <string>
 #include <BaseDataSet.h>
-#include <Relation.h>
 #include <MemoryViewDataSet.h>
 #include <Exceptions.h>
 #include <QueryCommon.h>
+#include <LexicalAnalyser.h>
+#include <SyntaxAnalyser.h>
+#include <SemanticAnalyser.h>
+#include <MemoryDataSet.h>
+#include <AggregationMaker.h>
 
 namespace DataBase {
-class Rel;
 
 struct Table {
-  std::shared_ptr<DataSets::BaseDataSet> dataSet;
-  std::vector<Rel> relations;
+  std::shared_ptr<DataSets::MemoryDataSet> dataSet;
+
+  explicit Table(const std::shared_ptr<DataSets::MemoryDataSet> &dataSet);
 };
 
 struct View {
-  Table *table;
   std::shared_ptr<DataSets::MemoryViewDataSet> dataSet;
-  std::vector<Rel> relations;
-};
 
-class Rel {
- public:
-  Table secondary;
-  std::shared_ptr<DataSets::BaseField> primaryField;
-  std::shared_ptr<DataSets::BaseField> secondaryField;
-
-  std::string name;
-
-  std::vector<std::pair<DataSets::DataSetRow *, DataSets::DataSetRow *>>
-      connectedData;
-
-  void rebuildConnections();
+  explicit View(const std::shared_ptr<DataSets::MemoryViewDataSet> &dataSet);
 };
 
 class MemoryDataBase {
  public:
-  MemoryDataBase(const std::string &name);
+  explicit MemoryDataBase(const std::string &name);
 
-  void addTable(std::shared_ptr<DataSets::BaseDataSet> dataSet);
+  void addTable(std::shared_ptr<DataSets::MemoryDataSet> dataSet);
 
   void removeTable(std::string_view tableName);
 
-  void addRelation(std::string_view relationName,
-                   RelationType type,
-                   std::string_view table1Name,
-                   std::string_view table2Name);
+  void removeView(std::string_view viewName);
 
-  void cancelRelation(std::string_view relationName);
+  std::shared_ptr<Table> tableByName(std::string_view tableName) const;
 
-  std::shared_ptr<DataSets::MemoryViewDataSet> execSimpleQuery(
+  std::shared_ptr<View> execSimpleQuery(
       std::string_view query,
       bool keepView,
       std::string_view viewName);
 
-  std::shared_ptr<DataSets::BaseDataSet> execAggregateQuery(
+  std::shared_ptr<View> execAggregateQuery(
       std::string_view query,
       std::string_view viewName);
 
   std::string_view getName() const;
 
-  void validateQuery(StructuredQuery query) const;
-
  private:
-  std::vector<Table> tables;
+  std::vector<std::shared_ptr<Table>> tables;
   std::vector<std::shared_ptr<View>> views;
+
+  StructuredQuery validateQuery(StructuredQuery &query) const;
+
+  StructuredQuery parseQuery(std::string_view query);
 
   std::string name;
 
+  LexicalAnalyser lexicalAnalyser;
+  SyntaxAnalyser syntaxAnalyser;
+  SemanticAnalyser semanticAnalyser;
+
+  // operations on views
+  std::shared_ptr<View> doJoin(const StructuredQuery &query);
+  // TODO: implement and/or
+  std::shared_ptr<View> doWhere(const StructuredQuery &query,
+                                std::shared_ptr<View> &view);
+  std::shared_ptr<View> doOrder(const StructuredQuery &query,
+                                std::shared_ptr<View> &view);
+  std::shared_ptr<View> doProject(const StructuredQuery &query,
+                                  std::shared_ptr<View> &view);
+
+  std::shared_ptr<View> doHaving(const StructuredQuery &query,
+                                 std::shared_ptr<View> &view);
 };
 
 }  // namespace DataBase

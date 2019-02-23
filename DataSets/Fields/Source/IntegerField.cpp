@@ -37,11 +37,11 @@ int DataSets::IntegerField::getAsInteger() const {
   return data;
 }
 
-std::function<int8_t(const DataSets::DataSetRow *,
-                     const DataSets::DataSetRow *)> DataSets::IntegerField::getCompareFunction() const {
+std::function<int8_t(const DataSetRow *,
+                     const DataSetRow *)> DataSets::IntegerField::getCompareFunction() const {
   return [this](const DataSetRow *a,
                 const DataSetRow *b) {
-    return Utilities::compareInt(a->cells[getIndex() & 0x00FFFF]._integer,
-                                 b->cells[getIndex() & 0x00FFFF]._integer);
+    return Utilities::compareInt((*a)[getIndex() & 0x00FFFF]._integer,
+                                 (*b)[getIndex() & 0x00FFFF]._integer);
   };
 }
