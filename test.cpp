@@ -74,7 +74,11 @@ void agrTest() {
   }
 }
 
-int main() {
+int main(int argc, char **argv) {
+  if (argc == 3 && Utilities::compareString(argv[1], "-script") == 0) {
+    CLIController::RunScript(argv[2]);
+    return 0;
+  }
   CLIController controller;
   controller.runApp();
   return 0;

@@ -153,7 +153,7 @@ bool ScriptParser::runCommand(ScriptParser::Command command) {
       if (AppContext::GetInstance().DBs.find(dbName)
           == AppContext::GetInstance().DBs.end()) {
         ConsoleIO::writeLnErr("DataBase doesn't exist.");
-        return;
+        return false;
       }
       DataProviders::BaseDataProvider *provider;
       switch (fileType) {

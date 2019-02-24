@@ -43,7 +43,7 @@ void CLIController::runApp() {
               break;
             case CmdType::help:printHelp();
               break;
-            case CmdType::runScript:runScript();
+            case CmdType::runScript:RunScript(scriptPath);
               break;
             case CmdType::listDBs:ConsoleIO::writeLn("List of DataBases:");
               for (const auto &db : AppContext::GetInstance().DBs) {
@@ -149,9 +149,10 @@ void CLIController::printHelp() {
                    "clear\t\tclear/c\n");
 }
 
-void CLIController::runScript() {
+void CLIController::RunScript(std::string_view scriptPath) {
+  auto path = std::string(scriptPath);
+  std::ifstream input(path);
   auto scriptRunner = ScriptParser::GetInstance();
-  std::ifstream input(scriptPath);
   if (!input.is_open()) {
     ConsoleIO::writeLnErr("Can't open script file.");
   }

@@ -12,6 +12,7 @@ class CLIController {
  public:
   CLIController();
   void runApp();
+  static void RunScript(std::string_view scriptPath);
  private:
   enum class CmdType {
     runScript,
@@ -33,8 +34,6 @@ class CLIController {
   CmdType handleCommand(std::string_view command);
 
   void printHelp();
-
-  void runScript();
 };
 
 #endif //PROJECT_CLICONTROLLER_H
