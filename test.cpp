@@ -16,6 +16,7 @@
 #include <ThreadPool.h>
 #include <FileDownloader.h>
 #include <FileDownloadManager.h>
+#include <moor/archive_reader.hpp>
 
 void terminate_handler();
 
@@ -38,7 +39,20 @@ class Obs : public FileDownloadObserver {
 };
 
 int main(int argc, char **argv) {
-  FileDownloadManager man;
+  CLIController cl;
+  cl.runApp();
+  /*moor::ArchiveReader reader("/Users/petr/Downloads/libarchive-3.3.3.tar");
+  bool ex = true;
+  while (ex) {
+    auto va = reader.ExtractNext();
+    if (va.first.empty()) {
+      ex = false;
+    }
+    std::cout << va.first <<std::endl;
+  }
+
+  return 0;*/
+  /*FileDownloadManager man;
   Obs obs;
   man.enqueueDownload("/Users/petr/Desktop/dl/",
                       "https://en.cppreference.com/w/cpp",
@@ -64,7 +78,7 @@ int main(int argc, char **argv) {
                       false);
 
   std::this_thread::sleep_for(std::chrono::seconds(10));
-  return 0;
+  return 0;*/
 }
 
 

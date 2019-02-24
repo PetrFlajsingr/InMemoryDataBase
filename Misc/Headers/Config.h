@@ -9,6 +9,8 @@
 #include <unordered_map>
 #include <vector>
 #include <Utilities.h>
+#include <Exceptions.h>
+#include <fstream>
 
 /**
  * Config in files using categories & key value pairs
@@ -57,6 +59,19 @@ class Config {
       save();
     }
     return defaultVal;
+  }
+
+  template<typename T>
+  T getValue(std::string_view category,
+             std::string_view key) {
+    if (categories.find(std::string(category)) != categories.end()) {
+      auto cat = categories[std::string(category)];
+      if (cat.find(std::string(key)) != cat.end()) {
+        return fromString<T>(cat[std::string(key)]);
+      }
+    }
+    throw ResourceNotFoundException(
+        "Resource [" + std::string(category) + "[" + std::string(key) + "]]");
   }
 
   template<typename T>

@@ -5,7 +5,6 @@
 #include <AppContext.h>
 
 #include "AppContext.h"
-AppContext::AppContext() = default;
 AppContext &AppContext::GetInstance() {
   static AppContext instance;
   return instance;

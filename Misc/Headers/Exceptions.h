@@ -84,4 +84,19 @@ class DataBaseException : public std::exception {
     return errorMessage;
   }
 };
+
+class ResourceNotFoundException : public std::exception {
+ private:
+  const gsl::czstring<> errorMessage;
+ public:
+  explicit ResourceNotFoundException(const std::string &errorMessage)
+      : errorMessage(
+      errorMessage.c_str()) {}
+  explicit ResourceNotFoundException(const gsl::czstring<> message)
+      : errorMessage(message) {}
+
+  char const *what() const noexcept override {
+    return errorMessage;
+  }
+};
 #endif  //  MISC_HEADERS_EXCEPTIONS_H_

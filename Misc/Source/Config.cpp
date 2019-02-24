@@ -31,10 +31,10 @@ void Config::load() {
       categories[curCat] = {};
     } else {
       auto parts = Utilities::splitStringByDelimiter(line, "=");
-      if (parts.size() != 3) {
+      if (parts.size() != 2) {
         continue;
       }
-      categories[curCat][parts[0]] = parts[2];
+      categories[curCat][parts[0]] = parts[1];
     }
   }
 }
