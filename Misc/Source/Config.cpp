@@ -15,10 +15,11 @@ Config::Config(const std::string &path, bool autoCommit)
     std::ofstream newFile(path);
     file.open(path);
   }
-  load(file);
+  load();
 }
 
-void Config::load(std::ifstream &file) {
+void Config::load() {
+  std::ifstream file(path);
   std::string line;
   std::string curCat;
   while (std::getline(file, line)) {
@@ -38,7 +39,8 @@ void Config::load(std::ifstream &file) {
   }
 }
 
-void Config::save(std::ofstream &file) {
+void Config::save() {
+  std::ofstream file(path);
   for (const auto &cat : categories) {
     file << "[" << cat.first << "]\n";
     for (const auto &val : cat.second) {
@@ -46,6 +48,13 @@ void Config::save(std::ofstream &file) {
     }
   }
 }
-Config::~Config() {
 
+Config::~Config() {
+  commit();
+}
+
+void Config::commit() {
+  if (!autoCommit) {
+    save();
+  }
 }

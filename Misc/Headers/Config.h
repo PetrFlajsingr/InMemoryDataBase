@@ -10,6 +10,9 @@
 #include <vector>
 #include <Utilities.h>
 
+/**
+ * Config in files using categories & key value pairs
+ */
 class Config {
   template<typename T>
   std::string toString(T val) {
@@ -51,7 +54,7 @@ class Config {
     categories[category][key] = toString(defaultVal);
     if (autoCommit) {
       std::ofstream file(path);
-      save(file);
+      save();
     }
     return defaultVal;
   }
@@ -62,10 +65,11 @@ class Config {
                 T value) {
     categories[category][key] = toString(value);
     if (autoCommit) {
-      std::ofstream file(path);
-      save(file);
+      save();
     }
   }
+
+  void commit();
  private:
   std::string path;
   bool autoCommit;
@@ -73,8 +77,8 @@ class Config {
   std::unordered_map<std::string, std::unordered_map<std::string, std::string>>
       categories;
 
-  void load(std::ifstream &file);
-  void save(std::ofstream &file);
+  void load();
+  void save();
 };
 
 #endif //PROJECT_CONFIG_H
