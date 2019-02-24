@@ -12,7 +12,6 @@
 #include <thread>
 
 #include <BaseDataSet.h>
-#include <MemoryDataWorker.h>
 #include "Types.h"
 #include "FilterStructures.h"
 #include "Exceptions.h"

@@ -11,6 +11,7 @@
 #include <CsvReader.h>
 #include <XlsxWriter.h>
 #include <CLIController.h>
+#include <CsvWriter.h>
 
 void terminate_handler() {
   try {

@@ -18,7 +18,6 @@ include_directories(DataSets/Fields/Headers)
 include_directories(FileDownloaders/Headers)
 include_directories(third_party/Decimal)
 include_directories(CLI/Headers)
-include_directories(DataWorkers/Headers)
 include_directories(DataBase/Headers)
 include_directories(DataBase/QueryParser/Headers)
 include_directories(third_party/xlsxio/include)
@@ -36,11 +35,6 @@ FILE(GLOB DataSetTestsG DataSets/tests/Gtests*.cpp)
 
 FILE(GLOB FieldSources DataSets/Fields/Source/*.cpp)
 FILE(GLOB FieldHeaders DataSets/Fields/Headers/*.h)
-
-FILE(GLOB DataWorkerSources DataWorkers/Source/*.cpp)
-FILE(GLOB DataWorkerHeaders DataWorkers/Headers/*.h)
-FILE(GLOB DataWorkerTests DataWorkers/tests/*catch*.cpp)
-FILE(GLOB DataWorkerTestsG DataWorkers/tests/Gtests*.cpp)
 
 FILE(GLOB DataWriterSources DataWriters/Source/*.cpp)
 FILE(GLOB DataWriterHeaders DataWriters/Headers/*.h)
@@ -74,7 +68,6 @@ set(SOURCE_FILES
         ${DataSetSources}
         ${QueryParserSources}
         ${FieldSources}
-        ${DataWorkerSources}
         ${DataWriterSources}
         ${MiscSources}
         ${RelationLayerSources}
@@ -85,7 +78,6 @@ set(TEST_SOURCE_FILES
         ${SOURCE_FILES}
         ${DataProviderTests}
         ${DataSetTests}
-        ${DataWorkerTests}
         ${DataWriterTests}
         ${MiscTests}
         ${RelationLayerTests})
@@ -94,7 +86,6 @@ set(GTEST_SOURCE_FILES
         ${SOURCE_FILES}
         ${DataProviderTestsG}
         ${DataSetTestsG}
-        ${DataWorkerTestsG}
         ${DataWriterTestsG}
         ${MiscTestsG})
 
