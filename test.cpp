@@ -42,25 +42,26 @@ int main(int argc, char **argv) {
   Obs obs;
   man.enqueueDownload("/Users/petr/Desktop/dl/",
                       "https://en.cppreference.com/w/cpp",
-                      obs);
+                      obs, false);
   man.enqueueDownload("/Users/petr/Desktop/dl/",
                       "https://en.cppreference.com/w/cpp/language",
-                      obs);
+                      obs, false);
   man.enqueueDownload("/Users/petr/Desktop/dl/",
                       "https://en.cppreference.com/w/cpp/memory_model",
-                      obs);
+                      obs, true);
   man.enqueueDownload("/Users/petr/Desktop/dl/",
                       "https://en.cppreference.com/w/cpp/namespace_alias",
-                      obs);
+                      obs, false);
   man.enqueueDownload("/Users/petr/Desktop/dl/",
                       "https://en.cppreference.com/w/cpp/operator_other",
-                      obs);
+                      obs, false);
   man.enqueueDownload("/Users/petr/Desktop/dl/",
                       "https://en.cppreference.com/w/cpp/adl",
-                      obs);
+                      obs, true);
   man.enqueueDownload("/Users/petr/Desktop/dl/",
                       "https://en.cppreference.com/w/cpp/partial_specialization",
-                      obs);
+                      obs,
+                      false);
 
   std::this_thread::sleep_for(std::chrono::seconds(10));
   return 0;

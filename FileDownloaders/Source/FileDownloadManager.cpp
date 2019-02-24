@@ -15,13 +15,18 @@ FileDownloadManager::FileDownloadManager()
 
 void FileDownloadManager::enqueueDownload(const std::string &localFolder,
                                           const std::string &url,
-                                          FileDownloadObserver &observer) {
+                                          FileDownloadObserver &observer,
+                                          bool blocking) {
   auto downloadTask = [=, &observer] {
     FileDownloader downloader(localFolder);
     downloader.addObserver(&observer);
     downloader.downloadFile(url);
   };
-  threadPool.enqueue(downloadTask);
+  if (!blocking) {
+    threadPool.enqueue(downloadTask);
+  } else {
+    threadPool.enqueue(downloadTask).get();
+  }
 }
 
 FileDownloadManager::~FileDownloadManager() {

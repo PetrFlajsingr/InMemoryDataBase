@@ -16,7 +16,8 @@ class FileDownloadManager {
 
   void enqueueDownload(const std::string &localFolder,
                        const std::string &url,
-                       FileDownloadObserver &observer);
+                       FileDownloadObserver &observer,
+                       bool blocking = false);
  private:
   ThreadPool threadPool;
 };
