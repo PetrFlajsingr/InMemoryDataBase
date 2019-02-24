@@ -10,7 +10,7 @@
 #include <set>
 #include <unordered_set>
 #include <XlsxWriter.h>
-#include <BaseFileDownloader.h>
+#include <FileDownloader.h>
 #include <ArrayDataProvider.h>
 
 const std::string csvPath = "/Users/petr/Desktop/csvs/";

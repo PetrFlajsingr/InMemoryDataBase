@@ -139,6 +139,8 @@ int8_t compareDateTime(const DateTime &a, const DateTime &b);
 std::string getRandomString(size_t length);
 
 std::string toLower(const std::string &str);
+
+int getCoreCount();
 }  // namespace Utilities
 
 #endif //  MISC_HEADERS_UTILITIES_H_

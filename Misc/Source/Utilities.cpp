@@ -5,6 +5,7 @@
 #include <Utilities.h>
 #include <DateTimeUtils.h>
 #include <Types.h>
+#include <thread>
 
 std::vector<std::string> Utilities::splitStringByDelimiter(std::string_view str,
                                                            std::string_view delimiter) {
@@ -174,4 +175,11 @@ int8_t Utilities::compare(const T &a, const T &b) {
     return 1;
   }
   return -1;
+}
+int Utilities::getCoreCount() {
+  auto result = std::thread::hardware_concurrency();
+  if (result == 0) {
+    result = 1;
+  }
+  return result;
 }

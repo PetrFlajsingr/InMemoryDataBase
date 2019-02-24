@@ -13,6 +13,59 @@
 #include <CLIController.h>
 #include <CsvWriter.h>
 #include <Config.h>
+#include <ThreadPool.h>
+#include <FileDownloader.h>
+#include <FileDownloadManager.h>
+
+void terminate_handler();
+
+int cnt = 0;
+
+class Obs : public FileDownloadObserver {
+ public:
+  void onDownloadStarted(std::string_view fileName) override {
+    std::cout << "Started " << fileName << std::endl;
+  }
+  void onDownloadFailed(std::string_view fileName,
+                        std::string_view errorMessage) override {
+    std::cout << "failed " << fileName << std::endl;
+  }
+  void onDownloadFinished(std::string_view fileName,
+                          std::string_view filePath) override {
+    std::cout << "finished " << fileName << " downloaded to: " << filePath
+              << std::endl;
+  }
+};
+
+int main(int argc, char **argv) {
+  FileDownloadManager man;
+  Obs obs;
+  man.enqueueDownload("/Users/petr/Desktop/dl/",
+                      "https://en.cppreference.com/w/cpp",
+                      obs);
+  man.enqueueDownload("/Users/petr/Desktop/dl/",
+                      "https://en.cppreference.com/w/cpp/language",
+                      obs);
+  man.enqueueDownload("/Users/petr/Desktop/dl/",
+                      "https://en.cppreference.com/w/cpp/memory_model",
+                      obs);
+  man.enqueueDownload("/Users/petr/Desktop/dl/",
+                      "https://en.cppreference.com/w/cpp/namespace_alias",
+                      obs);
+  man.enqueueDownload("/Users/petr/Desktop/dl/",
+                      "https://en.cppreference.com/w/cpp/operator_other",
+                      obs);
+  man.enqueueDownload("/Users/petr/Desktop/dl/",
+                      "https://en.cppreference.com/w/cpp/adl",
+                      obs);
+  man.enqueueDownload("/Users/petr/Desktop/dl/",
+                      "https://en.cppreference.com/w/cpp/partial_specialization",
+                      obs);
+
+  std::this_thread::sleep_for(std::chrono::seconds(10));
+  return 0;
+}
+
 
 void terminate_handler() {
   try {
@@ -29,206 +82,4 @@ void terminate_handler() {
     std::cerr << "Unknown exception of type" << std::endl;
   }
   abort();
-}
-
-void agrTest() {
-  const std::string file1 = "/Users/petr/Desktop/agr test/big.csv";
-  const std::string file2 = "/Users/petr/Desktop/agr test/test2.csv";
-  const std::string outFile = "/Users/petr/Desktop/agr_test_out.csv";
-  auto prov1 = DataProviders::CsvReader(file1, ";");
-  auto prov2 = DataProviders::CsvReader(file2);
-  auto ds1 = std::make_shared<DataSets::MemoryDataSet>("t1");
-  ds1->open(prov1,
-            {ValueType::Integer, ValueType::Currency, ValueType::Integer,
-             ValueType::Integer});
-  auto ds2 = std::make_shared<DataSets::MemoryDataSet>("t2");
-  ds2->open(prov2,
-            {ValueType::Integer, ValueType::Currency, ValueType::Integer,
-             ValueType::Integer});
-
-  DataBase::MemoryDataBase db("testDB");
-  db.addTable(ds1);
-  db.addTable(ds2);
-
-  const std::string
-      query = "select t1.gr1, t1.gr2, sum(t1.suma) "
-              "from t1 "
-              "group by t1.gr1, t1.gr2 "
-              "having sum(t1.suma) = 1;";
-
-  auto view = db.execAggregateQuery(query, "tmpView");
-
-  auto writer = DataWriters::CsvWriter(outFile);
-
-  writer.writeHeader(view->dataSet->getFieldNames());
-
-  auto fields = view->dataSet->getFields();
-
-  while (view->dataSet->next()) {
-    std::vector<std::string> record;
-    std::transform(fields.begin(),
-                   fields.end(),
-                   std::back_inserter(record),
-                   [](const DataSets::BaseField *field) {
-                     return std::string(field->getAsString());
-                   });
-    writer.writeRecord(record);
-  }
-}
-
-int main(int argc, char **argv) {
-  Config config("/Users/petr/Desktop/test.conf", true);
-
-  config.setValue("test", "key", 100);
-  config.setValue("test", "A", 100);
-  config.setValue("test", "V", 2);
-  config.setValue("wat man", "asdas", "čupakabra");
-  config.setValue("test", "C", 99);
-  config.setValue("test", "D", "test");
-
-  auto value = config.getValue("test", "key", 0);
-  std::cout << value << std::endl;
-
-  config.getValue("wat man", "jes", 10.11);
-  auto val = config.getValue("wat man", "jes", 10.0);
-  std::cout << val << std::endl;
-
-  /*if (argc == 3 && Utilities::compareString(argv[1], "-script") == 0) {
-    CLIController::RunScript(argv[2]);
-    return 0;
-  }
-  CLIController controller;
-  controller.runApp();
-  return 0;*/
-  //std::set_terminate(terminate_handler);
-
-  /*const std::string registr = "/Users/petr/Desktop/csvs/export-2019-02.csv";
-  const std::string nno = "/Users/petr/Desktop/csvs/NNO_subjekty6ver2.4.csv";
-
-  auto prov1 = DataProviders::CsvReader(registr, ";");
-  auto prov2 = DataProviders::CsvReader(nno, ";");
-
-  auto ds1 = std::make_shared<DataSets::MemoryDataSet>("registr");
-  std::vector<ValueType> types {ValueType::Integer,
-                                  ValueType::Integer,
-                                  ValueType::Integer,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::Integer,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::Integer,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String,
-                                  ValueType::String};
-  ds1->open(prov1, types);
-  auto ds2 = std::make_shared<DataSets::MemoryDataSet>("nno");
-  ds2->open(prov2, {ValueType::Integer,
-                    ValueType::Integer,
-                    ValueType::Integer,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String});
-
-  DataBase::MemoryDataBase db("testDB");
-  db.addTable(ds1);
-  db.addTable(ds2);
-
-  const std::string
-      query = "select nno.ICO_num, registr.PoskytovatelNazev, registr.PravniFormaKod, "
-              "registr.PscSidlo, registr.ObecSidlo, registr.UliceSidlo, "
-              "registr.CisloDomovniOrientacniSidlo, registr.NazevCely, "
-              "registr.DruhZarizeni, registr.FormaPece, registr.OborPece, "
-              "registr.Obec, registr.Psc, registr.Ulice, registr.CisloDomovniOrientacni, "
-              "nno.X, nno.Y "
-              "from nno "
-              "join registr on nno.ICO_num = registr.Ico;";
-
-  auto view = db.execSimpleQuery(query, false, "wat");
-
-  auto writer = DataWriters::CsvWriter("/Users/petr/Desktop/wow.csv");
-  writer.writeHeader(view->dataSet->getFieldNames());
-  auto fields = view->dataSet->getFields();
-  while (view->dataSet->next()) {
-    std::vector<std::string> record;
-    std::transform(fields.begin(),
-                   fields.end(),
-                   std::back_inserter(record),
-                   [](const DataSets::BaseField *field) {
-                     return std::string(field->getAsString());
-                   });
-    writer.writeRecord(record);
-  }
-
-  return 0;*/
-
-
-  /*const std::string file1 = "/Users/petr/Desktop/join_test_1.csv";
-  const std::string file2 = "/Users/petr/Desktop/join_test_2.csv";
-  const std::string outFile = "/Users/petr/Desktop/join_test_out.csv";
-  auto prov1 = DataProviders::CsvReader(file1);
-  auto prov2 = DataProviders::CsvReader(file2);
-  auto ds1 = std::make_shared<DataSets::MemoryDataSet>("test1");
-  ds1->open(prov1, {ValueType::String, ValueType::String, ValueType::Integer});
-  auto ds2 = std::make_shared<DataSets::MemoryDataSet>("test2");
-  ds2->open(prov2, {ValueType::String, ValueType::String, ValueType::Integer});
-
-  DataBase::MemoryDataBase db("testDB");
-  db.addTable(ds1);
-  db.addTable(ds2);
-
-  const std::string
-      query = "select test1.*, test2.B, test2.C "
-              "from test1 join test2 on test1.A1 = test2.A left join test2 on test1.A1 = test2.A "
-              //"where test1.A1 = \"A\" | \"B\" and test1.C1 = 11 | 22 | 33 | 44 and test2.A = \"A\" "
-              "order by test2.A asc, test2.C desc;";
-
-  auto view = db.execSimpleQuery(query, false, "tmpView");
-
-  auto writer = DataWriters::CsvWriter(outFile);
-
-  writer.writeHeader(view->dataSet->getFieldNames());
-
-  auto fields = view->dataSet->getFields();
-
-  while (view->dataSet->next()) {
-    std::vector<std::string> record;
-    std::transform(fields.begin(),
-                   fields.end(),
-                   std::back_inserter(record),
-                   [](const DataSets::BaseField *field) {
-                     return std::string(field->getAsString());
-                   });
-    writer.writeRecord(record);
-  }
-
-  return 0;*/
-
 }

@@ -90,17 +90,24 @@ set(GTEST_SOURCE_FILES
         ${MiscTestsG})
 
 
+FIND_PACKAGE(CURL)
+include_directories(${CURL_INCLUDE_DIR})
+
+
 add_executable(cedr cedr.cpp ${SOURCE_FILES})
 add_executable(test test.cpp ${SOURCE_FILES})
 add_executable(catch_tests ${TEST_SOURCE_FILES})
 
 target_link_libraries(cedr xlsxio_read)
 target_link_libraries(cedr xlsxio_write)
+target_link_libraries(cedr ${CURL_LIBRARIES})
 
 target_link_libraries(catch_tests xlsxio_read)
 target_link_libraries(catch_tests xlsxio_write)
+target_link_libraries(catch_tests ${CURL_LIBRARIES})
 
 target_link_libraries(test xlsxio_read)
 target_link_libraries(test xlsxio_write)
+target_link_libraries(test ${CURL_LIBRARIES})
 
 
