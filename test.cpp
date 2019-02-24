@@ -12,6 +12,7 @@
 #include <XlsxWriter.h>
 #include <CLIController.h>
 #include <CsvWriter.h>
+#include <Config.h>
 
 void terminate_handler() {
   try {
@@ -76,13 +77,29 @@ void agrTest() {
 }
 
 int main(int argc, char **argv) {
-  if (argc == 3 && Utilities::compareString(argv[1], "-script") == 0) {
+  Config config("/Users/petr/Desktop/test.conf", true);
+
+  config.setValue("test", "key", 100);
+  config.setValue("test", "A", 100);
+  config.setValue("test", "V", 2);
+  config.setValue("wat man", "asdas", "čupakabra");
+  config.setValue("test", "C", 99);
+  config.setValue("test", "D", "test");
+
+  auto value = config.getValue("test", "key", 0);
+  std::cout << value << std::endl;
+
+  config.getValue("wat man", "jes", 10.11);
+  auto val = config.getValue("wat man", "jes", 10.0);
+  std::cout << val << std::endl;
+
+  /*if (argc == 3 && Utilities::compareString(argv[1], "-script") == 0) {
     CLIController::RunScript(argv[2]);
     return 0;
   }
   CLIController controller;
   controller.runApp();
-  return 0;
+  return 0;*/
   //std::set_terminate(terminate_handler);
 
   /*const std::string registr = "/Users/petr/Desktop/csvs/export-2019-02.csv";
