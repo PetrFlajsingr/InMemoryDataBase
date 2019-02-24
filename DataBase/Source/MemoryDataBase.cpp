@@ -9,6 +9,9 @@
 
 DataBase::Table::Table(const std::shared_ptr<DataSets::MemoryDataSet> &dataSet)
     : dataSet(dataSet) {}
+std::string_view DataBase::Table::getName() {
+  return dataSet->getName();
+}
 DataBase::View::View(const std::shared_ptr<DataSets::MemoryViewDataSet> &dataSet)
     : dataSet(dataSet) {}
 
@@ -358,4 +361,7 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doHaving(
       view->dataSet->filter(filterOptions)));
   result->dataSet->addParents(view->dataSet->getParents());
   return result;
+}
+const std::vector<std::shared_ptr<DataBase::Table>> &DataBase::MemoryDataBase::getTables() const {
+  return tables;
 }

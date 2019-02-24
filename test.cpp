@@ -10,6 +10,7 @@
 #include <JoinMaker.h>
 #include <CsvReader.h>
 #include <XlsxWriter.h>
+#include <CLIController.h>
 
 void terminate_handler() {
   try {
@@ -74,55 +75,57 @@ void agrTest() {
 }
 
 int main() {
-  agrTest();
+  CLIController controller;
+  controller.runApp();
   return 0;
   //std::set_terminate(terminate_handler);
 
-  /*const std::string registr = "/Users/petr/Desktop/registr.csv";
+  /*const std::string registr = "/Users/petr/Desktop/csvs/export-2019-02.csv";
   const std::string nno = "/Users/petr/Desktop/csvs/NNO_subjekty6ver2.4.csv";
 
-  auto prov1 = DataProviders::CsvReader(registr, ",");
+  auto prov1 = DataProviders::CsvReader(registr, ";");
   auto prov2 = DataProviders::CsvReader(nno, ";");
 
   auto ds1 = std::make_shared<DataSets::MemoryDataSet>("registr");
-  ds1->open(prov1, {ValueType::Integer,
-                    ValueType::Integer,
-                    ValueType::Integer,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::Integer,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::Integer,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String});
+  std::vector<ValueType> types {ValueType::Integer,
+                                  ValueType::Integer,
+                                  ValueType::Integer,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::Integer,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::Integer,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String};
+  ds1->open(prov1, types);
   auto ds2 = std::make_shared<DataSets::MemoryDataSet>("nno");
   ds2->open(prov2, {ValueType::Integer,
                     ValueType::Integer,
@@ -137,25 +140,18 @@ int main() {
   db.addTable(ds2);
 
   const std::string
-      query = "select nno.*, registr.id, registr.pcz, registr.pcdp, "
-              "registr.nazev, registr.typ, registr.adresa_nazev_obce, "
-              "registr.adresa_psc, registr.adresa_nazev_ulice, "
-              "registr.adresa_cislo_domovni, registr.adresa_nazev_kraje, "
-              "registr.adresa_kod_kraje, registr.adresa_nazev_okresu, "
-              "registr.adresa_kod_okresu, registr.spravni_obvod, registr.nazev_zkraceny, "
-              "registr.poskytovatel_ic, registr.poskytovatel_pravni_forma_osoba, "
-              "registr.poskytovatel_pravni_forma, registr.sidlo_adresa_kod_kraje, "
-              "registr.sidlo_adresa_nazev_kraje, registr.sidlo_adresa_kod_okresu, "
-              "registr.sidlo_adresa_nazev_okresu, registr.sidlo_adresa_psc, "
-              "registr.sidlo_adresa_nazev_obce, registr.sidlo_adresa_nazev_ulice, "
-              "registr.sidlo_adresa_cislo_domovni, registr.obor_pece, "
-              "registr.forma_pece, registr.druh_pece, registr.poskytovatel_souradnice "
+      query = "select nno.ICO_num, registr.PoskytovatelNazev, registr.PravniFormaKod, "
+              "registr.PscSidlo, registr.ObecSidlo, registr.UliceSidlo, "
+              "registr.CisloDomovniOrientacniSidlo, registr.NazevCely, "
+              "registr.DruhZarizeni, registr.FormaPece, registr.OborPece, "
+              "registr.Obec, registr.Psc, registr.Ulice, registr.CisloDomovniOrientacni, "
+              "nno.X, nno.Y "
               "from nno "
-              "join registr on nno.ICO_num = registr.poskytovatel_ic;";
+              "join registr on nno.ICO_num = registr.Ico;";
 
   auto view = db.execSimpleQuery(query, false, "wat");
 
-  auto writer = DataWriters::XlsxWriter("/Users/petr/Desktop/wow.xlsx");
+  auto writer = DataWriters::CsvWriter("/Users/petr/Desktop/wow.csv");
   writer.writeHeader(view->dataSet->getFieldNames());
   auto fields = view->dataSet->getFields();
   while (view->dataSet->next()) {

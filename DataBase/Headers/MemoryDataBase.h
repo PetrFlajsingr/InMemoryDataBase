@@ -22,6 +22,8 @@ namespace DataBase {
 struct Table {
   std::shared_ptr<DataSets::MemoryDataSet> dataSet;
 
+  std::string_view getName();
+
   explicit Table(const std::shared_ptr<DataSets::MemoryDataSet> &dataSet);
 };
 
@@ -53,6 +55,8 @@ class MemoryDataBase {
       std::string_view viewName);
 
   std::string_view getName() const;
+
+  const std::vector<std::shared_ptr<Table>> &getTables() const;
 
  private:
   std::vector<std::shared_ptr<Table>> tables;
