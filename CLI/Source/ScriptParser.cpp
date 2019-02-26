@@ -108,7 +108,8 @@ ScriptParser::Command ScriptParser::parseInput(std::string_view input) {
   return Command::unknown;
 }
 
-std::vector<std::string> ScriptParser::tokenize(std::string_view str) {
+std::vector<std::string> ScriptParser::tokenize(std::string_view input) {
+  auto str = ReplaceResources(std::string(input));
   std::vector<std::string> result;
   std::string part;
   bool noSpaces = false;
@@ -257,4 +258,23 @@ bool ScriptParser::runCommand(ScriptParser::Command command) {
 ScriptParser &ScriptParser::GetInstance() {
   static ScriptParser instance;
   return instance;
+}
+std::string ScriptParser::ReplaceResources(std::string input) {
+  std::regex
+      rx(R"(\[[a-zA-Z0-9]*\[[a-zA-Z0-9]*\]\])", std::regex_constants::icase);
+  std::smatch matches;
+  std::string output;
+  while (std::regex_search(input, matches, rx)) {
+    for (gsl::index i = 0; i < matches.size(); ++i) {
+      output += input.substr(0, matches.position(i));
+
+      std::string match(matches[i]);
+      output +=
+          AppContext::GetInstance().getResourceManager()->getResource<std::string>(
+              match);
+    }
+    input = matches.suffix().str();
+  }
+  output += input;
+  return output;
 }

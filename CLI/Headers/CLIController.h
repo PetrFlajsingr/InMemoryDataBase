@@ -41,7 +41,7 @@ class CLIController : public MessageReceiver, public MessageSender {
   std::string savePath;
 
   void handleQuery(std::string_view query);
-  CmdType handleCommand(std::string_view command);
+  CmdType handleCommand(std::string_view input);
 
   void handleInput(std::string_view input);
 

@@ -20,23 +20,27 @@ bool FileDownloader::downloadFile(std::string_view fileName) {
     curl_easy_setopt(curl, CURLOPT_URL, fileName);
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 
+    auto parts = Utilities::splitStringByDelimiter(fileName, "/");
+    auto name = parts.back();
+    //saveFile(readBuffer, downloadLocation + name);
+    FILE *fp;
+    fp = fopen((downloadLocation + name).c_str(), "wb");
+
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 
     notifyDownloadStarted(fileName);
     res = curl_easy_perform(curl);
 
     if (res != CURLE_OK) {
       notifyDownloadFailed(fileName, "dunno");
+      fclose(fp);
       return false;
     }
 
-    auto parts = Utilities::splitStringByDelimiter(fileName, "/");
-    auto name = parts.back();
-    saveFile(readBuffer, downloadLocation + name);
-
     notifyDownloadFinished(fileName, downloadLocation + name);
 
+    fclose(fp);
     curl_easy_cleanup(curl);
   }
   return true;
@@ -67,12 +71,13 @@ void FileDownloader::notifyDownloadFinished(std::string_view fileName,
     observer->onDownloadFinished(fileName, filePath);
   }
 }
-size_t FileDownloader::WriteCallback(void *contents,
+size_t FileDownloader::WriteCallback(void *ptr,
                                      size_t size,
                                      size_t nmemb,
-                                     void *userp) {
-  ((std::string *) userp)->append((char *) contents, size * nmemb);
-  return size * nmemb;
+                                     FILE *stream) {
+  size_t written;
+  written = fwrite(ptr, size, nmemb, stream);
+  return written;
 }
 void FileDownloader::saveFile(std::string_view content,
                               std::string_view location) {

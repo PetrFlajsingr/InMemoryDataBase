@@ -10,6 +10,8 @@
 #include "FileDownloadObserver.h"
 #include <MessageSender.h>
 #include <MessageReceiver.h>
+#include <Utilities.h>
+#include <FileDownloader.h>
 
 class FileDownloadManager : public MessageReceiver, public MessageSender {
  public:
@@ -33,6 +35,18 @@ class FileDownloadManager : public MessageReceiver, public MessageSender {
 
   void unfinished();
   void finished();
+
+  std::function<void(const std::shared_ptr<Download>)> downloadTask
+      = [=](const std::shared_ptr<Download> &msg) {
+        FileDownloader downloader(msg->getData().second);
+        auto cntObs = CountObserver(this);
+        downloader.addObserver(&cntObs);
+        if (auto tmp = commandManager.lock()) {
+          auto dispatchObserver = Dispatcher(tmp);
+          downloader.addObserver(&dispatchObserver);
+        }
+        downloader.downloadFile(msg->getData().first);
+      };
 
   class CountObserver : public FileDownloadObserver {
    public:

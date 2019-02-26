@@ -2,9 +2,7 @@
 // Created by Petr Flajsingr on 2019-02-24.
 //
 
-#include <Utilities.h>
 #include <FileDownloadManager.h>
-#include <FileDownloader.h>
 
 FileDownloadManager::FileDownloadManager(const std::shared_ptr<MessageManager> &commandManager,
                                          const std::shared_ptr<ThreadPool> &threadPool)
@@ -28,7 +26,7 @@ void FileDownloadManager::enqueueDownload(const std::string &localFolder,
   if (!blocking) {
     threadPool->enqueue(downloadTask);
   } else {
-    threadPool->enqueue(downloadTask).get();
+    downloadTask();
   }
 }
 
@@ -40,14 +38,7 @@ FileDownloadManager::~FileDownloadManager() {
 }
 
 void FileDownloadManager::receive(std::shared_ptr<Message> message) {
-  auto downloadTask = [=](const std::shared_ptr<Download> &msg) {
-    FileDownloader downloader(msg->getData().second);
-    auto cntObs = CountObserver(this);
-    downloader.addObserver(&cntObs);
-    auto dispatchObserver = Dispatcher(commandManager.lock());
-    downloader.addObserver(&dispatchObserver);
-    downloader.downloadFile(msg->getData().first);
-  };
+
   if (auto msg = std::dynamic_pointer_cast<DownloadNoBlock>(message)) {
     auto dlLambda = [=] {
       downloadTask(msg);

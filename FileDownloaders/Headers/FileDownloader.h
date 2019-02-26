@@ -38,10 +38,10 @@ class FileDownloader {
   void notifyDownloadFinished(std::string_view fileName,
                               std::string_view filePath);
 
-  static size_t WriteCallback(void *contents,
+  static size_t WriteCallback(void *ptr,
                               size_t size,
                               size_t nmemb,
-                              void *userp);
+                              FILE *stream);
 
   void saveFile(std::string_view content, std::string_view location);
 };

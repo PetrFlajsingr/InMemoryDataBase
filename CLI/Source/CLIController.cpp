@@ -32,14 +32,15 @@ void CLIController::handleQuery(std::string_view query) {
     inputParser.runCommand(cmd);
   } catch (const std::exception &e) {
     AppContext::GetInstance().getUserInterface()->writeLnErr(
-        "Messages could not be performed.\n"
+        "Command could not be performed.\n"
                               + std::string(typeid(e).name()) + "\n"
                               + std::string(e.what()));
   }
   AppContext::GetInstance().getUserInterface()->write("");
 }
 
-CLIController::CmdType CLIController::handleCommand(std::string_view command) {
+CLIController::CmdType CLIController::handleCommand(std::string_view input) {
+  auto command = ScriptParser::ReplaceResources(std::string(input));
   if (Utilities::compareString(command, "exit") == 0
       || Utilities::compareString(command, "e") == 0
       || Utilities::compareString(command, "quit") == 0

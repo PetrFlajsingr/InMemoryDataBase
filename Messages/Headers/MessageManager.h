@@ -45,6 +45,7 @@ class MessageManager {
   template<typename T>
   void dispatch(std::shared_ptr<T> command) {
     static_assert(std::is_base_of<Message, T>{});
+    std::cout << "Message: " << typeid(*command.get()).name() << std::endl;
     auto receivers = commands[typeid(*command.get()).name()];
     std::for_each(receivers.begin(),
                   receivers.end(),
