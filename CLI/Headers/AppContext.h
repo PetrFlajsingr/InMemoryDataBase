@@ -12,6 +12,7 @@
 #include "ConsoleIO.h"
 #include <ThreadPool.h>
 #include <FileDownloadManager.h>
+#include <ResourceManager.h>
 
 class AppContext {
  public:
@@ -22,28 +23,9 @@ class AppContext {
   };
   Mode mode = Mode::normal;
 
-  Config config = Config("./test.conf");
-
-  template<typename T>
-  T getResource(std::string_view resString) {
-    if (resString[0] == '['
-        && resString.back() == ']'
-        && resString[resString.size() - 2] == ']') {
-      auto sub = resString.substr(1, resString.size() - 3);
-      auto pos = sub.find('[');
-      if (pos != std::string::npos) {
-        auto cat = sub.substr(0, pos);
-        auto key = sub.substr(pos + 1, sub.size() - pos - 1);
-
-        return config.getValue<T>(cat, key);
-      }
-    }
-
-    throw InvalidArgumentException("Invalid resource format.");
-  }
-
   std::shared_ptr<MessageManager> getMessageManager();
   std::shared_ptr<ConsoleIO> getUserInterface();
+  std::shared_ptr<ResourceManager> getResourceManager();
 
   static AppContext &GetInstance();
 
@@ -56,6 +38,8 @@ class AppContext {
       threadPool = std::make_shared<ThreadPool>(Utilities::getCoreCount());
   std::shared_ptr<FileDownloadManager> dlManager =
       std::make_shared<FileDownloadManager>(messageManager, threadPool);
+  std::shared_ptr<ResourceManager> resourceManager =
+      std::make_shared<ResourceManager>();
 
   AppContext() = default;
 };

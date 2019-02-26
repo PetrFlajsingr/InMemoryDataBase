@@ -15,3 +15,6 @@ std::shared_ptr<MessageManager> AppContext::getMessageManager() {
 std::shared_ptr<ConsoleIO> AppContext::getUserInterface() {
   return userInterface;
 }
+std::shared_ptr<ResourceManager> AppContext::getResourceManager() {
+  return resourceManager;
+}
