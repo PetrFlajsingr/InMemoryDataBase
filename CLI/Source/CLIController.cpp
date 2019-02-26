@@ -154,7 +154,7 @@ void CLIController::handleInput(std::string_view input) {
           case CmdType::waitDownload:
             AppContext::GetInstance().getUserInterface()->writeLn(
                 "Waiting for downloads...");
-            AppContext::GetInstance().getDownloadManager()->waitForDownloads();
+            AppContext::GetInstance().getThreadPool()->wait(0);
             AppContext::GetInstance().getUserInterface()->writeLn(
                 "Downloads finished...");
             break;

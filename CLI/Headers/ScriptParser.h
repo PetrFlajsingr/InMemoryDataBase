@@ -10,6 +10,7 @@
 #include <string>
 #include <Types.h>
 
+// TODO: resource string
 class ScriptParser {
  public:
   enum class SaveMode {

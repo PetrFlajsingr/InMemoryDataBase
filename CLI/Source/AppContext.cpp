@@ -21,3 +21,12 @@ std::shared_ptr<ResourceManager> AppContext::getResourceManager() {
 std::shared_ptr<FileDownloadManager> AppContext::getDownloadManager() {
   return dlManager;
 }
+std::shared_ptr<ThreadPool> AppContext::getThreadPool() {
+  return threadPool;
+}
+AppContext::AppContext() {
+  messageManager->registerMessage<TaggedExecAsyncNotify>(threadPool.get());
+  messageManager->registerMessage<TaggedExecAsync>(threadPool.get());
+  messageManager->registerMessage<ExecAsyncNotify>(threadPool.get());
+  messageManager->registerMessage<ExecAsync>(threadPool.get());
+}

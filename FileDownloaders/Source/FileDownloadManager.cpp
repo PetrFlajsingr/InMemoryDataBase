@@ -38,10 +38,6 @@ FileDownloadManager::~FileDownloadManager() {
   }
   curl_global_cleanup();
 }
-void FileDownloadManager::waitForDownloads() {
-  std::unique_lock lck{mutex};
-  downloadsDone.wait(lck, [&] { return unfinishedFileCount == 0; });
-}
 
 void FileDownloadManager::receive(std::shared_ptr<Message> message) {
   auto downloadTask = [=](const std::shared_ptr<Download> &msg) {
@@ -56,7 +52,8 @@ void FileDownloadManager::receive(std::shared_ptr<Message> message) {
     auto dlLambda = [=] {
       downloadTask(msg);
     };
-    threadPool->enqueue(dlLambda);
+    dispatch(new TaggedExecAsync(dlLambda, 0));
+
   } else if (auto msg = std::dynamic_pointer_cast<Download>(message)) {
     downloadTask(msg);
   }
@@ -66,9 +63,6 @@ void FileDownloadManager::unfinished() {
 }
 void FileDownloadManager::finished() {
   unfinishedFileCount--;
-  if (unfinishedFileCount == 0) {
-    downloadsDone.notify_all();
-  }
 }
 
 FileDownloadManager::CountObserver::CountObserver(FileDownloadManager *parent)

@@ -3,6 +3,8 @@
 //
 
 #include <Exceptions.h>
+#include <ThreadPool.h>
+
 #include "ThreadPool.h"
 
 ThreadPool::ThreadPool(std::size_t numThreads) {
@@ -46,13 +48,40 @@ void ThreadPool::stop() noexcept {
     thread.join();
 }
 void ThreadPool::receive(std::shared_ptr<Message> message) {
-  if (auto msg = std::dynamic_pointer_cast<ExecAsync>(message)) {
-    enqueue(msg->getFnc());
+  if (auto msg = std::dynamic_pointer_cast<TaggedExecAsyncNotify>(message)) {
+    tagCounters[msg->getTag()].cnt++;
+    auto execAndDecTag = [this, msg] {
+      msg->getFnc()();
+      tagCounters[msg->getTag()].cnt--;
+
+      if (tagCounters[msg->getTag()].cnt == 0) {
+        tagCounters[msg->getTag()].cv.notify_all();
+      }
+      msg->getOnDone()();
+    };
+    enqueue(execAndDecTag);
+  } else if (auto msg = std::dynamic_pointer_cast<TaggedExecAsync>(message)) {
+    tagCounters[msg->getTag()].cnt++;
+    auto execAndDecTag = [this, msg] {
+      msg->getFnc()();
+      tagCounters[msg->getTag()].cnt--;
+
+      if (tagCounters[msg->getTag()].cnt == 0) {
+        tagCounters[msg->getTag()].cv.notify_all();
+      }
+    };
+    enqueue(execAndDecTag);
   } else if (auto msg = std::dynamic_pointer_cast<ExecAsyncNotify>(message)) {
     auto execAndNotify = [msg] {
       msg->getFnc()();
       msg->getOnDone()();
     };
     enqueue(execAndNotify);
+  } else if (auto msg = std::dynamic_pointer_cast<ExecAsync>(message)) {
+    enqueue(msg->getFnc());
   }
+}
+void ThreadPool::wait(std::size_t tag) {
+  std::unique_lock lck{tagCounters[tag].mtx};
+  tagCounters[tag].cv.wait(lck, [&] { return tagCounters[tag].cnt == 0; });
 }

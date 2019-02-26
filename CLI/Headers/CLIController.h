@@ -9,6 +9,7 @@
 #include "AppContext.h"
 #include <MessageReceiver.h>
 
+// TODO: unarchive, async query, async unarchive, wait async query/unarchive
 class CLIController : public MessageReceiver, public MessageSender {
  public:
   CLIController();

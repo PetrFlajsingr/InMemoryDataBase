@@ -27,6 +27,7 @@ class AppContext {
   std::shared_ptr<ConsoleIO> getUserInterface();
   std::shared_ptr<ResourceManager> getResourceManager();
   std::shared_ptr<FileDownloadManager> getDownloadManager();
+  std::shared_ptr<ThreadPool> getThreadPool();
 
   static AppContext &GetInstance();
 
@@ -42,7 +43,7 @@ class AppContext {
   std::shared_ptr<ResourceManager> resourceManager =
       std::make_shared<ResourceManager>();
 
-  AppContext() = default;
+  AppContext();
 };
 
 #endif //PROJECT_APPCONTEXT_H

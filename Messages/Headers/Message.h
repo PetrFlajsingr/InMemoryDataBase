@@ -25,26 +25,37 @@ class DataMessage : public Message {
 };
 
 template<typename T>
-class FncMesssage : public Message {
+class FncMessage : public Message {
  protected:
   T fnc;
  public:
+  explicit FncMessage(T fnc) : fnc(fnc) {}
   T getFnc() const {
     return fnc;
   }
 };
 
-class ExecAsync : public FncMesssage<std::function<void()>> {
+class ExecAsync : public FncMessage<std::function<void()>> {
  public:
-  explicit ExecAsync(std::function<void()> fnc) {
-    FncMesssage::fnc = std::move(fnc);
-  }
+  ExecAsync(const std::function<void()> &fnc) : FncMessage(fnc) {}
 };
 
-class ExecAsyncNotify : public FncMesssage<std::function<void()>> {
+class TaggedExecAsync : public FncMessage<std::function<void()>> {
  public:
-  ExecAsyncNotify(std::function<void()> fnc, std::function<void()> onDoneFnc) {
-    FncMesssage::fnc = std::move(fnc);
+  TaggedExecAsync(const std::function<void()> &fnc, int tag)
+      : FncMessage(fnc), tag(tag) {}
+
+  int getTag() {
+    return tag;
+  }
+ private:
+  int tag;
+};
+
+class ExecAsyncNotify : public FncMessage<std::function<void()>> {
+ public:
+  ExecAsyncNotify(std::function<void()> fnc,
+                  std::function<void()> onDoneFnc) : FncMessage(fnc) {
     onDone = std::move(onDoneFnc);
   }
 
@@ -53,6 +64,19 @@ class ExecAsyncNotify : public FncMesssage<std::function<void()>> {
   }
  private:
   std::function<void()> onDone;
+};
+
+class TaggedExecAsyncNotify : public ExecAsyncNotify {
+ public:
+  TaggedExecAsyncNotify(const std::function<void()> &fnc,
+                        const std::function<void()> &onDoneFnc,
+                        int tag) : ExecAsyncNotify(fnc, onDoneFnc), tag(tag) {}
+
+  int getTag() {
+    return tag;
+  }
+ private:
+  int tag;
 };
 
 class StdinMsg : public DataMessage<std::string> {

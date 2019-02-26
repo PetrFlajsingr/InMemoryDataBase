@@ -22,7 +22,6 @@ class FileDownloadManager : public MessageReceiver, public MessageSender {
                        FileDownloadObserver &observer,
                        bool blocking = false);
 
-  void waitForDownloads();
  private:
   void receive(std::shared_ptr<Message> message) override;
   std::shared_ptr<ThreadPool> threadPool;

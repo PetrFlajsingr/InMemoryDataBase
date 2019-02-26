@@ -12,6 +12,13 @@
 #include <thread>
 #include <future>
 #include <MessageReceiver.h>
+#include <map>
+
+struct TagSync {
+  std::condition_variable cv;
+  std::mutex mtx;
+  std::size_t cnt = 0;
+};
 
 class ThreadPool final : public MessageReceiver {
  public:
@@ -24,6 +31,8 @@ class ThreadPool final : public MessageReceiver {
   std::condition_variable event;
   std::mutex mutex;
   bool stopping = false;
+
+  std::map<int, TagSync> tagCounters;
 
  public:
   explicit ThreadPool(std::size_t numThreads);
@@ -49,6 +58,7 @@ class ThreadPool final : public MessageReceiver {
     return wrapper->get_future();
   }
 
+  void wait(std::size_t tag);
  private:
   void start(std::size_t numThreads);
 
