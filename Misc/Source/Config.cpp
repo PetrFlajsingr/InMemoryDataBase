@@ -18,6 +18,10 @@ Config::Config(const std::string &path, bool autoCommit)
   load();
 }
 
+Config::~Config() {
+  commit();
+}
+
 void Config::load() {
   std::ifstream file(path);
   std::string line;
@@ -47,10 +51,6 @@ void Config::save() {
       file << val.first << "=" << val.second << "\n";
     }
   }
-}
-
-Config::~Config() {
-  commit();
 }
 
 void Config::commit() {

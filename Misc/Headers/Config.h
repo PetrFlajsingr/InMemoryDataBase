@@ -40,9 +40,22 @@ class Config {
     }
   }
  public:
+  /**
+   *
+   * @param path path to config file
+   * @param autoCommit save changes automatically
+   */
   explicit Config(const std::string &path, bool autoCommit = false);
   virtual ~Config();
 
+  /**
+   *
+   * @tparam T requested data type
+   * @param category
+   * @param key
+   * @param defaultVal
+   * @return required value if found, else defaultVal
+   */
   template<typename T>
   T getValue(const std::string &category,
              const std::string &key,
@@ -61,6 +74,13 @@ class Config {
     return defaultVal;
   }
 
+  /**
+   * Get value of requested type. Throw exception when no value is found
+   * @tparam T requested data type
+   * @param category
+   * @param key
+   * @return required value
+   */
   template<typename T>
   T getValue(std::string_view category,
              std::string_view key) {
@@ -74,6 +94,13 @@ class Config {
         "Resource [" + std::string(category) + "[" + std::string(key) + "]]");
   }
 
+  /**
+   * Save value on autocommit
+   * @tparam T
+   * @param category
+   * @param key
+   * @param value
+   */
   template<typename T>
   void setValue(const std::string &category,
                 const std::string &key,
@@ -84,6 +111,9 @@ class Config {
     }
   }
 
+  /**
+   * Save data to file if autocommit is off.
+   */
   void commit();
  private:
   std::string path;
