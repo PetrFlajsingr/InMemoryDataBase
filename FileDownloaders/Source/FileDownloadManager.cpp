@@ -39,7 +39,8 @@ FileDownloadManager::~FileDownloadManager() {
   curl_global_cleanup();
 }
 void FileDownloadManager::waitForDownloads() {
-  // TODO: downloadsDone.wait(mutex, [&] {return unfinishedFileCount == 0;});
+  std::unique_lock lck{mutex};
+  downloadsDone.wait(lck, [&] { return unfinishedFileCount == 0; });
 }
 
 void FileDownloadManager::receive(std::shared_ptr<Message> message) {
@@ -51,29 +52,37 @@ void FileDownloadManager::receive(std::shared_ptr<Message> message) {
     downloader.addObserver(&dispatchObserver);
     downloader.downloadFile(msg->getData().first);
   };
-  if (auto msg = std::dynamic_pointer_cast<Download>(message)) {
-    downloadTask(msg);
-  } else if (auto msg = std::dynamic_pointer_cast<DownloadNoBlock>(message)) {
+  if (auto msg = std::dynamic_pointer_cast<DownloadNoBlock>(message)) {
     auto dlLambda = [=] {
       downloadTask(msg);
     };
     threadPool->enqueue(dlLambda);
+  } else if (auto msg = std::dynamic_pointer_cast<Download>(message)) {
+    downloadTask(msg);
+  }
+}
+void FileDownloadManager::unfinished() {
+  unfinishedFileCount++;
+}
+void FileDownloadManager::finished() {
+  unfinishedFileCount--;
+  if (unfinishedFileCount == 0) {
+    downloadsDone.notify_all();
   }
 }
 
 FileDownloadManager::CountObserver::CountObserver(FileDownloadManager *parent)
     : parent(parent) {}
 void FileDownloadManager::CountObserver::onDownloadStarted(std::string_view) {
-  parent->unfinishedFileCount++;
+  parent->unfinished();
 }
 void FileDownloadManager::CountObserver::onDownloadFailed(std::string_view,
                                                           std::string_view) {
-  parent->unfinishedFileCount--;
+  parent->finished();
 }
 void FileDownloadManager::CountObserver::onDownloadFinished(std::string_view,
                                                             std::string_view) {
-  parent->unfinishedFileCount--;
-
+  parent->finished();
 }
 
 FileDownloadManager::Dispatcher::Dispatcher(const std::shared_ptr<MessageManager> &commandManager)

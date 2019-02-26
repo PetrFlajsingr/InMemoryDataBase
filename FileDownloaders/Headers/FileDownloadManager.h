@@ -32,6 +32,9 @@ class FileDownloadManager : public MessageReceiver, public MessageSender {
   std::condition_variable downloadsDone;
   std::mutex mutex;
 
+  void unfinished();
+  void finished();
+
   class CountObserver : public FileDownloadObserver {
    public:
     explicit CountObserver(FileDownloadManager *parent);

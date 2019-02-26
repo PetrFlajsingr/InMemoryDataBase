@@ -28,6 +28,7 @@ class ConsoleIO : public MessageSender, public MessageReceiver {
 
   void setMode(Mode mode);
  private:
+  std::mutex mutex;
   void receive(std::shared_ptr<Message> message) override;
   std::string form;
   Mode mode = Mode::simple;

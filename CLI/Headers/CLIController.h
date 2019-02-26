@@ -28,6 +28,7 @@ class CLIController : public MessageReceiver, public MessageSender {
     listTables,
     download,
     downloadAsync,
+    waitDownload,
     unknown
   };
   ScriptParser inputParser = ScriptParser::GetInstance();

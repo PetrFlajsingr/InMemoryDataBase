@@ -18,3 +18,6 @@ std::shared_ptr<ConsoleIO> AppContext::getUserInterface() {
 std::shared_ptr<ResourceManager> AppContext::getResourceManager() {
   return resourceManager;
 }
+std::shared_ptr<FileDownloadManager> AppContext::getDownloadManager() {
+  return dlManager;
+}

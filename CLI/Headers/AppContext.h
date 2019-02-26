@@ -26,6 +26,7 @@ class AppContext {
   std::shared_ptr<MessageManager> getMessageManager();
   std::shared_ptr<ConsoleIO> getUserInterface();
   std::shared_ptr<ResourceManager> getResourceManager();
+  std::shared_ptr<FileDownloadManager> getDownloadManager();
 
   static AppContext &GetInstance();
 

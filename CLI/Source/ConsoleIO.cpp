@@ -10,18 +10,22 @@ ConsoleIO::ConsoleIO(const std::shared_ptr<MessageManager> &commandManager)
 }
 
 void ConsoleIO::write(std::string_view str) {
+  std::unique_lock lck{mutex};
   std::cout << ConsoleIO::form << str;
 }
 void ConsoleIO::writeLn(std::string_view str) {
+  std::unique_lock lck{mutex};
   std::cout << ConsoleIO::form << str << std::endl;
   if (mode == Mode::arrow) {
     std::cout << ConsoleIO::form;
   }
 }
 void ConsoleIO::writeErr(std::string_view str) {
+  std::unique_lock lck{mutex};
   std::cerr << ConsoleIO::form << str;
 }
 void ConsoleIO::writeLnErr(std::string_view str) {
+  std::unique_lock lck{mutex};
   std::cerr << ConsoleIO::form << str << std::endl;
 }
 std::string ConsoleIO::readLn() {

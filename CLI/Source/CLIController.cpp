@@ -74,15 +74,13 @@ CLIController::CmdType CLIController::handleCommand(std::string_view command) {
     if (parts.size() == 4 && parts[2] == "to") {
       fileName = parts[1];
       savePath = parts[3];
+      if (parts[0] == "downloadasync") {
+        return CmdType::downloadAsync;
+      }
       return CmdType::download;
     }
-  } else if (command.substr(0, 8) == "downloadasync") {
-    auto parts = Utilities::splitStringByDelimiter(command, " ");
-    if (parts.size() == 4 && parts[2] == "to") {
-      fileName = parts[1];
-      savePath = parts[3];
-      return CmdType::downloadAsync;
-    }
+  } else if (command == "wait download") {
+    return CmdType::waitDownload;
   }
 
   AppContext::GetInstance().getUserInterface()->writeLn(
@@ -153,6 +151,13 @@ void CLIController::handleInput(std::string_view input) {
             dispatch(new UIEnd());
             return;
           }
+          case CmdType::waitDownload:
+            AppContext::GetInstance().getUserInterface()->writeLn(
+                "Waiting for downloads...");
+            AppContext::GetInstance().getDownloadManager()->waitForDownloads();
+            AppContext::GetInstance().getUserInterface()->writeLn(
+                "Downloads finished...");
+            break;
           case CmdType::download:dispatch(new Download(fileName, savePath));
             break;
           case CmdType::downloadAsync:
