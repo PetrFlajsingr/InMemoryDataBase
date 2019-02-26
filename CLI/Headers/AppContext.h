@@ -8,7 +8,10 @@
 #include <unordered_map>
 #include <MemoryDataBase.h>
 #include <Config.h>
+#include <MessageManager.h>
 #include "ConsoleIO.h"
+#include <ThreadPool.h>
+#include <FileDownloadManager.h>
 
 class AppContext {
  public:
@@ -39,12 +42,22 @@ class AppContext {
     throw InvalidArgumentException("Invalid resource format.");
   }
 
+  std::shared_ptr<MessageManager> getMessageManager();
+  std::shared_ptr<ConsoleIO> getUserInterface();
+
   static AppContext &GetInstance();
 
  private:
+  std::shared_ptr<MessageManager>
+      messageManager = std::make_shared<MessageManager>();
+  std::shared_ptr<ConsoleIO>
+      userInterface = std::make_shared<ConsoleIO>(messageManager);
+  std::shared_ptr<ThreadPool>
+      threadPool = std::make_shared<ThreadPool>(Utilities::getCoreCount());
+  std::shared_ptr<FileDownloadManager> dlManager =
+      std::make_shared<FileDownloadManager>(messageManager, threadPool);
 
- public:
-  AppContext() {};
+  AppContext() = default;
 };
 
 #endif //PROJECT_APPCONTEXT_H

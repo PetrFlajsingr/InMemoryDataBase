@@ -142,7 +142,8 @@ bool ScriptParser::runCommand(ScriptParser::Command command) {
         AppContext::GetInstance().DBs[dbName] =
             std::make_shared<DataBase::MemoryDataBase>(dbName);
       } else {
-        ConsoleIO::writeLnErr("DataBase already exists.");
+        AppContext::GetInstance().getUserInterface()->writeLnErr(
+            "DataBase already exists.");
         return false;
       }
       break;
@@ -152,7 +153,8 @@ bool ScriptParser::runCommand(ScriptParser::Command command) {
     case ScriptParser::Command::load: {
       if (AppContext::GetInstance().DBs.find(dbName)
           == AppContext::GetInstance().DBs.end()) {
-        ConsoleIO::writeLnErr("DataBase doesn't exist.");
+        AppContext::GetInstance().getUserInterface()->writeLnErr(
+            "DataBase doesn't exist.");
         return false;
       }
       DataProviders::BaseDataProvider *provider;
@@ -176,7 +178,8 @@ bool ScriptParser::runCommand(ScriptParser::Command command) {
     case ScriptParser::Command::append:
       if (AppContext::GetInstance().DBs.find(dbName)
           == AppContext::GetInstance().DBs.end()) {
-        ConsoleIO::writeLnErr("DataBase doesn't exist.");
+        AppContext::GetInstance().getUserInterface()->writeLnErr(
+            "DataBase doesn't exist.");
         return false;
       }
       {
@@ -201,7 +204,8 @@ bool ScriptParser::runCommand(ScriptParser::Command command) {
     case ScriptParser::Command::removeTab:
       if (AppContext::GetInstance().DBs.find(dbName)
           == AppContext::GetInstance().DBs.end()) {
-        ConsoleIO::writeLnErr("DataBase doesn't exist.");
+        AppContext::GetInstance().getUserInterface()->writeLnErr(
+            "DataBase doesn't exist.");
         return false;
       }
       AppContext::GetInstance().DBs[dbName]->removeTable(dataSetName);
@@ -209,7 +213,8 @@ bool ScriptParser::runCommand(ScriptParser::Command command) {
     case ScriptParser::Command::query:
       if (AppContext::GetInstance().DBs.find(dbName)
           == AppContext::GetInstance().DBs.end()) {
-        ConsoleIO::writeLnErr("DataBase doesn't exist.");
+        AppContext::GetInstance().getUserInterface()->writeLnErr(
+            "DataBase doesn't exist.");
         return false;
       }
       {
@@ -242,7 +247,9 @@ bool ScriptParser::runCommand(ScriptParser::Command command) {
       }
       break;
     case ScriptParser::Command::save:break;
-    case ScriptParser::Command::unknown:ConsoleIO::writeLnErr("Unknown command.");
+    case ScriptParser::Command::unknown:
+      AppContext::GetInstance().getUserInterface()->writeLnErr(
+          "Unknown command.");
       break;
   }
   return true;

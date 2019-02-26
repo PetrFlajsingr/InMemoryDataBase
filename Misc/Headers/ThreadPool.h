@@ -11,8 +11,9 @@
 #include <condition_variable>
 #include <thread>
 #include <future>
+#include <MessageReceiver.h>
 
-class ThreadPool final {
+class ThreadPool final : public MessageReceiver {
  public:
   using Task = std::function<void()>;
 
@@ -52,5 +53,6 @@ class ThreadPool final {
   void start(std::size_t numThreads);
 
   void stop() noexcept;
+  void receive(std::shared_ptr<Message> message) override;
 };
 #endif //PROJECT_DOWNLOADTHREADPOOL_H

@@ -17,28 +17,15 @@
 #include <FileDownloader.h>
 #include <FileDownloadManager.h>
 #include <moor/archive_reader.hpp>
+#include <Message.h>
+#include <MessageManager.h>
+#include <MessageReceiver.h>
+#include <MessageSender.h>
 
 void terminate_handler();
 
-int cnt = 0;
-
-class Obs : public FileDownloadObserver {
- public:
-  void onDownloadStarted(std::string_view fileName) override {
-    std::cout << "Started " << fileName << std::endl;
-  }
-  void onDownloadFailed(std::string_view fileName,
-                        std::string_view errorMessage) override {
-    std::cout << "failed " << fileName << std::endl;
-  }
-  void onDownloadFinished(std::string_view fileName,
-                          std::string_view filePath) override {
-    std::cout << "finished " << fileName << " downloaded to: " << filePath
-              << std::endl;
-  }
-};
-
 int main(int argc, char **argv) {
+
   CLIController cl;
   cl.runApp();
   /*moor::ArchiveReader reader("/Users/petr/Downloads/libarchive-3.3.3.tar");

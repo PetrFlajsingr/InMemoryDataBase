@@ -4,8 +4,10 @@
 
 #include <ConsoleIO.h>
 
-ConsoleIO::Mode ConsoleIO::mode = ConsoleIO::Mode::simple;
-std::string ConsoleIO::form;
+ConsoleIO::ConsoleIO(const std::shared_ptr<MessageManager> &commandManager)
+    : MessageSender(commandManager) {
+  commandManager->registerMessage<UIEnd>(this);
+}
 
 void ConsoleIO::write(std::string_view str) {
   std::cout << ConsoleIO::form << str;
@@ -35,5 +37,22 @@ void ConsoleIO::setMode(ConsoleIO::Mode mode) {
     case Mode::arrow:ConsoleIO::form = ">> ";
       write("");
       break;
+  }
+}
+
+void ConsoleIO::listenInput() {
+  while (listen) {
+    dispatch(new StdinMsg(readLn()));
+  }
+}
+void ConsoleIO::receive(std::shared_ptr<Message> message) {
+  if (auto msg = std::dynamic_pointer_cast<UIEnd>(message)) {
+    listen = false;
+    writeLn("Press enter to exit...");
+  }
+}
+ConsoleIO::~ConsoleIO() {
+  if (auto tmp = commandManager.lock()) {
+    tmp->unregister(this);
   }
 }

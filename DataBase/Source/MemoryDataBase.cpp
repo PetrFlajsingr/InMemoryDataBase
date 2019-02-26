@@ -261,7 +261,9 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doJoin(
     const DataBase::StructuredQuery &query) {
   auto joinItem1 = query.joins.data[0];
   auto table1 = tableByName(joinItem1.firstField.table);
+  std::unique_lock lck1{table1->mutex};
   auto table2 = tableByName(joinItem1.secondField.table);
+  std::unique_lock lck2{table2->mutex};
   JoinMaker joinMaker(table1, joinItem1.firstField.column,
                       table2, joinItem1.secondField.column);
   auto joinResult = joinMaker.join(joinItem1.type);

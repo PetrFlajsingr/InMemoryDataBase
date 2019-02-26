@@ -7,26 +7,31 @@
 
 #include <iostream>
 #include <string>
-#include <string_view>
+#include <MessageSender.h>
 
-class ConsoleIO {
+class ConsoleIO : public MessageSender, public MessageReceiver {
  public:
-  static void write(std::string_view str);
-  static void writeLn(std::string_view str);
-  static void writeErr(std::string_view str);
-  static void writeLnErr(std::string_view str);
-  static std::string readLn();
+  explicit ConsoleIO(const std::shared_ptr<MessageManager> &commandManager);
+  virtual ~ConsoleIO();
+
+  void listenInput();
+
+  void write(std::string_view str);
+  void writeLn(std::string_view str);
+  void writeErr(std::string_view str);
+  void writeLnErr(std::string_view str);
+  std::string readLn();
 
   enum class Mode {
     simple, arrow
   };
 
-  static void setMode(Mode mode);
-
+  void setMode(Mode mode);
  private:
-  static std::string form;
-
-  static Mode mode;
+  void receive(std::shared_ptr<Message> message) override;
+  std::string form;
+  Mode mode = Mode::simple;
+  bool listen = true;
 };
 
 #endif //PROJECT_CONSOLEIO_H

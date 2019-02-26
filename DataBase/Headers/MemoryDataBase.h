@@ -24,11 +24,15 @@ struct Table {
 
   std::string_view getName();
 
+  std::mutex mutex;
+
   explicit Table(const std::shared_ptr<DataSets::MemoryDataSet> &dataSet);
 };
 
 struct View {
   std::shared_ptr<DataSets::MemoryViewDataSet> dataSet;
+
+  std::mutex mutex;
 
   explicit View(const std::shared_ptr<DataSets::MemoryViewDataSet> &dataSet);
 };

@@ -22,6 +22,7 @@ include_directories(DataBase/Headers)
 include_directories(DataBase/QueryParser/Headers)
 include_directories(third_party/xlsxio/include)
 include_directories(third_party/catch2)
+include_directories(Messages/Headers)
 
 FILE(GLOB DataProviderSources DataProviders/Source/*.cpp)
 FILE(GLOB DataProviderHeaders DataProviders/Headers/*.h)
@@ -59,6 +60,9 @@ FILE(GLOB QueryParserHeaders DataBase/QueryParser/Headers/*.h)
 FILE(GLOB CLISources CLI/Source/*.cpp)
 FILE(GLOB CLIHeaders CLI/Headers/*.h)
 
+FILE(GLOB CommandSources Messages/Source/*.cpp)
+FILE(GLOB CommandHeaders Messages/Headers/*.h)
+
 FILE(GLOB moorSources third_party/moor/*.cpp)
 
 # third party:
@@ -75,7 +79,8 @@ set(SOURCE_FILES
         ${RelationLayerSources}
         ${FileDownloaderSources}
         ${CLISources}
-        ${moorSources})
+        ${moorSources}
+        ${CommandSources})
 
 set(TEST_SOURCE_FILES
         ${SOURCE_FILES}

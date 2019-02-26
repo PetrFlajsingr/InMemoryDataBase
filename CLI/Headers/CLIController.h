@@ -7,13 +7,16 @@
 
 #include "ScriptParser.h"
 #include "AppContext.h"
+#include <MessageReceiver.h>
 
-class CLIController {
+class CLIController : public MessageReceiver, public MessageSender {
  public:
   CLIController();
   void runApp();
   static void RunScript(std::string_view scriptPath);
+
  private:
+  void receive(std::shared_ptr<Message> message) override;
   enum class CmdType {
     runScript,
     queryModeStart, // query start/qs
@@ -23,6 +26,8 @@ class CLIController {
     exit, // exit/quit/e/q
     listDBs,
     listTables,
+    download,
+    downloadAsync,
     unknown
   };
   ScriptParser inputParser = ScriptParser::GetInstance();
@@ -30,8 +35,13 @@ class CLIController {
   std::string scriptPath;
   std::string dbName;
 
+  std::string fileName;
+  std::string savePath;
+
   void handleQuery(std::string_view query);
   CmdType handleCommand(std::string_view command);
+
+  void handleInput(std::string_view input);
 
   void printHelp();
 };

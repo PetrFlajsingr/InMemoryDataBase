@@ -747,7 +747,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
     currentToken++;
   }
   if (state != SynState::end) {
-    throw SyntaxException("Command not properly ended.");
+    throw SyntaxException("Messages not properly ended.");
   }
   return result;
 }

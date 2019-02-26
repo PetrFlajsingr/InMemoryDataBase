@@ -6,10 +6,11 @@
 #include <FileDownloadManager.h>
 #include <FileDownloader.h>
 
-#include "FileDownloadManager.h"
-
-FileDownloadManager::FileDownloadManager()
-    : threadPool(Utilities::getCoreCount()) {
+FileDownloadManager::FileDownloadManager(const std::shared_ptr<MessageManager> &commandManager,
+                                         const std::shared_ptr<ThreadPool> &threadPool)
+    : MessageSender(commandManager), threadPool(threadPool) {
+  commandManager->registerMessage<Download>(this);
+  commandManager->registerMessage<DownloadNoBlock>(this);
   curl_global_init(CURL_GLOBAL_DEFAULT);
 }
 
@@ -19,16 +20,74 @@ void FileDownloadManager::enqueueDownload(const std::string &localFolder,
                                           bool blocking) {
   auto downloadTask = [=, &observer] {
     FileDownloader downloader(localFolder);
+    auto cntObs = CountObserver(this);
+    downloader.addObserver(&cntObs);
     downloader.addObserver(&observer);
     downloader.downloadFile(url);
   };
   if (!blocking) {
-    threadPool.enqueue(downloadTask);
+    threadPool->enqueue(downloadTask);
   } else {
-    threadPool.enqueue(downloadTask).get();
+    threadPool->enqueue(downloadTask).get();
   }
 }
 
 FileDownloadManager::~FileDownloadManager() {
+  if (auto tmp = commandManager.lock()) {
+    tmp->unregister(this);
+  }
   curl_global_cleanup();
 }
+void FileDownloadManager::waitForDownloads() {
+  // TODO: downloadsDone.wait(mutex, [&] {return unfinishedFileCount == 0;});
+}
+
+void FileDownloadManager::receive(std::shared_ptr<Message> message) {
+  auto downloadTask = [=](const std::shared_ptr<Download> &msg) {
+    FileDownloader downloader(msg->getData().second);
+    auto cntObs = CountObserver(this);
+    downloader.addObserver(&cntObs);
+    auto dispatchObserver = Dispatcher(commandManager.lock());
+    downloader.addObserver(&dispatchObserver);
+    downloader.downloadFile(msg->getData().first);
+  };
+  if (auto msg = std::dynamic_pointer_cast<Download>(message)) {
+    downloadTask(msg);
+  } else if (auto msg = std::dynamic_pointer_cast<DownloadNoBlock>(message)) {
+    auto dlLambda = [=] {
+      downloadTask(msg);
+    };
+    threadPool->enqueue(dlLambda);
+  }
+}
+
+FileDownloadManager::CountObserver::CountObserver(FileDownloadManager *parent)
+    : parent(parent) {}
+void FileDownloadManager::CountObserver::onDownloadStarted(std::string_view) {
+  parent->unfinishedFileCount++;
+}
+void FileDownloadManager::CountObserver::onDownloadFailed(std::string_view,
+                                                          std::string_view) {
+  parent->unfinishedFileCount--;
+}
+void FileDownloadManager::CountObserver::onDownloadFinished(std::string_view,
+                                                            std::string_view) {
+  parent->unfinishedFileCount--;
+
+}
+
+FileDownloadManager::Dispatcher::Dispatcher(const std::shared_ptr<MessageManager> &commandManager)
+    : MessageSender(commandManager) {}
+void FileDownloadManager::Dispatcher::onDownloadStarted(std::string_view fileName) {
+  dispatch(new DownloadProgress(DownloadState::started, std::string(fileName)));
+}
+void FileDownloadManager::Dispatcher::onDownloadFailed(std::string_view fileName,
+                                                       std::string_view errorMessage) {
+  dispatch(new DownloadProgress(DownloadState::failed, std::string(fileName)));
+}
+void FileDownloadManager::Dispatcher::onDownloadFinished(std::string_view fileName,
+                                                         std::string_view filePath) {
+  dispatch(new DownloadProgress(DownloadState::finished,
+                                std::string(fileName)));
+}
+

@@ -21,7 +21,7 @@ DataWriters::CsvWriter::~CsvWriter() {
 
 void DataWriters::CsvWriter::writeHeader(const std::vector<std::string> &header) {
   if (header.empty()) {
-    throw InvalidArgumentException("Header can not be empty.");
+    throw InvalidArgumentException("Headers can not be empty.");
   }
   columnCount = header.size();
   writeRow(header);
