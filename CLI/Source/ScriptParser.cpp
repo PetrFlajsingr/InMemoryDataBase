@@ -143,7 +143,7 @@ bool ScriptParser::runCommand(ScriptParser::Command command) {
         AppContext::GetInstance().DBs[dbName] =
             std::make_shared<DataBase::MemoryDataBase>(dbName);
       } else {
-        AppContext::GetInstance().getUserInterface()->writeLnErr(
+        AppContext::GetInstance().ui->writeLnErr(
             "DataBase already exists.");
         return false;
       }
@@ -154,7 +154,7 @@ bool ScriptParser::runCommand(ScriptParser::Command command) {
     case ScriptParser::Command::load: {
       if (AppContext::GetInstance().DBs.find(dbName)
           == AppContext::GetInstance().DBs.end()) {
-        AppContext::GetInstance().getUserInterface()->writeLnErr(
+        AppContext::GetInstance().ui->writeLnErr(
             "DataBase doesn't exist.");
         return false;
       }
@@ -179,7 +179,7 @@ bool ScriptParser::runCommand(ScriptParser::Command command) {
     case ScriptParser::Command::append:
       if (AppContext::GetInstance().DBs.find(dbName)
           == AppContext::GetInstance().DBs.end()) {
-        AppContext::GetInstance().getUserInterface()->writeLnErr(
+        AppContext::GetInstance().ui->writeLnErr(
             "DataBase doesn't exist.");
         return false;
       }
@@ -205,7 +205,7 @@ bool ScriptParser::runCommand(ScriptParser::Command command) {
     case ScriptParser::Command::removeTab:
       if (AppContext::GetInstance().DBs.find(dbName)
           == AppContext::GetInstance().DBs.end()) {
-        AppContext::GetInstance().getUserInterface()->writeLnErr(
+        AppContext::GetInstance().ui->writeLnErr(
             "DataBase doesn't exist.");
         return false;
       }
@@ -214,7 +214,7 @@ bool ScriptParser::runCommand(ScriptParser::Command command) {
     case ScriptParser::Command::query:
       if (AppContext::GetInstance().DBs.find(dbName)
           == AppContext::GetInstance().DBs.end()) {
-        AppContext::GetInstance().getUserInterface()->writeLnErr(
+        AppContext::GetInstance().ui->writeLnErr(
             "DataBase doesn't exist.");
         return false;
       }
@@ -249,7 +249,7 @@ bool ScriptParser::runCommand(ScriptParser::Command command) {
       break;
     case ScriptParser::Command::save:break;
     case ScriptParser::Command::unknown:
-      AppContext::GetInstance().getUserInterface()->writeLnErr(
+      AppContext::GetInstance().ui->writeLnErr(
           "Unknown command.");
       break;
   }
@@ -270,7 +270,7 @@ std::string ScriptParser::ReplaceResources(std::string input) {
 
       std::string match(matches[i]);
       output +=
-          AppContext::GetInstance().getResourceManager()->getResource<std::string>(
+          AppContext::GetInstance().resourceManager->getResource<std::string>(
               match);
     }
     input = matches.suffix().str();

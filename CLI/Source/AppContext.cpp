@@ -9,24 +9,18 @@ AppContext &AppContext::GetInstance() {
   static AppContext instance;
   return instance;
 }
-std::shared_ptr<MessageManager> AppContext::getMessageManager() {
-  return messageManager;
-}
-std::shared_ptr<ConsoleIO> AppContext::getUserInterface() {
-  return userInterface;
-}
-std::shared_ptr<ResourceManager> AppContext::getResourceManager() {
-  return resourceManager;
-}
-std::shared_ptr<FileDownloadManager> AppContext::getDownloadManager() {
-  return dlManager;
-}
-std::shared_ptr<ThreadPool> AppContext::getThreadPool() {
-  return threadPool;
-}
+
 AppContext::AppContext() {
-  messageManager->registerMessage<TaggedExecAsyncNotify>(threadPool.get());
-  messageManager->registerMessage<TaggedExecAsync>(threadPool.get());
-  messageManager->registerMessage<ExecAsyncNotify>(threadPool.get());
-  messageManager->registerMessage<ExecAsync>(threadPool.get());
+  messageManager.value = std::make_shared<MessageManager>();
+  ui.value = std::make_shared<ConsoleIO>(messageManager);
+  threadPool.value = std::make_shared<ThreadPool>(Utilities::getCoreCount());
+  downloadManager.value =
+      std::make_shared<FileDownloadManager>(messageManager, threadPool);
+  resourceManager.value = std::make_shared<ResourceManager>();
+
+  messageManager.value->registerMsg<TaggedExecAsyncNotify>(threadPool.value.get());
+  messageManager.value->registerMsg<TaggedExecAsync>(threadPool.value.get());
+  messageManager.value->registerMsg<ExecAsyncNotify>(threadPool.value.get());
+  messageManager.value->registerMsg<ExecAsync>(threadPool.value.get());
 }
+

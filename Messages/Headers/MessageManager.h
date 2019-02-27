@@ -15,13 +15,13 @@
 class MessageManager {
  public:
   template<typename T>
-  void registerMessage(MessageReceiver *receiver) {
+  void registerMsg(MessageReceiver *receiver) {
     static_assert(std::is_base_of<Message, T>{});
     commands[typeid(T).name()].emplace_back(receiver);
   }
 
   template<typename T>
-  void unregisterCommand(MessageReceiver *receiver) {
+  void unregisterMsg(MessageReceiver *receiver) {
     auto &vec = commands[typeid(T).name()];
     if (auto it = std::find(vec.begin(), vec.end(), receiver); it
         != vec.end()) {
@@ -45,7 +45,6 @@ class MessageManager {
   template<typename T>
   void dispatch(std::shared_ptr<T> command) {
     static_assert(std::is_base_of<Message, T>{});
-    std::cout << "Message: " << typeid(*command.get()).name() << std::endl;
     auto receivers = commands[typeid(*command.get()).name()];
     std::for_each(receivers.begin(),
                   receivers.end(),

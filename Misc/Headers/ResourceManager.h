@@ -8,6 +8,11 @@
 #include <string>
 #include <Exceptions.h>
 #include "Config.h"
+#include "FileManager.h"
+
+enum ResourceType {
+  Image, Text, Csv, Archive
+};
 
 class ResourceManager {
  public:
@@ -25,12 +30,13 @@ class ResourceManager {
         return config.getValue<T>(cat, key);
       }
     }
-
     throw InvalidArgumentException("Invalid resource format.");
   }
 
  private:
   Config config = Config("./test.conf");
+
+  Folder resourceFolder = FileManager().getFolder("./resources");
 };
 
 #endif //PROJECT_RESOURCEMANAGER_H

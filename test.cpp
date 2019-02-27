@@ -22,45 +22,63 @@
 #include <MessageReceiver.h>
 #include <MessageSender.h>
 #include <regex>
+#include <Lazy.h>
+
 
 void terminate_handler();
 
-std::string replaceResources(std::string input) {
-  Config config("./test.conf", true);
-  std::regex
-      rx(R"(\[[a-zA-Z0-9]*\[[a-zA-Z0-9]*\]\])", std::regex_constants::icase);
-  std::smatch matches;
-  std::string output;
-  std::cout << input.length() << std::endl;
-  while (std::regex_search(input, matches, rx)) {
-    for (gsl::index i = 0; i < matches.size(); ++i) {
-      output += input.substr(0, matches.position(i));
-
-      std::string match = matches[i];
-      auto index = match.find_last_of('[');
-      auto index2 = match.find(']');
-      output += config.getValue<std::string>(match.substr(1, index - 1),
-                                             match.substr(index + 1,
-                                                          index2 - index - 1));
+class LazyTest {
+ public:
+  LazyTest() {
+    bool1.setOwner(this);
+    bool2.setOwner(this);
+    bool1.value = true;
+    bool2.value = false;
+  }
+  class : public Property<bool, LazyTest> {
+   public:
+    using Property<bool, LazyTest>::operator=;
+   protected:
+    bool const &get() const override {
+      return value;
     }
-    input = matches.suffix().str();
-  }
-  output += input;
-  return output;
-}
+    bool &set(const bool &f) override {
+      value = f;
+      owner->isTrue.invalidate();
+      return value;
+    }
+  } bool1;
 
-void man() {
-  std::regex
-      rx(R"(\[[a-zA-Z0-9]*\[[a-zA-Z0-9]*\]\])", std::regex_constants::icase);
-  std::smatch OuMatches;
-  std::string input("test [ye[ma]] sad [hi[d]]dfdsfdsfsd");
-  while (std::regex_search(input, OuMatches, rx)) {
-    for (auto x:OuMatches) std::cout << x << " ";
-    std::cout << std::endl;
-    input = OuMatches.suffix().str();
-  }
-}
+  class : public Property<bool, LazyTest> {
+   public:
+    using Property<bool, LazyTest>::operator=;
+   protected:
+    bool const &get() const override {
+      return value;
+    }
+    bool &set(const bool &f) override {
+      value = f;
+      owner->isTrue.invalidate();
+      return value;
+    }
+  } bool2;
+
+  Lazy<bool> isTrue = Lazy<bool>([this] {
+    return bool1 | bool2;
+  });
+
+};
+
 int main(int argc, char **argv) {
+  LazyTest test;
+  std::cout << test.isTrue << std::endl;
+  std::cout << test.isTrue << std::endl;
+  std::cout << test.bool1 << std::endl;
+  test.bool1 = false;
+  std::cout << test.bool1 << std::endl;
+  std::cout << test.isTrue << std::endl;
+
+  return 0;
   CLIController cl;
   cl.runApp();
   /*moor::ArchiveReader reader("/Users/petr/Downloads/libarchive-3.3.3.tar");

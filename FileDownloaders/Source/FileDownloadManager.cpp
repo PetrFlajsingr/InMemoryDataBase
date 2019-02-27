@@ -7,8 +7,8 @@
 FileDownloadManager::FileDownloadManager(const std::shared_ptr<MessageManager> &commandManager,
                                          const std::shared_ptr<ThreadPool> &threadPool)
     : MessageSender(commandManager), threadPool(threadPool) {
-  commandManager->registerMessage<Download>(this);
-  commandManager->registerMessage<DownloadNoBlock>(this);
+  commandManager->registerMsg<Download>(this);
+  commandManager->registerMsg<DownloadNoBlock>(this);
   curl_global_init(CURL_GLOBAL_DEFAULT);
 }
 

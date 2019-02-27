@@ -17,7 +17,6 @@ class DateTime;
  * Typy ulozenych dat
  */
 enum class ValueType {
-  None,
   Integer,
   Double,
   String,

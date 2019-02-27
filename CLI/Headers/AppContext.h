@@ -13,9 +13,11 @@
 #include <ThreadPool.h>
 #include <FileDownloadManager.h>
 #include <ResourceManager.h>
+#include <Property.h>
 
 class AppContext {
  public:
+
   std::unordered_map<std::string, std::shared_ptr<DataBase::MemoryDataBase>>
       DBs;
   enum class Mode {
@@ -23,26 +25,22 @@ class AppContext {
   };
   Mode mode = Mode::normal;
 
-  std::shared_ptr<MessageManager> getMessageManager();
-  std::shared_ptr<ConsoleIO> getUserInterface();
-  std::shared_ptr<ResourceManager> getResourceManager();
-  std::shared_ptr<FileDownloadManager> getDownloadManager();
-  std::shared_ptr<ThreadPool> getThreadPool();
+  class : public ReadOnlyProperty<std::shared_ptr<MessageManager>, AppContext> {
+  } messageManager;
+  class : public ReadOnlyProperty<std::shared_ptr<ConsoleIO>, AppContext> {
+  } ui;
+  class : public ReadOnlyProperty<std::shared_ptr<ResourceManager>,
+                                  AppContext> {
+  } resourceManager;
+  class : public ReadOnlyProperty<std::shared_ptr<FileDownloadManager>,
+                                  AppContext> {
+  } downloadManager;
+  class : public ReadOnlyProperty<std::shared_ptr<ThreadPool>, AppContext> {
+  } threadPool;
 
   static AppContext &GetInstance();
 
  private:
-  std::shared_ptr<MessageManager>
-      messageManager = std::make_shared<MessageManager>();
-  std::shared_ptr<ConsoleIO>
-      userInterface = std::make_shared<ConsoleIO>(messageManager);
-  std::shared_ptr<ThreadPool>
-      threadPool = std::make_shared<ThreadPool>(Utilities::getCoreCount());
-  std::shared_ptr<FileDownloadManager> dlManager =
-      std::make_shared<FileDownloadManager>(messageManager, threadPool);
-  std::shared_ptr<ResourceManager> resourceManager =
-      std::make_shared<ResourceManager>();
-
   AppContext();
 };
 

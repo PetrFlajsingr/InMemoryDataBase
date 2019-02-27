@@ -6,7 +6,8 @@
 
 ConsoleIO::ConsoleIO(const std::shared_ptr<MessageManager> &commandManager)
     : MessageSender(commandManager) {
-  commandManager->registerMessage<UIEnd>(this);
+  commandManager->registerMsg<UIEnd>(this);
+  mode.setOwner(this);
 }
 
 void ConsoleIO::write(std::string_view str) {
@@ -34,7 +35,6 @@ std::string ConsoleIO::readLn() {
   return str;
 }
 void ConsoleIO::setMode(ConsoleIO::Mode mode) {
-  ConsoleIO::mode = mode;
   switch (mode) {
     case Mode::simple:ConsoleIO::form = "";
       break;

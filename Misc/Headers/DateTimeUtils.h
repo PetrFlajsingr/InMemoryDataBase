@@ -10,6 +10,7 @@
 #include <string>
 #include <sstream>
 #include <ostream>
+#include <boost/date_time.hpp>
 
 /**
  * Trida pro reprezentaci casu a data.

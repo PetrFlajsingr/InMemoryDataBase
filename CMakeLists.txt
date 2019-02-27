@@ -102,6 +102,7 @@ FIND_PACKAGE(CURL)
 include_directories(${CURL_INCLUDE_DIR})
 FIND_PACKAGE(LibArchive)
 include_directories(${LibArchive_INCLUDE_DIR})
+FIND_PACKAGE(Boost 1.68 COMPONENTS date_time filesystem REQUIRED)
 
 
 add_executable(cedr cedr.cpp ${SOURCE_FILES})
@@ -119,6 +120,6 @@ target_link_libraries(catch_tests ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 message(${LibArchive_LIBRARIES})
 target_link_libraries(test xlsxio_read)
 target_link_libraries(test xlsxio_write)
-target_link_libraries(test ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
+target_link_libraries(test Boost::date_time Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 
 

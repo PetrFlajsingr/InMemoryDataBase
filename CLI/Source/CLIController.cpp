@@ -10,20 +10,20 @@
 #include <XlsxWriter.h>
 
 CLIController::CLIController()
-    : MessageSender(AppContext::GetInstance().getMessageManager()) {}
+    : MessageSender(AppContext::GetInstance().messageManager) {}
 
 void CLIController::runApp() {
-  AppContext::GetInstance().getMessageManager()->registerMessage<StdinMsg>(
+  ctx.messageManager->registerMsg<StdinMsg>(
       this);
-  AppContext::GetInstance().getMessageManager()->registerMessage<
+  ctx.messageManager->registerMsg<
       DownloadProgress>(
       this);
 
-  AppContext::GetInstance().mode = AppContext::Mode::normal;
+  ctx.mode = AppContext::Mode::normal;
 
-  AppContext::GetInstance().getUserInterface()->writeLn("Normal mode");
-  AppContext::GetInstance().getUserInterface()->writeLn("___________");
-  AppContext::GetInstance().getUserInterface()->listenInput();
+  ctx.ui->writeLn("Normal mode");
+  ctx.ui->writeLn("___________");
+  ctx.ui->listenInput();
 }
 
 void CLIController::handleQuery(std::string_view query) {
@@ -31,12 +31,12 @@ void CLIController::handleQuery(std::string_view query) {
   try {
     inputParser.runCommand(cmd);
   } catch (const std::exception &e) {
-    AppContext::GetInstance().getUserInterface()->writeLnErr(
+    ctx.ui->writeLnErr(
         "Command could not be performed.\n"
                               + std::string(typeid(e).name()) + "\n"
                               + std::string(e.what()));
   }
-  AppContext::GetInstance().getUserInterface()->write("");
+  ctx.ui->write("");
 }
 
 CLIController::CmdType CLIController::handleCommand(std::string_view input) {
@@ -84,45 +84,46 @@ CLIController::CmdType CLIController::handleCommand(std::string_view input) {
     return CmdType::waitDownload;
   }
 
-  AppContext::GetInstance().getUserInterface()->writeLn(
+  ctx.ui->writeLn(
       "Ignoring unknown command.");
   return CmdType::unknown;
 }
 
 void CLIController::printHelp() {
-  AppContext::GetInstance().getUserInterface()->write("exit\t\texit/e/quit\n"
+  ctx.ui->write("exit\t\texit/e/quit\n"
                    "query mode\tquery start/qs\n"
                    "query end\tquery end/qe\n"
                    "clear\t\tclear/c\n");
 }
 
 void CLIController::RunScript(std::string_view scriptPath) {
+  auto &context = AppContext::GetInstance();
   auto path = std::string(scriptPath);
   std::ifstream input(path);
   auto scriptRunner = ScriptParser::GetInstance();
   if (!input.is_open()) {
-    AppContext::GetInstance().getUserInterface()->writeLnErr(
+    context.ui->writeLnErr(
         "Can't open script file.");
   }
   std::string line;
   try {
     while (std::getline(input, line)) {
-      AppContext::GetInstance().getUserInterface()->writeLn("Running: " + line);
+      context.ui->writeLn("Running: " + line);
       if (!scriptRunner.runCommand(scriptRunner.parseInput(line))) {
-        AppContext::GetInstance().getUserInterface()->writeLnErr(
+        context.ui->writeLnErr(
             "Interrupting script execution");
         break;
       }
     }
-    AppContext::GetInstance().getUserInterface()->writeLn(
+    context.ui->writeLn(
         "Script finished successfully.");
   } catch (const std::exception &e) {
-    AppContext::GetInstance().getUserInterface()->writeLnErr(
+    context.ui->writeLnErr(
         "Messages could not be performed.\n"
                               + std::string(typeid(e).name()) + "\n"
                               + std::string(e.what()));
   }
-  AppContext::GetInstance().getUserInterface()->write("");
+  context.ui->write("");
 }
 
 void CLIController::receive(std::shared_ptr<Message> message) {
@@ -138,12 +139,12 @@ void CLIController::receive(std::shared_ptr<Message> message) {
       case DownloadState::failed:outMsg += "failed.";
         break;
     }
-    AppContext::GetInstance().getUserInterface()->writeLn(outMsg);
+    ctx.ui->writeLn(outMsg);
   }
 }
 void CLIController::handleInput(std::string_view input) {
   if (input.length() > 0) {
-    if (AppContext::GetInstance().mode == AppContext::Mode::normal) {
+    if (ctx.mode == AppContext::Mode::normal) {
       if (input[0] == ':') {
         handleQuery(input.substr(1));
       } else {
@@ -153,10 +154,10 @@ void CLIController::handleInput(std::string_view input) {
             return;
           }
           case CmdType::waitDownload:
-            AppContext::GetInstance().getUserInterface()->writeLn(
+            ctx.ui->writeLn(
                 "Waiting for downloads...");
-            AppContext::GetInstance().getThreadPool()->wait(0);
-            AppContext::GetInstance().getUserInterface()->writeLn(
+            ctx.threadPool->wait(0);
+            ctx.ui->writeLn(
                 "Downloads finished...");
             break;
           case CmdType::download:dispatch(new Download(fileName, savePath));
@@ -165,44 +166,42 @@ void CLIController::handleInput(std::string_view input) {
             dispatch(new DownloadNoBlock(fileName,
                                          savePath));
             break;
-          case CmdType::queryModeStart:
-            AppContext::GetInstance().mode = AppContext::Mode::query;
-            AppContext::GetInstance().getUserInterface()->setMode(ConsoleIO::Mode::arrow);
-            AppContext::GetInstance().getUserInterface()->writeLn("Query mode");
-            AppContext::GetInstance().getUserInterface()->writeLn("**********");
+          case CmdType::queryModeStart:ctx.mode = AppContext::Mode::query;
+            ctx.ui->setMode(ConsoleIO::Mode::arrow);
+            ctx.ui->writeLn("Query mode");
+            ctx.ui->writeLn("**********");
             break;
-          case CmdType::queryModeEnd:
-            AppContext::GetInstance().mode = AppContext::Mode::normal;
-            AppContext::GetInstance().getUserInterface()->setMode(ConsoleIO::Mode::simple);
-            AppContext::GetInstance().getUserInterface()->writeLn("Normal mode");
-            AppContext::GetInstance().getUserInterface()->writeLn(
+          case CmdType::queryModeEnd:ctx.mode = AppContext::Mode::normal;
+            ctx.ui->setMode(ConsoleIO::Mode::simple);
+            ctx.ui->writeLn("Normal mode");
+            ctx.ui->writeLn(
                 "\"***********\"");
             break;
-          case CmdType::clear:AppContext::GetInstance().DBs.clear();
+          case CmdType::clear:ctx.DBs.clear();
             break;
           case CmdType::help:printHelp();
             break;
           case CmdType::runScript:RunScript(scriptPath);
             break;
           case CmdType::listDBs:
-            AppContext::GetInstance().getUserInterface()->writeLn(
+            ctx.ui->writeLn(
                 "List of DataBases:");
-            for (const auto &db : AppContext::GetInstance().DBs) {
-              AppContext::GetInstance().getUserInterface()->writeLn(db.first);
+            for (const auto &db : ctx.DBs) {
+              ctx.ui->writeLn(db.first);
             }
             break;
           case CmdType::listTables:
-            AppContext::GetInstance().getUserInterface()->writeLn(
+            ctx.ui->writeLn(
                 "List of tables in " + dbName + ": ");
-            if (AppContext::GetInstance().DBs.find(dbName)
-                == AppContext::GetInstance().DBs.end()) {
-              AppContext::GetInstance().getUserInterface()->writeLnErr(
+            if (ctx.DBs.find(dbName)
+                == ctx.DBs.end()) {
+              ctx.ui->writeLnErr(
                   "DataBase not found.");
               break;
             }
             for (const auto
-                  &val : AppContext::GetInstance().DBs[dbName]->getTables()) {
-              AppContext::GetInstance().getUserInterface()->writeLn(val->getName());
+                  &val : ctx.DBs[dbName]->getTables()) {
+              ctx.ui->writeLn(val->getName());
             }
             break;
         }
@@ -210,13 +209,12 @@ void CLIController::handleInput(std::string_view input) {
     } else {
       if (input[0] == ':') {
         switch (handleCommand(input.substr(1))) {
-          case CmdType::queryModeEnd:
-            AppContext::GetInstance().mode = AppContext::Mode::normal;
-            AppContext::GetInstance().getUserInterface()->setMode(ConsoleIO::Mode::simple);
-            AppContext::GetInstance().getUserInterface()->writeLn("Normal mode");
-            AppContext::GetInstance().getUserInterface()->writeLn("***********");
+          case CmdType::queryModeEnd:ctx.mode = AppContext::Mode::normal;
+            ctx.ui->setMode(ConsoleIO::Mode::simple);
+            ctx.ui->writeLn("Normal mode");
+            ctx.ui->writeLn("***********");
             break;
-          case CmdType::clear:AppContext::GetInstance().DBs.clear();
+          case CmdType::clear:ctx.DBs.clear();
             break;
           case CmdType::help:printHelp();
             break;

@@ -25,6 +25,8 @@ class IOException : public std::exception {
   const gsl::czstring<> errorMessage;
  public:
   explicit IOException(const gsl::czstring<> message) : errorMessage(message) {}
+  explicit IOException(const std::string &message)
+      : errorMessage(message.c_str()) {}
 
   char const *what() const noexcept override {
     return errorMessage;
