@@ -3,27 +3,8 @@
 //
 
 #include <MemoryDataSet.h>
-#include <LexicalAnalyser.h>
-#include <SyntaxAnalyser.h>
-#include <SemanticAnalyser.h>
-#include <MemoryDataBase.h>
-#include <JoinMaker.h>
-#include <CsvReader.h>
-#include <XlsxWriter.h>
 #include <CLIController.h>
-#include <CsvWriter.h>
-#include <Config.h>
-#include <ThreadPool.h>
-#include <FileDownloader.h>
-#include <FileDownloadManager.h>
-#include <moor/archive_reader.hpp>
-#include <Message.h>
-#include <MessageManager.h>
-#include <MessageReceiver.h>
-#include <MessageSender.h>
-#include <regex>
 #include <Lazy.h>
-
 
 void terminate_handler();
 
@@ -50,7 +31,7 @@ class LazyTest {
       [this](const bool &value) -> bool & {
         bool3.value = value;
         return bool3.value;
-    }
+      }
   };
 
   Lazy<bool> isTrue = Lazy<bool>([this] {
@@ -101,7 +82,6 @@ int main(int argc, char **argv) {
   std::this_thread::sleep_for(std::chrono::seconds(10));
   return 0;*/
 }
-
 
 void terminate_handler() {
   try {
