@@ -13,7 +13,7 @@ Config::Config(const std::string &path, bool autoCommit)
   std::ifstream file(path);
   if (!file.is_open()) {
     std::ofstream newFile(path);
-    file.open(path);
+    newFile.open(path);
   }
   load();
 }
