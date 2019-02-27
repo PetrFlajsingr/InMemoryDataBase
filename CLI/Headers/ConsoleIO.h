@@ -27,19 +27,14 @@ class ConsoleIO : public MessageSender, public MessageReceiver {
     simple, arrow
   };
 
-  class : public Property<Mode, ConsoleIO> {
-   public:
-    using Property<Mode, ConsoleIO>::operator=;
-   protected:
-    Mode const &get() const override {
-      return value;
+  Property<Mode, ConsoleIO> mode{
+      [this]() -> Mode & { return mode.value; },
+      [this](const Mode &val) -> Mode & {
+        mode.value = val;
+        setMode(val);
+        return mode.value;
     }
-    Mode &set(const Mode &f) override {
-      value = f;
-      owner->setMode(f);
-      return value;
-    }
-  } mode;
+  };
 
   void setMode(Mode mode);
  private:

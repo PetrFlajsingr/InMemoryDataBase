@@ -30,38 +30,28 @@ void terminate_handler();
 class LazyTest {
  public:
   LazyTest() {
-    bool1.setOwner(this);
-    bool2.setOwner(this);
     bool1.value = true;
     bool2.value = false;
   }
-  class : public Property<bool, LazyTest> {
-   public:
-    using Property<bool, LazyTest>::operator=;
-   protected:
-    bool const &get() const override {
-      return value;
-    }
-    bool &set(const bool &f) override {
-      value = f;
-      owner->isTrue.invalidate();
-      return value;
-    }
-  } bool1;
+  Property<bool, LazyTest> bool1{
+      [this]() -> bool & { return bool1.value; },
+      [this](const bool &value) -> bool & {
+        bool1.value = value;
+        isTrue.invalidate();
+        return bool1.value;
+      }
+  };
 
-  class : public Property<bool, LazyTest> {
-   public:
-    using Property<bool, LazyTest>::operator=;
-   protected:
-    bool const &get() const override {
-      return value;
+  ReadOnlyProperty<bool, LazyTest> bool2{
+      [this]() -> bool & { return bool2.value; }
+  };
+
+  WriteOnlyProperty<bool, LazyTest> bool3{
+      [this](const bool &value) -> bool & {
+        bool3.value = value;
+        return bool3.value;
     }
-    bool &set(const bool &f) override {
-      value = f;
-      owner->isTrue.invalidate();
-      return value;
-    }
-  } bool2;
+  };
 
   Lazy<bool> isTrue = Lazy<bool>([this] {
     return bool1 | bool2;
@@ -70,15 +60,6 @@ class LazyTest {
 };
 
 int main(int argc, char **argv) {
-  LazyTest test;
-  std::cout << test.isTrue << std::endl;
-  std::cout << test.isTrue << std::endl;
-  std::cout << test.bool1 << std::endl;
-  test.bool1 = false;
-  std::cout << test.bool1 << std::endl;
-  std::cout << test.isTrue << std::endl;
-
-  return 0;
   CLIController cl;
   cl.runApp();
   /*moor::ArchiveReader reader("/Users/petr/Downloads/libarchive-3.3.3.tar");

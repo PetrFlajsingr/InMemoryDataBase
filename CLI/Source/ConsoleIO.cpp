@@ -7,7 +7,6 @@
 ConsoleIO::ConsoleIO(const std::shared_ptr<MessageManager> &commandManager)
     : MessageSender(commandManager) {
   commandManager->registerMsg<UIEnd>(this);
-  mode.setOwner(this);
 }
 
 void ConsoleIO::write(std::string_view str) {
