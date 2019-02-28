@@ -13,21 +13,23 @@ class LazyTest {
   LazyTest() {
     bool1.value = true;
     bool2.value = false;
+    dt.value = DateTime();
   }
-  Property<bool, LazyTest> bool1{
+  Property<bool, LazyTest, RW> bool1{
       [this]() -> bool & { return bool1.value; },
-      [this](const bool &value) -> bool & {
+      [this](const bool &value) {
         bool1.value = value;
         isTrue.invalidate();
-        return bool1.value;
       }
   };
 
-  ReadOnlyProperty<bool, LazyTest> bool2{
+  Property<DateTime, LazyTest, RW> dt;
+
+  Property<bool, LazyTest, R> bool2{
       [this]() -> bool & { return bool2.value; }
   };
 
-  WriteOnlyProperty<bool, LazyTest> bool3{
+  Property<bool, LazyTest, W> bool3{
       [this](const bool &value) -> bool & {
         bool3.value = value;
         return bool3.value;
@@ -35,14 +37,14 @@ class LazyTest {
   };
 
   Lazy<bool> isTrue = Lazy<bool>([this] {
-    return bool1 | bool2;
+    return (bool) bool1 | (bool) bool2;
   });
-
 };
 
 int main(int argc, char **argv) {
   CLIController cl;
   cl.runApp();
+  LazyTest test;
   /*moor::ArchiveReader reader("/Users/petr/Downloads/libarchive-3.3.3.tar");
   bool ex = true;
   while (ex) {

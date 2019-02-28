@@ -10,62 +10,67 @@
 
 #include <type_traits>
 
-template<typename T, typename Owner>
+template<typename T>
+struct is_shared_ptr : std::false_type {};
+template<typename T>
+struct is_shared_ptr<std::shared_ptr<T>> : std::true_type {};
+
+template<class T>
+struct ptr_type { typedef T type; };
+template<class T>
+struct ptr_type<std::shared_ptr<T>> {
+  typedef T *type;
+};
+
+enum PropType {
+  R, W, RW
+};
+
+template<typename T, typename Owner, PropType SetGet>
 class Property final {
   friend Owner;
   using Getter = std::function<T &()>;
-  using Setter = std::function<T &(const T &)>;
+  using Setter = std::function<void(const T &)>;
  public:
   Property() = default;
-  Property(const Getter &get, const Setter &set) : get(get), set(set) {}
+  template<PropType Type = SetGet,
+      typename = typename std::enable_if<Type == PropType::RW,
+                                         void>::type>
+  Property(const Getter &get,
+           const Setter &set) : get(
+      get), set(set) {}
+  template<PropType Type = SetGet,
+      typename = typename std::enable_if<Type == PropType::R, void>::type>
+  Property(const Getter &get) : get(get) {}
+  template<PropType Type = SetGet,
+      typename = typename std::enable_if<Type == PropType::W, void>::type>
+  Property(const Setter &set) : set(set) {}
   ~Property() = default;
-  Property<T, Owner>(const Property<T, Owner> &) = delete;
-  Property<T, Owner> &operator=(const Property<T, Owner> &) = delete;
-  T &operator=(const T &f) { return set(f); }
-  operator const T &() const { return get(); }
+  Property<T, Owner>(const Property<T, Owner, SetGet> &) = delete;
+  Property<T, Owner, SetGet> &operator=(const Property<T,
+                                                       Owner,
+                                                       SetGet> &) = delete;
+  template<PropType Type = SetGet,
+      typename = typename std::enable_if<Type != PropType::R, void>::type>
+  T &operator=(const T &f) {
+    set(f);
+    return value;
+  }
+  template<PropType Type = SetGet>
+  typename std::enable_if<Type != PropType::W && is_shared_ptr<T>{},
+                          typename ptr_type<T>::type>::type
+  operator->() const { return get().get(); }
+
+  template<PropType Type = SetGet,
+      typename = typename std::enable_if<Type != PropType::W, void>::type>
+  operator const T &() const {
+    return get();
+  }
  private:
-  Getter get = [this] { return value; };
+  Getter get =
+      [this]() -> T & { return value; };
   Setter set = [this](const T &val) {
     value = val;
-    return value;
-  };
-  T value;
-};
-
-template<typename T, typename Owner>
-class ReadOnlyProperty final {
-  friend Owner;
-  using Getter = std::function<T()>;
- public:
-  ReadOnlyProperty() = default;
-  explicit ReadOnlyProperty(const Getter &get) : get(get) {}
-  ~ReadOnlyProperty() = default;
-  ReadOnlyProperty<T, Owner>(const ReadOnlyProperty<T, Owner> &) = delete;
-  ReadOnlyProperty<T, Owner> &operator=(const ReadOnlyProperty<T,
-                                                               Owner> &) = delete;
-  operator T const &() const { return get(); }
-  T operator->() const { return get(); }
- private:
-  Getter get = [this] { return value; };
-  T value;
-};
-
-template<typename T, typename Owner>
-class WriteOnlyProperty final {
-  friend Owner;
-  using Setter = std::function<T &(const T &)>;
- public:
-  WriteOnlyProperty() = default;
-  explicit WriteOnlyProperty(const Setter &set) : set(set) {}
-  ~WriteOnlyProperty() = default;
-  WriteOnlyProperty<T, Owner>(const WriteOnlyProperty<T, Owner> &) = delete;
-  WriteOnlyProperty<T, Owner> &operator=(const WriteOnlyProperty<T,
-                                                                 Owner> &) = delete;
-  T &operator=(const T &f) { return set(f); }
- private:
-  Setter set = [this](const T &val) {
-    value = val;
-    return value;
   };
   T value;
 };

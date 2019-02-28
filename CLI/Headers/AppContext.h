@@ -25,13 +25,15 @@ class AppContext {
   };
   Mode mode = Mode::normal;
 
-  ReadOnlyProperty<std::shared_ptr<MessageManager>, AppContext> messageManager;
-  ReadOnlyProperty<std::shared_ptr<ConsoleIO>, AppContext> ui;
-  ReadOnlyProperty<std::shared_ptr<ResourceManager>,
-                   AppContext> resourceManager;
-  ReadOnlyProperty<std::shared_ptr<FileDownloadManager>,
-                   AppContext> downloadManager;
-  ReadOnlyProperty<std::shared_ptr<ThreadPool>, AppContext> threadPool;
+  Property<std::shared_ptr<MessageManager>, AppContext, PropType::R>
+      messageManager;
+  Property<std::shared_ptr<ConsoleIO>, AppContext, PropType::R> ui;
+  Property<std::shared_ptr<ResourceManager>,
+           AppContext, PropType::R> resourceManager;
+  Property<std::shared_ptr<FileDownloadManager>,
+           AppContext,
+           PropType::R> downloadManager;
+  Property<std::shared_ptr<ThreadPool>, AppContext, PropType::R> threadPool;
 
   static AppContext &GetInstance();
 

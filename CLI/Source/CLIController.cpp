@@ -3,8 +3,6 @@
 //
 
 #include <CLIController.h>
-
-#include "CLIController.h"
 #include <CsvReader.h>
 #include <XlsReader.h>
 #include <XlsxWriter.h>
@@ -13,6 +11,7 @@ CLIController::CLIController()
     : MessageSender(AppContext::GetInstance().messageManager) {}
 
 void CLIController::runApp() {
+  auto tmp = ctx.messageManager.operator->();
   ctx.messageManager->registerMsg<StdinMsg>(
       this);
   ctx.messageManager->registerMsg<

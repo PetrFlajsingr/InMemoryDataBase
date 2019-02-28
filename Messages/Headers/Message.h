@@ -97,6 +97,14 @@ class Download : public DataMessage<std::pair<std::string, std::string>> {
     DataMessage::data = std::make_pair(url, dest);
   }
 };
+
+class Print : public DataMessage<std::string> {
+ public:
+  explicit Print(const std::string &data) {
+    DataMessage::data = data;
+  }
+};
+
 class DownloadNoBlock : public Download {
  public:
   explicit DownloadNoBlock(const std::pair<std::string, std::string> &data)
