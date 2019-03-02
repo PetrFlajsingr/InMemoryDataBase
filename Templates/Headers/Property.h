@@ -77,49 +77,46 @@ class Property final {
     return get();
   }
 
-  template<PropType Type = SetGet>
-  typename std::enable_if<
-      Type != PropType::W && (std::is_pointer<T>::value || is_shared_ptr<T>{}),
-      typename std::conditional<std::is_pointer<T>::value,
-                                typename std::remove_pointer<T>::type,
-                                typename std::conditional<is_shared_ptr<T>{},
-                                                          typename std::remove_pointer<
-                                                              typename ptr_type<
-                                                                  T>::type>::type,
-                                                          void>::type>::type>::type
-  operator*() const {
-    return *value;
-  }
-
   template<PropType Type = SetGet,
-      typename = typename std::enable_if<
-          Type == PropType::R && !std::is_pointer<T>::value
-              && !is_shared_ptr<T>{}>::type>
+      typename = typename std::enable_if<Type == PropType::R>::type>
   const T &operator*() const {
     return value;
   }
 
   template<PropType Type = SetGet,
-      typename = typename std::enable_if<
-          Type == PropType::RW && !std::is_pointer<T>::value
-              && !is_shared_ptr<T>{}>::type>
+      typename = typename std::enable_if<Type == PropType::RW>::type>
   T &operator*() {
     return value;
   }
 
   // TODO: readWrite, write
-  template<typename ...Args,
-      typename = typename std::enable_if<std::is_constructible<T,
-                                                               Args...>::value,
-                                         void>::type>
+  template<typename ...Args>
   static Property<T, Owner, SetGet> make_property(Getter getter, Args ...args) {
+    static_assert(std::is_constructible<T, Args...>::value,
+                  "Can't construct in make_property");
+    static_assert(SetGet != R, "Property is not read only");
     return Property<T, Owner, SetGet>(getter, T(std::forward<Args>(args)...));
   }
 
-  template<typename ...Args,
-      typename = typename std::enable_if<std::is_constructible<T,
-                                                               Args...>::value,
-                                         void>::type>
+  template<typename ...Args>
+  static Property<T, Owner, SetGet> make_property(Setter getter, Args ...args) {
+    static_assert(std::is_constructible<T, Args...>::value,
+                  "Can't construct in make_property");
+    static_assert(SetGet != W, "Property is not write only");
+    return Property<T, Owner, SetGet>(getter, T(std::forward<Args>(args)...));
+  }
+
+  template<typename ...Args>
+  static Property<T, Owner, SetGet> make_property(Getter getter,
+                                                  Setter setter,
+                                                  Args ...args) {
+    static_assert(std::is_constructible<T, Args...>::value,
+                  "Can't construct in make_property");
+    static_assert(SetGet != RW, "Property is not read write");
+    return Property<T, Owner, SetGet>(getter, T(std::forward<Args>(args)...));
+  }
+
+  template<typename ...Args>
   static Property<T, Owner, SetGet> make_property(Args ...args) {
     return Property<T, Owner, SetGet>(T(std::forward<Args>(args)...));
   }
@@ -145,35 +142,34 @@ class Property final {
   Property(const Setter &set, T val) : set(set), value(val) {}
 };
 
-// TODO: readWrite, write...
-template<typename T, typename Owner, PropType SetGet = R, typename ...Args,
+template<typename T, typename Owner, typename ...Args,
     typename Getter = std::function<const T &()>>
-Property<T, Owner, SetGet> make_property(Getter getter, Args ...args) {
-  return Property<T, Owner, SetGet>::make_property(getter,
-                                                   std::forward<Args>(args)...);
+Property<T, Owner, R> make_property(Getter getter, Args ...args) {
+  return Property<T, Owner, R>::make_property(getter,
+                                              std::forward<Args>(args)...);
+}
+
+template<typename T, typename Owner, typename ...Args,
+    typename Setter = std::function<void(const T &)>>
+Property<T, Owner, W> make_property(Setter setter, Args ...args) {
+  return Property<T, Owner, W>::make_property(setter,
+                                              std::forward<Args>(args)...);
+}
+
+template<typename T, typename Owner, typename ...Args,
+    typename Getter = std::function<const T &()>,
+    typename Setter = std::function<void(const T &)>>
+Property<T, Owner, RW> make_property(Getter getter,
+                                     Setter setter,
+                                     Args ...args) {
+  return Property<T, Owner, RW>::make_property(getter, setter,
+                                               std::forward<Args>(args)...);
 }
 
 template<typename T, typename Owner, PropType SetGet, typename ...Args>
 Property<T, Owner, SetGet> make_property(Args ...args) {
   return Property<T, Owner, SetGet>::make_property(std::forward<Args>(args)...);
 }
-/*
-template<typename T, typename Owner, PropType SetGet = W, typename ...Args,
-    typename Setter = std::function<void(const T &)>>
-Property<T, Owner, SetGet> make_property(Setter setter, Args ...args) {
-  static_assert(std::is_constructible<T, Args...>::value,
-                "Can't construct object in make_property");
-}
-
-template<typename T, typename Owner, PropType SetGet = RW, typename ...Args,
-    typename Getter = std::function<const T &()>,
-    typename Setter = std::function<void(const T &)>>
-Property<T, Owner, SetGet> make_property(Getter getter,
-                                         Setter setter,
-                                         Args ...args) {
-  static_assert(std::is_constructible<T, Args...>::value,
-                "Can't construct object in make_property");
-}*/
 
 #endif //PROJECT_PROPERTY_H
 
