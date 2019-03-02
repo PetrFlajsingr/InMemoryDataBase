@@ -8,7 +8,7 @@
 #include <iostream>
 #include <string>
 #include <MessageSender.h>
-#include <Property.h>
+#include "../../Templates/Headers/Property.h"
 
 class ConsoleIO : public MessageSender, public MessageReceiver {
  public:
@@ -27,7 +27,7 @@ class ConsoleIO : public MessageSender, public MessageReceiver {
     simple, arrow
   };
 
-  Property<Mode, ConsoleIO> mode{
+  Property<Mode, ConsoleIO, RW> mode{
       [this]() -> Mode & { return mode.value; },
       [this](const Mode &val) -> Mode & {
         mode.value = val;

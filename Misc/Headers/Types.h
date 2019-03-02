@@ -12,6 +12,9 @@
 #include <Utilities.h>
 #include <iostream>
 
+template<typename T>
+using RCptr = std::shared_ptr<T>;
+
 class DateTime;
 /**
  * Typy ulozenych dat

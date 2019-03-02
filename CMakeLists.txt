@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -o3")
+set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 
 if (APPLE)
     add_definitions(-DGTEST_USE_OWN_TR1_TUPLE)
@@ -23,6 +23,7 @@ include_directories(DataBase/QueryParser/Headers)
 include_directories(third_party/xlsxio/include)
 include_directories(third_party/catch2)
 include_directories(Messages/Headers)
+include_directories(Templates/Headers)
 
 FILE(GLOB DataProviderSources DataProviders/Source/*.cpp)
 FILE(GLOB DataProviderHeaders DataProviders/Headers/*.h)

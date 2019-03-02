@@ -13,7 +13,7 @@
 #include <ThreadPool.h>
 #include <FileDownloadManager.h>
 #include <ResourceManager.h>
-#include <Property.h>
+#include "../../Templates/Headers/Property.h"
 
 class AppContext {
  public:

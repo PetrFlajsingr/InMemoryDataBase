@@ -4,47 +4,49 @@
 
 #include <MemoryDataSet.h>
 #include <CLIController.h>
-#include <Lazy.h>
+#include "Templates/Headers/Observable.h"
+#include <Bindable.h>
 
 void terminate_handler();
 
-class LazyTest {
+class Test {
  public:
-  LazyTest() {
-    bool1.value = true;
-    bool2.value = false;
-    dt.value = DateTime();
+  Test() {
+
   }
-  Property<bool, LazyTest, RW> bool1{
-      [this]() -> bool & { return bool1.value; },
-      [this](const bool &value) {
-        bool1.value = value;
-        isTrue.invalidate();
-      }
-  };
+  std::shared_ptr<Bindable<int>> a = std::make_shared<Bindable<int>>(2);
+  std::shared_ptr<Bindable<float>> b = std::make_shared<Bindable<float>>(2.0f);
+  std::shared_ptr<Bindable<int>> c = std::make_shared<Bindable<int>>(2);
+  std::shared_ptr<Bindable<double>> d = std::make_shared<Bindable<double>>(2);
+};
 
-  Property<DateTime, LazyTest, RW> dt;
-
-  Property<bool, LazyTest, R> bool2{
-      [this]() -> bool & { return bool2.value; }
-  };
-
-  Property<bool, LazyTest, W> bool3{
-      [this](const bool &value) -> bool & {
-        bool3.value = value;
-        return bool3.value;
-      }
-  };
-
-  Lazy<bool> isTrue = Lazy<bool>([this] {
-    return (bool) bool1 | (bool) bool2;
-  });
+class ARTest : public std::enable_shared_from_this<ARTest> {
+ public:
+  std::shared_ptr<ARTest> getPtr() {
+    return shared_from_this();
+  }
+  virtual ~ARTest() {
+    std::cout << "~ARTest called" << std::endl;
+  }
 };
 
 int main(int argc, char **argv) {
-  CLIController cl;
-  cl.runApp();
-  LazyTest test;
+  //CLIController cl;
+  //cl.runApp();
+
+  Test test;
+  auto binding = test.a->add(test.b)->mul(test.c)->diff(test.d);
+  std::cout << *test.a << "+" << *test.b << "*" << *test.c << " = " << *binding
+            << std::endl;
+
+  *test.a = 10;
+  std::cout << *test.a << "+" << *test.b << "*" << *test.c << " = " << *binding
+            << std::endl;
+  *test.c = 100;
+  std::cout << *test.a << "+" << *test.b << "*" << *test.c << " = " << *binding
+            << std::endl;
+
+
   /*moor::ArchiveReader reader("/Users/petr/Downloads/libarchive-3.3.3.tar");
   bool ex = true;
   while (ex) {

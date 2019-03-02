@@ -9,6 +9,7 @@
 #define PROJECT_PROPERTY_H
 
 #include <type_traits>
+#include <iostream>
 
 template<typename T>
 struct is_shared_ptr : std::false_type {};
@@ -37,8 +38,7 @@ class Property final {
       typename = typename std::enable_if<Type == PropType::RW,
                                          void>::type>
   Property(const Getter &get,
-           const Setter &set) : get(
-      get), set(set) {}
+           const Setter &set) : get(get), set(set) {}
   template<PropType Type = SetGet,
       typename = typename std::enable_if<Type == PropType::R, void>::type>
   Property(const Getter &get) : get(get) {}
@@ -52,19 +52,42 @@ class Property final {
                                                        SetGet> &) = delete;
   template<PropType Type = SetGet,
       typename = typename std::enable_if<Type != PropType::R, void>::type>
-  T &operator=(const T &f) {
+  typename std::conditional<std::is_compound<T>::value, T &, T>::type operator=(
+      const T &f) {
     set(f);
     return value;
   }
   template<PropType Type = SetGet>
-  typename std::enable_if<Type != PropType::W && is_shared_ptr<T>{},
-                          typename ptr_type<T>::type>::type
-  operator->() const { return get().get(); }
+  typename std::enable_if<
+      Type != PropType::W && (std::is_pointer<T>::value || is_shared_ptr<T>{}),
+      typename std::conditional<std::is_pointer<T>::value,
+                                T,
+                                typename std::conditional<is_shared_ptr<T>{},
+                                                          typename ptr_type<
+                                                              T>::type,
+                                                          void>::type>::type>::type
+  operator->() const { return &*get(); }
 
   template<PropType Type = SetGet,
       typename = typename std::enable_if<Type != PropType::W, void>::type>
-  operator const T &() const {
+  operator typename std::conditional<std::is_compound<T>::value,
+                                     const T &,
+                                     T>::type() const {
     return get();
+  }
+
+  template<PropType Type = SetGet>
+  typename std::enable_if<
+      Type != PropType::W && (std::is_pointer<T>::value || is_shared_ptr<T>{}),
+      typename std::conditional<std::is_pointer<T>::value,
+                                typename std::remove_pointer<T>::type,
+                                typename std::conditional<is_shared_ptr<T>{},
+                                                          typename std::remove_pointer<
+                                                              typename ptr_type<
+                                                                  T>::type>::type,
+                                                          void>::type>::type>::type
+  operator*() const {
+    return *value;
   }
  private:
   Getter get =
