@@ -35,16 +35,12 @@ int main(int argc, char **argv) {
   //cl.runApp();
 
   Test test;
-  auto binding = test.a->add(test.b)->mul(test.c)->diff(test.d);
-  std::cout << *test.a << "+" << *test.b << "*" << *test.c << " = " << *binding
-            << std::endl;
-
-  *test.a = 10;
-  std::cout << *test.a << "+" << *test.b << "*" << *test.c << " = " << *binding
-            << std::endl;
-  *test.c = 100;
-  std::cout << *test.a << "+" << *test.b << "*" << *test.c << " = " << *binding
-            << std::endl;
+  auto binding = test.a->transform<int>([](int a) {
+    return 10 * a;
+  });
+  std::cout << *binding << std::endl;
+  *test.a = 100;
+  std::cout << *binding << std::endl;
 
 
   /*moor::ArchiveReader reader("/Users/petr/Downloads/libarchive-3.3.3.tar");

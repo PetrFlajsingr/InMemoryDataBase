@@ -41,10 +41,10 @@ template<typename T,
 class Binding
     : public Bindable<Ret>,
       public Observer {
-  using ComputeFnc = std::function<Ret(std::shared_ptr<Bindable<T>> a,
-                                       std::shared_ptr<Bindable<U>> b)>;
- public:
+  using ComputeFnc = std::function<Ret(std::shared_ptr<Bindable<T>>,
+                                       std::shared_ptr<Bindable<U>>)>;
   using Observable<Ret>::operator=;
+ public:
   Binding(std::shared_ptr<Bindable<T>> a,
           std::shared_ptr<Bindable<U>> b,
           ComputeFnc compute)
@@ -65,6 +65,25 @@ class Binding
   ComputeFnc compute;
   std::shared_ptr<Bindable<T>> a;
   std::shared_ptr<Bindable<U>> b;
+};
+
+template<typename T, typename U>
+class TransformBinding : public Bindable<T>, public Observer {
+  using TransFunc = std::function<T(U)>;
+  using Observable<T>::operator=;
+ public:
+  TransformBinding(const std::shared_ptr<Bindable<U>> &a,
+                   const TransFunc &transform)
+      : transform(transform), a(a) {
+    *this = transform(*a);
+    a->addObserver(this);
+  }
+  void update(ObservableBase const *) override {
+    *this = transform(*a);
+  }
+ private:
+  TransFunc transform;
+  std::shared_ptr<Bindable<U>> a;
 };
 
 template<typename T>
@@ -149,6 +168,14 @@ class Bindable
                                               std::shared_ptr<Bindable<U>> b) -> Ret {
                                              return (T) *a / (U) * b;
                                            });
+  }
+
+  template<typename U>
+  std::shared_ptr<TransformBinding<U, T>> transform(std::function<U(T)> func) {
+    static_assert(
+        std::is_fundamental<U>::value && std::is_fundamental<T>::value);
+    return std::make_shared<TransformBinding<U, T>>(this->shared_from_this(),
+                                                    func);
   }
 
  private:
