@@ -12,8 +12,19 @@ void terminate_handler();
 class Test {
  public:
   Test() {
-
+    dataSet.value = DataSets::MemoryDataSet("test");
+    ptr = &dataSet.value;
   }
+
+  Property<DataSets::MemoryDataSet, Test, RW> dataSet =
+      make_property<DataSets::MemoryDataSet, Test, RW>("man");
+
+  void foo() {
+    std::cout << "get" << std::endl;
+  }
+
+  DataSets::MemoryDataSet *ptr;
+
   std::shared_ptr<Bindable<int>> a = std::make_shared<Bindable<int>>(2);
   std::shared_ptr<Bindable<float>> b = std::make_shared<Bindable<float>>(2.0f);
   std::shared_ptr<Bindable<int>> c = std::make_shared<Bindable<int>>(2);
@@ -41,6 +52,11 @@ int main(int argc, char **argv) {
   std::cout << *binding << std::endl;
   *test.a = 100;
   std::cout << *binding << std::endl;
+
+  (*test.dataSet).setName("hihihi");
+
+  std::cout << (*test.dataSet).getName();
+
 
 
   /*moor::ArchiveReader reader("/Users/petr/Downloads/libarchive-3.3.3.tar");

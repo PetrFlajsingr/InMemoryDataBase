@@ -10,6 +10,7 @@
 
 #include <type_traits>
 #include <iostream>
+#include <utility>
 
 template<typename T>
 struct is_shared_ptr : std::false_type {};
@@ -30,7 +31,7 @@ enum PropType {
 template<typename T, typename Owner, PropType SetGet>
 class Property final {
   friend Owner;
-  using Getter = std::function<T &()>;
+  using Getter = std::function<const T &()>;
   using Setter = std::function<void(const T &)>;
  public:
   Property() = default;
@@ -89,6 +90,39 @@ class Property final {
   operator*() const {
     return *value;
   }
+
+  template<PropType Type = SetGet,
+      typename = typename std::enable_if<
+          Type == PropType::R && !std::is_pointer<T>::value
+              && !is_shared_ptr<T>{}>::type>
+  const T &operator*() const {
+    return value;
+  }
+
+  template<PropType Type = SetGet,
+      typename = typename std::enable_if<
+          Type == PropType::RW && !std::is_pointer<T>::value
+              && !is_shared_ptr<T>{}>::type>
+  T &operator*() {
+    return value;
+  }
+
+  // TODO: readWrite, write
+  template<typename ...Args,
+      typename = typename std::enable_if<std::is_constructible<T,
+                                                               Args...>::value,
+                                         void>::type>
+  static Property<T, Owner, SetGet> make_property(Getter getter, Args ...args) {
+    return Property<T, Owner, SetGet>(getter, T(std::forward<Args>(args)...));
+  }
+
+  template<typename ...Args,
+      typename = typename std::enable_if<std::is_constructible<T,
+                                                               Args...>::value,
+                                         void>::type>
+  static Property<T, Owner, SetGet> make_property(Args ...args) {
+    return Property<T, Owner, SetGet>(T(std::forward<Args>(args)...));
+  }
  private:
   Getter get =
       [this]() -> T & { return value; };
@@ -96,7 +130,51 @@ class Property final {
     value = val;
   };
   T value;
+
+  Property(T val) : value(val) {}
+  template<PropType Type = SetGet,
+      typename = typename std::enable_if<Type == PropType::RW,
+                                         void>::type>
+  Property(const Getter &get,
+           const Setter &set, T val) : get(get), set(set), value(val) {}
+  template<PropType Type = SetGet,
+      typename = typename std::enable_if<Type == PropType::R, void>::type>
+  Property(const Getter &get, T val) : get(get), value(val) {}
+  template<PropType Type = SetGet,
+      typename = typename std::enable_if<Type == PropType::W, void>::type>
+  Property(const Setter &set, T val) : set(set), value(val) {}
 };
+
+// TODO: readWrite, write...
+template<typename T, typename Owner, PropType SetGet = R, typename ...Args,
+    typename Getter = std::function<const T &()>>
+Property<T, Owner, SetGet> make_property(Getter getter, Args ...args) {
+  return Property<T, Owner, SetGet>::make_property(getter,
+                                                   std::forward<Args>(args)...);
+}
+
+template<typename T, typename Owner, PropType SetGet, typename ...Args>
+Property<T, Owner, SetGet> make_property(Args ...args) {
+  return Property<T, Owner, SetGet>::make_property(std::forward<Args>(args)...);
+}
+/*
+template<typename T, typename Owner, PropType SetGet = W, typename ...Args,
+    typename Setter = std::function<void(const T &)>>
+Property<T, Owner, SetGet> make_property(Setter setter, Args ...args) {
+  static_assert(std::is_constructible<T, Args...>::value,
+                "Can't construct object in make_property");
+}
+
+template<typename T, typename Owner, PropType SetGet = RW, typename ...Args,
+    typename Getter = std::function<const T &()>,
+    typename Setter = std::function<void(const T &)>>
+Property<T, Owner, SetGet> make_property(Getter getter,
+                                         Setter setter,
+                                         Args ...args) {
+  static_assert(std::is_constructible<T, Args...>::value,
+                "Can't construct object in make_property");
+}*/
+
 #endif //PROJECT_PROPERTY_H
 
 #pragma clang diagnostic pop
