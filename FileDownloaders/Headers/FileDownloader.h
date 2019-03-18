@@ -10,20 +10,23 @@
 #include "Exceptions.h"
 #include "FileDownloadObserver.h"
 #include <curl/curl.h>
-
+/**
+ * Provides capability to download a file and save it.
+ */
 class FileDownloader {
  public:
-  explicit FileDownloader(std::string_view downloadLocation);
-
   /**
-   * Stazeni vybraneho souboru na disk. Cesta k ulozeni je urcena
-   * v konstruktoru objektu.
-   * @param fileName Nazev souboru ke stazeni
+   *
+   * @param downloadLocation folder where all downloaded files will be saved.
    */
-  bool downloadFile(std::string_view fileName);
-
+  explicit FileDownloader(std::string_view downloadLocation);
+  /**
+   * Download file from given url.
+   * @param url
+   */
+  bool downloadFile(std::string_view url);
+  
   void addObserver(gsl::not_null<FileDownloadObserver *> observer);
-
   void removeObserver(FileDownloadObserver *observer);
 
  protected:

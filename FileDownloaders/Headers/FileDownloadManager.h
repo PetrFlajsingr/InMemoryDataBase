@@ -12,7 +12,11 @@
 #include <MessageReceiver.h>
 #include <Utilities.h>
 #include <FileDownloader.h>
-
+#include <memory>
+/**
+ * Receives messages requiring file download. Provides information about download
+ * progress and handles asynchronous downloads.
+ */
 class FileDownloadManager : public MessageReceiver, public MessageSender {
  public:
   FileDownloadManager(const std::shared_ptr<MessageManager> &commandManager,
@@ -47,7 +51,9 @@ class FileDownloadManager : public MessageReceiver, public MessageSender {
         }
         downloader.downloadFile(msg->getData().first);
       };
-
+  /**
+   * Observer used for keeping information about download state.
+   */
   class CountObserver : public FileDownloadObserver {
    public:
     explicit CountObserver(FileDownloadManager *parent);
@@ -59,7 +65,9 @@ class FileDownloadManager : public MessageReceiver, public MessageSender {
    private:
     FileDownloadManager *parent;
   };
-
+  /**
+   * Dispatches messages about download progress and state.
+   */
   class Dispatcher : public FileDownloadObserver, public MessageSender {
    public:
     explicit Dispatcher(const std::shared_ptr<MessageManager> &commandManager);

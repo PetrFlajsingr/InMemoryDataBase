@@ -10,17 +10,17 @@ FileDownloader::FileDownloader(std::string_view downloadLocation)
     : downloadLocation(downloadLocation) {
 
 }
-bool FileDownloader::downloadFile(std::string_view fileName) {
+bool FileDownloader::downloadFile(std::string_view url) {
   CURL *curl;
   CURLcode res;
 
   curl = curl_easy_init();
   std::string readBuffer;
   if (curl) {
-    curl_easy_setopt(curl, CURLOPT_URL, fileName);
+    curl_easy_setopt(curl, CURLOPT_URL, url);
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 
-    auto parts = Utilities::splitStringByDelimiter(fileName, "/");
+    auto parts = Utilities::splitStringByDelimiter(url, "/");
     auto name = parts.back();
     //saveFile(readBuffer, downloadLocation + name);
     FILE *fp;
@@ -29,16 +29,16 @@ bool FileDownloader::downloadFile(std::string_view fileName) {
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 
-    notifyDownloadStarted(fileName);
+    notifyDownloadStarted(url);
     res = curl_easy_perform(curl);
 
     if (res != CURLE_OK) {
-      notifyDownloadFailed(fileName, "dunno");
+      notifyDownloadFailed(url, "dunno");
       fclose(fp);
       return false;
     }
 
-    notifyDownloadFinished(fileName, downloadLocation + name);
+    notifyDownloadFinished(url, downloadLocation + name);
 
     fclose(fp);
     curl_easy_cleanup(curl);
