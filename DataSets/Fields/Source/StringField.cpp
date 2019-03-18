@@ -21,7 +21,7 @@ void DataSets::StringField::setAsString(std::string_view value) {
                      getFieldType());
 }
 
-std::string_view DataSets::StringField::getAsString() const {
+std::string DataSets::StringField::getAsString() const {
   return data;
 }
 

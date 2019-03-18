@@ -19,7 +19,7 @@ void DataSets::DoubleField::setAsString(std::string_view value) {
   setData(&data, getFieldType());
 }
 
-std::string_view DataSets::DoubleField::getAsString() const {
+std::string DataSets::DoubleField::getAsString() const {
   return std::to_string(data);
 }
 

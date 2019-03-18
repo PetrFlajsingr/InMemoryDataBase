@@ -117,7 +117,7 @@ target_link_libraries(cedr ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 
 target_link_libraries(zdrav xlsxio_read)
 target_link_libraries(zdrav xlsxio_write)
-target_link_libraries(zdrav ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
+target_link_libraries(zdrav Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 
 target_link_libraries(catch_tests xlsxio_read)
 target_link_libraries(catch_tests xlsxio_write)

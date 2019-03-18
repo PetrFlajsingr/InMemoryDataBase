@@ -50,7 +50,7 @@ class BaseField {
    * Navrat hodnoty v poli jako string
    * @return
    */
-  virtual std::string_view getAsString() const = 0;
+  virtual std::string getAsString() const = 0;
 
   /**
    *

@@ -24,7 +24,7 @@ class IntegerField : public BaseField {
 
   void setAsString(std::string_view value) override;
 
-  std::string_view getAsString() const override;
+  std::string getAsString() const override;
 
   void setAsInteger(int value);
 

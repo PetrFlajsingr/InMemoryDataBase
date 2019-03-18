@@ -559,6 +559,7 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataSets::MemoryDataSet::fullView()
     result->rawData()->emplace_back(std::vector<DataSetRow *>{val});
   }
   result->rawData()->emplace_back();
+  result->resetBegin();
   return result;
 }
 

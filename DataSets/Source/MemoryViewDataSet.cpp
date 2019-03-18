@@ -425,3 +425,51 @@ void DataSets::MemoryViewDataSet::addParents(const std::vector<std::shared_ptr<
 const std::vector<std::shared_ptr<DataSets::MemoryDataSet>> &DataSets::MemoryViewDataSet::getParents() const {
   return parents;
 }
+
+std::shared_ptr<DataSets::MemoryDataSet> DataSets::MemoryViewDataSet::toDataSet() {
+  auto result = std::make_shared<MemoryDataSet>(getName());
+  std::vector<ValueType> fieldTypes;
+
+  if (allowedFields.empty()) {
+    std::transform(fields.begin(), fields.end(), std::back_inserter(fieldTypes),
+                   [](std::shared_ptr<BaseField> &field) {
+                     return field->getFieldType();
+                   });
+  } else {
+    std::transform(allowedFields.begin(),
+                   allowedFields.end(),
+                   std::back_inserter(fieldTypes),
+                   [](BaseField *field) {
+                     return field->getFieldType();
+                   });
+  }
+  result->openEmpty(getFieldNames(), fieldTypes);
+  auto resFields = result->getFields();
+  while (next()) {
+    result->append();
+    for (int i = 0; i < resFields.size(); ++i) {
+      if (allowedFields.empty()) {
+        resFields[i]->setAsString(fields[i]->getAsString());
+      } else {
+        resFields[i]->setAsString(allowedFields[i]->getAsString());
+      }
+    }
+  }
+
+  result->resetBegin();
+  return result;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

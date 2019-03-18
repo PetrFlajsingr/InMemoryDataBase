@@ -62,6 +62,8 @@ class MemoryViewDataSet : public ViewDataSet {
   void addParents(const std::vector<std::shared_ptr<MemoryDataSet>> &parents);
   const std::vector<std::shared_ptr<MemoryDataSet>> &getParents() const;
 
+  std::shared_ptr<MemoryDataSet> toDataSet();
+
   class iterator : public std::iterator<std::random_access_iterator_tag, int> {
    public:
     iterator() = default;

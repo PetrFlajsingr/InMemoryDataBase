@@ -18,7 +18,7 @@ void DataSets::DateTimeField::setAsString(std::string_view value) {
   setData(&data, ValueType::DateTime);
 }
 
-std::string_view DataSets::DateTimeField::getAsString() const {
+std::string DataSets::DateTimeField::getAsString() const {
   return data.toString();
 }
 

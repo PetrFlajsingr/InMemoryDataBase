@@ -88,6 +88,7 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::execSimpleQuery(
   if (keepView) {
     views.emplace_back(result);
   }
+  result->dataSet->resetBegin();
   return result;
 }
 
@@ -125,6 +126,7 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::execAggregateQuery(
 
   result->dataSet->setName(std::string(viewName));
 
+  result->dataSet->resetBegin();
   return result;
 }
 

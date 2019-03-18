@@ -20,7 +20,7 @@ void DataSets::IntegerField::setAsString(std::string_view value) {
   BaseField::setData(&data, getFieldType());
 }
 
-std::string_view DataSets::IntegerField::getAsString() const {
+std::string DataSets::IntegerField::getAsString() const {
   return std::to_string(data);
 }
 

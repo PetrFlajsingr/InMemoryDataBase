@@ -24,7 +24,7 @@ class DateTimeField : public BaseField {
 
   void setAsString(std::string_view value) override;
 
-  std::string_view getAsString() const override;
+  std::string getAsString() const override;
 
   void setAsDateTime(const DateTime &dateTime);
 

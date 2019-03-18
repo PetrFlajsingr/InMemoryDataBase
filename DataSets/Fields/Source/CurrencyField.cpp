@@ -24,7 +24,7 @@ void DataSets::CurrencyField::setAsString(std::string_view value) {
   setData(&data, getFieldType());
 }
 
-std::string_view DataSets::CurrencyField::getAsString() const {
+std::string DataSets::CurrencyField::getAsString() const {
   return dec::toString(data);
 }
 

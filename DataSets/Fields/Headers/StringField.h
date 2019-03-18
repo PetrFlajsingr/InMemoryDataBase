@@ -24,7 +24,7 @@ class StringField : public BaseField {
 
   void setAsString(std::string_view value) override;
 
-  std::string_view getAsString() const override;
+  std::string getAsString() const override;
 
   std::function<int8_t(const DataSetRow *,
                        const DataSetRow *)> getCompareFunction() const override;
