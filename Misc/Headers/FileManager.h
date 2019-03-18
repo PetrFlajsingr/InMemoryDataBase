@@ -16,7 +16,9 @@ class FileException : public IOException {
   explicit FileException(const char *message);
   explicit FileException(const std::string &message);
 };
-
+/**
+ * Represents a file. Provides methods to open said file.
+ */
 class File {
  private:
   boost::filesystem::path path;
@@ -27,7 +29,9 @@ class File {
   std::ifstream inStream();
   std::ofstream ofStream();
 };
-
+/**
+ * Represents a folder. Provides methods to move in file structure.
+ */
 class Folder {
  private:
   boost::filesystem::path path;
@@ -42,7 +46,9 @@ class Folder {
 
   const boost::filesystem::path &getPath() const;
 };
-
+/**
+ * Basic access point to File/Folder classes.
+ */
 class FileManager {
  public:
   Folder getFolder(std::string_view path);

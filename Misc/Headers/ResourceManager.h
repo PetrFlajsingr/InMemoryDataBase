@@ -13,9 +13,17 @@
 enum ResourceType {
   Image, Text, Csv, Archive
 };
-
+/**
+ * Access point for resource handling.
+ */
 class ResourceManager {
  public:
+  /**
+   * Return a string resource [category[name]]
+   * @tparam T type of resource
+   * @param resString resource string indetifying the value
+   * @return value saved under provided key
+   */
   template<typename T>
   T getResource(std::string_view resString) {
     if (resString[0] == '['

@@ -7,6 +7,12 @@
 
 #include <functional>
 
+/**
+ * Lazy init implementation. Allows for value initialisation using a function.
+ *
+ * Call to invalidate forces the object to recalculate saved value on next access.
+ * @tparam T type of value stored.
+ */
 template<typename T>
 class Lazy {
   using InitFnc = std::function<T()>;

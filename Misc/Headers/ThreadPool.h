@@ -13,13 +13,18 @@
 #include <future>
 #include <MessageReceiver.h>
 #include <map>
-
+/**
+ * Synchronisation structure for tasks in the same group.
+ */
 struct TagSync {
   std::condition_variable cv;
   std::mutex mtx;
   std::size_t cnt = 0;
 };
-
+/**
+ * Thread pool running executables either provided via enqueue method or
+ * via a message.
+ */
 class ThreadPool final : public MessageReceiver {
  public:
   using Task = std::function<void()>;

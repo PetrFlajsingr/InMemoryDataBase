@@ -12,7 +12,7 @@
 #include <chrono>
 
 /**
- * Typ zpravy pro log
+ * Types of log messages
  */
 enum class LogLevel { Verbose, Info, Status, Debug, Warning, Error };
 
@@ -20,10 +20,9 @@ class Logger {
  private:
   explicit Logger(bool isAllowedDebug = false)
       : isAllowedDebug(isAllowedDebug) {}
-
   /**
    *
-   * @return Momentalni cas ve formatu HH-MM-SS
+   * @return Current time as HH-MM-SS
    */
   std::string getTime() {
     auto t = std::time(nullptr);
@@ -32,9 +31,8 @@ class Logger {
     ss << std::put_time(&tm, "%H-%M-%S");
     return ss.str();
   }
-
   /**
-   * Popisek pro jednotlive urovne logovani
+   * Log tags
    * @param level
    * @return
    */
@@ -47,14 +45,10 @@ class Logger {
       case LogLevel::Warning: return "[WARNING]";
       case LogLevel::Error: return "[ERROR]";
     }
-    return "";
   }
 
   bool isAllowedDebug;
 
-  /**
-   * Pro logovani casu
-   */
   std::chrono::milliseconds startTimeMs;
   std::chrono::milliseconds endTimeMs;
 
@@ -63,12 +57,11 @@ class Logger {
     static Logger instance;
     return instance;
   }
-
   /**
-   * Vypis zpravu na stdout
-   * @param logLevel typ zpravy
-   * @param message zprava
-   * @param printTime pokud true, vypise cas, jinak nic
+   * Print to stdout
+   * @param logLevel
+   * @param message
+   * @param printTime
    */
   void log(LogLevel logLevel, std::string message, bool printTime = false) {
     if (isAllowedDebug && logLevel == LogLevel::Debug) {
@@ -83,12 +76,11 @@ class Logger {
     }
     std::cout << message << std::endl;
   }
-
   /**
-   * Vypis obsahu .what() ve vyjimce
-   * @param logLevel typ zpravy
-   * @param exception vyjimka, o niz se ma vypsat info
-   * @param printTime pokud true, vypise cas, jinak nic
+   * Exception logging
+   * @param logLevel
+   * @param exception exception to print out
+   * @param printTime
    */
   void log(LogLevel logLevel,
            const std::exception &exception,
@@ -106,25 +98,17 @@ class Logger {
     }
     std::cout << message << std::endl;
   }
-
-  /**
-   * Uloz pocatecni stav pro logovani.
-   */
   void startTime() {
     startTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::system_clock::now().time_since_epoch());
   }
-
-  /**
-   * Uloz koncovy stav pro logovani.
-   */
   void endTime() {
     endTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::system_clock::now().time_since_epoch());
   }
 
   /**
-   * Vypise na stdout rozdil endTime a startTime v ms.
+   * Print time difference between endTime() and startTime() calls
    */
   void printElapsedTime() {
     auto tmp = endTimeMs - startTimeMs;

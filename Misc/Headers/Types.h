@@ -16,9 +16,7 @@ template<typename T>
 using RCptr = std::shared_ptr<T>;
 
 class DateTime;
-/**
- * Typy ulozenych dat
- */
+
 enum class ValueType {
   Integer,
   Double,
@@ -27,21 +25,15 @@ enum class ValueType {
   DateTime
 };
 
-/**
- * Poradi pro razeni
- */
 enum class SortOrder {
   Ascending,
   Descending
 };
 
-/**
- * Mena reprezentovana jako fixed point hodnota se dvemi desetinnymi misty
- */
 typedef dec::decimal<2> Currency;
 
 /**
- * Union ukladajici data memory data setu.
+ * Main data container for data sets
  */
 union DataContainer {
   gsl::zstring<> _string = nullptr;
@@ -122,9 +114,6 @@ union DataContainer {
   }
 };
 
-/**
- * Struktura pro jeden zaznam v data setu.
- */
 using DataSetRow = std::vector<DataContainer>;
 
 int compareDataContainers(const DataContainer &data1,
