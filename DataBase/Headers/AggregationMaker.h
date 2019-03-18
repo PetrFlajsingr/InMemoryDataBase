@@ -80,6 +80,7 @@ class AggregationMaker {
 
   std::vector<Unique> groupByFields;
   std::vector<Sum> sumFields;
+  std::vector<Count> countFields;
   std::vector<std::pair<AgrOperator, gsl::index>> writeOrder;
 
   std::vector<std::pair<gsl::index, gsl::index>> fieldIndices;

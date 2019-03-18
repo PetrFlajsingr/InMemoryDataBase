@@ -62,9 +62,8 @@ std::shared_ptr<DataSets::MemoryDataSet> DataBase::AggregationMaker::prepareData
         //maxFields.emplace_back(field);
         //writeOrder.emplace_back(AgrOperator::max, maxFields.size() - 1);
         break;
-      case AgrOperator::count:
-        //countFields.emplace_back(field);
-        //writeOrder.emplace_back(AgrOperator::count, countFields.size() - 1);
+      case AgrOperator::count:countFields.emplace_back(field);
+        writeOrder.emplace_back(AgrOperator::count, countFields.size() - 1);
         break;
       case AgrOperator::sum:sumFields.emplace_back(field);
         writeOrder.emplace_back(AgrOperator::sum, sumFields.size() - 1);
@@ -75,7 +74,11 @@ std::shared_ptr<DataSets::MemoryDataSet> DataBase::AggregationMaker::prepareData
         break;
     }
     fieldNames.emplace_back(field->getName());
-    fieldTypes.emplace_back(field->getFieldType());
+    if (val.op == AgrOperator::count) {
+      fieldTypes.emplace_back(ValueType::Integer);
+    } else {
+      fieldTypes.emplace_back(field->getFieldType());
+    }
     fieldIndices.emplace_back(DataSets::BaseField::convertIndex(*field));
   }
 
@@ -133,7 +136,9 @@ void DataBase::AggregationMaker::aggregateDataSet(
             }
             break;
           case AgrOperator::avg:break;
-          case AgrOperator::count:break;
+          case AgrOperator::count:
+            (*(*resultIter))[cnt]._integer = countFields[info.second].count;
+            break;
           case AgrOperator::min:break;
           case AgrOperator::max:break;
           case AgrOperator::group:
@@ -175,9 +180,15 @@ void DataBase::AggregationMaker::aggregateDataSet(
       for (auto &sum : sumFields) {
         sum.reset();
       }
+      for (auto &count : countFields) {
+        count.reset();
+      }
     }
     for (auto &sum : sumFields) {
       sum.accumulate((*val)[sum.field->getIndex()]);
+    }
+    for (auto &count : countFields) {
+      count.add();
     }
   }
 
@@ -201,7 +212,9 @@ void DataBase::AggregationMaker::aggregateDataSet(
           }
           break;
         case AgrOperator::avg:break;
-        case AgrOperator::count:break;
+        case AgrOperator::count:
+          (*(*resultIter))[cnt]._integer = countFields[info.second].count;
+          break;
         case AgrOperator::min:break;
         case AgrOperator::max:break;
         case AgrOperator::group:
@@ -278,7 +291,9 @@ void DataBase::AggregationMaker::aggregateView(
             }
             break;
           case AgrOperator::avg:break;
-          case AgrOperator::count:break;
+          case AgrOperator::count:
+            (*(*resultIter))[cnt]._integer = countFields[info.second].count;
+            break;
           case AgrOperator::min:break;
           case AgrOperator::max:break;
           case AgrOperator::group:
@@ -320,9 +335,15 @@ void DataBase::AggregationMaker::aggregateView(
       for (auto &sum : sumFields) {
         sum.reset();
       }
+      for (auto &count : countFields) {
+        count.reset();
+      }
     }
     for (auto &sum : sumFields) {
       sum.accumulate((*val[sum.fieldIndex.first])[sum.fieldIndex.second]);
+    }
+    for (auto &count : countFields) {
+      count.add();
     }
   }
 
@@ -346,7 +367,9 @@ void DataBase::AggregationMaker::aggregateView(
           }
           break;
         case AgrOperator::avg:break;
-        case AgrOperator::count:break;
+        case AgrOperator::count:
+          (*(*resultIter))[cnt]._integer = countFields[info.second].count;
+          break;
         case AgrOperator::min:break;
         case AgrOperator::max:break;
         case AgrOperator::group:
@@ -438,5 +461,11 @@ DataBase::BaseAgr::BaseAgr(DataSets::BaseField *field) : field(field) {
 DataBase::Min::Min(DataSets::BaseField *field) : BaseAgr(field) {}
 DataBase::Max::Max(DataSets::BaseField *field) : BaseAgr(field) {}
 DataBase::Count::Count(DataSets::BaseField *field) : BaseAgr(field) {}
+void DataBase::Count::add() {
+  count++;
+}
+void DataBase::Count::reset() {
+  count = 0;
+}
 DataBase::Avg::Avg(DataSets::BaseField *field, DataSets::BaseField *field1)
     : Sum(field), Count(field1) {}

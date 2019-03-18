@@ -39,9 +39,11 @@ ScriptParser::Command ScriptParser::parseInput(std::string_view input) {
     }
   } else if (tokens.size() > 9 && tokens[0] == "load") {
     if (tokens[2] == "file" && tokens[4] == "to"
-        && tokens[6] == "as" && tokens[8] == "types") {
+        && tokens[6] == "as") {
+      auto typesOffset = 9;
       if (tokens[1] == "csv") {
         fileType = FileTypes::csv;
+        typesOffset = 11;
       } else if (tokens[1] == "xlsx") {
         fileType = FileTypes::xlsx;
       } else {
@@ -50,8 +52,14 @@ ScriptParser::Command ScriptParser::parseInput(std::string_view input) {
       filePath = tokens[3];
       dbName = tokens[5];
       dataSetName = tokens[7];
+      if (fileType == FileTypes::csv) {
+        if (tokens[8] != "delimiter") {
+          return Command::unknown;
+        }
+        delimiter = tokens[9];
+      }
       valueTypes.clear();
-      for (auto it = tokens.begin() + 9; it != tokens.end(); ++it) {
+      for (auto it = tokens.begin() + typesOffset; it != tokens.end(); ++it) {
         if (*it == "string") {
           valueTypes.emplace_back(ValueType::String);
         } else if (*it == "integer") {
@@ -162,7 +170,7 @@ bool ScriptParser::runCommand(ScriptParser::Command command) {
       switch (fileType) {
         case ScriptParser::FileTypes::csv:
           provider =
-              new DataProviders::CsvReader(filePath);
+              new DataProviders::CsvReader(filePath, delimiter);
           break;
         case ScriptParser::FileTypes::xlsx:
           provider =
@@ -219,10 +227,18 @@ bool ScriptParser::runCommand(ScriptParser::Command command) {
         return false;
       }
       {
-        auto result = AppContext::GetInstance().DBs[dbName]->execSimpleQuery(
-            query,
-            false,
-            dataSetName);
+        auto startMs =
+            std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+        std::shared_ptr<DataBase::View> result;
+        if (query.find("group") != std::string::npos) {
+          result = AppContext::GetInstance().DBs[dbName]->execAggregateQuery(
+              query, dataSetName);
+        } else {
+          result = AppContext::GetInstance().DBs[dbName]->execSimpleQuery(
+              query,
+              false,
+              dataSetName);
+        }
         DataWriters::BaseDataWriter *writer;
         switch (fileType) {
           case ScriptParser::FileTypes::csv:
@@ -245,6 +261,10 @@ bool ScriptParser::runCommand(ScriptParser::Command command) {
           writer->writeRecord(record);
         }
         delete writer;
+        auto endMs =
+            std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
+        std::cout << "Exec time: " << (endMs - startMs).count() << "ms"
+                  << std::endl;
       }
       break;
     case ScriptParser::Command::save:break;

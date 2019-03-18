@@ -44,6 +44,8 @@ class ScriptParser {
   FileTypes fileType;
   SaveMode saveMode;
 
+  std::string delimiter;
+
   static std::string ReplaceResources(std::string input);
  private:
   std::vector<std::string> tokenize(std::string_view input);

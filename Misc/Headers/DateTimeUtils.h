@@ -11,6 +11,7 @@
 #include <sstream>
 #include <ostream>
 #include <boost/date_time.hpp>
+#include <cereal/cereal.hpp>
 
 /**
  * Trida pro reprezentaci casu a data.
@@ -80,6 +81,28 @@ class DateTime {
 #pragma clang diagnostic ignored "-Wconversion"
   friend std::istream &operator>>(std::istream &is, DateTime &dateTime);
 #pragma clang diagnostic pop
+
+  template<class Archive>
+  void save(Archive &ar) const {
+    ar(CEREAL_NVP(year));
+    ar(CEREAL_NVP(month));
+    ar(CEREAL_NVP(day));
+    ar(CEREAL_NVP(hour));
+    ar(CEREAL_NVP(minute));
+    ar(CEREAL_NVP(second));
+    ar(CEREAL_NVP(millisecond));
+  }
+
+  template<class Archive>
+  void load(Archive &ar) {
+    ar(year);
+    ar(month);
+    ar(day);
+    ar(hour);
+    ar(minute);
+    ar(second);
+    ar(millisecond);
+  }
 
  private:
   int32_t year = 0;

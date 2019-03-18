@@ -6,6 +6,9 @@
 #include <CLIController.h>
 #include "Templates/Headers/Observable.h"
 #include <Bindable.h>
+#include <cereal/cereal.hpp>
+#include <cereal/types/memory.hpp>
+#include <cereal/archives/json.hpp>
 
 void terminate_handler();
 
@@ -15,32 +18,13 @@ class Test {
 
   }
 
-  Property<DataSets::MemoryDataSet, Test, RW> dataSet =
-      make_property<DataSets::MemoryDataSet, Test, RW>("man");
-
-  std::shared_ptr<Bindable<int>> a = std::make_shared<Bindable<int>>(2);
-  std::shared_ptr<Bindable<float>> b = std::make_shared<Bindable<float>>(2.0f);
-  std::shared_ptr<Bindable<int>> c = std::make_shared<Bindable<int>>(2);
-  std::shared_ptr<Bindable<double>> d = std::make_shared<Bindable<double>>(2);
+  Property<std::shared_ptr<Bindable<int>>, Test, RW>
+      s = std::make_shared<Bindable<int>>();
 };
 
 int main(int argc, char **argv) {
-  //CLIController cl;
-  //cl.runApp();
-
-  Test test;
-  auto binding = test.a->transform<int>([](int a) {
-    return 10 * a;
-  });
-  std::cout << *binding << std::endl;
-  *test.a = 100;
-  std::cout << *binding << std::endl;
-
-  (*test.dataSet).setName("hihihi");
-
-  std::cout << (*test.dataSet).getName();
-
-
+  CLIController cl;
+  cl.runApp();
 
   /*moor::ArchiveReader reader("/Users/petr/Downloads/libarchive-3.3.3.tar");
   bool ex = true;

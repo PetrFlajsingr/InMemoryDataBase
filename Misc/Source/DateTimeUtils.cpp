@@ -116,10 +116,12 @@ bool DateTime::operator>=(const DateTime &rhs) const {
   return !(*this < rhs);
 }
 std::ostream &operator<<(std::ostream &os, const DateTime &dateTime) {
-  os << dateTime.year << "-" << dateTime.month << "-" << dateTime.day << " "
-     << dateTime.hour << "-" << dateTime.minute << "-" << dateTime.second
+  os << dateTime.year << "-" << (int) dateTime.month << "-"
+     << (int) dateTime.day << " "
+     << (int) dateTime.hour << "-" << (int) dateTime.minute << "-"
+     << (int) dateTime.second
      << " "
-     << dateTime.millisecond;
+     << (int) dateTime.millisecond;
   return os;
 }
 std::istream &operator>>(std::istream &is, DateTime &dateTime) {

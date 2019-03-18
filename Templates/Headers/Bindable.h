@@ -90,7 +90,9 @@ template<typename T>
 class Bindable
     : public Observable<T>, public std::enable_shared_from_this<Bindable<T>> {
  public:
-  Bindable() = default;
+  Bindable() {
+    std::cout << "jo" << std::endl;
+  }
   explicit Bindable(T value) : Observable<T>(value) {}
   void bindBidirectional(Bindable<T> *to) {
     to->bind(this);
