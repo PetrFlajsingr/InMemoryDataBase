@@ -54,7 +54,7 @@ class FncMessage : public Message {
  */
 class ExecAsync : public FncMessage<std::function<void()>> {
  public:
-  ExecAsync(const std::function<void()> &fnc) : FncMessage(fnc) {}
+  explicit ExecAsync(const std::function<void()> &fnc) : FncMessage(fnc) {}
 };
 /**
  * Function to be run asynchronously. Provide a tag to groupy tasks.

@@ -11,6 +11,7 @@
 #include <type_traits>
 #include <iostream>
 #include <utility>
+#include <memory>
 
 template<typename T>
 struct is_shared_ptr : std::false_type {};
@@ -28,11 +29,18 @@ enum PropType {
   R, W, RW
 };
 
+/**
+ * Emulation of c# properties.
+ * @tparam T type stored inside property
+ * @tparam Owner owner type (in order to access inner value)
+ * @tparam SetGet type of property - read/write only, read write
+ */
 template<typename T, typename Owner, PropType SetGet>
 class Property final {
   friend Owner;
   using Getter = std::function<const T &()>;
   using Setter = std::function<void(const T &)>;
+
  public:
   Property() = default;
   template<PropType Type = SetGet,
@@ -89,7 +97,6 @@ class Property final {
     return value;
   }
 
-  // TODO: readWrite, write
   template<typename ...Args>
   static Property<T, Owner, SetGet> make_property(Getter getter, Args ...args) {
     static_assert(std::is_constructible<T, Args...>::value,

@@ -7,6 +7,7 @@
 
 #include "Message.h"
 #include "MessageManager.h"
+#include <memory>
 
 /**
  * Allows usage of dispatch method to send messages to all Manager listeners.

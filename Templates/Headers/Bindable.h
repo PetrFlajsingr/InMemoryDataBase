@@ -12,7 +12,14 @@ class Binder;
 
 template<typename T>
 class Bindable;
-
+/**
+ * Utility class binding two Observables together. Handles one-way binding.
+ * Example:
+ *  A is bound to B
+ *  When A changes value, B value stays the same.
+ *  When B changes value, the value is written to A as well.
+ * @tparam T type of bound values
+ */
 template<typename T>
 class Binder : public Observer {
  public:
@@ -32,7 +39,13 @@ class Binder : public Observer {
   Observable<T> *to;
   Observable<T> *bind;
 };
-
+/**
+ * Transformation binding. Allows to use a function to compute new value
+ * when any of the two connected Bindables is changed.
+ * @tparam T type of first bindable
+ * @tparam U type of second bindable
+ * @tparam Ret type of return value
+ */
 template<typename T,
     typename U,
     typename Ret = typename std::conditional<std::is_floating_point<T>::value,
@@ -66,7 +79,11 @@ class Binding
   std::shared_ptr<Bindable<T>> a;
   std::shared_ptr<Bindable<U>> b;
 };
-
+/**
+ * Similiar to Binding class, this one transforms only a single value.
+ * @tparam T return type
+ * @tparam U type of Bindable
+ */
 template<typename T, typename U>
 class TransformBinding : public Bindable<T>, public Observer {
   using TransFunc = std::function<T(U)>;
@@ -85,14 +102,15 @@ class TransformBinding : public Bindable<T>, public Observer {
   TransFunc transform;
   std::shared_ptr<Bindable<U>> a;
 };
-
+/**
+ * A value which can be bound to another one via objects above.
+ * @tparam T type of value storec
+ */
 template<typename T>
 class Bindable
     : public Observable<T>, public std::enable_shared_from_this<Bindable<T>> {
  public:
-  Bindable() {
-    std::cout << "jo" << std::endl;
-  }
+  Bindable() {}
   explicit Bindable(T value) : Observable<T>(value) {}
   void bindBidirectional(Bindable<T> *to) {
     to->bind(this);

@@ -17,11 +17,17 @@ template<typename T>
 class Binder;
 
 class ObservableBase;
+/**
+ * Interface allowing object to receive an update when watched value is changed.
+ */
 class Observer {
  public:
   virtual void update(ObservableBase const *obs) = 0;
 };
-
+/**
+ * Base for Observable classes. Handles observer pattern.
+ * Allows for disabling of notification on change.
+ */
 class ObservableBase {
  public:
   void addObserver(Observer *observer) {
@@ -57,12 +63,16 @@ class ObservableBase {
     }
   }
   virtual ~ObservableBase() = default;
+
  protected:
   bool changed = false;
   bool enabled = true;
   std::list<Observer *> observers;
 };
-
+/**
+ * Concrete implementation of Observable.
+ * @tparam T type of observable value
+ */
 template<typename T>
 class Observable
     : public ObservableBase {

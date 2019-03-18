@@ -7,6 +7,7 @@
 
 #include "Message.h"
 #include <string>
+#include <memory>
 
 /**
  * Listener of messages.
