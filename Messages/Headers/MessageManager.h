@@ -13,14 +13,28 @@
 #include <iostream>
 #include <typeindex>
 
+/**
+ * This class takes care of sending messages to listeners who registered them.
+ * It allows to unregister as well.
+ * It dispatches messages only to those who registered the specific type.
+ */
 class MessageManager {
  public:
+  /**
+   * Register receiver for certain message.
+   * @tparam T type of message to register
+   * @param receiver listener
+   */
   template<typename T>
   void registerMsg(MessageReceiver *receiver) {
     static_assert(std::is_base_of<Message, T>{});
     commands[typeid(T)].emplace_back(receiver);
   }
-
+  /**
+   * Unregister receiver from gettin certain messages.
+   * @tparam T type of message to unregister
+   * @param receiver listener
+   */
   template<typename T>
   void unregisterMsg(MessageReceiver *receiver) {
     auto &vec = commands[typeid(T)];
@@ -29,7 +43,10 @@ class MessageManager {
       vec.erase(it);
     }
   }
-
+  /**
+   * Unregister receiver from all messages
+   * @param receiver listener
+   */
   void unregister(MessageReceiver *receiver) {
     std::for_each(commands.begin(), commands.end(),
                   [receiver](std::pair<const std::type_index,
@@ -42,7 +59,11 @@ class MessageManager {
                     }
                   });
   }
-
+  /**
+   * Dispatch message to all listeners.
+   * @tparam T type of message
+   * @param command message
+   */
   template<typename T>
   void dispatch(std::shared_ptr<T> command) {
     static_assert(std::is_base_of<Message, T>{});

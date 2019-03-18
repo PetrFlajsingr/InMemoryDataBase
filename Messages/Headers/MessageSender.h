@@ -8,6 +8,9 @@
 #include "Message.h"
 #include "MessageManager.h"
 
+/**
+ * Allows usage of dispatch method to send messages to all Manager listeners.
+ */
 class MessageSender {
  public:
   explicit MessageSender(const std::shared_ptr<MessageManager> &commandManager)

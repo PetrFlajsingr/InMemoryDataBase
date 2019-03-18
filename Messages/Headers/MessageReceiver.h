@@ -8,6 +8,10 @@
 #include "Message.h"
 #include <string>
 
+/**
+ * Listener of messages.
+ * Receive method is called when desired message type is sent.
+ */
 class MessageReceiver {
  private:
   virtual void receive(std::shared_ptr<Message> message) = 0;
