@@ -17,7 +17,7 @@ DataWriters::XlsxWriter::XlsxWriter(std::string_view fileName,
 }
 
 DataWriters::XlsxWriter::XlsxWriter(std::string_view fileName,
-                                    CharSetConverter::CharSet outCharSet,
+                                    CharSet outCharSet,
                                     std::string_view sheetName)
     : BaseDataWriter(outCharSet) {
   xlsxWriterHandle = xlsxiowrite_open(std::string(fileName).c_str(),

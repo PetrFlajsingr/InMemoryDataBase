@@ -44,7 +44,7 @@ class CsvReader : public BaseDataProvider {
                      std::string_view delimiter = ",");
 
   explicit CsvReader(std::string_view filePath,
-                     CharSetConverter::CharSet inputCharSet,
+                     CharSet inputCharSet,
                      std::string_view delimiter = ",");
 
   /**

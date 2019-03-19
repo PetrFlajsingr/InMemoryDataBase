@@ -18,7 +18,7 @@ class XlsxWriter : public BaseDataWriter {
                       std::string_view sheetName = "");
 
   XlsxWriter(std::string_view fileName,
-             CharSetConverter::CharSet outCharSet,
+             CharSet outCharSet,
              std::string_view sheetName = "");
 
   ~XlsxWriter() override;

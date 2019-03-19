@@ -14,7 +14,7 @@ class XlntReader : public BaseDataProvider {
   explicit XlntReader(std::string_view fileName,
                       std::string_view sheetName = "");
   XlntReader(std::string_view fileName,
-             CharSetConverter::CharSet inputCharSet,
+             CharSet inputCharSet,
              std::string_view sheetName = "");
 
   const std::vector<std::string> &getRow() const override;

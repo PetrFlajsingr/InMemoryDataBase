@@ -34,7 +34,7 @@ class BaseDataProvider {
   BaseDataProvider()
       : convert(false) {}
 
-  explicit BaseDataProvider(CharSetConverter::CharSet sourceCharSet) : convert(
+  explicit BaseDataProvider(CharSet sourceCharSet) : convert(
       true), converter(std::make_unique<CharSetConverter>(sourceCharSet)) {}
   /**
    * Get a record divided into fields

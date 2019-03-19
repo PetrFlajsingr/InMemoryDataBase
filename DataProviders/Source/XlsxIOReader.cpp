@@ -10,7 +10,7 @@ DataProviders::XlsxIOReader::XlsxIOReader(std::string_view fileName)
 }
 
 DataProviders::XlsxIOReader::XlsxIOReader(std::string_view fileName,
-                                          CharSetConverter::CharSet inputCharSet)
+                                          CharSet inputCharSet)
     : BaseDataProvider(inputCharSet) {
   init(fileName);
 }

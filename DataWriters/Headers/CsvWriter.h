@@ -21,7 +21,7 @@ class CsvWriter : public BaseDataWriter {
                      std::string_view delimiter = ",");
 
   CsvWriter(std::string_view filePath,
-            CharSetConverter::CharSet outCharSet,
+            CharSet outCharSet,
             std::string_view delimiter = ",");
 
   ~CsvWriter() override;

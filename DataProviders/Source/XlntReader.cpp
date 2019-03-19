@@ -15,7 +15,7 @@ DataProviders::XlntReader::XlntReader(std::string_view fileName,
 }
 
 DataProviders::XlntReader::XlntReader(std::string_view fileName,
-                                      CharSetConverter::CharSet inputCharSet,
+                                      CharSet inputCharSet,
                                       std::string_view sheetName)
     : BaseDataProvider(inputCharSet),
       fileName(fileName),

@@ -51,7 +51,7 @@ std::string CharSetConverter::convertBack(const std::string &value) const {
   }
 }
 
-CharSetConverter::CharSetConverter(CharSetConverter::CharSet charsetIn)
+CharSetConverter::CharSetConverter(CharSet charsetIn)
     : charsetIn(charsetIn) {}
 std::string IntegerStringConverter::convert(const int &value) const {
   return std::to_string(value);
@@ -96,3 +96,22 @@ std::string StringSplitConverter::convertBack(const std::vector<std::string> &va
   return result;
 }
 
+boost::posix_time::ptime ExcelDateTime2DateTimeConverter::convert(const double &value) const {
+  using namespace boost::gregorian;
+  using namespace boost::posix_time;
+  auto finDate = excelStartDate + date_duration(gsl::narrow_cast<int>(value) - 2);
+  auto hourF = (value - gsl::narrow_cast<int>(value)) * 24;
+  auto h = gsl::narrow_cast<uint8_t>(hourF);
+  auto minF = (hourF - h) * 60;
+  auto m = gsl::narrow_cast<uint8_t>(minF);
+  auto secF = (minF - m) * 60;
+  auto s = gsl::narrow_cast<uint8_t>(round(secF));
+  return ptime(finDate, hours(h) + minutes(m) + seconds(s));
+}
+double ExcelDateTime2DateTimeConverter::convertBack(const boost::posix_time::ptime &value) const {
+  constexpr double daySecondCount = 24 * 60 * 60;
+  auto wholePart = (value.date() - excelStartDate).days() + 2;
+  std::cout << value.time_of_day().total_seconds() << std::endl;
+  auto fractPart = value.time_of_day().total_seconds() / daySecondCount;
+  return wholePart + fractPart;
+}

@@ -12,7 +12,7 @@ namespace DataWriters {
 class XlntWriter : public BaseDataWriter {
  public:
   explicit XlntWriter(std::string_view fileName);
-  XlntWriter(std::string_view fileName, CharSetConverter::CharSet outCharSet);
+  XlntWriter(std::string_view fileName, CharSet outCharSet);
   void writeHeader(const std::vector<std::string> &header) override;
   void writeRecord(const std::vector<std::string> &record) override;
   virtual ~XlntWriter();

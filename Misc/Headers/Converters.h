@@ -6,8 +6,20 @@
 #define PROJECT_CONVERTERS_H
 
 #include <string>
+#include <vector>
 #include <boost/locale.hpp>
+#include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
+enum class CharSet {
+  Latin1, Latin2, CP1250, CP1252, Utf16, ANSI
+};
+
+/**
+ * Convert T to U and vice versa.
+ * @tparam T
+ * @tparam U
+ */
 template<typename T, typename U>
 class Converter {
  public:
@@ -40,8 +52,7 @@ class StringDoubleConverter : public Converter<std::string, double> {
   std::string convertBack(const double &value) const override;
 };
 
-class StringSplitConverter : public Converter<std::string,
-                                              std::vector<std::string>> {
+class StringSplitConverter : public Converter<std::string, std::vector<std::string>> {
  public:
   explicit StringSplitConverter(const std::string &delimiter);
   std::vector<std::string> convert(const std::string &value) const override;
@@ -50,12 +61,17 @@ class StringSplitConverter : public Converter<std::string,
   std::string delimiter;
 };
 
+class ExcelDateTime2DateTimeConverter : public Converter<double,
+                                                         boost::posix_time::ptime> {
+ public:
+  boost::posix_time::ptime convert(const double &value) const override;
+  double convertBack(const boost::posix_time::ptime &value) const override;
+ private:
+  const boost::gregorian::date excelStartDate = boost::gregorian::date(1900, 1, 1);
+};
+
 class CharSetConverter : public Converter<std::string, std::string> {
  public:
-  enum class CharSet {
-    Latin1, Latin2, CP1250, CP1252, Utf16, ANSI
-  };
-
   explicit CharSetConverter(CharSet charsetIn);
 
   std::string convert(const std::string &value) const override;

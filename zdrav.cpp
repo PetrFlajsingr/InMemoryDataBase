@@ -14,10 +14,18 @@
 #include <Logger.h>
 
 int main() {
+  auto tst = DataProviders::XlsxIOReader("/Users/petr/Desktop/date_test.xlsx");
+  ExcelDateTime2DateTimeConverter t;
+  while (tst.next()) {
+    std::cout << t.convert(Utilities::stringToDouble(tst.getRow()[0])) << std::endl;
+    std::cout << t.convert(t.convertBack(t.convert(Utilities::stringToDouble(tst.getRow()[0])))) << std::endl;
+  }
+
+  return 0;
   Logger::GetInstance().log(LogLevel::Debug, "Start", true);
   auto nnoProvider =
       DataProviders::XlsxIOReader("/Users/petr/Desktop/NNO_subjekty6ver2.4.xlsx",
-                                  CharSetConverter::CharSet::CP1250);
+                                  CharSet::CP1250);
   Logger::GetInstance().log(LogLevel::Debug, "created nno provider", true);
   auto nnoDs = std::make_shared<DataSets::MemoryDataSet>("nno");
   nnoDs->open(nnoProvider,
@@ -53,7 +61,7 @@ int main() {
 
   auto zdravProvider =
       DataProviders::CsvReader("/Users/petr/Desktop/csvs/export-2019-02.csv",
-                               CharSetConverter::CharSet::CP1250,
+                               CharSet::CP1250,
                                ";");
   Logger::GetInstance().log(LogLevel::Debug, "Created zdrav provider", true);
   auto zdravDs = std::make_shared<DataSets::MemoryDataSet>("zdrav");

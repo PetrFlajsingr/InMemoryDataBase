@@ -18,7 +18,7 @@ class XlsxIOReader : public BaseDataProvider {
  public:
   explicit XlsxIOReader(std::string_view fileName);
   XlsxIOReader(std::string_view fileName,
-               CharSetConverter::CharSet inputCharSet);
+               CharSet inputCharSet);
 
   ~XlsxIOReader() override;
 

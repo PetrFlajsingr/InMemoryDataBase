@@ -12,7 +12,7 @@ DataProviders::CsvReader::CsvReader(std::string_view filePath,
 }
 
 DataProviders::CsvReader::CsvReader(std::string_view filePath,
-                                    CharSetConverter::CharSet inputCharSet,
+                                    CharSet inputCharSet,
                                     std::string_view delimiter)
     : BaseDataProvider(inputCharSet) {
   init(filePath, delimiter);

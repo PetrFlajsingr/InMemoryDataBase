@@ -32,7 +32,7 @@ namespace DataWriters {
 class BaseDataWriter {
  public:
   BaseDataWriter() : convert(false) {}
-  explicit BaseDataWriter(CharSetConverter::CharSet inCharSet)
+  explicit BaseDataWriter(CharSet inCharSet)
       : convert(true),
         converter(std::make_unique<CharSetConverter>(inCharSet)) {}
   /**
