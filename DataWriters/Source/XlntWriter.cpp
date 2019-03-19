@@ -5,14 +5,22 @@
 #include <Exceptions.h>
 #include <XlntWriter.h>
 
-#include "XlntWriter.h"
 
 DataWriters::XlntWriter::XlntWriter(std::string_view fileName) {
-  throw NotImplementedException();
+  ws = wb.active_sheet();
+  destination = fileName;
 }
 void DataWriters::XlntWriter::writeHeader(const std::vector<std::string> &header) {
-  throw NotImplementedException();
+  for (gsl::index i = 0; i < header.size(); ++i) {
+    ws.cell(i + 1, 1).value(header[i]);
+  }
 }
 void DataWriters::XlntWriter::writeRecord(const std::vector<std::string> &record) {
-  throw NotImplementedException();
+  ++recordNumber;
+  for (gsl::index i = 0; i < record.size(); ++i) {
+    ws.cell(i + 1, recordNumber).value(record[i]);
+  }
+}
+DataWriters::XlntWriter::~XlntWriter() {
+  wb.save(destination);
 }

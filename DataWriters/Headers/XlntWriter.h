@@ -6,15 +6,23 @@
 #define PROJECT_XLNTWRITER_H
 
 #include "BaseDataWriter.h"
+#include <xlnt/xlnt.hpp>
+
 namespace DataWriters {
 class XlntWriter : public BaseDataWriter {
  public:
   explicit XlntWriter(std::string_view fileName);
   void writeHeader(const std::vector<std::string> &header) override;
   void writeRecord(const std::vector<std::string> &record) override;
+  virtual ~XlntWriter();
 
  private:
+  xlnt::workbook wb;
+  xlnt::worksheet ws;
 
+  std::string destination;
+
+  gsl::index recordNumber = 1;
 };
 }
 
