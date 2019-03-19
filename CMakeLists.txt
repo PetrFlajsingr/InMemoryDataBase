@@ -21,7 +21,6 @@ include_directories(CLI/Headers)
 include_directories(DataBase/Headers)
 include_directories(DataBase/QueryParser/Headers)
 include_directories(third_party/xlsxio/include)
-include_directories(third_party/catch2)
 include_directories(Messages/Headers)
 include_directories(Templates/Headers)
 

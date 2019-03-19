@@ -19,9 +19,6 @@ class ArrayWriter : public BaseDataWriter {
 
   void writeRecord(const std::vector<std::string> &record) override;
 
-  /**
-   * Vytiskne obsah zapsanych dat na stdout.
-   */
   void print() const;
 
   const std::vector<const std::vector<std::string>> &getArray() const;
