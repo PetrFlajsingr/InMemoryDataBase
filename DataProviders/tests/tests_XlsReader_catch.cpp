@@ -3,7 +3,7 @@
 //
 
 #include <catch2/catch.hpp>
-#include <XlsReader.h>
+#include <XlsxIOReader.h>
 #include <ArrayWriter.h>
 
 #define COLUMN_COUNT 5
@@ -22,7 +22,7 @@ SCENARIO("Reading xlsx file via BaseDataProvider interface", "[XlsReader]") {
         {"RECORD31", "RECORD32", "RECOR33", "RECORD34", "RECORD35"}
     };
 
-    DataProviders::XlsReader
+    DataProviders::XlsxIOReader
         xlsReader("../DataProviders/tests/Files/simple.xlsx");
 
     WHEN("reading the header") {
@@ -89,7 +89,7 @@ SCENARIO("Reading xlsx file via iterator", "[XlsReader]") {
         {"RECORD31", "RECORD32", "RECOR33", "RECORD34", "RECORD35"}
     };
 
-    DataProviders::XlsReader
+    DataProviders::XlsxIOReader
         xlsReader("../DataProviders/tests/Files/simple.xlsx");
 
     WHEN("reading the file contents") {
@@ -145,7 +145,7 @@ SCENARIO(
         {"RECORD31", "RECORD32", "RECOR33", "RECORD34", "RECORD35"}
     };
 
-    DataProviders::XlsReader
+    DataProviders::XlsxIOReader
         xlsReader("../DataProviders/tests/Files/simple.xlsx");
 
     DataWriters::ArrayWriter writer;
@@ -188,7 +188,7 @@ SCENARIO("Writing parsed xlsx directly to DataWriter using iterator",
         {"RECORD31", "RECORD32", "RECOR33", "RECORD34", "RECORD35"}
     };
 
-    DataProviders::XlsReader
+    DataProviders::XlsxIOReader
         xlsReader("../DataProviders/tests/Files/simple.xlsx");
 
     DataWriters::ArrayWriter writer;

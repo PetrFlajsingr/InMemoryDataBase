@@ -8,6 +8,7 @@
 #include <gsl/gsl>
 #include <string>
 #include <vector>
+#include <Converters.h>
 
 namespace DataProviders {
 
@@ -30,6 +31,12 @@ namespace DataProviders {
  */
 class BaseDataProvider {
  public:
+  BaseDataProvider()
+      : convert(false),
+        converter(CharSetConverter(CharSetConverter::CharSet::Utf16)) {}
+
+  explicit BaseDataProvider(CharSetConverter::CharSet sourceCharSet) : convert(
+      true), converter(CharSetConverter(sourceCharSet)) {}
   /**
    * Get a record divided into fields
    * @return
@@ -136,6 +143,10 @@ class BaseDataProvider {
   iterator end() {
     return iterator(this);
   }
+
+ protected:
+  bool convert;
+  CharSetConverter converter;
 };
 
 }  // namespace DataProviders

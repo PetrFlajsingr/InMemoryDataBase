@@ -9,7 +9,7 @@
 #include <ConsoleIO.h>
 #include <AppContext.h>
 #include <CsvReader.h>
-#include <XlsReader.h>
+#include <XlsxIOReader.h>
 #include <CsvWriter.h>
 #include <XlsxWriter.h>
 
@@ -174,7 +174,7 @@ bool ScriptParser::runCommand(ScriptParser::Command command) {
           break;
         case ScriptParser::FileTypes::xlsx:
           provider =
-              new DataProviders::XlsReader(filePath);
+              new DataProviders::XlsxIOReader(filePath);
           break;
       }
       auto ds =
@@ -201,7 +201,7 @@ bool ScriptParser::runCommand(ScriptParser::Command command) {
             break;
           case ScriptParser::FileTypes::xlsx:
             provider =
-                new DataProviders::XlsReader(
+                new DataProviders::XlsxIOReader(
                     filePath);
             break;
         }

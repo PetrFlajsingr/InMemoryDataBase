@@ -22,7 +22,7 @@ class ArrayDataProvider : public BaseDataProvider {
    * Prepares header names as indexes of fields.
    */
   explicit ArrayDataProvider(const std::vector<std::vector<std::string>> &data)
-      : data(data) {
+      : data(data), BaseDataProvider() {
     header.reserve(data[0].size());
     for (auto i = 0; i < data[0].size(); ++i) {
       header.emplace_back(std::to_string(i));

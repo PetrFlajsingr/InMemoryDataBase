@@ -4,8 +4,9 @@
 
 #include <Exceptions.h>
 #include "Converters.h"
+#include <Utilities.h>
 
-std::string CharSetConverter::convert(const std::string &value) {
+std::string CharSetConverter::convert(const std::string &value) const {
   switch (charsetIn) {
     case CharSet::Latin1:
       return boost::locale::conv::to_utf<char>(value,
@@ -27,7 +28,7 @@ std::string CharSetConverter::convert(const std::string &value) {
                                                "ANSI");
   }
 }
-std::string CharSetConverter::convertBack(const std::string &value) {
+std::string CharSetConverter::convertBack(const std::string &value) const {
   switch (charsetIn) {
     case CharSet::Latin1:
       return boost::locale::conv::from_utf<char>(value,
@@ -52,44 +53,44 @@ std::string CharSetConverter::convertBack(const std::string &value) {
 
 CharSetConverter::CharSetConverter(CharSetConverter::CharSet charsetIn)
     : charsetIn(charsetIn) {}
-std::string IntegerStringConverter::convert(const int &value) {
+std::string IntegerStringConverter::convert(const int &value) const {
   return std::to_string(value);
 }
-int IntegerStringConverter::convertBack(const std::string &value) {
+int IntegerStringConverter::convertBack(const std::string &value) const {
   return Utilities::stringToInt(value);
 }
 
-int StringIntegerConverter::convert(const std::string &value) {
+int StringIntegerConverter::convert(const std::string &value) const {
   return Utilities::stringToInt(value);
 }
-std::string StringIntegerConverter::convertBack(const int &value) {
+std::string StringIntegerConverter::convertBack(const int &value) const {
   return std::to_string(value);
 }
 
-std::string DoubleStringConverter::convert(const double &value) {
+std::string DoubleStringConverter::convert(const double &value) const {
   return std::to_string(value);
 }
-double DoubleStringConverter::convertBack(const std::string &value) {
+double DoubleStringConverter::convertBack(const std::string &value) const {
   return Utilities::stringToDouble(value);
 }
 
-double StringDoubleConverter::convert(const std::string &value) {
+double StringDoubleConverter::convert(const std::string &value) const {
   return Utilities::stringToDouble(value);
 }
-std::string StringDoubleConverter::convertBack(const double &value) {
+std::string StringDoubleConverter::convertBack(const double &value) const {
   return std::to_string(value);
 }
 
 StringSplitConverter::StringSplitConverter(const std::string &delimiter)
     : delimiter(delimiter) {}
-std::vector<std::string> StringSplitConverter::convert(const std::string &value) {
+std::vector<std::string> StringSplitConverter::convert(const std::string &value) const {
   return Utilities::splitStringByDelimiter(value, delimiter);
 }
-std::string StringSplitConverter::convertBack(const std::vector<std::string> &value) {
+std::string StringSplitConverter::convertBack(const std::vector<std::string> &value) const {
   std::string result;
   for (gsl::index i = 0; i < value.size() - 1; ++i) {
-    result.append(val)
-    result.append(delimiter)
+    result.append(value[i]);
+    result.append(delimiter);
   }
   result.append(value.back());
   return result;

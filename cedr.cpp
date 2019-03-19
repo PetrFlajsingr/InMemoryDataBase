@@ -68,7 +68,7 @@ const std::string
     QUERY_AGR_2017 = QUERY_AGR + " WHERE main.rozpoctoveObdobi = 2017";
 
 int main(int argc, char **argv) {
-  Logger::getInstance().startTime();
+  Logger::GetInstance().startTime();
   // open input files
   DataProviders::CsvReader dotaceProvider(csvPath + dotaceCSVName, ",");
   DataProviders::CsvReader rozhodnutiProvider(csvPath + rozhodnutiCSVName, ",");
@@ -76,26 +76,26 @@ int main(int argc, char **argv) {
   DataProviders::CsvReader prijemceProvider(csvPath + prijemceCSVName, ",");
   DataProviders::CsvReader subjektyProvider(csvPath + subjektyCSVName, ";");
 
-  Logger::getInstance().log(LogLevel::Debug, "Providers prepared", true);
+  Logger::GetInstance().log(LogLevel::Debug, "Providers prepared", true);
   auto dotaceDataSet = new DataSets::MemoryDataSet("dotace");
   dotaceDataSet->open(dotaceProvider, {ValueType::String, ValueType::String,
                                        ValueType::String,
                                        ValueType::String, ValueType::String,
                                        ValueType::String});
-  Logger::getInstance().log(LogLevel::Debug, "Dotace loaded", true);
+  Logger::GetInstance().log(LogLevel::Debug, "Dotace loaded", true);
 
   auto rozhodnutiDataSet = new DataSets::MemoryDataSet("rozhodnuti");
   rozhodnutiDataSet->open(rozhodnutiProvider, {ValueType::String,
                                                ValueType::String,
                                                ValueType::String});
-  Logger::getInstance().log(LogLevel::Debug, "Rozhodnuti loaded", true);
+  Logger::GetInstance().log(LogLevel::Debug, "Rozhodnuti loaded", true);
 
   DataWorkers::DataSetMerger merger;
   merger.addDataSet(dotaceDataSet);
   merger.addDataSet(rozhodnutiDataSet);
   auto dotace_rozhodnutiDataSet =
       merger.mergeDataSets("dotace", "rozhodnuti", "idDotace", "idDotace");
-  Logger::getInstance().log(LogLevel::Debug, "Merged dotace, rozhodnuti", true);
+  Logger::GetInstance().log(LogLevel::Debug, "Merged dotace, rozhodnuti", true);
 
   merger.removeDataSet("dotace");
   merger.removeDataSet("rozhodnuti");
@@ -109,7 +109,7 @@ int main(int argc, char **argv) {
                                        ValueType::Currency,
                                        ValueType::String,
                                        ValueType::String});
-  Logger::getInstance().log(LogLevel::Debug, "Obdobi loaded", true);
+  Logger::GetInstance().log(LogLevel::Debug, "Obdobi loaded", true);
 
   merger.addDataSet(dotace_rozhodnutiDataSet);
   merger.addDataSet(obdobiDataSet);
@@ -118,7 +118,7 @@ int main(int argc, char **argv) {
                            "obdobi",
                            "idRozhodnuti",
                            "idRozhodnuti");
-  Logger::getInstance().log(LogLevel::Debug,
+  Logger::GetInstance().log(LogLevel::Debug,
                             "Merged dotace_rozhodnuti, obdobi",
                             true);
   merger.removeDataSet("dotace_rozhodnuti");
@@ -133,7 +133,7 @@ int main(int argc, char **argv) {
   prijemceDataSet->open(prijemceProvider, {ValueType::String,
                                            ValueType::Integer,
                                            ValueType::String});
-  Logger::getInstance().log(LogLevel::Debug, "Prijemce loaded", true);
+  Logger::GetInstance().log(LogLevel::Debug, "Prijemce loaded", true);
 
   auto subjektyDataSet = new DataSets::MemoryDataSet("subjekty");
   subjektyDataSet->open(subjektyProvider, {ValueType::Integer,
@@ -143,13 +143,13 @@ int main(int argc, char **argv) {
                                            ValueType::String,
                                            ValueType::String,
                                            ValueType::String});
-  Logger::getInstance().log(LogLevel::Debug, "Subjekty loaded", true);
+  Logger::GetInstance().log(LogLevel::Debug, "Subjekty loaded", true);
 
   merger.addDataSet(subjektyDataSet);
   merger.addDataSet(prijemceDataSet);
   auto prijemce_subjektyDataSet =
       merger.mergeDataSets("prijemce", "subjekty", "ico", "IČO_num");
-  Logger::getInstance().log(LogLevel::Debug, "Merged prijemce, subjekty", true);
+  Logger::GetInstance().log(LogLevel::Debug, "Merged prijemce, subjekty", true);
   delete subjektyDataSet;
   delete prijemceDataSet;
 
@@ -158,21 +158,21 @@ int main(int argc, char **argv) {
   auto operacniProgramDataSet = new DataSets::MemoryDataSet("operacniProgram");
   operacniProgramDataSet->open(operacniProgramProvider, {ValueType::String,
                                                          ValueType::String});
-  Logger::getInstance().log(LogLevel::Debug, "operacniProgram loaded", true);
+  Logger::GetInstance().log(LogLevel::Debug, "operacniProgram loaded", true);
 
   DataProviders::CsvReader
       grantoveSchemaProvider(csvPath + grantoveSchemaCSVName, ",");
   auto grantoveSchemaDataSet = new DataSets::MemoryDataSet("grantoveSchema");
   grantoveSchemaDataSet->open(grantoveSchemaProvider, {ValueType::String,
                                                        ValueType::String});
-  Logger::getInstance().log(LogLevel::Debug, "grantoveSchema loaded", true);
+  Logger::GetInstance().log(LogLevel::Debug, "grantoveSchema loaded", true);
 
   DataProviders::CsvReader
       dotaceTitulProvider(csvPath + dotacniTitulCSVName, ",");
   auto dotaceTitulDataSet = new DataSets::MemoryDataSet("dotaceTitul");
   dotaceTitulDataSet->open(dotaceTitulProvider, {ValueType::String,
                                                  ValueType::String});
-  Logger::getInstance().log(LogLevel::Debug, "dotaceTitul loaded", true);
+  Logger::GetInstance().log(LogLevel::Debug, "dotaceTitul loaded", true);
 
   DataProviders::CsvReader
       poskytovatelDotaceProvider(csvPath + poskytovatelDotaceCSVName, ",");
@@ -181,14 +181,14 @@ int main(int argc, char **argv) {
   poskytovatelDotaceDataSet->open(poskytovatelDotaceProvider,
                                   {ValueType::String,
                                    ValueType::String});
-  Logger::getInstance().log(LogLevel::Debug, "poskytovatelDotace loaded", true);
+  Logger::GetInstance().log(LogLevel::Debug, "poskytovatelDotace loaded", true);
 
   dataWorker->addDataSet(prijemce_subjektyDataSet);
   dataWorker->addDataSet(operacniProgramDataSet);
   dataWorker->addDataSet(grantoveSchemaDataSet);
   dataWorker->addDataSet(dotaceTitulDataSet);
   dataWorker->addDataSet(poskytovatelDotaceDataSet);
-  Logger::getInstance().log(LogLevel::Debug,
+  Logger::GetInstance().log(LogLevel::Debug,
                             "Add datasets to data worker",
                             true);
   auto dataWriter = new DataWriters::CsvWriter(outPath + "all.csv", ",");
@@ -196,27 +196,27 @@ int main(int argc, char **argv) {
   dataWorker->writeResult(*dataWriter,
                           query);
 
-  Logger::getInstance().log(LogLevel::Debug, "Written query: " + query, true);
+  Logger::GetInstance().log(LogLevel::Debug, "Written query: " + query, true);
   delete dataWriter;
   dataWriter = new DataWriters::CsvWriter(outPath + "all_agr.csv", ",");
   query = QUERY_AGR;
   dataWorker->writeResult(*dataWriter,
                           query);
-  Logger::getInstance().log(LogLevel::Debug, "Written query: " + query, true);
+  Logger::GetInstance().log(LogLevel::Debug, "Written query: " + query, true);
   delete dataWriter;
 
   dataWriter = new DataWriters::CsvWriter(outPath + "2017.csv", ",");
   query = QUERY_2017;
   dataWorker->writeResult(*dataWriter,
                           query);
-  Logger::getInstance().log(LogLevel::Debug, "Written query: " + query, true);
+  Logger::GetInstance().log(LogLevel::Debug, "Written query: " + query, true);
   delete dataWriter;
 
   dataWriter = new DataWriters::CsvWriter(outPath + "2017_agr.csv", ",");
   query = QUERY_AGR_2017;
   dataWorker->writeResult(*dataWriter,
                           query);
-  Logger::getInstance().log(LogLevel::Debug, "Written query: " + query, true);
+  Logger::GetInstance().log(LogLevel::Debug, "Written query: " + query, true);
   delete dataWriter;
 
   delete dataWorker;
@@ -225,8 +225,8 @@ int main(int argc, char **argv) {
   delete dotaceTitulDataSet;
   delete poskytovatelDotaceDataSet;
   delete prijemce_subjektyDataSet;
-  Logger::getInstance().log(LogLevel::Debug, "Done", true);
-  Logger::getInstance().endTime();
-  Logger::getInstance().printElapsedTime();
+  Logger::GetInstance().log(LogLevel::Debug, "Done", true);
+  Logger::GetInstance().endTime();
+  Logger::GetInstance().printElapsedTime();
   return 0;
 }

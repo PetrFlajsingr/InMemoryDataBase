@@ -6,6 +6,19 @@
 #include <CsvReader.h>
 
 DataProviders::CsvReader::CsvReader(std::string_view filePath,
+                                    std::string_view delimiter)
+    : BaseDataProvider() {
+  init(filePath, delimiter);
+}
+
+DataProviders::CsvReader::CsvReader(std::string_view filePath,
+                                    CharSetConverter::CharSet inputCharSet,
+                                    std::string_view delimiter)
+    : BaseDataProvider(inputCharSet) {
+  init(filePath, delimiter);
+}
+
+void DataProviders::CsvReader::init(std::string_view filePath,
                                     std::string_view delimiter) {
   this->delimiter = delimiter;
   file.open(std::string(filePath));
@@ -13,7 +26,6 @@ DataProviders::CsvReader::CsvReader(std::string_view filePath,
     std::string errMsg = "File could not be open: " + std::string(filePath);
     throw IOException(errMsg.c_str());
   }
-
   readHeader();
 }
 
@@ -80,6 +92,10 @@ bool DataProviders::CsvReader::eof() const {
 
 std::vector<std::string> DataProviders::CsvReader::tokenize(std::string_view line,
                                                             unsigned int vectorReserve) const {
+  std::string innerLine = std::string(line);
+  if (convert) {
+    innerLine = converter.convert(innerLine);
+  }
   char buffer[BUFFER_SIZE];
   uint64_t bufferIter = 0;
   ParseState state = ParseState::Read;
@@ -92,7 +108,7 @@ std::vector<std::string> DataProviders::CsvReader::tokenize(std::string_view lin
 
   std::vector<std::string> result;
   result.reserve(vectorReserve);
-  for (auto character : line) {
+  for (auto character : innerLine) {
     switch (state) {
       case ParseState::Read:  // normal read
         if (character == '\"') {

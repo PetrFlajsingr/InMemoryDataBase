@@ -43,6 +43,10 @@ class CsvReader : public BaseDataProvider {
   explicit CsvReader(std::string_view filePath,
                      std::string_view delimiter = ",");
 
+  explicit CsvReader(std::string_view filePath,
+                     CharSetConverter::CharSet inputCharSet,
+                     std::string_view delimiter = ",");
+
   /**
    * Close file on deletion.
    */
@@ -75,6 +79,8 @@ class CsvReader : public BaseDataProvider {
   bool eof() const override;
 
  private:
+  void init(std::string_view filePath,
+            std::string_view delimiter);
   /**
    * FSM states for csv parsing.
    */

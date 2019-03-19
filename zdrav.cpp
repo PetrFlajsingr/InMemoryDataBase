@@ -5,18 +5,23 @@
 #include <CsvReader.h>
 #include <MemoryDataSet.h>
 #include <MemoryDataBase.h>
-#include <XlsReader.h>
+#include <XlsxIOReader.h>
 #include <XlsxWriter.h>
 #include <CsvWriter.h>
 #include <XlntWriter.h>
 #include <boost/locale.hpp>
+#include <XlntReader.h>
+#include <Logger.h>
 
 int main() {
   //auto nnoProvider = DataProviders::CsvReader(
   //    "/Users/petr/Desktop/csvs/NNO_subjekty6ver2.4.csv",
   //    ";");
+  Logger::GetInstance().log(LogLevel::Debug, "Start", true);
   auto nnoProvider =
-      DataProviders::XlsReader("/Users/petr/Desktop/NNO_subjekty6ver2.4.xlsx");
+      DataProviders::XlntReader("/Users/petr/Desktop/NNO_subjekty6ver2.4.xlsx",
+                                CharSetConverter::CharSet::CP1250);
+  Logger::GetInstance().log(LogLevel::Debug, "created nno provider", true);
   auto nnoDs = std::make_shared<DataSets::MemoryDataSet>("nno");
   //nnoDs->open(nnoProvider,
   //            {ValueType::Integer, ValueType::Integer, ValueType::Integer,
@@ -51,10 +56,13 @@ int main() {
                ValueType::String, ValueType::String, ValueType::String,
                ValueType::String, ValueType::String, ValueType::String,
                ValueType::String});
+  Logger::GetInstance().log(LogLevel::Debug, "Loaded nno", true);
 
   auto zdravProvider =
       DataProviders::CsvReader("/Users/petr/Desktop/csvs/export-2019-02.csv",
+                               CharSetConverter::CharSet::CP1250,
                                ";");
+  Logger::GetInstance().log(LogLevel::Debug, "Created zdrav provider", true);
   auto zdravDs = std::make_shared<DataSets::MemoryDataSet>("zdrav");
   zdravDs->open(zdravProvider,
                 {ValueType::String, ValueType::String, ValueType::String,
@@ -70,7 +78,7 @@ int main() {
                  ValueType::String, ValueType::String, ValueType::String,
                  ValueType::String, ValueType::String, ValueType::String,
                  ValueType::String, ValueType::String});
-
+  Logger::GetInstance().log(LogLevel::Debug, "Loaded zdrav", true);
   DataBase::MemoryDataBase db("main");
   db.addTable(nnoDs);
   db.addTable(zdravDs);
@@ -78,6 +86,8 @@ int main() {
   auto joinRes = db.execSimpleQuery("select zdrav.*, nno.* from nno join zdrav "
                                     "on nno.ICO_num = zdrav.Ico;",
                                     false, "joinRes");
+
+  Logger::GetInstance().log(LogLevel::Debug, "Join query done", true);
 
   auto nrzps_nazevZarField = joinRes->dataSet->fieldByName("NazevCely");
   auto nrzps_druhZarField = joinRes->dataSet->fieldByName("DruhZarizeni");
@@ -115,6 +125,7 @@ int main() {
       "select joinRes.ICO_num, COUNT(joinRes.PoskytovatelNazev) "
       "from joinRes group by joinRes.ICO_num;",
       "count");
+  Logger::GetInstance().log(LogLevel::Debug, "Count query done", true);
 
   joinRes->dataSet->resetBegin();
   countRes->dataSet->resetBegin();
@@ -195,6 +206,7 @@ int main() {
   const std::string nilStr = "Null";
   countRes->dataSet->next();
   bool setPoskytovatel = false;
+  Logger::GetInstance().log(LogLevel::Debug, "Starting final alg", true);
   while (joinRes->dataSet->next()) {
     yay_goto:
     result.append();
@@ -269,11 +281,10 @@ int main() {
                    fields.end(),
                    std::back_inserter(record),
                    [](const DataSets::BaseField *field) {
-                     return boost::locale::conv::to_utf<char>(field->getAsString(),
-                                                              "CP1250");
+                     return field->getAsString();
                    });
     writer.writeRecord(record);
   }
 
-  std::cout << "done" << std::endl;
+  Logger::GetInstance().log(LogLevel::Debug, "Done", true);
 }

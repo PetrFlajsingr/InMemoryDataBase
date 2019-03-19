@@ -14,11 +14,13 @@
 
 namespace DataProviders {
 
-class XlsReader : public BaseDataProvider {
+class XlsxIOReader : public BaseDataProvider {
  public:
-  explicit XlsReader(std::string_view fileName);
+  explicit XlsxIOReader(std::string_view fileName);
+  XlsxIOReader(std::string_view fileName,
+               CharSetConverter::CharSet inputCharSet);
 
-  ~XlsReader() override;
+  ~XlsxIOReader() override;
 
   const std::vector<std::string> &getRow() const override;
 
@@ -37,6 +39,8 @@ class XlsReader : public BaseDataProvider {
   bool eof() const override;
 
  private:
+  void init(std::string_view fileName);
+
   xlsxioreader xlsxioReader;
 
   xlsxioreadersheet xlsxioSheet;

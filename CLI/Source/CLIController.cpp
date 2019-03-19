@@ -4,7 +4,7 @@
 
 #include <CLIController.h>
 #include <CsvReader.h>
-#include <XlsReader.h>
+#include <XlsxIOReader.h>
 #include <XlsxWriter.h>
 
 CLIController::CLIController()

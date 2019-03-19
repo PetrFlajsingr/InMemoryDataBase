@@ -53,7 +53,7 @@ class Logger {
   std::chrono::milliseconds endTimeMs;
 
  public:
-  static Logger getInstance() {
+  static Logger GetInstance() {
     static Logger instance;
     return instance;
   }
