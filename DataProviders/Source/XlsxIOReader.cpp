@@ -59,7 +59,7 @@ bool DataProviders::XlsxIOReader::next() {
     gsl::zstring<> value;
     while ((value = xlsxioread_sheet_next_cell(xlsxioSheet)) != nullptr) {
       if (convert) {
-        currentRecord.emplace_back(converter.convert(value));
+        currentRecord.emplace_back(converter->convert(value));
       } else {
         currentRecord.emplace_back(value);
       }
@@ -107,7 +107,7 @@ void DataProviders::XlsxIOReader::readHeader() {
     gsl::zstring<> value;
     while ((value = xlsxioread_sheet_next_cell(xlsxioSheet)) != nullptr) {
       if (convert) {
-        header.emplace_back(converter.convert(value));
+        header.emplace_back(converter->convert(value));
       } else {
         header.emplace_back(value);
       }

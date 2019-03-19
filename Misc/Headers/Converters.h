@@ -13,6 +13,7 @@ class Converter {
  public:
   virtual U convert(const T &value) const = 0;
   virtual T convertBack(const U &value) const = 0;
+  virtual ~Converter() = default;
 };
 
 class IntegerStringConverter : public Converter<int, std::string> {

@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include <iterator>
+#include <Converters.h>
 
 namespace DataWriters {
 
@@ -30,6 +31,10 @@ namespace DataWriters {
  */
 class BaseDataWriter {
  public:
+  BaseDataWriter() : convert(false) {}
+  explicit BaseDataWriter(CharSetConverter::CharSet inCharSet)
+      : convert(true),
+        converter(std::make_unique<CharSetConverter>(inCharSet)) {}
   /**
    * Zapise hlavicku dat (nazvy sloupcu)
    * @param header nazvy sloupcu
@@ -101,6 +106,10 @@ class BaseDataWriter {
   iterator begin() {
     return iterator(this);
   }
+
+ protected:
+  bool convert;
+  std::unique_ptr<CharSetConverter> converter;
 };
 
 }  // namespace DataWriters

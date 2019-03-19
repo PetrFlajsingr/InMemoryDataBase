@@ -14,19 +14,12 @@
 #include <Logger.h>
 
 int main() {
-  //auto nnoProvider = DataProviders::CsvReader(
-  //    "/Users/petr/Desktop/csvs/NNO_subjekty6ver2.4.csv",
-  //    ";");
   Logger::GetInstance().log(LogLevel::Debug, "Start", true);
   auto nnoProvider =
-      DataProviders::XlntReader("/Users/petr/Desktop/NNO_subjekty6ver2.4.xlsx",
-                                CharSetConverter::CharSet::CP1250);
+      DataProviders::XlsxIOReader("/Users/petr/Desktop/NNO_subjekty6ver2.4.xlsx",
+                                  CharSetConverter::CharSet::CP1250);
   Logger::GetInstance().log(LogLevel::Debug, "created nno provider", true);
   auto nnoDs = std::make_shared<DataSets::MemoryDataSet>("nno");
-  //nnoDs->open(nnoProvider,
-  //            {ValueType::Integer, ValueType::Integer, ValueType::Integer,
-  //             ValueType::String, ValueType::String, ValueType::String,
-  //             ValueType::String});
   nnoDs->open(nnoProvider,
               {ValueType::Integer, ValueType::Integer, ValueType::Integer,
                ValueType::Integer, ValueType::String, ValueType::String,

@@ -94,7 +94,7 @@ std::vector<std::string> DataProviders::CsvReader::tokenize(std::string_view lin
                                                             unsigned int vectorReserve) const {
   std::string innerLine = std::string(line);
   if (convert) {
-    innerLine = converter.convert(innerLine);
+    innerLine = converter->convert(innerLine);
   }
   char buffer[BUFFER_SIZE];
   uint64_t bufferIter = 0;

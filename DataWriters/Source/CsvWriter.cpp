@@ -8,7 +8,17 @@
 #include <Logger.h>
 
 DataWriters::CsvWriter::CsvWriter(std::string_view filePath,
-                                  std::string_view delimiter) {
+                                  std::string_view delimiter)
+    : BaseDataWriter() {
+  this->delimiter = delimiter;
+  outputStream = new std::ofstream();
+  outputStream->open(std::string(filePath), std::ofstream::out);
+}
+
+DataWriters::CsvWriter::CsvWriter(std::string_view filePath,
+                                  CharSetConverter::CharSet outCharSet,
+                                  std::string_view delimiter)
+    : BaseDataWriter(outCharSet) {
   this->delimiter = delimiter;
   outputStream = new std::ofstream();
   outputStream->open(std::string(filePath), std::ofstream::out);
@@ -37,7 +47,16 @@ void DataWriters::CsvWriter::writeRecord(const std::vector<std::string> &record)
 
 void DataWriters::CsvWriter::writeRow(const std::vector<std::string> &data) {
   for (auto i = 0; i < columnCount - 1; ++i) {
-    *outputStream << data[i] << delimiter;
+    if (convert) {
+      *outputStream << converter->convertBack(data[i]) << delimiter;
+    } else {
+      *outputStream << data[i] << delimiter;
+    }
   }
-  *outputStream << data[columnCount - 1] << "\n";
+  if (convert) {
+    *outputStream << converter->convertBack(data[columnCount - 1]) << "\n";
+  } else {
+    *outputStream << data[columnCount - 1] << "\n";
+  }
 }
+

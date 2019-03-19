@@ -59,7 +59,7 @@ void DataProviders::XlntReader::readHeader() {
   header.clear();
   bool readFirst = false;
   if (convert) {
-    header.emplace_back(converter.convert(lastUnusedCell.value<std::string>()));
+    header.emplace_back(converter->convert(lastUnusedCell.value<std::string>()));
   } else {
     header.emplace_back(lastUnusedCell.value<std::string>());
   }
@@ -70,7 +70,7 @@ void DataProviders::XlntReader::readHeader() {
       break;
     }
     if (convert) {
-      header.emplace_back(converter.convert(cell.value<std::string>()));
+      header.emplace_back(converter->convert(cell.value<std::string>()));
     } else {
       header.emplace_back(cell.value<std::string>());
     }
@@ -82,7 +82,7 @@ void DataProviders::XlntReader::readRecord() {
   currentRecord.clear();
   bool readFirst = false;
   if (convert) {
-    currentRecord.emplace_back(converter.convert(lastUnusedCell.value<std::string>()));
+    currentRecord.emplace_back(converter->convert(lastUnusedCell.value<std::string>()));
   } else {
     currentRecord.emplace_back(lastUnusedCell.value<std::string>());
   }
@@ -93,7 +93,7 @@ void DataProviders::XlntReader::readRecord() {
       break;
     }
     if (convert) {
-      currentRecord.emplace_back(converter.convert(cell.value<std::string>()));
+      currentRecord.emplace_back(converter->convert(cell.value<std::string>()));
     } else {
       currentRecord.emplace_back(cell.value<std::string>());
     }

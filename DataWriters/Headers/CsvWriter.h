@@ -20,6 +20,10 @@ class CsvWriter : public BaseDataWriter {
   explicit CsvWriter(std::string_view filePath,
                      std::string_view delimiter = ",");
 
+  CsvWriter(std::string_view filePath,
+            CharSetConverter::CharSet outCharSet,
+            std::string_view delimiter = ",");
+
   ~CsvWriter() override;
 
   void writeHeader(const std::vector<std::string> &header) override;

@@ -32,11 +32,10 @@ namespace DataProviders {
 class BaseDataProvider {
  public:
   BaseDataProvider()
-      : convert(false),
-        converter(CharSetConverter(CharSetConverter::CharSet::Utf16)) {}
+      : convert(false) {}
 
   explicit BaseDataProvider(CharSetConverter::CharSet sourceCharSet) : convert(
-      true), converter(CharSetConverter(sourceCharSet)) {}
+      true), converter(std::make_unique<CharSetConverter>(sourceCharSet)) {}
   /**
    * Get a record divided into fields
    * @return
@@ -146,7 +145,7 @@ class BaseDataProvider {
 
  protected:
   bool convert;
-  CharSetConverter converter;
+  std::unique_ptr<CharSetConverter> converter;
 };
 
 }  // namespace DataProviders
