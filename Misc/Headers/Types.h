@@ -7,6 +7,7 @@
 
 #include <gsl/gsl>
 #include <string>
+#include <vector>
 #include <decimal.h>
 #include <Utilities.h>
 #include <iostream>
@@ -19,20 +20,51 @@
 enum class DateTimeType {
   Date, Time, DateTime
 };
+/**
+ * DateTime wrapper for boost/date_time.
+ * Provides methods for string conversions and conversions for xlnt library.
+ */
 class DateTime {
  public:
   DateTime();
-  DateTime(DateTimeType type);
+  explicit DateTime(DateTimeType type);
   DateTime(const boost::posix_time::ptime &ptime, DateTimeType type);
   DateTime(const DateTime &other);
+  /**
+   * Construct from string using default formats.
+   * @param str date/time/datetime string
+   * @param type
+   */
   DateTime(std::string_view str, DateTimeType type);
+  /**
+   * Construct from string using user defined format.
+   * @param str date/time/datetime string
+   * @param fmt format of string
+   */
   DateTime(std::string_view str, std::string_view fmt);
 
   DateTimeType getType() const;
+  /**
+   * Convert to string using default formats.
+   * @return string representation of this
+   */
   std::string toString() const;
+  /**
+   * Convert to string using user defined format.
+   * @return string representation of this
+   */
   std::string toString(std::string_view fmt) const;
 
+  /**
+   * Set datetime from string using default formats.
+   * @param str datetime as string
+   */
   void fromString(std::string_view str);
+  /**
+   * Set datetime from string using user defined format.
+   * @param str datetime as string
+   * @param fmt datetime string format
+   */
   void fromString(std::string_view str, std::string_view fmt);
 
   xlnt::date toXlntDate();
@@ -49,6 +81,7 @@ class DateTime {
   bool operator>=(const DateTime &rhs) const;
   friend std::ostream &operator<<(std::ostream &os, const DateTime &timeB);
   friend std::istream &operator>>(std::istream &is, DateTime &timeB);
+
  private:
   DateTimeType type;
   boost::posix_time::ptime ptime;
@@ -60,7 +93,6 @@ class DateTime {
   std::pair<DateTimeType, boost::posix_time::ptime> innerFromString(std::string_view str,
                                                                     std::string_view fmt);
 };
-
 
 enum class ValueType {
   Integer,
@@ -78,7 +110,7 @@ enum class SortOrder {
 typedef dec::decimal<2> Currency;
 
 /**
- * Main data container for data sets
+ * Main data container for data sets.
  */
 union DataContainer {
   gsl::zstring<> _string = nullptr;
@@ -164,11 +196,5 @@ using DataSetRow = std::vector<DataContainer>;
 int compareDataContainers(const DataContainer &data1,
                           const DataContainer &data2,
                           ValueType valueType);
-
-enum class Operation {
-  Distinct, Sum, Average
-};
-
-std::string OperationToString(Operation op);
 
 #endif  // MISC_HEADERS_TYPES_H_

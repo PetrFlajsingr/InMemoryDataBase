@@ -4,14 +4,6 @@
 
 #include <Types.h>
 
-std::string OperationToString(Operation op) {
-  switch (op) {
-    case Operation::Distinct:return "";
-    case Operation::Sum:return "(Sum)";
-    case Operation::Average:return "(Avg)";
-  }
-}
-
 int compareDataContainers(const DataContainer &data1,
                           const DataContainer &data2,
                           ValueType valueType) {
