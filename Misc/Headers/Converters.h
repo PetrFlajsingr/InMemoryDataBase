@@ -62,10 +62,10 @@ class StringSplitConverter : public Converter<std::string, std::vector<std::stri
   std::string delimiter;
 };
 
-class ExcelDateTime2DateTimeConverter : public Converter<double, DateTimeB> {
+class ExcelDateTime2DateTimeConverter : public Converter<double, DateTime> {
  public:
-  DateTimeB convert(const double &value) const override;
-  double convertBack(const DateTimeB &value) const override;
+  DateTime convert(const double &value) const override;
+  double convertBack(const DateTime &value) const override;
 
  private:
   const boost::gregorian::date excelStartDate = boost::gregorian::date(1900, 1, 1);

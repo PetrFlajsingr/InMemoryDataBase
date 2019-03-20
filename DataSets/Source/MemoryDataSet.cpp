@@ -79,7 +79,7 @@ void DataSets::MemoryDataSet::addRecord(DataProviders::BaseDataProvider &dataPro
         break;
       case ValueType::DateTime:
         data.back()->emplace_back(DataContainer{._dateTime = new DateTime(
-            record[i])});
+            record[i], DateTimeType::Date)});
         break;
       default:
         throw IllegalStateException(

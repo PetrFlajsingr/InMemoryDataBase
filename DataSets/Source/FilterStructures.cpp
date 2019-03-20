@@ -51,7 +51,8 @@ void DataSets::FilterOptions::addOption(const DataSets::BaseField *field,
                        return DataContainer{._currency = new Currency(std::string(
                            str))};
                      case ValueType::DateTime:
-                       return DataContainer{._dateTime = new DateTime(str)};
+                       return DataContainer{._dateTime = new DateTime(str,
+                                                                      DateTimeType::Date)};
                      default:
                        throw IllegalStateException(
                            "Internal error. FilterOptions::addOption");

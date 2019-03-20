@@ -8,28 +8,41 @@
 #include <gsl/gsl>
 #include <string>
 #include <decimal.h>
-#include <DateTimeUtils.h>
 #include <Utilities.h>
 #include <iostream>
 #include <Property.h>
+#include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 enum class DateTimeType {
   Date, Time, DateTime
 };
-class DateTimeB {
+class DateTime {
  public:
-  DateTimeB(const boost::posix_time::ptime &ptime, DateTimeType type);
+  DateTime();
+  DateTime(DateTimeType type);
+  DateTime(const boost::posix_time::ptime &ptime, DateTimeType type);
+  DateTime(const DateTime &other);
+  DateTime(std::string_view str, DateTimeType type);
+  DateTime(std::string_view str, std::string_view fmt);
 
   DateTimeType getType() const;
   std::string toString() const;
   std::string toString(std::string_view fmt) const;
 
+  void fromString(std::string_view str);
+  void fromString(std::string_view str, std::string_view fmt);
+
   const boost::posix_time::ptime &getTime() const;
 
-  // TODO: comparison operators, copy constructor...
-
-  static DateTimeB fromString(std::string_view str, DateTimeType type);
-  static DateTimeB fromString(std::string_view str, std::string_view fmt);
+  bool operator==(const DateTime &rhs) const;
+  bool operator!=(const DateTime &rhs) const;
+  bool operator<(const DateTime &rhs) const;
+  bool operator>(const DateTime &rhs) const;
+  bool operator<=(const DateTime &rhs) const;
+  bool operator>=(const DateTime &rhs) const;
+  friend std::ostream &operator<<(std::ostream &os, const DateTime &timeB);
+  friend std::istream &operator>>(std::istream &is, DateTime &timeB);
  private:
   DateTimeType type;
   boost::posix_time::ptime ptime;
@@ -37,9 +50,11 @@ class DateTimeB {
   static const std::string dateTimeDefFmt;
   static const std::string dateDefFmt;
   static const std::string timeDefFmt;
+
+  std::pair<DateTimeType, boost::posix_time::ptime> innerFromString(std::string_view str,
+                                                                    std::string_view fmt);
 };
 
-class DateTime;
 
 enum class ValueType {
   Integer,

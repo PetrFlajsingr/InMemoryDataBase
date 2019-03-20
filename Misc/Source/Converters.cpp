@@ -96,7 +96,7 @@ std::string StringSplitConverter::convertBack(const std::vector<std::string> &va
   return result;
 }
 
-DateTimeB ExcelDateTime2DateTimeConverter::convert(const double &value) const {
+DateTime ExcelDateTime2DateTimeConverter::convert(const double &value) const {
   using namespace boost::gregorian;
   using namespace boost::posix_time;
   auto finDate = excelStartDate + date_duration(gsl::narrow_cast<int>(value) - 2);
@@ -106,9 +106,9 @@ DateTimeB ExcelDateTime2DateTimeConverter::convert(const double &value) const {
   auto m = gsl::narrow_cast<uint8_t>(minF);
   auto secF = (minF - m) * 60;
   auto s = gsl::narrow_cast<uint8_t>(round(secF));
-  return DateTimeB(ptime(finDate, hours(h) + minutes(m) + seconds(s)), type);
+  return DateTime(ptime(finDate, hours(h) + minutes(m) + seconds(s)), type);
 }
-double ExcelDateTime2DateTimeConverter::convertBack(const DateTimeB &value) const {
+double ExcelDateTime2DateTimeConverter::convertBack(const DateTime &value) const {
   constexpr double daySecondCount = 24 * 60 * 60;
   auto wholePart = (value.getTime().date() - excelStartDate).days() + 2;
   auto fractPart = value.getTime().time_of_day().total_seconds() / daySecondCount;

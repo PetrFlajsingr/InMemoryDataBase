@@ -14,12 +14,14 @@
 #include <Logger.h>
 
 int main() {
-  auto tst = DateTimeB::fromString("08/06/1995", "%d/%m/%Y");
+  auto tst = DateTime("08/06/1995", "%d/%m/%Y");
   std::cout << tst.toString("%d-%m-%Y") << std::endl;
-  tst = DateTimeB::fromString("08/06/1995 083011", "%d/%m/%Y %H%M%S");
+  tst = DateTime("08/06/1995 083011", "%d/%m/%Y %H%M%S");
   std::cout << tst.toString() << std::endl;
-  tst = DateTimeB::fromString("08:30:11", "%H:%M:%S");
+  tst = DateTime("08:30:11", "%H:%M:%S");
   std::cout << tst.toString() << std::endl;
+  tst = DateTime("08/06/1995", DateTimeType::Date);
+  std::cout << tst.toString("%d-%m-%Y") << std::endl;
 
   return 0;
   Logger::GetInstance().log(LogLevel::Debug, "Start", true);

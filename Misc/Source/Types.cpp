@@ -61,15 +61,21 @@ DataContainer &DataContainer::operator=(const DateTime &val) {
   return *this;
 }
 
-const std::string DateTimeB::dateTimeDefFmt = "%d/%m/%Y %H:%M:%S";
-const std::string DateTimeB::dateDefFmt = "%d/%m/%Y";
-const std::string DateTimeB::timeDefFmt = "%H:%M:%S";
+const std::string DateTime::dateTimeDefFmt = "%d/%m/%Y %H:%M:%S";
+const std::string DateTime::dateDefFmt = "%d/%m/%Y";
+const std::string DateTime::timeDefFmt = "%H:%M:%S";
 
-DateTimeB::DateTimeB(const boost::posix_time::ptime &ptime,
+DateTime::DateTime() : type(DateTimeType::DateTime), ptime(boost::posix_time::second_clock::local_time()) {}
+DateTime::DateTime(DateTimeType type) : type(type), ptime(boost::posix_time::second_clock::local_time()) {}
+
+DateTime::DateTime(const boost::posix_time::ptime &ptime,
                      DateTimeType type)
     : type(type), ptime(ptime) {}
 
-std::string DateTimeB::toString() const {
+DateTime::DateTime(const DateTime &other)
+    : type(other.type), ptime(other.ptime) {}
+
+std::string DateTime::toString() const {
   switch (type) {
     case DateTimeType::Date: return toString(dateDefFmt);
     case DateTimeType::Time: return toString(timeDefFmt);
@@ -77,7 +83,7 @@ std::string DateTimeB::toString() const {
   }
 }
 
-std::string DateTimeB::toString(std::string_view fmt) const {
+std::string DateTime::toString(std::string_view fmt) const {
   boost::posix_time::time_facet *facet = new boost::posix_time::time_facet(std::string(fmt).c_str());
   std::ostringstream os;
   os.imbue(std::locale(os.getloc(), facet));
@@ -85,17 +91,48 @@ std::string DateTimeB::toString(std::string_view fmt) const {
   return os.str();
 }
 
-DateTimeType DateTimeB::getType() const {
+DateTimeType DateTime::getType() const {
   return type;
 }
-DateTimeB DateTimeB::fromString(std::string_view str, DateTimeType type) {
-  switch (type) {
-    case DateTimeType::Date: return fromString(str, dateDefFmt);
-    case DateTimeType::Time: return fromString(str, timeDefFmt);
-    case DateTimeType::DateTime: return fromString(str, dateTimeDefFmt);
-  }
+
+DateTime::DateTime(std::string_view str, DateTimeType type) : type(type) {
+  fromString(str);
 }
-DateTimeB DateTimeB::fromString(std::string_view str, std::string_view fmt) {
+DateTime::DateTime(std::string_view str, std::string_view fmt) {
+  fromString(str, fmt);
+}
+
+const boost::posix_time::ptime &DateTime::getTime() const {
+  return ptime;
+}
+bool DateTime::operator==(const DateTime &rhs) const {
+  return type == rhs.type &&
+      ptime == rhs.ptime;
+}
+bool DateTime::operator!=(const DateTime &rhs) const {
+  return !(rhs == *this);
+}
+bool DateTime::operator<(const DateTime &rhs) const {
+  return ptime < rhs.ptime;
+}
+bool DateTime::operator>(const DateTime &rhs) const {
+  return rhs < *this;
+}
+bool DateTime::operator<=(const DateTime &rhs) const {
+  return !(rhs < *this);
+}
+bool DateTime::operator>=(const DateTime &rhs) const {
+  return !(*this < rhs);
+}
+std::ostream &operator<<(std::ostream &os, const DateTime &timeB) {
+  os << timeB.toString();
+  return os;
+}
+std::istream &operator>>(std::istream &is, DateTime &timeB) {
+  throw NotImplementedException();
+}
+std::pair<DateTimeType, boost::posix_time::ptime> DateTime::innerFromString(std::string_view str,
+                                                                            std::string_view fmt) {
   const std::locale loc = std::locale(std::locale::classic(),
                                       new boost::posix_time::time_input_facet(std::string(fmt)));
   auto is = std::istringstream(std::string(str));
@@ -112,9 +149,22 @@ DateTimeB DateTimeB::fromString(std::string_view str, std::string_view fmt) {
   } else {
     type = DateTimeType::Time;
   }
-  return DateTimeB(t, type);
+  return std::make_pair(type, t);
 }
-const boost::posix_time::ptime &DateTimeB::getTime() const {
-  return ptime;
+
+void DateTime::fromString(std::string_view str) {
+  switch (type) {
+    case DateTimeType::Date: fromString(str, dateDefFmt);
+      break;
+    case DateTimeType::Time: fromString(str, timeDefFmt);
+      break;
+    case DateTimeType::DateTime: fromString(str, dateTimeDefFmt);
+      break;
+  }
+}
+void DateTime::fromString(std::string_view str, std::string_view fmt) {
+  auto[type, t] = innerFromString(str, fmt);
+  this->ptime = t;
+  this->type = type;
 }
 
