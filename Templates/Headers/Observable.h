@@ -107,8 +107,7 @@ class ObservableBase {
  * @tparam T type of observable value
  */
 template<typename T>
-class Observable
-    : public ObservableBase {
+class Observable : public ObservableBase {
  public:
   Observable() = default;
   explicit Observable(T value) : value(value) {}

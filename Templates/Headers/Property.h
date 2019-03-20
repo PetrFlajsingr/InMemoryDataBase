@@ -24,7 +24,12 @@ template<class T>
 struct ptr_type<std::shared_ptr<T>> {
   typedef T *type;
 };
-
+/**
+ * Type of property.
+ * R    -   read only
+ * W    -   write only
+ * RW   -   read write
+ */
 enum PropType {
   R, W, RW
 };
@@ -43,22 +48,35 @@ class Property final {
 
  public:
   Property() = default;
+  /**
+   * Create read write property
+   * @param get getter
+   * @param set setter
+   */
   template<PropType Type = SetGet,
       typename = typename std::enable_if<Type == PropType::RW,
                                          void>::type>
-  Property(const Getter &get,
-           const Setter &set) : get(get), set(set) {}
+  Property(const Getter &get, const Setter &set) : get(get), set(set) {}
+  /**
+   * Create ready only property
+   * @param get getter
+   */
   template<PropType Type = SetGet,
       typename = typename std::enable_if<Type == PropType::R, void>::type>
-  Property(const Getter &get) : get(get) {}
+  explicit Property(const Getter &get) : get(get) {}
+  /**
+   * Create write only property
+   * @param set setter
+   */
   template<PropType Type = SetGet,
       typename = typename std::enable_if<Type == PropType::W, void>::type>
-  Property(const Setter &set) : set(set) {}
+  explicit Property(const Setter &set) : set(set) {}
   ~Property() = default;
   Property<T, Owner>(const Property<T, Owner, SetGet> &) = delete;
-  Property<T, Owner, SetGet> &operator=(const Property<T,
-                                                       Owner,
-                                                       SetGet> &) = delete;
+  Property<T, Owner, SetGet> &operator=(const Property<T, Owner, SetGet> &) = delete;
+  /**
+   * Set value using Setter function
+   */
   template<PropType Type = SetGet,
       typename = typename std::enable_if<Type != PropType::R, void>::type>
   typename std::conditional<std::is_compound<T>::value, T &, T>::type operator=(
