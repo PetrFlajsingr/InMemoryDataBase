@@ -37,11 +37,41 @@ class Folder {
   boost::filesystem::path path;
  public:
   explicit Folder(const boost::filesystem::path &path);
+  /**
+   *
+   * @param name relative path
+   * @return folder on this.path+name
+   */
   Folder getFolder(std::string_view name);
+  /**
+   * Create new folder.
+   * @param name relative path
+   * @return folder on this.path+name
+   */
   Folder newFolder(std::string_view name);
+  /**
+   *
+   * @param name relative path
+   * @return true if this.path+name is folder, false otherwise
+   */
   bool isFolder(std::string_view name);
+  /**
+   *
+   * @param name relative path
+   * @return file on this.path+name
+   */
   File getFile(std::string_view name);
+  /**
+   * Create a new file.
+   * @param name relative path
+   * @return file on this.path+name
+   */
   File newFile(std::string_view name);
+  /**
+   *
+   * @param name relative path
+   * @return true if this.path+name is a file, false otherwise
+   */
   bool isFile(std::string_view name);
 
   const boost::filesystem::path &getPath() const;
@@ -51,7 +81,17 @@ class Folder {
  */
 class FileManager {
  public:
+  /**
+   *
+   * @param path absolute path
+   * @return folder on path
+   */
   Folder getFolder(std::string_view path);
+  /**
+   *
+   * @param path absolute path
+   * @return file on path
+   */
   File getFile(std::string_view path);
 };
 

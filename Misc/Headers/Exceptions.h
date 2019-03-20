@@ -9,17 +9,11 @@
 #include <string>
 #include <gsl/gsl>
 
-/**
- * Exception slouzici k oznaceni funkci, ktere nejsou implementovany
- */
 class NotImplementedException : public std::logic_error {
  public:
   NotImplementedException() : logic_error("Function is not implemented") {}
 };
 
-/**
- * Exception slouzici k informovani o chybné praci se soubory
- */
 class IOException : public std::exception {
  private:
   const gsl::czstring<> errorMessage;
@@ -33,9 +27,6 @@ class IOException : public std::exception {
   }
 };
 
-/**
- * Exception pro informovani o chybne zadanych argumentech
- */
 class InvalidArgumentException : public std::invalid_argument {
  public:
   explicit InvalidArgumentException(const gsl::czstring<> message)
@@ -43,9 +34,6 @@ class InvalidArgumentException : public std::invalid_argument {
       message) {}
 };
 
-/**
- * Exception pro notifikaci o chybnem pozadavku pro momentalni vnitrni stav objektu
- */
 class IllegalStateException : public std::exception {
  private:
   const gsl::czstring<> errorMessage;
@@ -58,9 +46,6 @@ class IllegalStateException : public std::exception {
   }
 };
 
-/**
- * Exception pro notifikaci o nepovolene operaci objektu
- */
 class UnsupportedOperationException : public std::exception {
  private:
   const gsl::czstring<> errorMessage;

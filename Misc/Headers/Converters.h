@@ -18,8 +18,6 @@ enum class CharSet {
 
 /**
  * Convert T to U and vice versa.
- * @tparam T
- * @tparam U
  */
 template<typename T, typename U>
 class Converter {
@@ -58,6 +56,7 @@ class StringSplitConverter : public Converter<std::string, std::vector<std::stri
   explicit StringSplitConverter(const std::string &delimiter);
   std::vector<std::string> convert(const std::string &value) const override;
   std::string convertBack(const std::vector<std::string> &value) const override;
+
  private:
   std::string delimiter;
 };
@@ -69,14 +68,12 @@ class ExcelDateTime2DateTimeConverter : public Converter<double, DateTime> {
 
  private:
   const boost::gregorian::date excelStartDate = boost::gregorian::date(1900, 1, 1);
-
   DateTimeType type = DateTimeType::DateTime;
 };
 
 class CharSetConverter : public Converter<std::string, std::string> {
  public:
   explicit CharSetConverter(CharSet charsetIn);
-
   std::string convert(const std::string &value) const override;
   std::string convertBack(const std::string &value) const override;
 
