@@ -13,6 +13,8 @@
 #include <Property.h>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <xlnt/utils/date.hpp>
+#include <xlnt/utils/datetime.hpp>
 
 enum class DateTimeType {
   Date, Time, DateTime
@@ -32,6 +34,10 @@ class DateTime {
 
   void fromString(std::string_view str);
   void fromString(std::string_view str, std::string_view fmt);
+
+  xlnt::date toXlntDate();
+  xlnt::time toXlntTime();
+  xlnt::datetime toXlntDateTime();
 
   const boost::posix_time::ptime &getTime() const;
 

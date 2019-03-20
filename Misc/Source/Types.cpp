@@ -167,4 +167,18 @@ void DateTime::fromString(std::string_view str, std::string_view fmt) {
   this->ptime = t;
   this->type = type;
 }
+xlnt::date DateTime::toXlntDate() {
+  return xlnt::date(ptime.date().year(),
+                    ptime.date().month().as_number(),
+                    ptime.date().day().as_number());
+}
+xlnt::time DateTime::toXlntTime() {
+  return xlnt::time(ptime.time_of_day().hours(),
+                    ptime.time_of_day().minutes(),
+                    ptime.time_of_day().seconds(),
+                    0);
+}
+xlnt::datetime DateTime::toXlntDateTime() {
+  return xlnt::datetime(toXlntDate(), toXlntTime());
+}
 
