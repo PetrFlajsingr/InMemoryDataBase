@@ -47,7 +47,6 @@ class Config {
    */
   explicit Config(const std::string &path, bool autoCommit = false);
   virtual ~Config();
-
   /**
    *
    * @tparam T requested data type
@@ -57,9 +56,7 @@ class Config {
    * @return required value if found, else defaultVal
    */
   template<typename T>
-  T getValue(const std::string &category,
-             const std::string &key,
-             T defaultVal) {
+  T getValue(const std::string &category, const std::string &key, T defaultVal) {
     if (categories.find(category) != categories.end()) {
       auto cat = categories[category];
       if (cat.find(key) != cat.end()) {
@@ -73,17 +70,15 @@ class Config {
     }
     return defaultVal;
   }
-
   /**
-   * Get value of requested type. Throw exception when no value is found
+   * Get value of requested type. Throw ResourceNotFoundException when no value is found.
    * @tparam T requested data type
    * @param category
    * @param key
    * @return required value
    */
   template<typename T>
-  T getValue(std::string_view category,
-             std::string_view key) {
+  T getValue(std::string_view category, std::string_view key) {
     if (categories.find(std::string(category)) != categories.end()) {
       auto cat = categories[std::string(category)];
       if (cat.find(std::string(key)) != cat.end()) {
@@ -93,7 +88,6 @@ class Config {
     throw ResourceNotFoundException(
         "Resource [" + std::string(category) + "[" + std::string(key) + "]]");
   }
-
   /**
    * Save value on autocommit
    * @tparam T
@@ -102,26 +96,22 @@ class Config {
    * @param value
    */
   template<typename T>
-  void setValue(const std::string &category,
-                const std::string &key,
-                T value) {
+  void setValue(const std::string &category, const std::string &key, T value) {
     categories[category][key] = toString(value);
     if (autoCommit) {
       save();
     }
   }
-
   /**
    * Save data to file if autocommit is off.
    */
   void commit();
+
  private:
   std::string path;
   bool autoCommit;
 
-  std::unordered_map<std::string, std::unordered_map<std::string, std::string>>
-      categories;
-
+  std::unordered_map<std::string, std::unordered_map<std::string, std::string>> categories;
   void load();
   void save();
 };
