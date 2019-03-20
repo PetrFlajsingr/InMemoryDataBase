@@ -10,6 +10,7 @@
 #include <boost/locale.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <Types.h>
 
 enum class CharSet {
   Latin1, Latin2, CP1250, CP1252, Utf16, ANSI
@@ -61,14 +62,15 @@ class StringSplitConverter : public Converter<std::string, std::vector<std::stri
   std::string delimiter;
 };
 
-class ExcelDateTime2DateTimeConverter : public Converter<double,
-                                                         boost::posix_time::ptime> {
+class ExcelDateTime2DateTimeConverter : public Converter<double, DateTimeB> {
  public:
-  boost::posix_time::ptime convert(const double &value) const override;
-  double convertBack(const boost::posix_time::ptime &value) const override;
+  DateTimeB convert(const double &value) const override;
+  double convertBack(const DateTimeB &value) const override;
 
  private:
   const boost::gregorian::date excelStartDate = boost::gregorian::date(1900, 1, 1);
+
+  DateTimeType type = DateTimeType::DateTime;
 };
 
 class CharSetConverter : public Converter<std::string, std::string> {

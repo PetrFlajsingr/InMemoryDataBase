@@ -114,4 +114,7 @@ DateTimeB DateTimeB::fromString(std::string_view str, std::string_view fmt) {
   }
   return DateTimeB(t, type);
 }
+const boost::posix_time::ptime &DateTimeB::getTime() const {
+  return ptime;
+}
 

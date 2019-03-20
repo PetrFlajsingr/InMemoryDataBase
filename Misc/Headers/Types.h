@@ -24,6 +24,10 @@ class DateTimeB {
   std::string toString() const;
   std::string toString(std::string_view fmt) const;
 
+  const boost::posix_time::ptime &getTime() const;
+
+  // TODO: comparison operators, copy constructor...
+
   static DateTimeB fromString(std::string_view str, DateTimeType type);
   static DateTimeB fromString(std::string_view str, std::string_view fmt);
  private:
