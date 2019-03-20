@@ -66,6 +66,7 @@ class ExcelDateTime2DateTimeConverter : public Converter<double,
  public:
   boost::posix_time::ptime convert(const double &value) const override;
   double convertBack(const boost::posix_time::ptime &value) const override;
+
  private:
   const boost::gregorian::date excelStartDate = boost::gregorian::date(1900, 1, 1);
 };

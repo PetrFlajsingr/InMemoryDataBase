@@ -11,9 +11,29 @@
 #include <DateTimeUtils.h>
 #include <Utilities.h>
 #include <iostream>
+#include <Property.h>
 
-template<typename T>
-using RCptr = std::shared_ptr<T>;
+enum class DateTimeType {
+  Date, Time, DateTime
+};
+class DateTimeB {
+ public:
+  DateTimeB(const boost::posix_time::ptime &ptime, DateTimeType type);
+
+  DateTimeType getType() const;
+  std::string toString() const;
+  std::string toString(std::string_view fmt) const;
+
+  static DateTimeB fromString(std::string_view str, DateTimeType type);
+  static DateTimeB fromString(std::string_view str, std::string_view fmt);
+ private:
+  DateTimeType type;
+  boost::posix_time::ptime ptime;
+
+  static const std::string dateTimeDefFmt;
+  static const std::string dateDefFmt;
+  static const std::string timeDefFmt;
+};
 
 class DateTime;
 

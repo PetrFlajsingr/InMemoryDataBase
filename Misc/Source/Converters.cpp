@@ -111,7 +111,6 @@ boost::posix_time::ptime ExcelDateTime2DateTimeConverter::convert(const double &
 double ExcelDateTime2DateTimeConverter::convertBack(const boost::posix_time::ptime &value) const {
   constexpr double daySecondCount = 24 * 60 * 60;
   auto wholePart = (value.date() - excelStartDate).days() + 2;
-  std::cout << value.time_of_day().total_seconds() << std::endl;
   auto fractPart = value.time_of_day().total_seconds() / daySecondCount;
   return wholePart + fractPart;
 }

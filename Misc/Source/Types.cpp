@@ -3,7 +3,6 @@
 //
 
 #include <Types.h>
-#include <Utilities.h>
 
 std::string OperationToString(Operation op) {
   switch (op) {
@@ -61,3 +60,58 @@ DataContainer &DataContainer::operator=(const DateTime &val) {
   *_dateTime = val;
   return *this;
 }
+
+const std::string DateTimeB::dateTimeDefFmt = "%d/%m/%Y %H:%M:%S";
+const std::string DateTimeB::dateDefFmt = "%d/%m/%Y";
+const std::string DateTimeB::timeDefFmt = "%H:%M:%S";
+
+DateTimeB::DateTimeB(const boost::posix_time::ptime &ptime,
+                     DateTimeType type)
+    : type(type), ptime(ptime) {}
+
+std::string DateTimeB::toString() const {
+  switch (type) {
+    case DateTimeType::Date: return toString(dateDefFmt);
+    case DateTimeType::Time: return toString(timeDefFmt);
+    case DateTimeType::DateTime: return toString(dateTimeDefFmt);
+  }
+}
+
+std::string DateTimeB::toString(std::string_view fmt) const {
+  boost::posix_time::time_facet *facet = new boost::posix_time::time_facet(std::string(fmt).c_str());
+  std::ostringstream os;
+  os.imbue(std::locale(os.getloc(), facet));
+  os << ptime;
+  return os.str();
+}
+
+DateTimeType DateTimeB::getType() const {
+  return type;
+}
+DateTimeB DateTimeB::fromString(std::string_view str, DateTimeType type) {
+  switch (type) {
+    case DateTimeType::Date: return fromString(str, dateDefFmt);
+    case DateTimeType::Time: return fromString(str, timeDefFmt);
+    case DateTimeType::DateTime: return fromString(str, dateTimeDefFmt);
+  }
+}
+DateTimeB DateTimeB::fromString(std::string_view str, std::string_view fmt) {
+  const std::locale loc = std::locale(std::locale::classic(),
+                                      new boost::posix_time::time_input_facet(std::string(fmt)));
+  auto is = std::istringstream(std::string(str));
+  is.imbue(loc);
+  boost::posix_time::ptime t;
+  is >> t;
+  DateTimeType type;
+  if (fmt.find("%d") != std::string::npos) {
+    if (fmt.find("%H") != std::string::npos) {
+      type = DateTimeType::DateTime;
+    } else {
+      type = DateTimeType::Date;
+    }
+  } else {
+    type = DateTimeType::Time;
+  }
+  return DateTimeB(t, type);
+}
+

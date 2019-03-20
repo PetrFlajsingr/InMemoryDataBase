@@ -14,12 +14,12 @@
 #include <Logger.h>
 
 int main() {
-  auto tst = DataProviders::XlsxIOReader("/Users/petr/Desktop/date_test.xlsx");
-  ExcelDateTime2DateTimeConverter t;
-  while (tst.next()) {
-    std::cout << t.convert(Utilities::stringToDouble(tst.getRow()[0])) << std::endl;
-    std::cout << t.convert(t.convertBack(t.convert(Utilities::stringToDouble(tst.getRow()[0])))) << std::endl;
-  }
+  auto tst = DateTimeB::fromString("08/06/1995", "%d/%m/%Y");
+  std::cout << tst.toString("%d-%m-%Y") << std::endl;
+  tst = DateTimeB::fromString("08/06/1995 083011", "%d/%m/%Y %H%M%S");
+  std::cout << tst.toString() << std::endl;
+  tst = DateTimeB::fromString("08:30:11", "%H:%M:%S");
+  std::cout << tst.toString() << std::endl;
 
   return 0;
   Logger::GetInstance().log(LogLevel::Debug, "Start", true);
