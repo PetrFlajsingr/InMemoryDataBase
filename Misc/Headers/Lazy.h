@@ -16,8 +16,13 @@
 template<typename T>
 class Lazy {
   using InitFnc = std::function<T()>;
+
  public:
   explicit Lazy(const InitFnc &init) : init(init) {}
+  /**
+   * Calculate value on first call or if invalidate() was called.
+   * @return lazily evaluated value
+   */
   virtual operator const T &() {
     if (!initialised) {
       value = init();
@@ -25,9 +30,13 @@ class Lazy {
     }
     return value;
   }
+  /**
+   * Mark value as invalid and force it to recompute on next acess.
+   */
   void invalidate() {
     initialised = false;
   }
+
  private:
   T value;
   InitFnc init;
