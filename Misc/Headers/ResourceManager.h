@@ -41,6 +41,8 @@ class ResourceManager {
     throw InvalidArgumentException("Invalid resource format.");
   }
 
+  File getResourceFile(std::string_view fileName);
+
  private:
   Config config = Config("./test.conf");
 

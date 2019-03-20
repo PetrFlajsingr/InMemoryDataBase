@@ -41,32 +41,43 @@ class ThreadPool final : public MessageReceiver {
 
  public:
   explicit ThreadPool(std::size_t numThreads);
-
   ~ThreadPool();
-
   ThreadPool(const ThreadPool &c) = delete;
   ThreadPool &operator=(const ThreadPool &c) = delete;
-
+  /**
+   * Enqueue task for execution.
+   * @tparam T type of executable
+   * @param task invocable
+   * @return std::future to wait for task execution
+   */
   template<class T>
   auto enqueue(T task) -> std::future<decltype(task())> {
     auto wrapper =
         std::make_shared<std::packaged_task<decltype(task())()>>(std::move(task));
-
     {
       std::unique_lock<std::mutex> lock(mutex);
       tasks.emplace([=] {
         (*wrapper)();
       });
     }
-
     event.notify_one();
     return wrapper->get_future();
   }
-
+  /**
+   * Wait for tasks of tag to finish
+   * @param tag task tag
+   */
   void wait(std::size_t tag);
- private:
-  void start(std::size_t numThreads);
 
+ private:
+  /**
+   * Start threadpool.
+   * @param numThreads thread count in thread pool
+   */
+  void start(std::size_t numThreads);
+  /**
+   * Stop threadpool. Executables in progress will finish before the thread pool fully stops.
+   */
   void stop() noexcept;
   void receive(std::shared_ptr<Message> message) override;
 };

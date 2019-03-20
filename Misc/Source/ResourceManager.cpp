@@ -5,3 +5,6 @@
 #include <ResourceManager.h>
 
 #include "ResourceManager.h"
+File ResourceManager::getResourceFile(std::string_view fileName) {
+  throw NotImplementedException();
+}

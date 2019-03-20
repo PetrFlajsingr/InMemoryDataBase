@@ -1,3 +1,5 @@
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "cppcoreguidelines-pro-type-member-init"
 //
 // Created by Petr Flajsingr on 2019-01-25.
 //
@@ -113,7 +115,7 @@ class Logger {
   void printElapsedTime() {
     auto tmp = endTimeMs - startTimeMs;
     log(LogLevel::Verbose,
-                "Time elapsed: " + std::to_string(tmp.count()) + " ms");
+        "Time elapsed: " + std::to_string(tmp.count()) + " ms");
   }
 
   void allowDebug() {
@@ -122,3 +124,5 @@ class Logger {
 };
 
 #endif //CSV_READER_LOGGER_H
+
+#pragma clang diagnostic pop
