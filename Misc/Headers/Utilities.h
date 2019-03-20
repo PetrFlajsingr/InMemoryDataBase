@@ -16,9 +16,6 @@
 typedef dec::decimal<2> Currency;
 class DateTime;
 
-/**
- * Obecne metody s ruznym vyuzitim
- */
 namespace Utilities {
 /**
  * Rozdeleni stringu pomoci urceneho delimiteru.
@@ -29,7 +26,6 @@ namespace Utilities {
  */
 std::vector<std::string> splitStringByDelimiter(std::string_view str,
                                                 std::string_view delimiter);
-
 /**
  * Rozdeleni stringu pomoci urceneho delimiteru.
  * Delimiter neni v rozdelenych retezcich obsazen.
@@ -40,7 +36,6 @@ std::vector<std::string> splitStringByDelimiter(std::string_view str,
 std::vector<std::string> splitStringByDelimiterReserve(std::string_view str,
                                                        std::string_view delimiter,
                                                        int reserve);
-
 /**
  * Prevod string do int.
  *
@@ -49,7 +44,6 @@ std::vector<std::string> splitStringByDelimiterReserve(std::string_view str,
  * @return
  */
 int stringToInt(std::string_view str);
-
 /**
  * Prevod string do double.
  *
@@ -58,21 +52,18 @@ int stringToInt(std::string_view str);
  * @return
  */
 double stringToDouble(std::string_view str);
-
 /**
  * Kontrola jestli je string integer za pomoci regex
  * @param value
  * @return
  */
 bool isInteger(std::string_view value);
-
 /**
  * Kontrola jestli je string double za pomoci regex
  * @param value
  * @return
  */
 bool isDouble(std::string_view value);
-
 /**
  * Kontrola, jestli string konci jinym stringem
  * @param value Kontrolovany string
@@ -80,7 +71,6 @@ bool isDouble(std::string_view value);
  * @return true pokud value konci ending, jinak false
  */
 bool endsWith(std::string_view value, std::string_view ending);
-
 /**
  * Zkopirovani std::string do nove alokovane char*.
  * Vyuziva strdup()
@@ -88,7 +78,6 @@ bool endsWith(std::string_view value, std::string_view ending);
  * @return nove alokovany char* obsahujici str.data()
  */
 gsl::zstring<> copyStringToNewChar(std::string_view str);
-
 template<typename T>
 int8_t compare(const T &a, const T &b);
 /**
@@ -98,7 +87,6 @@ int8_t compare(const T &a, const T &b);
  * @return -1 pokud a < b, 0 pokud a == b, 1 pokud a > b
  */
 int8_t compareInt(int a, int b);
-
 /**
  * Srovnani double hodnot
  * @param a
@@ -106,7 +94,6 @@ int8_t compareInt(int a, int b);
  * @return -1 pokud a < b, 0 pokud a == b, 1 pokud a > b
  */
 int8_t compareDouble(double a, double b);
-
 /**
  * Srovnani Currency hodnot
  * @param a
@@ -114,7 +101,6 @@ int8_t compareDouble(double a, double b);
  * @return -1 pokud a < b, 0 pokud a == b, 1 pokud a > b
  */
 int8_t compareCurrency(const Currency &a, const Currency &b);
-
 /**
  * Srovnani string hodnot
  * @param a
@@ -122,7 +108,6 @@ int8_t compareCurrency(const Currency &a, const Currency &b);
  * @return -1 pokud a < b, 0 pokud a == b, 1 pokud a > b
  */
 int8_t compareString(std::string_view a, std::string_view b);
-
 /**
  * Srovnani DateTime hodnot
  * @param a

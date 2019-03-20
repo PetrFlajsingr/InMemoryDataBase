@@ -5,7 +5,7 @@
 #include <CLIController.h>
 #include <CsvReader.h>
 #include <XlsxIOReader.h>
-#include <XlsxWriter.h>
+#include <XlsxIOWriter.h>
 
 CLIController::CLIController()
     : MessageSender(AppContext::GetInstance().messageManager) {}

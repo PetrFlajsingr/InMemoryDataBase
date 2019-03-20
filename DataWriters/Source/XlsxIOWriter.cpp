@@ -3,9 +3,9 @@
 //
 
 #include <Exceptions.h>
-#include <XlsxWriter.h>
+#include <XlsxIOWriter.h>
 
-DataWriters::XlsxWriter::XlsxWriter(std::string_view fileName,
+DataWriters::XlsxIOWriter::XlsxIOWriter(std::string_view fileName,
                                     std::string_view sheetName)
     : BaseDataWriter() {
   xlsxWriterHandle = xlsxiowrite_open(std::string(fileName).c_str(),
@@ -16,10 +16,10 @@ DataWriters::XlsxWriter::XlsxWriter(std::string_view fileName,
   }
 }
 
-DataWriters::XlsxWriter::XlsxWriter(std::string_view fileName,
-                                    CharSet outCharSet,
-                                    std::string_view sheetName)
-    : BaseDataWriter(outCharSet) {
+DataWriters::XlsxIOWriter::XlsxIOWriter(std::string_view fileName,
+                                        CharSet charSet,
+                                        std::string_view sheetName)
+    : BaseDataWriter(charSet) {
   xlsxWriterHandle = xlsxiowrite_open(std::string(fileName).c_str(),
                                       std::string(sheetName).c_str());
 
@@ -28,11 +28,11 @@ DataWriters::XlsxWriter::XlsxWriter(std::string_view fileName,
   }
 }
 
-DataWriters::XlsxWriter::~XlsxWriter() {
+DataWriters::XlsxIOWriter::~XlsxIOWriter() {
   xlsxiowrite_close(xlsxWriterHandle);
 }
 
-void DataWriters::XlsxWriter::writeHeader(const std::vector<std::string> &header) {
+void DataWriters::XlsxIOWriter::writeHeader(const std::vector<std::string> &header) {
   for (auto &name : header) {
     if (convert) {
       xlsxiowrite_add_column(xlsxWriterHandle,
@@ -45,7 +45,7 @@ void DataWriters::XlsxWriter::writeHeader(const std::vector<std::string> &header
   xlsxiowrite_next_row(xlsxWriterHandle);
 }
 
-void DataWriters::XlsxWriter::writeRecord(const std::vector<std::string> &record) {
+void DataWriters::XlsxIOWriter::writeRecord(const std::vector<std::string> &record) {
   for (auto &value : record) {
     if (convert) {
       xlsxiowrite_add_column(xlsxWriterHandle,

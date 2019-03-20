@@ -6,7 +6,7 @@
 #include <MemoryDataSet.h>
 #include <MemoryDataBase.h>
 #include <XlsxIOReader.h>
-#include <XlsxWriter.h>
+#include <XlsxIOWriter.h>
 #include <CsvWriter.h>
 #include <XlntWriter.h>
 #include <boost/locale.hpp>

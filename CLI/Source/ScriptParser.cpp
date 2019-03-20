@@ -11,7 +11,7 @@
 #include <CsvReader.h>
 #include <XlsxIOReader.h>
 #include <CsvWriter.h>
-#include <XlsxWriter.h>
+#include <XlsxIOWriter.h>
 
 ScriptParser::Command ScriptParser::parseInput(std::string_view input) {
   auto tokens = tokenize(input);
@@ -244,8 +244,7 @@ bool ScriptParser::runCommand(ScriptParser::Command command) {
           case ScriptParser::FileTypes::csv:
             writer = new DataWriters::CsvWriter(filePath);
             break;
-          case ScriptParser::FileTypes::xlsx:
-            writer = new DataWriters::XlsxWriter(filePath);
+          case ScriptParser::FileTypes::xlsx:writer = new DataWriters::XlsxIOWriter(filePath);
             break;
         }
         writer->writeHeader(result->dataSet->getFieldNames());

@@ -8,12 +8,13 @@
 #include <gsl/gsl>
 #include <string>
 #include <vector>
+#include <iostream>
 #include <decimal.h>
 #include <Utilities.h>
-#include <iostream>
 #include <Property.h>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <xlnt/utils/time.hpp>
 #include <xlnt/utils/date.hpp>
 #include <xlnt/utils/datetime.hpp>
 

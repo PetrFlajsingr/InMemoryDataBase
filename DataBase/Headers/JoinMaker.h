@@ -97,8 +97,7 @@ class JoinMaker {
           container2 = (*(*begin2))[secondIndex.first];
         }
 
-        auto cmpResult =
-            compareDataContainers(container1, container2, valueType);
+        auto cmpResult = compareDataContainers(container1, container2, valueType);
 
         cmpFunc(cmpResult, found, begin1, begin2);
         if (cmpResult == 0) {

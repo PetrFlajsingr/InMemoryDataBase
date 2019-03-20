@@ -9,7 +9,7 @@
 
 #include <set>
 #include <unordered_set>
-#include <XlsxWriter.h>
+#include <XlsxIOWriter.h>
 #include <FileDownloader.h>
 #include <ArrayDataProvider.h>
 

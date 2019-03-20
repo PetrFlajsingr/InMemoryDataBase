@@ -12,19 +12,29 @@
 
 namespace DataWriters {
 
-class XlsxWriter : public BaseDataWriter {
+/**
+ * Write data to xlsx file using XlsxIO library.
+ */
+class XlsxIOWriter : public BaseDataWriter {
  public:
-  explicit XlsxWriter(std::string_view fileName,
+  /**
+   *
+   * @param fileName destination
+   * @param sheetName name of sheet to write
+   */
+  explicit XlsxIOWriter(std::string_view fileName,
                       std::string_view sheetName = "");
-
-  XlsxWriter(std::string_view fileName,
-             CharSet outCharSet,
+  /**
+   *
+   * @param fileName destination
+   * @param charSet output encoding
+   * @param sheetName name of sheet to write
+   */
+  XlsxIOWriter(std::string_view fileName,
+               CharSet charSet,
              std::string_view sheetName = "");
-
-  ~XlsxWriter() override;
-
+  ~XlsxIOWriter() override;
   void writeHeader(const std::vector<std::string> &header) override;
-
   void writeRecord(const std::vector<std::string> &record) override;
 
  private:

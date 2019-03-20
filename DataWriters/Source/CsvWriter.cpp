@@ -16,9 +16,9 @@ DataWriters::CsvWriter::CsvWriter(std::string_view filePath,
 }
 
 DataWriters::CsvWriter::CsvWriter(std::string_view filePath,
-                                  CharSet outCharSet,
+                                  CharSet charSet,
                                   std::string_view delimiter)
-    : BaseDataWriter(outCharSet) {
+    : BaseDataWriter(charSet) {
   this->delimiter = delimiter;
   outputStream = new std::ofstream();
   outputStream->open(std::string(filePath), std::ofstream::out);
