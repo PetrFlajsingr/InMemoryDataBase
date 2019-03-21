@@ -33,8 +33,7 @@ class MemoryDataSet : public BaseDataSet {
   explicit MemoryDataSet(std::string_view dataSetName);
   ~MemoryDataSet() override;
   // BaseDataSet
-  void open(DataProviders::BaseDataProvider &dataProvider,
-            const std::vector<ValueType> &fieldTypes) override;
+  void open(DataProviders::BaseDataProvider &dataProvider, const std::vector<ValueType> &fieldTypes) override;
   void openEmpty(const std::vector<std::string> &fieldNames,
                  const std::vector<ValueType> &fieldTypes) override;
   void close() override;
@@ -69,10 +68,8 @@ class MemoryDataSet : public BaseDataSet {
   class iterator : public std::iterator<std::random_access_iterator_tag, int> {
    public:
     iterator() = default;
-    iterator(gsl::not_null<MemoryDataSet *> dataSet, gsl::index row)
-        : dataSet(dataSet), currentRecord(row) {}
-    iterator(const iterator &other) : dataSet(other.dataSet),
-                                      currentRecord(other.currentRecord) {}
+    iterator(gsl::not_null<MemoryDataSet *> dataSet, gsl::index row) : dataSet(dataSet), currentRecord(row) {}
+    iterator(const iterator &other) : dataSet(other.dataSet), currentRecord(other.currentRecord) {}
 
     iterator &operator=(const iterator &other) {
       if (this != &other) {
@@ -208,8 +205,7 @@ class MemoryDataSet : public BaseDataSet {
    * @param columns names of columns/fields
    * @param types types of fields
    */
-  void createFields(std::vector<std::string> columns,
-                    std::vector<ValueType> types);
+  void createFields(std::vector<std::string> columns, std::vector<ValueType> types);
   /**
    * Set values of current row to fields.
    * @param index Index Field

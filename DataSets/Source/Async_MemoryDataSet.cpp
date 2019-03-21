@@ -66,11 +66,11 @@ void DataSets::Async_MemoryDataSet::notify(Async_MemoryDataSet::EventType type) 
   }
 }
 
-void DataSets::Async_MemoryDataSet::addObserver(IAsyncMemoryDataSetObserver *observer) {
+void DataSets::Async_MemoryDataSet::addObserver(AsyncMemoryDataSetObserver *observer) {
   observers.push_back(observer);
 }
 
-void DataSets::Async_MemoryDataSet::removeObserver(IAsyncMemoryDataSetObserver *observer) {
+void DataSets::Async_MemoryDataSet::removeObserver(AsyncMemoryDataSetObserver *observer) {
   observers.erase(std::find(observers.begin(), observers.end(), observer));
 }
 

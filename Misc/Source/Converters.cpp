@@ -51,8 +51,7 @@ std::string CharSetConverter::convertBack(const std::string &value) const {
   }
 }
 
-CharSetConverter::CharSetConverter(CharSet charsetIn)
-    : charsetIn(charsetIn) {}
+CharSetConverter::CharSetConverter(CharSet charsetIn) : charsetIn(charsetIn) {}
 std::string IntegerStringConverter::convert(const int &value) const {
   return std::to_string(value);
 }
@@ -81,8 +80,7 @@ std::string StringDoubleConverter::convertBack(const double &value) const {
   return std::to_string(value);
 }
 
-StringSplitConverter::StringSplitConverter(const std::string &delimiter)
-    : delimiter(delimiter) {}
+StringSplitConverter::StringSplitConverter(const std::string &delimiter) : delimiter(delimiter) {}
 std::vector<std::string> StringSplitConverter::convert(const std::string &value) const {
   return Utilities::splitStringByDelimiter(value, delimiter);
 }

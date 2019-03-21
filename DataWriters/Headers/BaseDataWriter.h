@@ -28,8 +28,7 @@ class BaseDataWriter {
    * @param charSet output encoding
    */
   explicit BaseDataWriter(CharSet charSet)
-      : convert(true),
-        converter(std::make_unique<CharSetConverter>(charSet)) {}
+      : convert(true), converter(std::make_unique<CharSetConverter>(charSet)) {}
   /**
    * Write column names.
    * @param header column names
@@ -42,13 +41,11 @@ class BaseDataWriter {
   virtual void writeRecord(const std::vector<std::string> &record) = 0;
   virtual ~BaseDataWriter() = default;
 
-  class iterator : public std::iterator<std::output_iterator_tag,
-                                        std::vector<std::string>> {
+  class iterator : public std::iterator<std::output_iterator_tag, std::vector<std::string>> {
    private:
     BaseDataWriter *dataWriter;
    public:
-    explicit iterator(gsl::not_null<BaseDataWriter *> dataWriter) : dataWriter(
-        dataWriter) {}
+    explicit iterator(gsl::not_null<BaseDataWriter *> dataWriter) : dataWriter(dataWriter) {}
     iterator(const iterator &other) {
       dataWriter = other.dataWriter;
     }

@@ -13,7 +13,7 @@
 #include <ThreadPool.h>
 #include <FileDownloadManager.h>
 #include <ResourceManager.h>
-#include "../../Templates/Headers/Property.h"
+#include <Property.h>
 #include <string>
 #include <memory>
 

@@ -5,8 +5,7 @@
 #include <utility>
 #include <CsvReader.h>
 
-DataProviders::CsvReader::CsvReader(std::string_view filePath,
-                                    std::string_view delimiter)
+DataProviders::CsvReader::CsvReader(std::string_view filePath, std::string_view delimiter)
     : BaseDataProvider() {
   init(filePath, delimiter);
 }
@@ -18,8 +17,7 @@ DataProviders::CsvReader::CsvReader(std::string_view filePath,
   init(filePath, delimiter);
 }
 
-void DataProviders::CsvReader::init(std::string_view filePath,
-                                    std::string_view delimiter) {
+void DataProviders::CsvReader::init(std::string_view filePath, std::string_view delimiter) {
   this->delimiter = delimiter;
   file.open(std::string(filePath));
   if (!file.is_open()) {
@@ -72,8 +70,7 @@ void DataProviders::CsvReader::parseRecord() {
   if (!line.empty() && line[line.length() - 1] == '\r') {
     line = line.substr(0, line.length() - 1);
   }
-  currentRecord = tokenize(line,
-                           getColumnCount());
+  currentRecord = tokenize(line, getColumnCount());
 }
 
 void DataProviders::CsvReader::first() {
@@ -144,9 +141,7 @@ std::vector<std::string> DataProviders::CsvReader::tokenize(std::string_view lin
         buffer[bufferIter] = character;
         bufferIter++;
         break;
-      default:
-        throw IllegalStateException(
-            "Internal error. DataProviders::CsvReader::tokenize");
+      default:throw IllegalStateException("Internal error. DataProviders::CsvReader::tokenize");
     }
   }
   buffer[bufferIter] = '\0';

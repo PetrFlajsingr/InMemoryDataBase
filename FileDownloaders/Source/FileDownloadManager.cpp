@@ -12,10 +12,8 @@ FileDownloadManager::FileDownloadManager(const std::shared_ptr<MessageManager> &
   curl_global_init(CURL_GLOBAL_DEFAULT);
 }
 
-void FileDownloadManager::enqueueDownload(const std::string &localFolder,
-                                          const std::string &url,
-                                          FileDownloadObserver &observer,
-                                          bool blocking) {
+void FileDownloadManager::enqueueDownload(const std::string &localFolder, const std::string &url,
+                                          FileDownloadObserver &observer, bool blocking) {
   auto downloadTask = [=, &observer] {
     FileDownloader downloader(localFolder);
     auto cntObs = CountObserver(this);
@@ -38,13 +36,11 @@ FileDownloadManager::~FileDownloadManager() {
 }
 
 void FileDownloadManager::receive(std::shared_ptr<Message> message) {
-
   if (auto msg = std::dynamic_pointer_cast<DownloadNoBlock>(message)) {
     auto dlLambda = [=] {
       downloadTask(msg);
     };
     dispatch(new TaggedExecAsync(dlLambda, 0));
-
   } else if (auto msg = std::dynamic_pointer_cast<Download>(message)) {
     downloadTask(msg);
   }
@@ -56,17 +52,14 @@ void FileDownloadManager::finished() {
   unfinishedFileCount--;
 }
 
-FileDownloadManager::CountObserver::CountObserver(FileDownloadManager *parent)
-    : parent(parent) {}
+FileDownloadManager::CountObserver::CountObserver(FileDownloadManager *parent) : parent(parent) {}
 void FileDownloadManager::CountObserver::onDownloadStarted(std::string_view) {
   parent->unfinished();
 }
-void FileDownloadManager::CountObserver::onDownloadFailed(std::string_view,
-                                                          std::string_view) {
+void FileDownloadManager::CountObserver::onDownloadFailed(std::string_view, std::string_view) {
   parent->finished();
 }
-void FileDownloadManager::CountObserver::onDownloadFinished(std::string_view,
-                                                            std::string_view) {
+void FileDownloadManager::CountObserver::onDownloadFinished(std::string_view, std::string_view) {
   parent->finished();
 }
 
@@ -81,7 +74,6 @@ void FileDownloadManager::Dispatcher::onDownloadFailed(std::string_view fileName
 }
 void FileDownloadManager::Dispatcher::onDownloadFinished(std::string_view fileName,
                                                          std::string_view filePath) {
-  dispatch(new DownloadProgress(DownloadState::finished,
-                                std::string(fileName)));
+  dispatch(new DownloadProgress(DownloadState::finished, std::string(fileName)));
 }
 

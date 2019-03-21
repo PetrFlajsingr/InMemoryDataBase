@@ -11,7 +11,7 @@
 
 // TODO: implementovat dalsi udalosti, vytvořit zamky, frontu pozadavku?
 namespace DataSets {
-class IAsyncMemoryDataSetObserver;
+class AsyncMemoryDataSetObserver;
 
 /**
  * Modifikace data setu v pameti, pracuje asynchronne.
@@ -25,8 +25,7 @@ class Async_MemoryDataSet : public MemoryDataSet {
  public:
   explicit Async_MemoryDataSet(std::string_view dataSetName);
 
-  void open(DataProviders::BaseDataProvider &dataProvider,
-            const std::vector<ValueType> &fieldTypes) override;
+  void open(DataProviders::BaseDataProvider &dataProvider, const std::vector<ValueType> &fieldTypes) override;
 
   std::shared_ptr<ViewDataSet> filter(const FilterOptions &options) override;
 
@@ -34,12 +33,12 @@ class Async_MemoryDataSet : public MemoryDataSet {
 
   void append(DataProviders::BaseDataProvider &dataProvider) override;
 
-  void addObserver(IAsyncMemoryDataSetObserver *observer);
+  void addObserver(AsyncMemoryDataSetObserver *observer);
 
-  void removeObserver(IAsyncMemoryDataSetObserver *observer);
+  void removeObserver(AsyncMemoryDataSetObserver *observer);
 
  protected:
-  std::vector<IAsyncMemoryDataSetObserver *> observers;
+  std::vector<AsyncMemoryDataSetObserver *> observers;
 
   enum class EventType {
     BeforeOpen,
@@ -55,8 +54,7 @@ class Async_MemoryDataSet : public MemoryDataSet {
   /**
    * Pro otevreni data setu v dalsim vlakne (std::async)
    */
-  void innerOpen(DataProviders::BaseDataProvider &dataProvider,
-                 const std::vector<ValueType> &fieldTypes);
+  void innerOpen(DataProviders::BaseDataProvider &dataProvider, const std::vector<ValueType> &fieldTypes);
 
   /**
    * Pro filtrovani dat v dalsim vlakne (std::async)
@@ -84,7 +82,7 @@ class Async_MemoryDataSet : public MemoryDataSet {
   void notify(EventType type);
 };
 
-class IAsyncMemoryDataSetObserver {
+class AsyncMemoryDataSetObserver {
  public:
   /**
    * Pred otevrenim data setu.
@@ -134,7 +132,7 @@ class IAsyncMemoryDataSetObserver {
    */
   virtual void onAfterAppendDataProvider(Async_MemoryDataSet *sender) = 0;
 
-  virtual ~IAsyncMemoryDataSetObserver() = default;
+  virtual ~AsyncMemoryDataSetObserver() = default;
 };
 }  // namespace DataSets
 

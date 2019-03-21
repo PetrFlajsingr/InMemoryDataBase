@@ -14,8 +14,8 @@
  */
 class MessageSender {
  public:
-  explicit MessageSender(const std::shared_ptr<MessageManager> &commandManager)
-      : commandManager(commandManager) {}
+  explicit MessageSender(const std::shared_ptr<MessageManager> &commandManager) : commandManager(
+      commandManager) {}
  protected:
   void dispatch(Message *message) {
     if (auto tmp = commandManager.lock()) {

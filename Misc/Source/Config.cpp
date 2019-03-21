@@ -4,12 +4,8 @@
 
 #include <fstream>
 #include <Config.h>
-#include <Utilities.h>
 
-#include "Config.h"
-
-Config::Config(const std::string &path, bool autoCommit)
-    : path(path), autoCommit(autoCommit) {
+Config::Config(const std::string &path, bool autoCommit) : path(path), autoCommit(autoCommit) {
   std::ifstream file(path);
   if (!file.is_open()) {
     std::ofstream newFile(path);

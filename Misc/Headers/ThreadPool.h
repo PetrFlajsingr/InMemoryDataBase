@@ -52,8 +52,7 @@ class ThreadPool final : public MessageReceiver {
    */
   template<class T>
   auto enqueue(T task) -> std::future<decltype(task())> {
-    auto wrapper =
-        std::make_shared<std::packaged_task<decltype(task())()>>(std::move(task));
+    auto wrapper = std::make_shared<std::packaged_task<decltype(task())()>>(std::move(task));
     {
       std::unique_lock<std::mutex> lock(mutex);
       tasks.emplace([=] {

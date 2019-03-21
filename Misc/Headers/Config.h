@@ -86,7 +86,7 @@ class Config {
       }
     }
     throw ResourceNotFoundException(
-        "Resource [" + std::string(category) + "[" + std::string(key) + "]]");
+        "Resource [" + std::string(category) + "[" + std::string(key) + "]] not found");
   }
   /**
    * Save value on autocommit

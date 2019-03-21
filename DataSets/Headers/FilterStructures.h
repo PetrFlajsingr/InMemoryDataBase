@@ -41,9 +41,7 @@ struct FilterItem {
   std::vector<DataContainer> searchData;
   FilterOption filterOption;
 
-  FilterItem(const BaseField *field,
-             const std::vector<DataContainer> &searchData,
-             FilterOption filterOption);
+  FilterItem(const BaseField *field, const std::vector<DataContainer> &searchData, FilterOption filterOption);
 };
 /**
  * Structure holding options for filtering.
@@ -53,11 +51,11 @@ struct FilterOptions {
 
   void addOption(const DataSets::BaseField *field,
                  const std::vector<DataContainer> &values,
-                 const FilterOption filterOption);
+                 const FilterOption &filterOption);
 
   void addOption(const DataSets::BaseField *field,
                  const std::vector<std::string> &values,
-                 const FilterOption filterOption);
+                 const FilterOption &filterOption);
 };
 }  // namespace DataSets
 

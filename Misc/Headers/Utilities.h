@@ -24,8 +24,7 @@ namespace Utilities {
  * @param delimiter rozdelovac
  * @return vector casti
  */
-std::vector<std::string> splitStringByDelimiter(std::string_view str,
-                                                std::string_view delimiter);
+std::vector<std::string> splitStringByDelimiter(std::string_view str, std::string_view delimiter);
 /**
  * Rozdeleni stringu pomoci urceneho delimiteru.
  * Delimiter neni v rozdelenych retezcich obsazen.

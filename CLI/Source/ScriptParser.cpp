@@ -3,9 +3,7 @@
 //
 
 #include <ScriptParser.h>
-#include <string>
 
-#include "ScriptParser.h"
 #include <ConsoleIO.h>
 #include <AppContext.h>
 #include <CsvReader.h>
@@ -146,84 +144,60 @@ std::vector<std::string> ScriptParser::tokenize(std::string_view input) {
 bool ScriptParser::runCommand(ScriptParser::Command command) {
   switch (command) {
     case ScriptParser::Command::createDB:
-      if (AppContext::GetInstance().DBs.find(dbName)
-          == AppContext::GetInstance().DBs.end()) {
-        AppContext::GetInstance().DBs[dbName] =
-            std::make_shared<DataBase::MemoryDataBase>(dbName);
+      if (AppContext::GetInstance().DBs.find(dbName) == AppContext::GetInstance().DBs.end()) {
+        AppContext::GetInstance().DBs[dbName] = std::make_shared<DataBase::MemoryDataBase>(dbName);
       } else {
-        AppContext::GetInstance().ui->writeLnErr(
-            "DataBase already exists.");
+        AppContext::GetInstance().ui->writeLnErr("DataBase already exists.");
         return false;
       }
       break;
-    case ScriptParser::Command::removeDB:
-      AppContext::GetInstance().DBs.erase(dbName);
+    case ScriptParser::Command::removeDB:AppContext::GetInstance().DBs.erase(dbName);
       break;
     case ScriptParser::Command::load: {
-      if (AppContext::GetInstance().DBs.find(dbName)
-          == AppContext::GetInstance().DBs.end()) {
-        AppContext::GetInstance().ui->writeLnErr(
-            "DataBase doesn't exist.");
+      if (AppContext::GetInstance().DBs.find(dbName) == AppContext::GetInstance().DBs.end()) {
+        AppContext::GetInstance().ui->writeLnErr("DataBase doesn't exist.");
         return false;
       }
       DataProviders::BaseDataProvider *provider;
       switch (fileType) {
-        case ScriptParser::FileTypes::csv:
-          provider =
-              new DataProviders::CsvReader(filePath, delimiter);
+        case ScriptParser::FileTypes::csv:provider = new DataProviders::CsvReader(filePath, delimiter);
           break;
-        case ScriptParser::FileTypes::xlsx:
-          provider =
-              new DataProviders::XlsxIOReader(filePath);
+        case ScriptParser::FileTypes::xlsx:provider = new DataProviders::XlsxIOReader(filePath);
           break;
       }
-      auto ds =
-          std::make_shared<DataSets::MemoryDataSet>(dataSetName);
+      auto ds = std::make_shared<DataSets::MemoryDataSet>(dataSetName);
       ds->open(*provider, valueTypes);
       AppContext::GetInstance().DBs[dbName]->addTable(ds);
       delete provider;
     }
       break;
     case ScriptParser::Command::append:
-      if (AppContext::GetInstance().DBs.find(dbName)
-          == AppContext::GetInstance().DBs.end()) {
-        AppContext::GetInstance().ui->writeLnErr(
-            "DataBase doesn't exist.");
+      if (AppContext::GetInstance().DBs.find(dbName) == AppContext::GetInstance().DBs.end()) {
+        AppContext::GetInstance().ui->writeLnErr("DataBase doesn't exist.");
         return false;
       }
       {
         DataProviders::BaseDataProvider *provider;
         switch (fileType) {
-          case ScriptParser::FileTypes::csv:
-            provider =
-                new DataProviders::CsvReader(
-                    filePath);
+          case ScriptParser::FileTypes::csv:provider = new DataProviders::CsvReader(filePath);
             break;
-          case ScriptParser::FileTypes::xlsx:
-            provider =
-                new DataProviders::XlsxIOReader(
-                    filePath);
+          case ScriptParser::FileTypes::xlsx:provider = new DataProviders::XlsxIOReader(filePath);
             break;
         }
-        auto ds =
-            AppContext::GetInstance().DBs[dbName]->tableByName(dataSetName);
+        auto ds = AppContext::GetInstance().DBs[dbName]->tableByName(dataSetName);
         ds->dataSet->append(*provider);
       }
       break;
     case ScriptParser::Command::removeTab:
-      if (AppContext::GetInstance().DBs.find(dbName)
-          == AppContext::GetInstance().DBs.end()) {
-        AppContext::GetInstance().ui->writeLnErr(
-            "DataBase doesn't exist.");
+      if (AppContext::GetInstance().DBs.find(dbName) == AppContext::GetInstance().DBs.end()) {
+        AppContext::GetInstance().ui->writeLnErr("DataBase doesn't exist.");
         return false;
       }
       AppContext::GetInstance().DBs[dbName]->removeTable(dataSetName);
       break;
     case ScriptParser::Command::query:
-      if (AppContext::GetInstance().DBs.find(dbName)
-          == AppContext::GetInstance().DBs.end()) {
-        AppContext::GetInstance().ui->writeLnErr(
-            "DataBase doesn't exist.");
+      if (AppContext::GetInstance().DBs.find(dbName) == AppContext::GetInstance().DBs.end()) {
+        AppContext::GetInstance().ui->writeLnErr("DataBase doesn't exist.");
         return false;
       }
       {
@@ -231,18 +205,13 @@ bool ScriptParser::runCommand(ScriptParser::Command command) {
             std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
         std::shared_ptr<DataBase::View> result;
         if (query.find("group") != std::string::npos) {
-          result = AppContext::GetInstance().DBs[dbName]->execAggregateQuery(
-              query, dataSetName);
+          result = AppContext::GetInstance().DBs[dbName]->execAggregateQuery(query, dataSetName);
         } else {
-          result = AppContext::GetInstance().DBs[dbName]->execSimpleQuery(
-              query,
-              false,
-              dataSetName);
+          result = AppContext::GetInstance().DBs[dbName]->execSimpleQuery(query, false, dataSetName);
         }
         DataWriters::BaseDataWriter *writer;
         switch (fileType) {
-          case ScriptParser::FileTypes::csv:
-            writer = new DataWriters::CsvWriter(filePath);
+          case ScriptParser::FileTypes::csv:writer = new DataWriters::CsvWriter(filePath);
             break;
           case ScriptParser::FileTypes::xlsx:writer = new DataWriters::XlsxIOWriter(filePath);
             break;
@@ -262,14 +231,11 @@ bool ScriptParser::runCommand(ScriptParser::Command command) {
         delete writer;
         auto endMs =
             std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
-        std::cout << "Exec time: " << (endMs - startMs).count() << "ms"
-                  << std::endl;
+        std::cout << "Exec time: " << (endMs - startMs).count() << "ms" << std::endl;
       }
       break;
     case ScriptParser::Command::save:break;
-    case ScriptParser::Command::unknown:
-      AppContext::GetInstance().ui->writeLnErr(
-          "Unknown command.");
+    case ScriptParser::Command::unknown:AppContext::GetInstance().ui->writeLnErr("Unknown command.");
       break;
   }
   return true;
@@ -279,8 +245,7 @@ ScriptParser &ScriptParser::GetInstance() {
   return instance;
 }
 std::string ScriptParser::ReplaceResources(std::string input) {
-  std::regex
-      rx(R"(\[[a-zA-Z0-9]*\[[a-zA-Z0-9]*\]\])", std::regex_constants::icase);
+  std::regex rx(R"(\[[a-zA-Z0-9]*\[[a-zA-Z0-9]*\]\])", std::regex_constants::icase);
   std::smatch matches;
   std::string output;
   while (std::regex_search(input, matches, rx)) {
@@ -288,9 +253,7 @@ std::string ScriptParser::ReplaceResources(std::string input) {
       output += input.substr(0, matches.position(i));
 
       std::string match(matches[i]);
-      output +=
-          AppContext::GetInstance().resourceManager->getResource<std::string>(
-              match);
+      output += AppContext::GetInstance().resourceManager->getResource<std::string>(match);
     }
     input = matches.suffix().str();
   }

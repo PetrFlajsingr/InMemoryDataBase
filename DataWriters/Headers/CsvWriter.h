@@ -23,17 +23,14 @@ class CsvWriter : public BaseDataWriter {
    * @param filePath destination
    * @param delimiter csv delimiter
    */
-  explicit CsvWriter(std::string_view filePath,
-                     std::string_view delimiter = ",");
+  explicit CsvWriter(std::string_view filePath, std::string_view delimiter = ",");
   /**
    *
    * @param filePath destination
    * @param charSet output encoding
    * @param delimiter csv delimiter
    */
-  CsvWriter(std::string_view filePath,
-            CharSet charSet,
-            std::string_view delimiter = ",");
+  CsvWriter(std::string_view filePath, CharSet charSet, std::string_view delimiter = ",");
   ~CsvWriter() override;
   void writeHeader(const std::vector<std::string> &header) override;
   void writeRecord(const std::vector<std::string> &record) override;

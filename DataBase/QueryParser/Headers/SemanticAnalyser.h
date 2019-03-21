@@ -24,6 +24,6 @@ class SemanticAnalyser {
 
   std::string getErrorMsg(SemErrType errType, const std::string &value);
 };
-}
+}  // namespace DataBase
 
 #endif //PROJECT_SEMANTICANALYSER_H

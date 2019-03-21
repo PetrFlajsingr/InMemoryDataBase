@@ -9,9 +9,9 @@ void DataBase::LexicalAnalyser::setInput(const std::string &input) {
   currentIndex = 0;
 }
 
-std::tuple<DataBase::Token,
-           std::string,
-           bool> DataBase::LexicalAnalyser::getNextToken() {
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "cppcoreguidelines-avoid-goto"
+std::tuple<DataBase::Token, std::string, bool> DataBase::LexicalAnalyser::getNextToken() {
   auto it = input.begin() + currentIndex;
 
   auto state = LexState::start;
@@ -173,6 +173,7 @@ std::tuple<DataBase::Token,
   currentIndex = std::distance(input.begin(), it);
   return std::make_tuple(token, value, notLast);
 }
+#pragma clang diagnostic pop
 
 DataBase::Token DataBase::LexicalAnalyser::keyWordCheck(std::string_view str) {
   if (Utilities::compareString(str, "select") == 0) {
@@ -230,19 +231,13 @@ std::string DataBase::LexicalAnalyser::getErrorPrint() {
     fill += " ";
   }
   fill += "^";
-  return "Lexical error: Character #" + std::to_string(currentIndex) + "\n"
-      + input + "\n" + fill;
+  return "Lexical error: Character #" + std::to_string(currentIndex) + "\n" + input + "\n" + fill;
 }
 
-std::vector<std::tuple<DataBase::Token,
-                       std::string,
-                       bool>> DataBase::LexicalAnalyser::getAllTokens() {
-  std::vector<std::tuple<DataBase::Token,
-                         std::string,
-                         bool>> tokens;
+std::vector<std::tuple<DataBase::Token, std::string, bool>> DataBase::LexicalAnalyser::getAllTokens() {
+  std::vector<std::tuple<DataBase::Token, std::string, bool>> tokens;
   do {
     tokens.push_back(getNextToken());
   } while (std::get<2>(tokens.back()));
-
   return tokens;
 }

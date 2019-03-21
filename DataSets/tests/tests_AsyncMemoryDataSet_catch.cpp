@@ -6,7 +6,7 @@
 #include <Async_MemoryDataSet.h>
 
 class MockAsyncMemoryDatasetObserver
-    : public DataSets::IAsyncMemoryDataSetObserver {
+    : public DataSets::AsyncMemoryDataSetObserver {
  public:
   void onBeforeOpen(DataSets::Async_MemoryDataSet *sender) override {
     beforeOpenCalled = true;

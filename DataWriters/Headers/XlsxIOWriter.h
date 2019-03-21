@@ -22,17 +22,14 @@ class XlsxIOWriter : public BaseDataWriter {
    * @param fileName destination
    * @param sheetName name of sheet to write
    */
-  explicit XlsxIOWriter(std::string_view fileName,
-                      std::string_view sheetName = "");
+  explicit XlsxIOWriter(std::string_view fileName, std::string_view sheetName = "");
   /**
    *
    * @param fileName destination
    * @param charSet output encoding
    * @param sheetName name of sheet to write
    */
-  XlsxIOWriter(std::string_view fileName,
-               CharSet charSet,
-             std::string_view sheetName = "");
+  XlsxIOWriter(std::string_view fileName, CharSet charSet, std::string_view sheetName = "");
   ~XlsxIOWriter() override;
   void writeHeader(const std::vector<std::string> &header) override;
   void writeRecord(const std::vector<std::string> &record) override;

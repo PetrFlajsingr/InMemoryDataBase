@@ -14,10 +14,7 @@ namespace DataBase {
 // TODO: agre functions
 class SyntaxAnalyser {
  public:
-  void setInput(const std::vector<std::tuple<Token,
-                                             std::string,
-                                             bool>> &tokens);
-
+  void setInput(const std::vector<std::tuple<Token, std::string, bool>> &tokens);
   StructuredQuery analyse();
 
  private:
@@ -100,6 +97,6 @@ class SyntaxAnalyser {
                           const std::vector<DataBase::Token> &tokens,
                           std::tuple<Token, std::string, bool> token2);
 };
-}
+}  // namespace DataBase
 
 #endif //PROJECT_SYNTAXANALYSER_H

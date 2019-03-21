@@ -11,8 +11,7 @@ DataWriters::XlntWriter::XlntWriter(std::string_view fileName)
   destination = fileName;
 }
 
-DataWriters::XlntWriter::XlntWriter(std::string_view fileName,
-                                    CharSet outCharSet)
+DataWriters::XlntWriter::XlntWriter(std::string_view fileName, CharSet outCharSet)
     : BaseDataWriter(outCharSet) {
   ws = wb.active_sheet();
   destination = fileName;

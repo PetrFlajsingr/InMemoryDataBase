@@ -4,13 +4,11 @@
 
 #include <XlsxIOReader.h>
 
-DataProviders::XlsxIOReader::XlsxIOReader(std::string_view fileName)
-    : BaseDataProvider() {
+DataProviders::XlsxIOReader::XlsxIOReader(std::string_view fileName) : BaseDataProvider() {
   init(fileName);
 }
 
-DataProviders::XlsxIOReader::XlsxIOReader(std::string_view fileName,
-                                          CharSet inputCharSet)
+DataProviders::XlsxIOReader::XlsxIOReader(std::string_view fileName, CharSet inputCharSet)
     : BaseDataProvider(inputCharSet) {
   init(fileName);
 }
@@ -22,8 +20,7 @@ void DataProviders::XlsxIOReader::init(std::string_view fileName) {
     auto errMsg = "File could not be open: " + strFileName;
     throw IOException(errMsg.c_str());
   }
-  xlsxioSheet =
-      xlsxioread_sheet_open(xlsxioReader, nullptr, XLSXIOREAD_SKIP_EMPTY_ROWS);
+  xlsxioSheet = xlsxioread_sheet_open(xlsxioReader, nullptr, XLSXIOREAD_SKIP_EMPTY_ROWS);
 
   if (xlsxioSheet == nullptr) {
     auto errMsg = "Error while opening xls file: " + strFileName;
@@ -65,11 +62,9 @@ bool DataProviders::XlsxIOReader::next() {
       }
       delete value;
     }
-    if (std::all_of(currentRecord.begin(),
-                    currentRecord.end(),
-                    [](std::string_view value) {
-                      return value.empty();
-                    })) {
+    if (std::all_of(currentRecord.begin(), currentRecord.end(), [](std::string_view value) {
+      return value.empty();
+    })) {
       _eof = true;
       return false;
     }
@@ -83,9 +78,7 @@ bool DataProviders::XlsxIOReader::next() {
 
 void DataProviders::XlsxIOReader::first() {
   xlsxioread_sheet_close(xlsxioSheet);
-  xlsxioSheet =
-      xlsxioread_sheet_open(xlsxioReader, nullptr, XLSXIOREAD_SKIP_EMPTY_ROWS);
-
+  xlsxioSheet = xlsxioread_sheet_open(xlsxioReader, nullptr, XLSXIOREAD_SKIP_EMPTY_ROWS);
   readHeader();
 }
 

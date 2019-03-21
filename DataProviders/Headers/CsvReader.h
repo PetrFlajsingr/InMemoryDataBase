@@ -40,12 +40,9 @@ class CsvReader : public BaseDataProvider {
    * @param filePath path to file
    * @param delimiter csv delimiter
    */
-  explicit CsvReader(std::string_view filePath,
-                     std::string_view delimiter = ",");
+  explicit CsvReader(std::string_view filePath, std::string_view delimiter = ",");
 
-  explicit CsvReader(std::string_view filePath,
-                     CharSet inputCharSet,
-                     std::string_view delimiter = ",");
+  explicit CsvReader(std::string_view filePath, CharSet inputCharSet, std::string_view delimiter = ",");
 
   /**
    * Close file on deletion.
@@ -79,8 +76,7 @@ class CsvReader : public BaseDataProvider {
   bool eof() const override;
 
  private:
-  void init(std::string_view filePath,
-            std::string_view delimiter);
+  void init(std::string_view filePath, std::string_view delimiter);
   /**
    * FSM states for csv parsing.
    */
@@ -116,8 +112,7 @@ class CsvReader : public BaseDataProvider {
    * @param vectorReserve value to reserve vector size for
    * @return tokenized vector from line
    */
-  std::vector<std::string> tokenize(std::string_view line,
-                                    unsigned int vectorReserve) const;
+  std::vector<std::string> tokenize(std::string_view line, unsigned int vectorReserve) const;
 
 };
 }  // namespace DataProviders

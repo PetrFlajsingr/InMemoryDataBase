@@ -7,15 +7,14 @@
 
 #include "BaseDataProvider.h"
 #include <xlnt/xlnt.hpp>
+#include <vector>
+#include <string>
 
 namespace DataProviders {
 class XlntReader : public BaseDataProvider {
  public:
-  explicit XlntReader(std::string_view fileName,
-                      std::string_view sheetName = "");
-  XlntReader(std::string_view fileName,
-             CharSet inputCharSet,
-             std::string_view sheetName = "");
+  explicit XlntReader(std::string_view fileName, std::string_view sheetName = "");
+  XlntReader(std::string_view fileName, CharSet inputCharSet, std::string_view sheetName = "");
 
   const std::vector<std::string> &getRow() const override;
   std::string getColumnName(unsigned int columnIndex) const override;

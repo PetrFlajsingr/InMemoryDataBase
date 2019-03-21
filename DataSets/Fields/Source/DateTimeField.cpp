@@ -4,9 +4,7 @@
 
 #include <DateTimeField.h>
 
-DataSets::DateTimeField::DateTimeField(std::string_view fieldName,
-                                       gsl::index index,
-                                       BaseDataSet *dataSet)
+DataSets::DateTimeField::DateTimeField(std::string_view fieldName, gsl::index index, BaseDataSet *dataSet)
     : BaseField(fieldName, index, dataSet) {}
 
 ValueType DataSets::DateTimeField::getFieldType() const {
@@ -24,8 +22,7 @@ std::string DataSets::DateTimeField::getAsString() const {
 
 std::function<int8_t(const DataSetRow *,
                      const DataSetRow *)> DataSets::DateTimeField::getCompareFunction() const {
-  return [this](const DataSetRow *a,
-                const DataSetRow *b) {
+  return [this](const DataSetRow *a, const DataSetRow *b) {
     return Utilities::compareDateTime(*(*a)[getIndex() & 0x00FFFF]._dateTime,
                                       *(*b)[getIndex() & 0x00FFFF]._dateTime);
   };

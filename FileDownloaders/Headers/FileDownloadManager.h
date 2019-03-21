@@ -23,8 +23,7 @@ class FileDownloadManager : public MessageReceiver, public MessageSender {
                       const std::shared_ptr<ThreadPool> &threadPool);
   virtual ~FileDownloadManager();
 
-  void enqueueDownload(const std::string &localFolder,
-                       const std::string &url,
+  void enqueueDownload(const std::string &localFolder, const std::string &url,
                        FileDownloadObserver &observer,
                        bool blocking = false);
 
@@ -40,17 +39,17 @@ class FileDownloadManager : public MessageReceiver, public MessageSender {
   void unfinished();
   void finished();
 
-  std::function<void(const std::shared_ptr<Download>)> downloadTask
-      = [=](const std::shared_ptr<Download> &msg) {
-        FileDownloader downloader(msg->getData().second);
-        auto cntObs = CountObserver(this);
-        downloader.addObserver(&cntObs);
-        if (auto tmp = commandManager.lock()) {
-          auto dispatchObserver = Dispatcher(tmp);
-          downloader.addObserver(&dispatchObserver);
-        }
-        downloader.downloadFile(msg->getData().first);
-      };
+  std::function<void(const std::shared_ptr<Download>)>
+      downloadTask = [=](const std::shared_ptr<Download> &msg) {
+    FileDownloader downloader(msg->getData().second);
+    auto cntObs = CountObserver(this);
+    downloader.addObserver(&cntObs);
+    if (auto tmp = commandManager.lock()) {
+      auto dispatchObserver = Dispatcher(tmp);
+      downloader.addObserver(&dispatchObserver);
+    }
+    downloader.downloadFile(msg->getData().first);
+  };
   /**
    * Observer used for keeping information about download state.
    */
@@ -58,10 +57,8 @@ class FileDownloadManager : public MessageReceiver, public MessageSender {
    public:
     explicit CountObserver(FileDownloadManager *parent);
     void onDownloadStarted(std::string_view) override;
-    void onDownloadFailed(std::string_view,
-                          std::string_view) override;
-    void onDownloadFinished(std::string_view,
-                            std::string_view) override;
+    void onDownloadFailed(std::string_view, std::string_view) override;
+    void onDownloadFinished(std::string_view, std::string_view) override;
    private:
     FileDownloadManager *parent;
   };
@@ -72,10 +69,8 @@ class FileDownloadManager : public MessageReceiver, public MessageSender {
    public:
     explicit Dispatcher(const std::shared_ptr<MessageManager> &commandManager);
     void onDownloadStarted(std::string_view fileName) override;
-    void onDownloadFailed(std::string_view fileName,
-                          std::string_view errorMessage) override;
-    void onDownloadFinished(std::string_view fileName,
-                            std::string_view filePath) override;
+    void onDownloadFailed(std::string_view fileName, std::string_view errorMessage) override;
+    void onDownloadFinished(std::string_view fileName, std::string_view filePath) override;
   };
 };
 

@@ -5,13 +5,12 @@
 #include <AggregationMaker.h>
 #include <MemoryDataBase.h>
 
-DataBase::AggregationMaker::AggregationMaker(const std::shared_ptr<DataBase::Table> &table)
-    : table(table) {}
+DataBase::AggregationMaker::AggregationMaker(const std::shared_ptr<DataBase::Table> &table) : table(table) {}
 
-DataBase::AggregationMaker::AggregationMaker(const std::shared_ptr<DataBase::View> &view)
-    : view(view) {}
+DataBase::AggregationMaker::AggregationMaker(const std::shared_ptr<DataBase::View> &view) : view(view) {}
 
-std::shared_ptr<DataBase::Table> DataBase::AggregationMaker::aggregate(const DataBase::StructuredQuery &structuredQuery) {
+std::shared_ptr<DataBase::Table>
+DataBase::AggregationMaker::aggregate(const DataBase::StructuredQuery &structuredQuery) {
   auto result = prepareDataSet(structuredQuery);
 
   DataSets::SortOptions options;
@@ -33,8 +32,8 @@ std::shared_ptr<DataBase::Table> DataBase::AggregationMaker::aggregate(const Dat
 
   return std::make_shared<Table>(result);
 }
-std::shared_ptr<DataSets::MemoryDataSet> DataBase::AggregationMaker::prepareDataSet(
-    const DataBase::StructuredQuery &structuredQuery) {
+std::shared_ptr<DataSets::MemoryDataSet>
+DataBase::AggregationMaker::prepareDataSet(const DataBase::StructuredQuery &structuredQuery) {
   DataSets::BaseDataSet *dataSet;
   if (view != nullptr) {
     dataSet = dynamic_cast<DataSets::BaseDataSet *>(view->dataSet.get());
@@ -87,9 +86,8 @@ std::shared_ptr<DataSets::MemoryDataSet> DataBase::AggregationMaker::prepareData
 
   return result;
 }
-void DataBase::AggregationMaker::aggregateDataSet(
-    DataSets::MemoryDataSet *ds,
-    DataSets::MemoryDataSet *result) {
+void DataBase::AggregationMaker::aggregateDataSet(DataSets::MemoryDataSet *ds,
+                                                  DataSets::MemoryDataSet *result) {
   bool write = false;
   auto data = *ds->begin();
   for (auto &unique : groupByFields) {
@@ -224,9 +222,8 @@ void DataBase::AggregationMaker::aggregateDataSet(
   }
 }
 
-void DataBase::AggregationMaker::aggregateView(
-    DataSets::MemoryViewDataSet *ds,
-    DataSets::MemoryDataSet *result) {
+void DataBase::AggregationMaker::aggregateView(DataSets::MemoryViewDataSet *ds,
+                                               DataSets::MemoryDataSet *result) {
   bool write = false;
   auto data = *ds->begin();
   for (auto &unique : groupByFields) {

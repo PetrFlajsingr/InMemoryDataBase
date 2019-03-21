@@ -7,19 +7,16 @@
 #include <MemoryDataBase.h>
 #include <JoinMaker.h>
 
-DataBase::Table::Table(const std::shared_ptr<DataSets::MemoryDataSet> &dataSet)
-    : dataSet(dataSet) {}
+DataBase::Table::Table(const std::shared_ptr<DataSets::MemoryDataSet> &dataSet) : dataSet(dataSet) {}
 std::string_view DataBase::Table::getName() {
   return dataSet->getName();
 }
-DataBase::View::View(const std::shared_ptr<DataSets::MemoryViewDataSet> &dataSet)
-    : dataSet(dataSet) {}
+DataBase::View::View(const std::shared_ptr<DataSets::MemoryViewDataSet> &dataSet) : dataSet(dataSet) {}
 std::string_view DataBase::View::getName() {
   return dataSet->getName();
 }
 
-DataBase::MemoryDataBase::MemoryDataBase(const std::string &name)
-    : name(name) {}
+DataBase::MemoryDataBase::MemoryDataBase(const std::string &name) : name(name) {}
 
 std::string_view DataBase::MemoryDataBase::getName() const {
   return name;
@@ -30,15 +27,11 @@ void DataBase::MemoryDataBase::addTable(std::shared_ptr<DataSets::MemoryDataSet>
 }
 
 void DataBase::MemoryDataBase::removeTable(std::string_view tableName) {
-  const auto fncFindByName = [tableName]
-      (const std::shared_ptr<Table> &table) {
+  const auto fncFindByName = [tableName](const std::shared_ptr<Table> &table) {
     return table->dataSet->getName() == tableName;
   };
 
-  if (auto it = std::find_if(tables.begin(),
-                             tables.end(),
-                             fncFindByName);
-      it != tables.end()) {
+  if (auto it = std::find_if(tables.begin(), tables.end(), fncFindByName); it != tables.end()) {
     tables.erase(it);
   } else {
     throw DataBaseException("Table " + std::string(tableName) + " not found.");
@@ -46,21 +39,16 @@ void DataBase::MemoryDataBase::removeTable(std::string_view tableName) {
 }
 
 void DataBase::MemoryDataBase::removeView(std::string_view viewName) {
-  const auto fncFindByName = [viewName]
-      (const std::shared_ptr<View> &view) {
+  const auto fncFindByName = [viewName](const std::shared_ptr<View> &view) {
     return view->dataSet->getName() == viewName;
   };
 
-  if (auto it = std::find_if(views.begin(),
-                             views.end(),
-                             fncFindByName);
-      it != views.end()) {
+  if (auto it = std::find_if(views.begin(), views.end(), fncFindByName); it != views.end()) {
     views.erase(it);
   } else {
     throw DataBaseException("View " + std::string(viewName) + " not found.");
   }
 }
-
 
 std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::execSimpleQuery(
     std::string_view query,
@@ -76,8 +64,7 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::execSimpleQuery(
   if (!structQuery.joins.data.empty()) {
     result = doJoin(structQuery);
   } else {
-    result =
-        std::make_shared<View>(tableByName(structQuery.mainTable)->dataSet->fullView());
+    result = std::make_shared<View>(tableByName(structQuery.mainTable)->dataSet->fullView());
   }
   if (!structQuery.where.data.empty()) {
     result = doWhere(structQuery, result);
@@ -103,8 +90,7 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::execAggregateQuery(
   if (!structQuery.joins.data.empty()) {
     result = doJoin(structQuery);
   } else {
-    result =
-        std::make_shared<View>(tableByName(structQuery.mainTable)->dataSet->fullView());
+    result = std::make_shared<View>(tableByName(structQuery.mainTable)->dataSet->fullView());
   }
   if (!structQuery.where.data.empty()) {
     result = doWhere(structQuery, result);
@@ -133,22 +119,18 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::execAggregateQuery(
   return result;
 }
 
-DataBase::StructuredQuery DataBase::MemoryDataBase::validateQuery(
-    StructuredQuery &query) const {
+DataBase::StructuredQuery DataBase::MemoryDataBase::validateQuery(StructuredQuery &query) const {
   std::vector<std::pair<std::string, bool>> tables;
   tables.emplace_back(query.mainTable, false);
 
   std::vector<std::string> savedTables;
-  std::transform(this->tables.begin(),
-                 this->tables.end(),
-                 std::back_inserter(savedTables),
+  std::transform(this->tables.begin(), this->tables.end(), std::back_inserter(savedTables),
                  [](const std::shared_ptr<Table> &table) {
                    return table->dataSet->getName();
                  });
 
   for (auto &val : tables) {
-    val.second = std::find(savedTables.begin(), savedTables.end(), val.first)
-        != savedTables.end();
+    val.second = std::find(savedTables.begin(), savedTables.end(), val.first) != savedTables.end();
   }
 
   for (const auto &val : query.joins.data) {
@@ -156,8 +138,7 @@ DataBase::StructuredQuery DataBase::MemoryDataBase::validateQuery(
   }
   std::string errMsg;
   for (auto &val : tables) {
-    val.second = std::find(savedTables.begin(), savedTables.end(), val.first)
-        != savedTables.end();
+    val.second = std::find(savedTables.begin(), savedTables.end(), val.first) != savedTables.end();
     if (!val.second) {
       errMsg += "Unknown table: " + val.first + "\n";
     }
@@ -172,9 +153,7 @@ DataBase::StructuredQuery DataBase::MemoryDataBase::validateQuery(
       auto tableName = i.table;
       auto table = tableByName(tableName);
       auto fieldNames = table->dataSet->getFieldNames();
-      std::transform(fieldNames.begin(),
-                     fieldNames.end(),
-                     std::back_inserter(transformedProjects),
+      std::transform(fieldNames.begin(), fieldNames.end(), std::back_inserter(transformedProjects),
                      [&tableName](const std::string &str) {
                        return ProjectItem{.table = tableName, .column = str};
                      });
@@ -212,13 +191,10 @@ DataBase::StructuredQuery DataBase::MemoryDataBase::validateQuery(
   }
 
   for (auto &val : fields) {
-    val.second = std::find(savedFields[val.first.table].begin(),
-                           savedFields[val.first.table].end(), val.first.column)
-        != savedFields[val.first.table].end();
+    val.second = std::find(savedFields[val.first.table].begin(), savedFields[val.first.table].end(),
+                           val.first.column) != savedFields[val.first.table].end();
     if (!val.second && !val.first.column.empty()) {
-      errMsg +=
-          "Unknown field: " + val.first.column + " in table: " + val.first.table
-              + "\n";
+      errMsg += "Unknown field: " + val.first.column + " in table: " + val.first.table + "\n";
     }
   }
   if (!errMsg.empty()) {
@@ -262,15 +238,13 @@ std::shared_ptr<DataBase::Table> DataBase::MemoryDataBase::tableByName(std::stri
   throw InvalidArgumentException(errMsg.c_str());
 }
 
-std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doJoin(
-    const DataBase::StructuredQuery &query) {
+std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doJoin(const DataBase::StructuredQuery &query) {
   auto joinItem1 = query.joins.data[0];
   auto table1 = tableByName(joinItem1.firstField.table);
   std::unique_lock lck1{table1->mutex};
   auto table2 = tableByName(joinItem1.secondField.table);
   std::unique_lock lck2{table2->mutex};
-  JoinMaker joinMaker(table1, joinItem1.firstField.column,
-                      table2, joinItem1.secondField.column);
+  JoinMaker joinMaker(table1, joinItem1.firstField.column, table2, joinItem1.secondField.column);
   auto joinResult = joinMaker.join(joinItem1.type);
   joinResult->dataSet->addParents({table1->dataSet, table2->dataSet});
 
@@ -278,10 +252,7 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doJoin(
     auto parents = joinResult->dataSet->getParents();
     auto joinItem = query.joins.data[i];
     auto joinTable = tableByName(joinItem.secondField.table);
-    JoinMaker maker(joinResult,
-                    joinItem.firstField.column,
-                    joinTable,
-                    joinItem.secondField.column);
+    JoinMaker maker(joinResult, joinItem.firstField.column, joinTable, joinItem.secondField.column);
     joinResult = maker.join(query.joins.data[i].type);
     joinResult->dataSet->addParents(parents);
     joinResult->dataSet->addParent(joinTable->dataSet);
@@ -297,8 +268,7 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doWhere(
   for (const auto &whereItem : query.where.data) {
     auto field = view->dataSet->fieldByName(whereItem.first.field.column);
     std::vector<std::string> values;
-    std::transform(whereItem.first.constValues.begin(),
-                   whereItem.first.constValues.end(),
+    std::transform(whereItem.first.constValues.begin(), whereItem.first.constValues.end(),
                    std::back_inserter(values),
                    [](const std::pair<ConstType, std::string> &value) {
                      if (value.first == ConstType::string) {
@@ -307,16 +277,14 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doWhere(
                        return value.second;
                      }
                    });
-    filterOptions.addOption(field, values,
-                            DataSets::condOpToFilterOp(whereItem.first.condOperator));
+    filterOptions.addOption(field, values, DataSets::condOpToFilterOp(whereItem.first.condOperator));
   }
   return std::make_shared<View>(std::dynamic_pointer_cast<DataSets::MemoryViewDataSet>(
       view->dataSet->filter(filterOptions)));
 }
 
-std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doOrder(
-    const DataBase::StructuredQuery &query,
-    std::shared_ptr<View> &view) {
+std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doOrder(const DataBase::StructuredQuery &query,
+                                                                  std::shared_ptr<View> &view) {
   DataSets::SortOptions sortOptions;
   for (const auto &option : query.order.data) {
     sortOptions.addOption(view->dataSet->fieldByName(option.field.column),
@@ -327,13 +295,10 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doOrder(
   return view;
 }
 
-std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doProject(
-    const DataBase::StructuredQuery &query,
-    std::shared_ptr<View> &view) {
+std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doProject(const DataBase::StructuredQuery &query,
+                                                                    std::shared_ptr<View> &view) {
   std::vector<std::string> allowedFields;
-  std::transform(query.project.data.begin(),
-                 query.project.data.end(),
-                 std::back_inserter(allowedFields),
+  std::transform(query.project.data.begin(), query.project.data.end(), std::back_inserter(allowedFields),
                  [](const ProjectItem &item) {
                    return item.column;
                  });
@@ -342,16 +307,13 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doProject(
   return view;
 }
 
-std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doHaving(
-    const DataBase::StructuredQuery &query,
-    std::shared_ptr<View> &view) {
+std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doHaving(const DataBase::StructuredQuery &query,
+                                                                   std::shared_ptr<View> &view) {
   DataSets::FilterOptions filterOptions;
   for (const auto &havingItem : query.having.data) {
-    auto field =
-        view->dataSet->fieldByName(havingItem.first.agreItem.field.column);
+    auto field = view->dataSet->fieldByName(havingItem.first.agreItem.field.column);
     std::vector<std::string> values;
-    std::transform(havingItem.first.constValues.begin(),
-                   havingItem.first.constValues.end(),
+    std::transform(havingItem.first.constValues.begin(), havingItem.first.constValues.end(),
                    std::back_inserter(values),
                    [](const std::pair<ConstType, std::string> &value) {
                      if (value.first == ConstType::string) {
@@ -360,12 +322,11 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doHaving(
                        return value.second;
                      }
                    });
-    filterOptions.addOption(field, values,
-                            DataSets::condOpToFilterOp(havingItem.first.condOperator));
+    filterOptions.addOption(field, values, DataSets::condOpToFilterOp(havingItem.first.condOperator));
   }
   auto result =
-      std::make_shared<View>(std::dynamic_pointer_cast<DataSets::MemoryViewDataSet>(
-      view->dataSet->filter(filterOptions)));
+      std::make_shared<View>(std::dynamic_pointer_cast<DataSets::MemoryViewDataSet>(view->dataSet->filter(
+          filterOptions)));
   result->dataSet->addParents(view->dataSet->getParents());
   return result;
 }

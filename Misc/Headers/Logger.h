@@ -20,8 +20,7 @@ enum class LogLevel { Verbose, Info, Status, Debug, Warning, Error };
 
 class Logger {
  private:
-  explicit Logger(bool isAllowedDebug = false)
-      : isAllowedDebug(isAllowedDebug) {}
+  explicit Logger(bool isAllowedDebug = false) : isAllowedDebug(isAllowedDebug) {}
   /**
    *
    * @return Current time as HH-MM-SS
@@ -84,9 +83,7 @@ class Logger {
    * @param exception exception to print out
    * @param printTime
    */
-  void log(LogLevel logLevel,
-           const std::exception &exception,
-           bool printTime = false) {
+  void log(LogLevel logLevel, const std::exception &exception, bool printTime = false) {
     if (isAllowedDebug && logLevel == LogLevel::Debug) {
       return;
     }
@@ -114,8 +111,7 @@ class Logger {
    */
   void printElapsedTime() {
     auto tmp = endTimeMs - startTimeMs;
-    log(LogLevel::Verbose,
-        "Time elapsed: " + std::to_string(tmp.count()) + " ms");
+    log(LogLevel::Verbose, "Time elapsed: " + std::to_string(tmp.count()) + " ms");
   }
 
   void allowDebug() {

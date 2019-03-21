@@ -48,6 +48,6 @@ class LexicalAnalyser {
     start, negNum, num1, numFloat, id, string, exclam, less, greater
   };
 };
-}
+}  // namespace DataBase
 
 #endif //PROJECT_LEXICALANALYSER_H

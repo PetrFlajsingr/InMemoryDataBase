@@ -22,9 +22,7 @@ class IntegerField : public BaseField {
    * @param index index in data set
    * @param dataSet owner data set
    */
-  IntegerField(std::string_view fieldName,
-               gsl::index index,
-               BaseDataSet *dataSet);
+  IntegerField(std::string_view fieldName, gsl::index index, BaseDataSet *dataSet);
   ValueType getFieldType() const override;
   void setAsString(std::string_view value) override;
   std::string getAsString() const override;

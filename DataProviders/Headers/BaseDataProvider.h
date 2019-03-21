@@ -17,14 +17,13 @@ namespace DataProviders {
  */
 class BaseDataProvider {
  public:
-  BaseDataProvider()
-      : convert(false) {}
+  BaseDataProvider() : convert(false) {}
   /**
    *
    * @param charSet source charset
    */
-  explicit BaseDataProvider(CharSet charSet) : convert(
-      true), converter(std::make_unique<CharSetConverter>(charSet)) {}
+  explicit BaseDataProvider(CharSet charSet)
+      : convert(true), converter(std::make_unique<CharSetConverter>(charSet)) {}
   /**
    * Get a record divided into fields
    * @return
@@ -67,8 +66,7 @@ class BaseDataProvider {
 
   virtual ~BaseDataProvider() = default;
 
-  class iterator : public std::iterator<std::input_iterator_tag,
-                                        std::vector<std::string>> {
+  class iterator : public std::iterator<std::input_iterator_tag, std::vector<std::string>> {
    private:
     BaseDataProvider *provider;
 
@@ -77,8 +75,7 @@ class BaseDataProvider {
      * Move provider to the first record when no data has been read.
      * @param provider
      */
-    explicit iterator(gsl::not_null<BaseDataProvider *> provider)
-        : provider(provider) {
+    explicit iterator(gsl::not_null<BaseDataProvider *> provider) : provider(provider) {
       if (provider->getCurrentRecordNumber() == -1) {
         provider->next();
       }

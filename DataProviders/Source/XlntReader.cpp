@@ -5,11 +5,8 @@
 #include <Exceptions.h>
 #include <XlntReader.h>
 
-DataProviders::XlntReader::XlntReader(std::string_view fileName,
-                                      std::string_view sheetName)
-    : BaseDataProvider(),
-      fileName(fileName),
-      sheetName(sheetName),
+DataProviders::XlntReader::XlntReader(std::string_view fileName, std::string_view sheetName)
+    : BaseDataProvider(), fileName(fileName), sheetName(sheetName),
       lastUnusedCell((prepareSheet(), wb.read_cell())) {
   readHeader();
 }
@@ -17,9 +14,7 @@ DataProviders::XlntReader::XlntReader(std::string_view fileName,
 DataProviders::XlntReader::XlntReader(std::string_view fileName,
                                       CharSet inputCharSet,
                                       std::string_view sheetName)
-    : BaseDataProvider(inputCharSet),
-      fileName(fileName),
-      sheetName(sheetName),
+    : BaseDataProvider(inputCharSet), fileName(fileName), sheetName(sheetName),
       lastUnusedCell((prepareSheet(), wb.read_cell())) {
   readHeader();
 }

@@ -7,8 +7,7 @@
 #include "FileManager.h"
 
 FileException::FileException(const char *message) : IOException(message) {}
-FileException::FileException(const std::string &message)
-    : IOException(message) {}
+FileException::FileException(const std::string &message) : IOException(message) {}
 
 Folder FileManager::getFolder(std::string_view path) {
   auto folderPath = boost::filesystem::path(std::string(path));

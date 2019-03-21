@@ -4,25 +4,13 @@
 
 #include <Types.h>
 
-int compareDataContainers(const DataContainer &data1,
-                          const DataContainer &data2,
-                          ValueType valueType) {
+int compareDataContainers(const DataContainer &data1, const DataContainer &data2, ValueType valueType) {
   switch (valueType) {
-    case ValueType::Integer:
-      return Utilities::compareInt(data1._integer,
-                                   data2._integer);
-    case ValueType::Double:
-      return Utilities::compareDouble(data1._double,
-                                      data2._double);
-    case ValueType::String:
-      return Utilities::compareString(data1._string,
-                                      data2._string);
-    case ValueType::Currency:
-      return Utilities::compareCurrency(*data1._currency,
-                                        *data2._currency);
-    case ValueType::DateTime:
-      return Utilities::compareDateTime(*data1._dateTime,
-                                        *data2._dateTime);
+    case ValueType::Integer:return Utilities::compareInt(data1._integer, data2._integer);
+    case ValueType::Double:return Utilities::compareDouble(data1._double, data2._double);
+    case ValueType::String:return Utilities::compareString(data1._string, data2._string);
+    case ValueType::Currency:return Utilities::compareCurrency(*data1._currency, *data2._currency);
+    case ValueType::DateTime:return Utilities::compareDateTime(*data1._dateTime, *data2._dateTime);
   }
   throw IllegalStateException("Internal error. compareDataContainers");
 }
@@ -60,12 +48,9 @@ const std::string DateTime::timeDefFmt = "%H:%M:%S";
 DateTime::DateTime() : type(DateTimeType::DateTime), ptime(boost::posix_time::second_clock::local_time()) {}
 DateTime::DateTime(DateTimeType type) : type(type), ptime(boost::posix_time::second_clock::local_time()) {}
 
-DateTime::DateTime(const boost::posix_time::ptime &ptime,
-                     DateTimeType type)
-    : type(type), ptime(ptime) {}
+DateTime::DateTime(const boost::posix_time::ptime &ptime, DateTimeType type) : type(type), ptime(ptime) {}
 
-DateTime::DateTime(const DateTime &other)
-    : type(other.type), ptime(other.ptime) {}
+DateTime::DateTime(const DateTime &other) : type(other.type), ptime(other.ptime) {}
 
 std::string DateTime::toString() const {
   switch (type) {
@@ -157,12 +142,9 @@ void DateTime::fromString(std::string_view str) {
 void DateTime::fromString(std::string_view str, std::string_view fmt) {
   auto[type, t] = innerFromString(str, fmt);
   this->ptime = t;
-  this->type = type;
 }
 xlnt::date DateTime::toXlntDate() {
-  return xlnt::date(ptime.date().year(),
-                    ptime.date().month().as_number(),
-                    ptime.date().day().as_number());
+  return xlnt::date(ptime.date().year(), ptime.date().month().as_number(), ptime.date().day().as_number());
 }
 xlnt::time DateTime::toXlntTime() {
   return xlnt::time(ptime.time_of_day().hours(),

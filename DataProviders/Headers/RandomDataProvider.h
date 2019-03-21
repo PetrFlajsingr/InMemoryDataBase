@@ -27,10 +27,7 @@ class RandomDataProvider : public BaseDataProvider {
    * @param maxDataLength maximum length of a cell
    * @param recordCount amount of records in total
    */
-  RandomDataProvider(int columnCount,
-                     int minDataLength,
-                     int maxDataLength,
-                     int recordCount);
+  RandomDataProvider(int columnCount, int minDataLength, int maxDataLength, int recordCount);
 
   const std::vector<std::string> &getRow() const override;
 

@@ -7,6 +7,7 @@
 
 #include <exception>
 #include <gsl/gsl>
+#include <string>
 
 namespace DataBase {
 class QueryException : public std::exception {
@@ -38,6 +39,6 @@ class DataBaseQueryException : public QueryException {
  public:
   explicit DataBaseQueryException(const std::string &message) : QueryException(message) {}
 };
-}
+}  // namespace DataBase
 
 #endif //PROJECT_QUERYEXCEPTION_H

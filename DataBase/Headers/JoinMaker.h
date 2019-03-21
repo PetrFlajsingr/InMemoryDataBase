@@ -8,6 +8,8 @@
 #include <MemoryViewDataSet.h>
 #include <MemoryDataBase.h>
 #include <QueryCommon.h>
+#include <algorithm>
+#include <vector>
 
 namespace DataBase {
 /**
@@ -71,14 +73,10 @@ class JoinMaker {
    * @param valueType type of value to compare
    */
   template<typename CompFnc>
-  void iterAndCompare(DataSetType1 first,
-                      DataSetType2 second,
-                      std::pair<gsl::index,
-                                gsl::index> firstIndex,
-                      std::pair<gsl::index,
-                                gsl::index> secondIndex,
-                      CompFnc cmpFunc,
-                      ValueType valueType) {
+  void iterAndCompare(DataSetType1 first, DataSetType2 second,
+                      std::pair<gsl::index, gsl::index> firstIndex,
+                      std::pair<gsl::index, gsl::index> secondIndex,
+                      CompFnc cmpFunc, ValueType valueType) {
     auto begin1 = first->begin();
     auto end1 = first->end();
     auto begin2 = second->begin();
@@ -89,24 +87,19 @@ class JoinMaker {
     int diff = 0;
     while (begin1 != end1) {
       while (begin2 != end2) {
-        if constexpr(std::is_same<DataSetType1,
-                                  std::shared_ptr<DataSets::MemoryViewDataSet>>{}) {
+        if constexpr(std::is_same<DataSetType1, std::shared_ptr<DataSets::MemoryViewDataSet>>{}) {
           container1 = (*(*begin1)[firstIndex.first])[firstIndex.second];
         }
-        if constexpr(std::is_same<DataSetType1,
-                                  std::shared_ptr<DataSets::MemoryDataSet>>{}) {
+        if constexpr(std::is_same<DataSetType1, std::shared_ptr<DataSets::MemoryDataSet>>{}) {
           container1 = (*(*begin1))[firstIndex.first];
         }
 
-        if constexpr(std::is_same<DataSetType2,
-                                  std::shared_ptr<DataSets::MemoryViewDataSet>>{}) {
+        if constexpr(std::is_same<DataSetType2, std::shared_ptr<DataSets::MemoryViewDataSet>>{}) {
           container2 = (*(*begin2)[secondIndex.first])[secondIndex.second];
         }
-        if constexpr(std::is_same<DataSetType2,
-                                  std::shared_ptr<DataSets::MemoryDataSet>>{}) {
+        if constexpr(std::is_same<DataSetType2, std::shared_ptr<DataSets::MemoryDataSet>>{}) {
           container2 = (*(*begin2))[secondIndex.first];
         }
-
         auto cmpResult = compareDataContainers(container1, container2, valueType);
 
         cmpFunc(cmpResult, found, begin1, begin2);
@@ -173,9 +166,7 @@ class JoinMaker {
 
     auto result = std::make_shared<DataSets::MemoryViewDataSet>(
         "join_" + dataSet1->getName() + "_" + dataSet2->getName(),
-        fieldNames,
-        fieldTypes,
-        fieldIndices);
+        fieldNames, fieldTypes, fieldIndices);
     result->rawData()->emplace_back();
     return result;
   }
@@ -185,13 +176,11 @@ class JoinMaker {
    * @return indices of first field
    */
   std::pair<gsl::index, gsl::index> getFirstIndices() {
-    if constexpr (std::is_same<DataSetType1,
-                               std::shared_ptr<DataSets::MemoryDataSet>>{}) {
+    if constexpr (std::is_same<DataSetType1, std::shared_ptr<DataSets::MemoryDataSet>>{}) {
       return std::make_pair(t1->dataSet->fieldByName(col1)->getIndex(), 0);
     }
 
-    if constexpr (std::is_same<DataSetType1,
-                               std::shared_ptr<DataSets::MemoryViewDataSet>>{}) {
+    if constexpr (std::is_same<DataSetType1, std::shared_ptr<DataSets::MemoryViewDataSet>>{}) {
       return DataSets::BaseField::convertIndex(*t1->dataSet->fieldByName(col1));
     }
   }
@@ -201,13 +190,11 @@ class JoinMaker {
    * @return indices of second field
    */
   std::pair<gsl::index, gsl::index> getSecondIndices() {
-    if constexpr (std::is_same<DataSetType2,
-                               std::shared_ptr<DataSets::MemoryDataSet>>{}) {
+    if constexpr (std::is_same<DataSetType2, std::shared_ptr<DataSets::MemoryDataSet>>{}) {
       return std::make_pair(t2->dataSet->fieldByName(col2)->getIndex(), 0);
     }
 
-    if constexpr (std::is_same<DataSetType2,
-                               std::shared_ptr<DataSets::MemoryViewDataSet>>{}) {
+    if constexpr (std::is_same<DataSetType2, std::shared_ptr<DataSets::MemoryViewDataSet>>{}) {
       return DataSets::BaseField::convertIndex(*t2->dataSet->fieldByName(col2));
     }
   }
@@ -222,41 +209,28 @@ class JoinMaker {
    * @param joinType type of join operation
    * @return
    */
-  std::function<void(int8_t, bool,
-                     IteratorType1 &,
-                     IteratorType2 &)>
-  getJoinFunction(std::shared_ptr<DataSets::MemoryViewDataSet> result,
-                  JoinType joinType) {
+  std::function<void(int8_t, bool, IteratorType1 &, IteratorType2 &)>
+  getJoinFunction(std::shared_ptr<DataSets::MemoryViewDataSet> result, JoinType joinType) {
     if constexpr (std::is_same<T1, Table>{}) {
       if constexpr (std::is_same<T2, Table>{}) {
         switch (joinType) {
           case JoinType::innerJoin:
-            return [&result]
-                (int8_t cmpResult,
-                 bool,
-                 IteratorType1 &iter1,
-                 IteratorType2 &iter2) {
+            return [&result](int8_t cmpResult, bool, IteratorType1 &iter1, IteratorType2 &iter2) {
               if (cmpResult == 0) {
-                result->rawData()->emplace_back(std::vector<DataSetRow *>{
-                    *iter1, *iter2});
+                result->rawData()->emplace_back(std::vector<DataSetRow *>{*iter1, *iter2});
               }
             };
           case JoinType::leftJoin:
-            return [&result]
-                (int8_t cmpResult,
-                 bool found,
-                 IteratorType1 &iter1,
-                 IteratorType2 &iter2) {
+            return [&result](int8_t cmpResult, bool found, IteratorType1 &iter1, IteratorType2 &iter2) {
               if (cmpResult == 0) {
-                result->rawData()->emplace_back(std::vector<DataSetRow *>{
-                    *iter1, *iter2});
+                result->rawData()->emplace_back(std::vector<DataSetRow *>{*iter1, *iter2});
               } else if (cmpResult == -1 && !found) {
                 result->rawData()->emplace_back(std::vector<DataSetRow *>{
                     *iter1, result->getNullRow(result->getTableCount() - 1)});
               }
             };
-          case JoinType::rightJoin:break;
-          case JoinType::outerJoin:break;
+          case JoinType::rightJoin:break; // TODO
+          case JoinType::outerJoin:break; // TODO
         }
       }
     }
@@ -264,93 +238,59 @@ class JoinMaker {
       if constexpr (std::is_same<T2, Table>{}) {
         switch (joinType) {
           case JoinType::innerJoin:
-            return [&result]
-                (int8_t cmpResult,
-                 bool,
-                 IteratorType1 &iter1,
-                 IteratorType2 &iter2) {
+            return [&result](int8_t cmpResult, bool, IteratorType1 &iter1, IteratorType2 &iter2) {
               if (cmpResult == 0) {
                 std::vector<DataSetRow *> newRecord;
-                std::copy((*iter1).begin(),
-                          (*iter1).end(),
-                          std::back_inserter(newRecord));
+                std::copy((*iter1).begin(), (*iter1).end(), std::back_inserter(newRecord));
                 newRecord.emplace_back(*iter2);
                 result->rawData()->emplace_back(newRecord);
               }
             };
           case JoinType::leftJoin:
-            return [&result]
-                (int8_t cmpResult,
-                 bool found,
-                 IteratorType1 &iter1,
-                 IteratorType2 &iter2) {
+            return [&result](int8_t cmpResult, bool found, IteratorType1 &iter1, IteratorType2 &iter2) {
               if (cmpResult == 0) {
                 std::vector<DataSetRow *> newRecord;
-                std::copy((*iter1).begin(),
-                          (*iter1).end(),
-                          std::back_inserter(newRecord));
+                std::copy((*iter1).begin(), (*iter1).end(), std::back_inserter(newRecord));
                 newRecord.emplace_back(*iter2);
                 result->rawData()->emplace_back(newRecord);
               } else if (cmpResult == -1 && !found) {
                 std::vector<DataSetRow *> newRecord;
-                std::copy((*iter1).begin(),
-                          (*iter1).end(),
-                          std::back_inserter(newRecord));
-                newRecord.emplace_back(result->getNullRow(
-                    result->getTableCount() - 1));
+                std::copy((*iter1).begin(), (*iter1).end(), std::back_inserter(newRecord));
+                newRecord.emplace_back(result->getNullRow(result->getTableCount() - 1));
                 result->rawData()->emplace_back(newRecord);
               }
             };
-          case JoinType::rightJoin:break;
-          case JoinType::outerJoin:break;
+          case JoinType::rightJoin:break; // TODO
+          case JoinType::outerJoin:break; // TODO
         }
       }
       if constexpr (std::is_same<T2, View>{}) {
         switch (joinType) {
           case JoinType::innerJoin:
-            return [&result]
-                (int8_t cmpResult,
-                 bool,
-                 IteratorType1 &iter1,
-                 IteratorType2 &iter2) {
+            return [&result](int8_t cmpResult, bool, IteratorType1 &iter1, IteratorType2 &iter2) {
               if (cmpResult == 0) {
                 std::vector<DataSetRow *> newRecord;
-                std::copy((*iter1).begin(),
-                          (*iter1).end(),
-                          std::back_inserter(newRecord));
-                std::copy((*iter2).begin(),
-                          (*iter2).end(),
-                          std::back_inserter(newRecord));
+                std::copy((*iter1).begin(), (*iter1).end(), std::back_inserter(newRecord));
+                std::copy((*iter2).begin(), (*iter2).end(), std::back_inserter(newRecord));
                 result->rawData()->emplace_back(newRecord);
               }
             };
           case JoinType::leftJoin:
-            return [&result]
-                (int8_t cmpResult,
-                 bool found,
-                 IteratorType1 &iter1,
-                 IteratorType2 &iter2) {
+            return [&result](int8_t cmpResult, bool found, IteratorType1 &iter1, IteratorType2 &iter2) {
               if (cmpResult == 0) {
                 std::vector<DataSetRow *> newRecord;
-                std::copy((*iter1).begin(),
-                          (*iter1).end(),
-                          std::back_inserter(newRecord));
-                std::copy((*iter2).begin(),
-                          (*iter2).end(),
-                          std::back_inserter(newRecord));
+                std::copy((*iter1).begin(), (*iter1).end(), std::back_inserter(newRecord));
+                std::copy((*iter2).begin(), (*iter2).end(), std::back_inserter(newRecord));
                 result->rawData()->emplace_back(newRecord);
               } else if (cmpResult == -1 && !found) {
                 std::vector<DataSetRow *> newRecord;
-                std::copy((*iter1).begin(),
-                          (*iter1).end(),
-                          std::back_inserter(newRecord));
-                newRecord.emplace_back(result->getNullRow(
-                    result->getTableCount() - 1));
+                std::copy((*iter1).begin(), (*iter1).end(), std::back_inserter(newRecord));
+                newRecord.emplace_back(result->getNullRow(result->getTableCount() - 1));
                 result->rawData()->emplace_back(newRecord);
               }
             };
-          case JoinType::rightJoin:break;
-          case JoinType::outerJoin:break;
+          case JoinType::rightJoin:break; // TODO
+          case JoinType::outerJoin:break; // TODO
         }
       }
     }

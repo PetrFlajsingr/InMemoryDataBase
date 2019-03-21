@@ -74,21 +74,21 @@ DataBase::Min::Min(DataSets::BaseField *field) : BaseAgr(field) {
 void DataBase::Min::check() {
   switch (field->getFieldType()) {
     case ValueType::Integer: {
-      auto val = reinterpret_cast<DataSets::IntegerField *>(field)->getAsInteger();
+      auto val = static_cast<DataSets::IntegerField *>(field)->getAsInteger();
       if (val < min._integer) {
         min._integer = val;
       }
     }
       break;
     case ValueType::Double: {
-      auto val = reinterpret_cast<DataSets::DoubleField *>(field)->getAsDouble();
+      auto val = static_cast<DataSets::DoubleField *>(field)->getAsDouble();
       if (val < min._double) {
         min._double = val;
       }
     }
       break;
     case ValueType::Currency: {
-      auto val = reinterpret_cast<DataSets::CurrencyField *>(field)->getAsCurrency();
+      auto val = static_cast<DataSets::CurrencyField *>(field)->getAsCurrency();
       if (val < *min._currency) {
         *min._currency = val;
       }
@@ -113,21 +113,21 @@ DataBase::Max::Max(DataSets::BaseField *field) : BaseAgr(field) {
 void DataBase::Max::check() {
   switch (field->getFieldType()) {
     case ValueType::Integer: {
-      auto val = reinterpret_cast<DataSets::IntegerField *>(field)->getAsInteger();
+      auto val = static_cast<DataSets::IntegerField *>(field)->getAsInteger();
       if (val > max._integer) {
         max._integer = val;
       }
     }
       break;
     case ValueType::Double: {
-      auto val = reinterpret_cast<DataSets::DoubleField *>(field)->getAsDouble();
+      auto val = static_cast<DataSets::DoubleField *>(field)->getAsDouble();
       if (val > max._double) {
         max._double = val;
       }
     }
       break;
     case ValueType::Currency: {
-      auto val = reinterpret_cast<DataSets::CurrencyField *>(field)->getAsCurrency();
+      auto val = static_cast<DataSets::CurrencyField *>(field)->getAsCurrency();
       if (val > *max._currency) {
         *max._currency = val;
       }
@@ -154,8 +154,7 @@ void DataBase::Count::reset() {
   count = 0;
 }
 
-DataBase::Avg::Avg(DataSets::BaseField *field)
-    : Sum(field), Count(field) {}
+DataBase::Avg::Avg(DataSets::BaseField *field) : Sum(field), Count(field) {}
 void DataBase::Avg::accumulate(const DataContainer &val) {
   Sum::accumulate(val);
   Count::add();

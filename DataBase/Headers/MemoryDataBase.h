@@ -50,19 +50,14 @@ class MemoryDataBase {
    * @param viewName name of the result
    * @return View to the queried data
    */
-  std::shared_ptr<View> execSimpleQuery(
-      std::string_view query,
-      bool keepView,
-      std::string_view viewName);
+  std::shared_ptr<View> execSimpleQuery(std::string_view query, bool keepView, std::string_view viewName);
   /**
    * Execute a query containing aggregation.
    * @param query query to execute
    * @param viewName name of the result
    * @return View to the queried data
    */
-  std::shared_ptr<View> execAggregateQuery(
-      std::string_view query,
-      std::string_view viewName);
+  std::shared_ptr<View> execAggregateQuery(std::string_view query, std::string_view viewName);
 
   std::string_view getName() const;
 
@@ -85,15 +80,10 @@ class MemoryDataBase {
   // operations on views
   std::shared_ptr<View> doJoin(const StructuredQuery &query);
   // TODO: implement and/or
-  std::shared_ptr<View> doWhere(const StructuredQuery &query,
-                                std::shared_ptr<View> &view);
-  std::shared_ptr<View> doOrder(const StructuredQuery &query,
-                                std::shared_ptr<View> &view);
-  std::shared_ptr<View> doProject(const StructuredQuery &query,
-                                  std::shared_ptr<View> &view);
-
-  std::shared_ptr<View> doHaving(const StructuredQuery &query,
-                                 std::shared_ptr<View> &view);
+  std::shared_ptr<View> doWhere(const StructuredQuery &query, std::shared_ptr<View> &view);
+  std::shared_ptr<View> doOrder(const StructuredQuery &query, std::shared_ptr<View> &view);
+  std::shared_ptr<View> doProject(const StructuredQuery &query, std::shared_ptr<View> &view);
+  std::shared_ptr<View> doHaving(const StructuredQuery &query, std::shared_ptr<View> &view);
 };
 
 }  // namespace DataBase

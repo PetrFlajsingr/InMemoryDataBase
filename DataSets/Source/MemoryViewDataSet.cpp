@@ -7,38 +7,30 @@
 DataSets::MemoryViewDataSet::MemoryViewDataSet(std::string_view dataSetName,
                                                const std::vector<std::string> &fieldNames,
                                                const std::vector<ValueType> &fieldTypes,
-                                               const std::vector<std::pair<int,
-                                                                           int>> &fieldIndices)
+                                               const std::vector<std::pair<int, int>> &fieldIndices)
     : ViewDataSet(dataSetName) {
   createFields(fieldNames, fieldTypes, fieldIndices);
 }
 
 void DataSets::MemoryViewDataSet::createFields(const std::vector<std::string> &columns,
                                                const std::vector<ValueType> &types,
-                                               const std::vector<std::pair<int,
-                                                                           int>> &fieldIndices) {
+                                               const std::vector<std::pair<int, int>> &fieldIndices) {
   createNullRows(fieldIndices, types);
   for (gsl::index i = 0; i < columns.size(); ++i) {
-    auto index =
-        (fieldIndices[i].first << BaseField::maskTableShift)
-            + fieldIndices[i].second;
-    fields.emplace_back(FieldFactory::GetInstance().CreateField(
-        columns[i],
-        index,
-        types[i],
-        this));
+    auto index = (fieldIndices[i].first << BaseField::maskTableShift) + fieldIndices[i].second;
+    fields.emplace_back(FieldFactory::GetInstance().CreateField(columns[i], index, types[i], this));
   }
   columnCount = fields.size();
 }
 
 void DataSets::MemoryViewDataSet::open(DataProviders::BaseDataProvider &dataProvider,
                                        const std::vector<ValueType> &fieldTypes) {
-  throw NotImplementedException();
+  throw UnsupportedOperationException("View can't be opened.");
 }
 
 void DataSets::MemoryViewDataSet::openEmpty(const std::vector<std::string> &fieldNames,
                                             const std::vector<ValueType> &fieldTypes) {
-  throw NotImplementedException();
+  throw UnsupportedOperationException("View can't be opened.");
 }
 
 void DataSets::MemoryViewDataSet::close() {}
@@ -88,15 +80,13 @@ bool DataSets::MemoryViewDataSet::isEnd() const {
 }
 
 DataSets::BaseField *DataSets::MemoryViewDataSet::fieldByName(std::string_view name) const {
-  if (auto it = std::find_if(fields.begin(),
-                             fields.end(),
-                             [name](const std::shared_ptr<BaseField> field) {
-                               return field->getName() == name;
-                             }); it != fields.end()) {
+  if (auto it = std::find_if(fields.begin(), fields.end(), [name](const std::shared_ptr<BaseField> field) {
+      return field->getName() == name;
+    }); it != fields.end()) {
     return (*it).get();
   }
-  std::string errMsg = "Field named \"" + std::string(name)
-      + "\" not found. DataSets::MemoryViewDataSet::fieldByName";
+  std::string errMsg =
+      "Field named \"" + std::string(name) + "\" not found. DataSets::MemoryViewDataSet::fieldByName";
   throw InvalidArgumentException(errMsg.c_str());
 }
 
@@ -144,11 +134,11 @@ gsl::index DataSets::MemoryViewDataSet::getCurrentRecord() const {
 }
 
 void DataSets::MemoryViewDataSet::append() {
-  throw NotImplementedException();
+  throw UnsupportedOperationException("View can't be appended to.");
 }
 
 void DataSets::MemoryViewDataSet::append(DataProviders::BaseDataProvider &dataProvider) {
-  throw NotImplementedException();
+  throw UnsupportedOperationException("View can't be appended to.");
 }
 
 void DataSets::MemoryViewDataSet::sort(DataSets::SortOptions &options) {
@@ -163,31 +153,27 @@ void DataSets::MemoryViewDataSet::sort(DataSets::SortOptions &options) {
                  });
 
   auto optionArray = options.options;
-  auto compareFunction =
-      [this, &optionArray, &compareFunctions](const std::vector<DataSetRow *> &a,
-                                              const std::vector<DataSetRow *> &b) {
-        for (gsl::index i = 0; i < optionArray.size(); ++i) {
-          auto[tableIndex, _] = BaseField::convertIndex(*optionArray[i].field);
-          int compareResult = compareFunctions[i](a[tableIndex], b[tableIndex]);
-          if (compareResult < 0) {
-            return optionArray[i].order == SortOrder::Ascending;
-          } else if (compareResult > 0) {
-            return optionArray[i].order == SortOrder::Descending;
-          }
-        }
-        return false;
-      };
+  auto compareFunction = [this, &optionArray, &compareFunctions](const std::vector<DataSetRow *> &a,
+                                                                 const std::vector<DataSetRow *> &b) {
+    for (gsl::index i = 0; i < optionArray.size(); ++i) {
+      auto[tableIndex, _] = BaseField::convertIndex(*optionArray[i].field);
+      int compareResult = compareFunctions[i](a[tableIndex], b[tableIndex]);
+      if (compareResult < 0) {
+        return optionArray[i].order == SortOrder::Ascending;
+      } else if (compareResult > 0) {
+        return optionArray[i].order == SortOrder::Descending;
+      }
+    }
+    return false;
+  };
 
-  std::sort(data.begin() + 1,
-            data.end() - 1,
-            compareFunction);
+  std::sort(data.begin() + 1, data.end() - 1, compareFunction);
 
   currentRecord = 0;
 }
 
 // TODO: implement more filter functions
-std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryViewDataSet::filter(
-    const DataSets::FilterOptions &options) {
+std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryViewDataSet::filter(const DataSets::FilterOptions &options) {
   auto fieldNames = getFieldNames();
   std::vector<ValueType> fieldTypes;
   std::vector<std::pair<int, int>> fieldIndices;
@@ -195,10 +181,8 @@ std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryViewDataSet::filter(
     fieldTypes.emplace_back(field->getFieldType());
     fieldIndices.emplace_back(BaseField::convertIndex(*field));
   }
-  auto resultView = std::make_shared<MemoryViewDataSet>(getName() + "_filtered",
-                                                        fieldNames,
-                                                        fieldTypes,
-                                                        fieldIndices);
+  auto resultView =
+      std::make_shared<MemoryViewDataSet>(getName() + "_filtered", fieldNames, fieldTypes, fieldIndices);
   resultView->data.emplace_back();
 
   for (const auto &iter : data) {
@@ -221,41 +205,31 @@ std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryViewDataSet::filter(
         std::string toCompare(cell._string);
         for (const auto &search : filter.searchData) {
           switch (filter.filterOption) {
-            case FilterOption::Equals:
-              valid = Utilities::compareString(toCompare,
-                                               search._string) == 0;
+            case FilterOption::Equals:valid = Utilities::compareString(toCompare, search._string) == 0;
               break;
             case FilterOption::StartsWith:
               valid = std::strncmp(toCompare.c_str(),
                                    search._string,
                                    strlen(search._string)) == 0;
               break;
-            case FilterOption::Contains:
-              valid = toCompare.find(search._string)
-                  != std::string::npos;
+            case FilterOption::Contains:valid = toCompare.find(search._string) != std::string::npos;
               break;
-            case FilterOption::EndsWith:
-              valid = Utilities::endsWith(toCompare,
-                                          search._string);
+            case FilterOption::EndsWith:valid = Utilities::endsWith(toCompare, search._string);
               break;
-            case FilterOption::NotContains:
-              valid = toCompare.find(search._string)
-                  == std::string::npos;
+            case FilterOption::NotContains:valid = toCompare.find(search._string) == std::string::npos;
               break;
             case FilterOption::NotStartsWith:
               valid = std::strncmp(toCompare.c_str(),
                                    search._string,
                                    strlen(search._string)) != 0;
               break;
-            case FilterOption::NotEndsWith:
-              valid = !Utilities::endsWith(toCompare,
-                                           search._string);
+            case FilterOption::NotEndsWith:valid = !Utilities::endsWith(toCompare, search._string);
               break;
-            case FilterOption::NotEquals:break;
-            case FilterOption::Greater:break;
-            case FilterOption::GreaterEqual:break;
-            case FilterOption::Less:break;
-            case FilterOption::LessEqual:break;
+            case FilterOption::NotEquals:break;  // TODO
+            case FilterOption::Greater:break;  // TODO
+            case FilterOption::GreaterEqual:break;  // TODO
+            case FilterOption::Less:break;  // TODO
+            case FilterOption::LessEqual:break;  // TODO
           }
           if (valid) {
             break;
@@ -281,8 +255,7 @@ std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryViewDataSet::filter(
       } else if (filter.field->getFieldType() == ValueType::Currency) {
         auto toCompare = cell._currency;
         for (const auto &search : filter.searchData) {
-          valid =
-              Utilities::compareCurrency(*toCompare, *search._currency) == 0;
+          valid = Utilities::compareCurrency(*toCompare, *search._currency) == 0;
           if (valid) {
             break;
           }
@@ -290,8 +263,7 @@ std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryViewDataSet::filter(
       } else if (filter.field->getFieldType() == ValueType::DateTime) {
         auto toCompare = cell._dateTime;
         for (const auto &search : filter.searchData) {
-          valid =
-              Utilities::compareDateTime(*toCompare, *search._dateTime) == 0;
+          valid = Utilities::compareDateTime(*toCompare, *search._dateTime) == 0;
           if (valid) {
             break;
           }
@@ -315,10 +287,8 @@ void DataSets::MemoryViewDataSet::resetEnd() {
   currentRecord = data.size() - 1;
 }
 
-void DataSets::MemoryViewDataSet::setData(void *data,
-                                          gsl::index index,
-                                          ValueType type) {
-  throw NotImplementedException();
+void DataSets::MemoryViewDataSet::setData(void *data, gsl::index index, ValueType type) {
+  throw UnsupportedOperationException("View is immutable.");
 }
 
 void DataSets::MemoryViewDataSet::setFieldValues(gsl::index index) {
@@ -327,25 +297,15 @@ void DataSets::MemoryViewDataSet::setFieldValues(gsl::index index) {
 
     auto cell = (*data[currentRecord][tableIndex])[columnIndex];
     switch (field->getFieldType()) {
-      case ValueType::Integer:
-        setFieldData(field.get(),
-                     &cell._integer);
+      case ValueType::Integer:setFieldData(field.get(), &cell._integer);
         break;
-      case ValueType::Double:
-        setFieldData(field.get(),
-                     &cell._double);
+      case ValueType::Double:setFieldData(field.get(), &cell._double);
         break;
-      case ValueType::String:
-        setFieldData(field.get(),
-                     cell._string);
+      case ValueType::String:setFieldData(field.get(), cell._string);
         break;
-      case ValueType::Currency:
-        setFieldData(field.get(),
-                     cell._currency);
+      case ValueType::Currency:setFieldData(field.get(), cell._currency);
         break;
-      case ValueType::DateTime:
-        setFieldData(field.get(),
-                     cell._dateTime);
+      case ValueType::DateTime:setFieldData(field.get(), cell._dateTime);
         break;
       default:throw IllegalStateException("Internal error.");
     }
@@ -363,8 +323,7 @@ DataSets::MemoryViewDataSet::iterator DataSets::MemoryViewDataSet::begin() {
 DataSets::MemoryViewDataSet::iterator DataSets::MemoryViewDataSet::end() {
   return iterator(this, data.size() - 1);
 }
-void DataSets::MemoryViewDataSet::createNullRows(const std::vector<std::pair<int,
-                                                                             int>> &fieldIndices,
+void DataSets::MemoryViewDataSet::createNullRows(const std::vector<std::pair<int, int>> &fieldIndices,
                                                  const std::vector<ValueType> &fieldTypes) {
   static gsl::zstring<> nullStr = "null";
   int last = fieldIndices[0].first;
@@ -378,8 +337,7 @@ void DataSets::MemoryViewDataSet::createNullRows(const std::vector<std::pair<int
           break;
         case ValueType::String:nullData.emplace_back(DataContainer{._string = nullStr});
           break;
-        case ValueType::Currency:
-          nullData.emplace_back(DataContainer{._currency = new Currency(0)});
+        case ValueType::Currency:nullData.emplace_back(DataContainer{._currency = new Currency(0)});
           break;
         case ValueType::DateTime:nullData.emplace_back(DataContainer{._dateTime = new DateTime()});
           break;
@@ -414,8 +372,7 @@ void DataSets::MemoryViewDataSet::setAllowedFields(const std::vector<std::string
 void DataSets::MemoryViewDataSet::addParent(std::shared_ptr<MemoryDataSet> &parent) {
   parents.emplace_back(parent);
 }
-void DataSets::MemoryViewDataSet::addParents(const std::vector<std::shared_ptr<
-    DataSets::MemoryDataSet>> &parents) {
+void DataSets::MemoryViewDataSet::addParents(const std::vector<std::shared_ptr<DataSets::MemoryDataSet>> &parents) {
   std::copy(parents.begin(), parents.end(), std::back_inserter(this->parents));
 }
 const std::vector<std::shared_ptr<DataSets::MemoryDataSet>> &DataSets::MemoryViewDataSet::getParents() const {
@@ -427,7 +384,9 @@ std::shared_ptr<DataSets::MemoryDataSet> DataSets::MemoryViewDataSet::toDataSet(
   std::vector<ValueType> fieldTypes;
 
   if (allowedFields.empty()) {
-    std::transform(fields.begin(), fields.end(), std::back_inserter(fieldTypes),
+    std::transform(fields.begin(),
+                   fields.end(),
+                   std::back_inserter(fieldTypes),
                    [](std::shared_ptr<BaseField> &field) {
                      return field->getFieldType();
                    });

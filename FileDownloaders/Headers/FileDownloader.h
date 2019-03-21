@@ -35,16 +35,11 @@ class FileDownloader {
 
   void notifyDownloadStarted(std::string_view fileName);
 
-  void notifyDownloadFailed(std::string_view fileName,
-                            std::string_view errorMessage);
+  void notifyDownloadFailed(std::string_view fileName, std::string_view errorMessage);
 
-  void notifyDownloadFinished(std::string_view fileName,
-                              std::string_view filePath);
+  void notifyDownloadFinished(std::string_view fileName, std::string_view filePath);
 
-  static size_t WriteCallback(void *ptr,
-                              size_t size,
-                              size_t nmemb,
-                              FILE *stream);
+  static size_t WriteCallback(void *ptr, size_t size, size_t nmemb, FILE *stream);
 
   void saveFile(std::string_view content, std::string_view location);
 };

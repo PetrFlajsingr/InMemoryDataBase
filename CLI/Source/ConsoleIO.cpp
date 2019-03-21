@@ -4,8 +4,7 @@
 
 #include <ConsoleIO.h>
 
-ConsoleIO::ConsoleIO(const std::shared_ptr<MessageManager> &commandManager)
-    : MessageSender(commandManager) {
+ConsoleIO::ConsoleIO(const std::shared_ptr<MessageManager> &commandManager) : MessageSender(commandManager) {
   commandManager->registerMsg<UIEnd>(this);
   commandManager->registerMsg<Print>(this);
 }

@@ -26,9 +26,7 @@ class ResourceManager {
    */
   template<typename T>
   T getResource(std::string_view resString) {
-    if (resString[0] == '['
-        && resString.back() == ']'
-        && resString[resString.size() - 2] == ']') {
+    if (resString[0] == '[' && resString.back() == ']' && resString[resString.size() - 2] == ']') {
       auto sub = resString.substr(1, resString.size() - 3);
       auto pos = sub.find('[');
       if (pos != std::string::npos) {

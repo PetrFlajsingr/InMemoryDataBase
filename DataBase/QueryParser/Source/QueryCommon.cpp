@@ -59,9 +59,7 @@ DataBase::CondOperator DataBase::tokenToCondOperator(DataBase::Token token) {
     case Token::lessEqual: return CondOperator::lessEqual;
     case Token::equal: return CondOperator::equal;
     case Token::notEqual: return CondOperator::notEqual;
-    default:
-      throw IllegalStateException(
-          "Internal error: DataBase::tokenToCondOperator");
+    default:throw IllegalStateException("Internal error: DataBase::tokenToCondOperator");
   }
 }
 
@@ -70,8 +68,7 @@ DataBase::ConstType DataBase::tokenToConstType(DataBase::Token token) {
     case Token::number: return ConstType::integer;
     case Token::numberFloat: return ConstType::floatingPoint;
     case Token::string: return ConstType::string;
-    default:
-      throw IllegalStateException("Internal error: DataBase::tokenToConstType");
+    default:throw IllegalStateException("Internal error: DataBase::tokenToConstType");
   }
 }
 
@@ -79,8 +76,7 @@ DataBase::LogicOperator DataBase::tokenToLogic(DataBase::Token token) {
   switch (token) {
     case Token::logicOr: return LogicOperator::logicOr;
     case Token::logicAnd: return LogicOperator::logicAnd;
-    default:
-      throw IllegalStateException("Internal error: DataBase::tokenToConstType");
+    default:throw IllegalStateException("Internal error: DataBase::tokenToConstType");
   }
 }
 
@@ -91,8 +87,7 @@ DataBase::AgrOperator DataBase::tokenToAgrOperation(DataBase::Token token) {
     case Token::min: return AgrOperator::min;
     case Token::max: return AgrOperator::max;
     case Token::count: return AgrOperator::count;
-    default:
-      throw IllegalStateException("Internal error: DataBase::tokenToConstType");
+    default:throw IllegalStateException("Internal error: DataBase::tokenToConstType");
   }
 }
 
@@ -100,8 +95,7 @@ DataBase::Order DataBase::tokenToOrder(DataBase::Token token) {
   switch (token) {
     case Token::asc: return Order::asc;
     case Token::desc: return Order::desc;
-    default:
-      throw IllegalStateException("Internal error: DataBase::tokenToConstType");
+    default:throw IllegalStateException("Internal error: DataBase::tokenToConstType");
   }
 }
 

@@ -4,20 +4,15 @@
 
 #include <RandomDataProvider.h>
 
-DataProviders::RandomDataProvider::RandomDataProvider(int columnCount,
-                                                      int minDataLength,
-                                                      int maxDataLength,
-                                                      int recordCount)
+DataProviders::RandomDataProvider::RandomDataProvider(int columnCount, int minDataLength,
+                                                      int maxDataLength, int recordCount)
     : columnCount(columnCount), recordCount(recordCount) {
-  Expects(columnCount > 0 && minDataLength >= 0 && maxDataLength >= 0
-              && recordCount >= 0);
+  Expects(columnCount > 0 && minDataLength >= 0 && maxDataLength >= 0 && recordCount >= 0);
   std::random_device randomDevice;
   randomEngine = std::default_random_engine(randomDevice());
-  uniformIntDistribution =
-      std::uniform_int_distribution(minDataLength, maxDataLength);
+  uniformIntDistribution = std::uniform_int_distribution(minDataLength, maxDataLength);
   for (auto i = 0; i < columnCount; ++i) {
-    header.emplace_back(Utilities::getRandomString(static_cast<size_t>(uniformIntDistribution(
-        randomEngine))));
+    header.emplace_back(Utilities::getRandomString(static_cast<size_t>(uniformIntDistribution(randomEngine))));
   }
 }
 

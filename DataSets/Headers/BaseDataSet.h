@@ -21,8 +21,7 @@ class ViewDataSet;
  */
 class BaseDataSet {
  public:
-  explicit BaseDataSet(std::string_view dataSetName)
-      : dataSetName(dataSetName) {};
+  explicit BaseDataSet(std::string_view dataSetName) : dataSetName(dataSetName) {};
   /**
    * Load data from data provider. Names of fields (columns) is loaded from provider header.
    * @param dataProvider source of data

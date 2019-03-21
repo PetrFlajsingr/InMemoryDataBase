@@ -6,9 +6,7 @@
 
 #include "MemoryDataSet.h"
 
-DataSets::CurrencyField::CurrencyField(std::string_view fieldName,
-                                       gsl::index index,
-                                       BaseDataSet *dataSet)
+DataSets::CurrencyField::CurrencyField(std::string_view fieldName, gsl::index index, BaseDataSet *dataSet)
     : BaseField(fieldName, index, dataSet) {}
 
 void DataSets::CurrencyField::setValue(void *data) {
@@ -30,8 +28,7 @@ std::string DataSets::CurrencyField::getAsString() const {
 
 std::function<int8_t(const DataSetRow *,
                      const DataSetRow *)> DataSets::CurrencyField::getCompareFunction() const {
-  return [this](const DataSetRow *a,
-                const DataSetRow *b) {
+  return [this](const DataSetRow *a, const DataSetRow *b) {
     return Utilities::compareCurrency(*(*a)[getIndex() & 0x00FFFF]._currency,
                                       *(*b)[getIndex() & 0x00FFFF]._currency);
   };

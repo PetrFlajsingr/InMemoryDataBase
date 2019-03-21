@@ -3,20 +3,12 @@
 //
 
 #include <CLIController.h>
-#include <CsvReader.h>
-#include <XlsxIOReader.h>
-#include <XlsxIOWriter.h>
 
-CLIController::CLIController()
-    : MessageSender(AppContext::GetInstance().messageManager) {}
+CLIController::CLIController() : MessageSender(AppContext::GetInstance().messageManager) {}
 
 void CLIController::runApp() {
-  auto tmp = ctx.messageManager.operator->();
-  ctx.messageManager->registerMsg<StdinMsg>(
-      this);
-  ctx.messageManager->registerMsg<
-      DownloadProgress>(
-      this);
+  ctx.messageManager->registerMsg<StdinMsg>(this);
+  ctx.messageManager->registerMsg<DownloadProgress>(this);
 
   ctx.mode = AppContext::Mode::normal;
 
@@ -32,8 +24,8 @@ void CLIController::handleQuery(std::string_view query) {
   } catch (const std::exception &e) {
     ctx.ui->writeLnErr(
         "Command could not be performed.\n"
-                              + std::string(typeid(e).name()) + "\n"
-                              + std::string(e.what()));
+            + std::string(typeid(e).name()) + "\n"
+            + std::string(e.what()));
   }
   ctx.ui->write("");
 }
@@ -90,9 +82,9 @@ CLIController::CmdType CLIController::handleCommand(std::string_view input) {
 
 void CLIController::printHelp() {
   ctx.ui->write("exit\t\texit/e/quit\n"
-                   "query mode\tquery start/qs\n"
-                   "query end\tquery end/qe\n"
-                   "clear\t\tclear/c\n");
+                "query mode\tquery start/qs\n"
+                "query end\tquery end/qe\n"
+                "clear\t\tclear/c\n");
 }
 
 void CLIController::RunScript(std::string_view scriptPath) {
@@ -101,26 +93,22 @@ void CLIController::RunScript(std::string_view scriptPath) {
   std::ifstream input(path);
   auto scriptRunner = ScriptParser::GetInstance();
   if (!input.is_open()) {
-    context.ui->writeLnErr(
-        "Can't open script file.");
+    context.ui->writeLnErr("Can't open script file.");
   }
   std::string line;
   try {
     while (std::getline(input, line)) {
       context.ui->writeLn("Running: " + line);
       if (!scriptRunner.runCommand(scriptRunner.parseInput(line))) {
-        context.ui->writeLnErr(
-            "Interrupting script execution");
+        context.ui->writeLnErr("Interrupting script execution");
         break;
       }
     }
-    context.ui->writeLn(
-        "Script finished successfully.");
+    context.ui->writeLn("Script finished successfully.");
   } catch (const std::exception &e) {
-    context.ui->writeLnErr(
-        "Messages could not be performed.\n"
-                              + std::string(typeid(e).name()) + "\n"
-                              + std::string(e.what()));
+    context.ui->writeLnErr("Messages could not be performed.\n"
+                               + std::string(typeid(e).name()) + "\n"
+                               + std::string(e.what()));
   }
   context.ui->write("");
 }
@@ -152,18 +140,13 @@ void CLIController::handleInput(std::string_view input) {
             dispatch(new UIEnd());
             return;
           }
-          case CmdType::waitDownload:
-            ctx.ui->writeLn(
-                "Waiting for downloads...");
+          case CmdType::waitDownload:ctx.ui->writeLn("Waiting for downloads...");
             ctx.threadPool->wait(0);
-            ctx.ui->writeLn(
-                "Downloads finished...");
+            ctx.ui->writeLn("Downloads finished...");
             break;
           case CmdType::download:dispatch(new Download(fileName, savePath));
             break;
-          case CmdType::downloadAsync:
-            dispatch(new DownloadNoBlock(fileName,
-                                         savePath));
+          case CmdType::downloadAsync:dispatch(new DownloadNoBlock(fileName, savePath));
             break;
           case CmdType::queryModeStart:ctx.mode = AppContext::Mode::query;
             ctx.ui->setMode(ConsoleIO::Mode::arrow);
@@ -173,8 +156,7 @@ void CLIController::handleInput(std::string_view input) {
           case CmdType::queryModeEnd:ctx.mode = AppContext::Mode::normal;
             ctx.ui->setMode(ConsoleIO::Mode::simple);
             ctx.ui->writeLn("Normal mode");
-            ctx.ui->writeLn(
-                "\"***********\"");
+            ctx.ui->writeLn("***********");
             break;
           case CmdType::clear:ctx.DBs.clear();
             break;
@@ -182,24 +164,17 @@ void CLIController::handleInput(std::string_view input) {
             break;
           case CmdType::runScript:RunScript(scriptPath);
             break;
-          case CmdType::listDBs:
-            ctx.ui->writeLn(
-                "List of DataBases:");
+          case CmdType::listDBs:ctx.ui->writeLn("List of DataBases:");
             for (const auto &db : ctx.DBs) {
               ctx.ui->writeLn(db.first);
             }
             break;
-          case CmdType::listTables:
-            ctx.ui->writeLn(
-                "List of tables in " + dbName + ": ");
-            if (ctx.DBs.find(dbName)
-                == ctx.DBs.end()) {
-              ctx.ui->writeLnErr(
-                  "DataBase not found.");
+          case CmdType::listTables:ctx.ui->writeLn("List of tables in " + dbName + ": ");
+            if (ctx.DBs.find(dbName) == ctx.DBs.end()) {
+              ctx.ui->writeLnErr("DataBase not found.");
               break;
             }
-            for (const auto
-                  &val : ctx.DBs[dbName]->getTables()) {
+            for (const auto &val : ctx.DBs[dbName]->getTables()) {
               ctx.ui->writeLn(val->getName());
             }
             break;

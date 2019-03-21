@@ -36,8 +36,7 @@ class MemoryViewDataSet : public ViewDataSet {
                     const std::vector<ValueType> &fieldTypes,
                     const std::vector<std::pair<int, int>> &fieldIndices);
   // BaseDataSet
-  void open(DataProviders::BaseDataProvider &dataProvider,
-            const std::vector<ValueType> &fieldTypes) override;
+  void open(DataProviders::BaseDataProvider &dataProvider, const std::vector<ValueType> &fieldTypes) override;
   void openEmpty(const std::vector<std::string> &fieldNames,
                  const std::vector<ValueType> &fieldTypes) override;
   void close() override;
@@ -99,8 +98,7 @@ class MemoryViewDataSet : public ViewDataSet {
     iterator(gsl::not_null<MemoryViewDataSet *> dataSet, gsl::index row)
         : dataSet(dataSet), currentRecord(row) {}
 
-    iterator(const iterator &other) : dataSet(other.dataSet),
-                                      currentRecord(other.currentRecord) {}
+    iterator(const iterator &other) : dataSet(other.dataSet), currentRecord(other.currentRecord) {}
 
     iterator &operator=(const iterator &other) {
       if (this != &other) {

@@ -61,8 +61,7 @@ class ExecAsync : public FncMessage<std::function<void()>> {
  */
 class TaggedExecAsync : public FncMessage<std::function<void()>> {
  public:
-  TaggedExecAsync(const std::function<void()> &fnc, int tag)
-      : FncMessage(fnc), tag(tag) {}
+  TaggedExecAsync(const std::function<void()> &fnc, int tag) : FncMessage(fnc), tag(tag) {}
 
   int getTag() {
     return tag;
@@ -75,9 +74,7 @@ class TaggedExecAsync : public FncMessage<std::function<void()>> {
  */
 class ExecAsyncNotify : public FncMessage<std::function<void()>> {
  public:
-  ExecAsyncNotify(std::function<void()> fnc,
-                  std::function<void()> onDoneFnc)
-      : FncMessage(std::move(fnc)) {
+  ExecAsyncNotify(std::function<void()> fnc, std::function<void()> onDoneFnc) : FncMessage(std::move(fnc)) {
     onDone = std::move(onDoneFnc);
   }
 
@@ -92,9 +89,8 @@ class ExecAsyncNotify : public FncMessage<std::function<void()>> {
  */
 class TaggedExecAsyncNotify : public ExecAsyncNotify {
  public:
-  TaggedExecAsyncNotify(const std::function<void()> &fnc,
-                        const std::function<void()> &onDoneFnc,
-                        int tag) : ExecAsyncNotify(fnc, onDoneFnc), tag(tag) {}
+  TaggedExecAsyncNotify(const std::function<void()> &fnc, const std::function<void()> &onDoneFnc, int tag)
+      : ExecAsyncNotify(fnc, onDoneFnc), tag(tag) {}
 
   int getTag() {
     return tag;
@@ -141,11 +137,8 @@ class Print : public DataMessage<std::string> {
  */
 class DownloadNoBlock : public Download {
  public:
-  explicit DownloadNoBlock(const std::pair<std::string, std::string> &data)
-      : Download(data) {}
-  DownloadNoBlock(const std::string &url, const std::string &dest) : Download(
-      url,
-      dest) {}
+  explicit DownloadNoBlock(const std::pair<std::string, std::string> &data) : Download(data) {}
+  DownloadNoBlock(const std::string &url, const std::string &dest) : Download(url, dest) {}
 };
 enum class DownloadState {
   started, finished, failed
@@ -153,11 +146,9 @@ enum class DownloadState {
 /**
  * Provide download progress information.
  */
-class DownloadProgress : public DataMessage<std::pair<DownloadState,
-                                                      std::string>> {
+class DownloadProgress : public DataMessage<std::pair<DownloadState, std::string>> {
  public:
-  explicit DownloadProgress(const std::pair<DownloadState,
-                                            std::string> &data) {
+  explicit DownloadProgress(const std::pair<DownloadState, std::string> &data) {
     DataMessage::data = data;
   }
   DownloadProgress(DownloadState state, const std::string &file) {

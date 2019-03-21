@@ -27,12 +27,8 @@ class BaseField {
    * @param dataset dataset this field provides data from
    * @param index column index in dataset
    */
-  explicit BaseField(std::string_view fieldName,
-                     gsl::index index,
-                     BaseDataSet *dataSet)
-      : dataSet(dataSet),
-        fieldName(fieldName),
-        index(index) {}
+  explicit BaseField(std::string_view fieldName, gsl::index index, BaseDataSet *dataSet)
+      : dataSet(dataSet), fieldName(fieldName), index(index) {}
   virtual ~BaseField() = default;
   /**
    *

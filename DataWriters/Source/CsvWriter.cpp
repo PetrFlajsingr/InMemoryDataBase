@@ -5,19 +5,14 @@
 #include <Exceptions.h>
 #include <vector>
 #include "CsvWriter.h"
-#include <Logger.h>
 
-DataWriters::CsvWriter::CsvWriter(std::string_view filePath,
-                                  std::string_view delimiter)
-    : BaseDataWriter() {
+DataWriters::CsvWriter::CsvWriter(std::string_view filePath, std::string_view delimiter) : BaseDataWriter() {
   this->delimiter = delimiter;
   outputStream = new std::ofstream();
   outputStream->open(std::string(filePath), std::ofstream::out);
 }
 
-DataWriters::CsvWriter::CsvWriter(std::string_view filePath,
-                                  CharSet charSet,
-                                  std::string_view delimiter)
+DataWriters::CsvWriter::CsvWriter(std::string_view filePath, CharSet charSet, std::string_view delimiter)
     : BaseDataWriter(charSet) {
   this->delimiter = delimiter;
   outputStream = new std::ofstream();

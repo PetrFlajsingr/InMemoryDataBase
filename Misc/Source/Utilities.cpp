@@ -6,8 +6,7 @@
 #include <Types.h>
 #include <thread>
 
-std::vector<std::string> Utilities::splitStringByDelimiter(std::string_view str,
-                                                           std::string_view delimiter) {
+std::vector<std::string> Utilities::splitStringByDelimiter(std::string_view str, std::string_view delimiter) {
   std::vector<std::string> result;
   size_t first = 0;
 
@@ -81,8 +80,9 @@ bool Utilities::isDouble(std::string_view value) {
 }
 
 bool Utilities::endsWith(std::string_view value, std::string_view ending) {
-  if (ending.size() > value.size())
+  if (ending.size() > value.size()) {
     return false;
+  }
   return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
 }
 

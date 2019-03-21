@@ -159,6 +159,6 @@ LogicOperator tokenToLogic(Token token);
 AgrOperator tokenToAgrOperation(Token token);
 
 Order tokenToOrder(Token token);
-}
+}  // namespace DataBase
 
 #endif //PROJECT_QUERYCOMMON_H

@@ -22,7 +22,7 @@ DataSets::FilterItem::FilterItem(const DataSets::BaseField *field,
 
 void DataSets::FilterOptions::addOption(const DataSets::BaseField *field,
                                         const std::vector<DataContainer> &values,
-                                        const DataSets::FilterOption filterOption) {
+                                        const FilterOption &filterOption) {
   options.emplace_back(FilterItem{field,
                                   values,
                                   filterOption});
@@ -30,7 +30,7 @@ void DataSets::FilterOptions::addOption(const DataSets::BaseField *field,
 
 void DataSets::FilterOptions::addOption(const DataSets::BaseField *field,
                                         const std::vector<std::string> &values,
-                                        const DataSets::FilterOption filterOption) {
+                                        const FilterOption &filterOption) {
   std::vector<DataContainer> searchVals;
 
   std::transform(values.begin(),

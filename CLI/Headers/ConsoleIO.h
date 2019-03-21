@@ -8,7 +8,7 @@
 #include <iostream>
 #include <string>
 #include <MessageSender.h>
-#include "../../Templates/Headers/Property.h"
+#include <Property.h>
 #include <memory>
 
 class ConsoleIO : public MessageSender, public MessageReceiver {
@@ -34,7 +34,7 @@ class ConsoleIO : public MessageSender, public MessageReceiver {
         mode.value = val;
         setMode(val);
         return mode.value;
-    }
+      }
   };
 
   void setMode(Mode mode);
