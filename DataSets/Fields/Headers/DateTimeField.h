@@ -11,30 +11,30 @@
 namespace DataSets {
 
 /**
- * Trida zpristupnujici hodnoty typu DateTime v data setu.
+ * Field for date time values.
  */
 class DateTimeField : public BaseField {
  public:
+  /**
+   *
+   * @param fieldName name of the field (column)
+   * @param index index in data set
+   * @param dataSet owner data set
+   */
   DateTimeField(std::string_view fieldName,
                 gsl::index index,
                 BaseDataSet *dataSet);
-
   ValueType getFieldType() const override;
-
   void setAsString(std::string_view value) override;
-
   std::string getAsString() const override;
 
   void setAsDateTime(const DateTime &dateTime);
-
   DateTime getAsDateTime() const;
 
-  std::function<int8_t(const DataSetRow *,
-                       const DataSetRow *)> getCompareFunction() const override;
+  std::function<int8_t(const DataSetRow *, const DataSetRow *)> getCompareFunction() const override;
 
  protected:
   void setValue(void *data) override;
-
   DateTime data;
 };
 

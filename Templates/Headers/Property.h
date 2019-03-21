@@ -138,7 +138,7 @@ class Property final {
     static_assert(std::is_constructible<T, Args...>::value,
                   "Can't construct in make_property");
     static_assert(SetGet != RW, "Property is not read write");
-    return Property<T, Owner, SetGet>(getter, T(std::forward<Args>(args)...));
+    return Property<T, Owner, SetGet>(getter, setter, T(std::forward<Args>(args)...));
   }
 
   template<typename ...Args>

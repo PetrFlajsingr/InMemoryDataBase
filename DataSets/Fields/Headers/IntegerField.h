@@ -12,30 +12,30 @@
 namespace DataSets {
 
 /**
- * Field zpristupnujici hodnoty typu int v data setu.
+ * Field for integer values.
  */
 class IntegerField : public BaseField {
  public:
+  /**
+   *
+   * @param fieldName name of the field (column)
+   * @param index index in data set
+   * @param dataSet owner data set
+   */
   IntegerField(std::string_view fieldName,
                gsl::index index,
                BaseDataSet *dataSet);
-
   ValueType getFieldType() const override;
-
   void setAsString(std::string_view value) override;
-
   std::string getAsString() const override;
 
   void setAsInteger(int value);
-
   int getAsInteger() const;
 
-  std::function<int8_t(const DataSetRow *,
-                       const DataSetRow *)> getCompareFunction() const override;
+  std::function<int8_t(const DataSetRow *, const DataSetRow *)> getCompareFunction() const override;
 
  protected:
   void setValue(void *data) override;
-
   int data;
 };
 }

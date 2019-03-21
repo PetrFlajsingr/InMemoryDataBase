@@ -46,7 +46,7 @@ void DataSets::MemoryDataSet::createFields(std::vector<std::string> columns,
         "Column size doesn't match type size in table " + getName()).c_str());
   }
   for (gsl::index i = 0; i < columns.size(); ++i) {
-    fields.emplace_back(FieldFactory::Get().CreateField(
+    fields.emplace_back(FieldFactory::GetInstance().CreateField(
         columns[i],
         i,
         types[i],

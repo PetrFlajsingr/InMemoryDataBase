@@ -20,7 +20,7 @@ class XlntWriter : public BaseDataWriter {
    * @param fileName destination
    */
   explicit XlntWriter(std::string_view fileName);
-  XlntWriter(std::string_view fileName, CharSet outCharSet) = delete;
+  XlntWriter(std::string_view fileName, CharSet outCharSet);
   void writeHeader(const std::vector<std::string> &header) override;
   void writeRecord(const std::vector<std::string> &record) override;
   /**

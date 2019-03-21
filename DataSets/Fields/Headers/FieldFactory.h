@@ -14,13 +14,24 @@
 
 namespace DataSets {
 
+/**
+ * Create specific fields and return them as shared_ptr.
+ * Singleton.
+ */
 class FieldFactory {
  public:
-  static FieldFactory &Get() {
+  static FieldFactory &GetInstance() {
     static FieldFactory instance;
     return instance;
   }
-
+  /**
+   * Create field based on provided parameters.
+   * @param name name of the field (column)
+   * @param index index in data set
+   * @param type type of store data
+   * @param dataSet owner data set
+   * @return field created based on provided parameters
+   */
   std::shared_ptr<DataSets::BaseField> CreateField(std::string_view name,
                                                    gsl::index index,
                                                    ValueType type,
@@ -28,10 +39,8 @@ class FieldFactory {
 
  private:
   FieldFactory() = default;
-
-  FieldFactory(const FieldFactory &) = default;
-
-  FieldFactory &operator=(const FieldFactory &) = default;
+  FieldFactory(const FieldFactory &) = delete;
+  FieldFactory &operator=(const FieldFactory &) = delete;
 };
 
 }  // namespace DataSets

@@ -22,7 +22,7 @@ void DataSets::MemoryViewDataSet::createFields(const std::vector<std::string> &c
     auto index =
         (fieldIndices[i].first << BaseField::maskTableShift)
             + fieldIndices[i].second;
-    fields.emplace_back(FieldFactory::Get().CreateField(
+    fields.emplace_back(FieldFactory::GetInstance().CreateField(
         columns[i],
         index,
         types[i],

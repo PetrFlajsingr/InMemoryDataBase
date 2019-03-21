@@ -12,26 +12,27 @@
 namespace DataSets {
 
 /**
- * Field zpristupnujici hodnoty typu std::string ulozene v data setu
+ * Field for std::string values.
  */
 class StringField : public BaseField {
  public:
+  /**
+   *
+   * @param fieldName name of the field (column)
+   * @param index index in data set
+   * @param dataSet owner data set
+   */
   StringField(std::string_view fieldName,
               gsl::index index,
               BaseDataSet *dataSet);
-
   ValueType getFieldType() const override;
-
   void setAsString(std::string_view value) override;
-
   std::string getAsString() const override;
 
-  std::function<int8_t(const DataSetRow *,
-                       const DataSetRow *)> getCompareFunction() const override;
+  std::function<int8_t(const DataSetRow *, const DataSetRow *)> getCompareFunction() const override;
 
  protected:
   std::string data;
-
   void setValue(void *data) override;
 };
 }

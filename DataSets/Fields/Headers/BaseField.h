@@ -15,104 +15,99 @@ namespace DataSets {
 class BaseDataSet;
 
 /**
- * Interface pro fields datasetu.
+ * Base class for fields.
+ * Field is an interface to provide data from dataset while not providing the same
+ * memory location.
  */
 class BaseField {
  public:
   /**
-   * Nastaveni datasetu, nazvu a indexu field
-   * @param fieldName Nazev field
-   * @param dataset Rodicovsky dataset
-   * @param index Index pole v zaznamu
+   *
+   * @param fieldName name of the field (column)
+   * @param dataset dataset this field provides data from
+   * @param index column index in dataset
    */
   explicit BaseField(std::string_view fieldName,
                      gsl::index index,
                      BaseDataSet *dataSet)
-      : fieldName(fieldName),
-        index(index),
-        dataSet(dataSet) {}
-
+      : dataSet(dataSet),
+        fieldName(fieldName),
+        index(index) {}
   virtual ~BaseField() = default;
-
-  /**
-   * Typ dat ulozenych ve Field
-   * @return
-   */
-  virtual ValueType getFieldType() const = 0;
-
-  /**
-   * Nastaveni hodnoty pole pomoci string
-   * @param value
-   */
-  virtual void setAsString(std::string_view value) = 0;
-
-  /**
-   * Navrat hodnoty v poli jako string
-   * @return
-   */
-  virtual std::string getAsString() const = 0;
-
   /**
    *
-   * @return Index Field v DataSet
+   * @return type of data provided by this
+   */
+  virtual ValueType getFieldType() const = 0;
+  /**
+   * Set value as string - convert to inner value and set it in data set
+   * @param value value to set
+   */
+  virtual void setAsString(std::string_view value) = 0;
+  /**
+   * Convert inner value to string
+   * @return value as string
+   */
+  virtual std::string getAsString() const = 0;
+  /**
+   *
+   * @return index of a field in data set
    */
   gsl::index getIndex() const {
     return index;
   }
-
   /**
    *
-   * @return Nazev pole
+   * @return Name of field/column
    */
   std::string_view getName() const {
     return fieldName;
   }
-
+  /**
+   * Change field name
+   * @param name new name
+   */
   void setName(std::string_view name) {
     fieldName = name;
   }
-
   /**
-   * Funkce pro razeni polozek datasetu podle jejich datoveho typu
-   * @param order poradi (ascending nebo descending)
-   * @return porovnavaci funkce, ktera vraci:
-   *    0 pokud se prvky rovnaji
-   *    1 pokud je prvni vetsi
-   *    -1 pokud je prvni mensi
+   * Compare function for MemoryDataSet. Used for MemoryDataSet::Sort
+   * @return compare function returning
+   *    0   -   equal
+   *    1   -   first is greater
+   *    -1  -   second is greater
    */
-  virtual std::function<int8_t(const DataSetRow *,
-                               const DataSetRow *)> getCompareFunction() const = 0;
-
-  static std::pair<gsl::index,
-                   gsl::index> convertIndex(const BaseField &field);
+  virtual std::function<int8_t(const DataSetRow *, const DataSetRow *)> getCompareFunction() const = 0;
+  /**
+   * Index conversion for MemoryViewDataSet.
+   * @param field field whose index we need to convert
+   * @return [a, b] where a is an index of table and b is an index of a column
+   */
+  static std::pair<gsl::index, gsl::index> convertIndex(const BaseField &field);
   static const gsl::index maskTableShift = 16;
   static const gsl::index maskTableIndex = 0xFF0000;
   static const gsl::index maskColumnIndex = 0x00FFFF;
 
  protected:
-  friend class BaseDataSet;  //< Pro pristup k primemu nastaveni dat
-
+  friend class BaseDataSet; //< to allow for direct memory access
   BaseDataSet *dataSet;
-
+  // TODO: predavat pointer na DataContainer
   /**
-   * Nastaveni hodnoty field.
-   * @param data pointer na data
+   * Set inner field value.
+   * @param data pointer to data
    */
   virtual void setValue(void *data) = 0;
-
+  // TODO: predavat pointer na DataContainer
   /**
-   * Nastaveni dat v datasetu.
-   *
-   * Tato funkce zpristupnuje setValue potomkum.
-   * @param data data pro ulozeni
-   * @param type typ dat
+   * Set data in data set.
+   * @param data data to set
+   * @param type type of data to set
    */
   void setData(void *data, ValueType type);
 
  private:
-  std::string fieldName;  //< Nazev reprezentovaneho sloupce
-
-  gsl::index index;  //< Index sloupce
+  std::string fieldName;
+  gsl::index index;
 };
 
 }  // namespace DataSets

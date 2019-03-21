@@ -92,13 +92,6 @@ set(TEST_SOURCE_FILES
         ${MiscTests}
         ${RelationLayerTests})
 
-set(GTEST_SOURCE_FILES
-        ${SOURCE_FILES}
-        ${DataProviderTestsG}
-        ${DataSetTestsG}
-        ${DataWriterTestsG}
-        ${MiscTestsG})
-
 
 FIND_PACKAGE(CURL REQUIRED)
 include_directories(${CURL_INCLUDE_DIR})

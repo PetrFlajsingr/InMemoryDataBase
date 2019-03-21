@@ -4,7 +4,7 @@
 
 #include <catch2/catch.hpp>
 #include <Utilities.h>
-#include <DateTimeUtils.h>
+#include <Types.h>
 #include <map>
 
 TEST_CASE("Compare integers", "[compareInt]") {
@@ -96,13 +96,13 @@ TEST_CASE("Compare strings", "[compareString]") {
 
 TEST_CASE("Compare DateTime", "[compareDateTime]") {
   DateTime dateTime1;
-  dateTime1.fromString("2020-10-09 00-00-00-0");
+  dateTime1.fromString("2020/10/09 00:00:00");
   DateTime dateTime2;
-  dateTime2.fromString("10-01-06 00-00-00-0");
+  dateTime2.fromString("10/01/06 00:00:00");
   DateTime dateTime3;
-  dateTime3.fromString("2020-08-09 00-00-00-0");
+  dateTime3.fromString("2020/08/09 00:00:00");
   DateTime dateTime4;
-  dateTime4.fromString("2020-10-12 00-00-00-0");
+  dateTime4.fromString("2020/10/12 00:00:00");
 
   DateTime testVal = dateTime1;
   CHECK(Utilities::compareDateTime(dateTime1, testVal) == 0);
