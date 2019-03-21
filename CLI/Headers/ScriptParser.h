@@ -10,7 +10,6 @@
 #include <string>
 #include <Types.h>
 
-// TODO: resource string
 class ScriptParser {
  public:
   enum class SaveMode {
@@ -47,6 +46,7 @@ class ScriptParser {
   std::string delimiter;
 
   static std::string ReplaceResources(std::string input);
+
  private:
   std::vector<std::string> tokenize(std::string_view input);
 };

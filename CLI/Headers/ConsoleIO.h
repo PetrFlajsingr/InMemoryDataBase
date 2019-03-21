@@ -9,6 +9,7 @@
 #include <string>
 #include <MessageSender.h>
 #include "../../Templates/Headers/Property.h"
+#include <memory>
 
 class ConsoleIO : public MessageSender, public MessageReceiver {
  public:
@@ -37,6 +38,7 @@ class ConsoleIO : public MessageSender, public MessageReceiver {
   };
 
   void setMode(Mode mode);
+
  private:
   std::mutex mutex;
   void receive(std::shared_ptr<Message> message) override;

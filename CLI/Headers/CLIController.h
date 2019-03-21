@@ -8,12 +8,18 @@
 #include "ScriptParser.h"
 #include "AppContext.h"
 #include <MessageReceiver.h>
+#include <memory>
+#include <string>
 
 // TODO: unarchive, async query, async unarchive, wait async query/unarchive
 class CLIController : public MessageReceiver, public MessageSender {
  public:
   CLIController();
   void runApp();
+  /**
+   * Run a query script from file
+   * @param scriptPath path to query script file
+   */
   static void RunScript(std::string_view scriptPath);
 
  private:

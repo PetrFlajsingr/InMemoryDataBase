@@ -14,25 +14,27 @@
 #include <FileDownloadManager.h>
 #include <ResourceManager.h>
 #include "../../Templates/Headers/Property.h"
+#include <string>
+#include <memory>
 
+/**
+ * Global data and managers.
+ */
 class AppContext {
  public:
-
-  std::unordered_map<std::string, std::shared_ptr<DataBase::MemoryDataBase>>
-      DBs;
+  std::unordered_map<std::string, std::shared_ptr<DataBase::MemoryDataBase>> DBs;
+  /**
+   * CLI input mode.
+   */
   enum class Mode {
     query, normal
   };
   Mode mode = Mode::normal;
 
-  Property<std::shared_ptr<MessageManager>, AppContext, PropType::R>
-      messageManager;
+  Property<std::shared_ptr<MessageManager>, AppContext, PropType::R> messageManager;
   Property<std::shared_ptr<ConsoleIO>, AppContext, PropType::R> ui;
-  Property<std::shared_ptr<ResourceManager>,
-           AppContext, PropType::R> resourceManager;
-  Property<std::shared_ptr<FileDownloadManager>,
-           AppContext,
-           PropType::R> downloadManager;
+  Property<std::shared_ptr<ResourceManager>, AppContext, PropType::R> resourceManager;
+  Property<std::shared_ptr<FileDownloadManager>, AppContext, PropType::R> downloadManager;
   Property<std::shared_ptr<ThreadPool>, AppContext, PropType::R> threadPool;
 
   static AppContext &GetInstance();
