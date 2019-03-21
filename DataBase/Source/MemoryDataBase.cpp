@@ -14,6 +14,9 @@ std::string_view DataBase::Table::getName() {
 }
 DataBase::View::View(const std::shared_ptr<DataSets::MemoryViewDataSet> &dataSet)
     : dataSet(dataSet) {}
+std::string_view DataBase::View::getName() {
+  return dataSet->getName();
+}
 
 DataBase::MemoryDataBase::MemoryDataBase(const std::string &name)
     : name(name) {}

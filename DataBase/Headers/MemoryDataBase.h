@@ -21,39 +21,45 @@ namespace DataBase {
 
 struct Table {
   std::shared_ptr<DataSets::MemoryDataSet> dataSet;
-
   std::string_view getName();
-
   std::mutex mutex;
-
   explicit Table(const std::shared_ptr<DataSets::MemoryDataSet> &dataSet);
 };
 
 struct View {
   std::shared_ptr<DataSets::MemoryViewDataSet> dataSet;
-
+  std::string_view getName();
   std::mutex mutex;
-
   explicit View(const std::shared_ptr<DataSets::MemoryViewDataSet> &dataSet);
 };
-
+/**
+ * Data base whose data are saved in memory.
+ */
 class MemoryDataBase {
  public:
   explicit MemoryDataBase(const std::string &name);
-
   void addTable(std::shared_ptr<DataSets::MemoryDataSet> dataSet);
-
   void removeTable(std::string_view tableName);
-
   void removeView(std::string_view viewName);
 
   std::shared_ptr<Table> tableByName(std::string_view tableName) const;
-
+  /**
+   * Execute a query not containing aggregation.
+   * @param query query to execute
+   * @param keepView save result in database
+   * @param viewName name of the result
+   * @return View to the queried data
+   */
   std::shared_ptr<View> execSimpleQuery(
       std::string_view query,
       bool keepView,
       std::string_view viewName);
-
+  /**
+   * Execute a query containing aggregation.
+   * @param query query to execute
+   * @param viewName name of the result
+   * @return View to the queried data
+   */
   std::shared_ptr<View> execAggregateQuery(
       std::string_view query,
       std::string_view viewName);

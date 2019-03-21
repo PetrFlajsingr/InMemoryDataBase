@@ -10,6 +10,11 @@
 #include <QueryCommon.h>
 
 namespace DataBase {
+/**
+ * Handles joins on two tables/views
+ * @tparam T1 Table or View
+ * @tparam T2 Table or View
+ */
 template<typename T1, typename T2>
 class JoinMaker {
   using IteratorType1 = typename std::remove_reference<decltype(*T1::dataSet)>::type::iterator;
@@ -18,10 +23,15 @@ class JoinMaker {
   using DataSetType2 = decltype(T2::dataSet);
 
  public:
-  JoinMaker(const std::shared_ptr<T1> &t1,
-            const std::string &field1,
-            const std::shared_ptr<T2> &t2,
-            const std::string &field2)
+  /**
+   *
+   * @param t1 first table/view
+   * @param field1 field from first table/view to join on
+   * @param t2 second table/view
+   * @param field2 field from second table/view to join on
+   */
+  JoinMaker(const std::shared_ptr<T1> &t1, const std::string &field1,
+            const std::shared_ptr<T2> &t2, const std::string &field2)
       : t1(t1), t2(t2), col1(field1), col2(field2) {
     static_assert(std::is_same<T1, Table>{} || std::is_same<T1, View>{});
     static_assert(std::is_same<T2, Table>{} || std::is_same<T2, View>{});
@@ -142,8 +152,7 @@ class JoinMaker {
     std::vector<std::pair<int, int>> fieldIndices;
     auto fields1 = dataSet1->getFields();
     gsl::index offset = 1;
-    if (auto view = dynamic_cast<DataSets::MemoryViewDataSet *>(dataSet1); view
-        != nullptr) {
+    if (auto view = dynamic_cast<DataSets::MemoryViewDataSet *>(dataSet1); view != nullptr) {
       offset = (*view->rawData())[1].size();
     }
     std::for_each(fields1.begin(),

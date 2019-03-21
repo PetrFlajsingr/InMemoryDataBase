@@ -124,39 +124,30 @@ void DataBase::AggregationMaker::aggregateDataSet(
         switch (info.first) {
           case AgrOperator::sum:
             switch (sumFields[info.second].field->getFieldType()) {
-              case ValueType::Integer:
-                (*(*resultIter))[cnt].copyFrom<int>(sumFields[info.second].sum);
+              case ValueType::Integer:(*(*resultIter))[cnt].copyFrom<int>(sumFields[info.second].sum);
                 break;
-              case ValueType::Double:
-                (*(*resultIter))[cnt].copyFrom<double>(sumFields[info.second].sum);
+              case ValueType::Double:(*(*resultIter))[cnt].copyFrom<double>(sumFields[info.second].sum);
                 break;
-              case ValueType::Currency:
-                (*(*resultIter))[cnt].copyFrom<Currency>(sumFields[info.second].sum);
+              case ValueType::Currency:(*(*resultIter))[cnt].copyFrom<Currency>(sumFields[info.second].sum);
                 break;
             }
             break;
           case AgrOperator::avg:break;
-          case AgrOperator::count:
-            (*(*resultIter))[cnt]._integer = countFields[info.second].count;
+          case AgrOperator::count:(*(*resultIter))[cnt]._integer = countFields[info.second].count;
             break;
           case AgrOperator::min:break;
           case AgrOperator::max:break;
           case AgrOperator::group:
             switch (groupByFields[info.second].field->getFieldType()) {
-              case ValueType::Integer:
-                (*(*resultIter))[cnt].copyFrom<int>(groupByFields[info.second].lastVal);
+              case ValueType::Integer:(*(*resultIter))[cnt].copyFrom<int>(groupByFields[info.second].lastVal);
                 break;
-              case ValueType::Double:
-                (*(*resultIter))[cnt].copyFrom<double>(groupByFields[info.second].lastVal);
+              case ValueType::Double:(*(*resultIter))[cnt].copyFrom<double>(groupByFields[info.second].lastVal);
                 break;
-              case ValueType::String:
-                (*(*resultIter))[cnt].copyFrom<gsl::zstring<>>(groupByFields[info.second].lastVal);
+              case ValueType::String:(*(*resultIter))[cnt].copyFrom<gsl::zstring<>>(groupByFields[info.second].lastVal);
                 break;
-              case ValueType::Currency:
-                (*(*resultIter))[cnt].copyFrom<Currency>(groupByFields[info.second].lastVal);
+              case ValueType::Currency:(*(*resultIter))[cnt].copyFrom<Currency>(groupByFields[info.second].lastVal);
                 break;
-              case ValueType::DateTime:
-                (*(*resultIter))[cnt].copyFrom<DateTime>(groupByFields[info.second].lastVal);
+              case ValueType::DateTime:(*(*resultIter))[cnt].copyFrom<DateTime>(groupByFields[info.second].lastVal);
                 break;
             }
             break;
@@ -200,39 +191,30 @@ void DataBase::AggregationMaker::aggregateDataSet(
       switch (info.first) {
         case AgrOperator::sum:
           switch (sumFields[info.second].field->getFieldType()) {
-            case ValueType::Integer:
-              (*(*resultIter))[cnt].copyFrom<int>(sumFields[info.second].sum);
+            case ValueType::Integer:(*(*resultIter))[cnt].copyFrom<int>(sumFields[info.second].sum);
               break;
-            case ValueType::Double:
-              (*(*resultIter))[cnt].copyFrom<double>(sumFields[info.second].sum);
+            case ValueType::Double:(*(*resultIter))[cnt].copyFrom<double>(sumFields[info.second].sum);
               break;
-            case ValueType::Currency:
-              (*(*resultIter))[cnt].copyFrom<Currency>(sumFields[info.second].sum);
+            case ValueType::Currency:(*(*resultIter))[cnt].copyFrom<Currency>(sumFields[info.second].sum);
               break;
           }
           break;
         case AgrOperator::avg:break;
-        case AgrOperator::count:
-          (*(*resultIter))[cnt]._integer = countFields[info.second].count;
+        case AgrOperator::count:(*(*resultIter))[cnt]._integer = countFields[info.second].count;
           break;
         case AgrOperator::min:break;
         case AgrOperator::max:break;
         case AgrOperator::group:
           switch (groupByFields[info.second].field->getFieldType()) {
-            case ValueType::Integer:
-              (*(*resultIter))[cnt].copyFrom<int>(groupByFields[info.second].lastVal);
+            case ValueType::Integer:(*(*resultIter))[cnt].copyFrom<int>(groupByFields[info.second].lastVal);
               break;
-            case ValueType::Double:
-              (*(*resultIter))[cnt].copyFrom<double>(groupByFields[info.second].lastVal);
+            case ValueType::Double:(*(*resultIter))[cnt].copyFrom<double>(groupByFields[info.second].lastVal);
               break;
-            case ValueType::String:
-              (*(*resultIter))[cnt].copyFrom<gsl::zstring<>>(groupByFields[info.second].lastVal);
+            case ValueType::String:(*(*resultIter))[cnt].copyFrom<gsl::zstring<>>(groupByFields[info.second].lastVal);
               break;
-            case ValueType::Currency:
-              (*(*resultIter))[cnt].copyFrom<Currency>(groupByFields[info.second].lastVal);
+            case ValueType::Currency:(*(*resultIter))[cnt].copyFrom<Currency>(groupByFields[info.second].lastVal);
               break;
-            case ValueType::DateTime:
-              (*(*resultIter))[cnt].copyFrom<DateTime>(groupByFields[info.second].lastVal);
+            case ValueType::DateTime:(*(*resultIter))[cnt].copyFrom<DateTime>(groupByFields[info.second].lastVal);
               break;
           }
           break;
@@ -279,39 +261,30 @@ void DataBase::AggregationMaker::aggregateView(
         switch (info.first) {
           case AgrOperator::sum:
             switch (sumFields[info.second].field->getFieldType()) {
-              case ValueType::Integer:
-                (*(*resultIter))[cnt].copyFrom<int>(sumFields[info.second].sum);
+              case ValueType::Integer:(*(*resultIter))[cnt].copyFrom<int>(sumFields[info.second].sum);
                 break;
-              case ValueType::Double:
-                (*(*resultIter))[cnt].copyFrom<double>(sumFields[info.second].sum);
+              case ValueType::Double:(*(*resultIter))[cnt].copyFrom<double>(sumFields[info.second].sum);
                 break;
-              case ValueType::Currency:
-                (*(*resultIter))[cnt].copyFrom<Currency>(sumFields[info.second].sum);
+              case ValueType::Currency:(*(*resultIter))[cnt].copyFrom<Currency>(sumFields[info.second].sum);
                 break;
             }
             break;
           case AgrOperator::avg:break;
-          case AgrOperator::count:
-            (*(*resultIter))[cnt]._integer = countFields[info.second].count;
+          case AgrOperator::count:(*(*resultIter))[cnt]._integer = countFields[info.second].count;
             break;
           case AgrOperator::min:break;
           case AgrOperator::max:break;
           case AgrOperator::group:
             switch (groupByFields[info.second].field->getFieldType()) {
-              case ValueType::Integer:
-                (*(*resultIter))[cnt].copyFrom<int>(groupByFields[info.second].lastVal);
+              case ValueType::Integer:(*(*resultIter))[cnt].copyFrom<int>(groupByFields[info.second].lastVal);
                 break;
-              case ValueType::Double:
-                (*(*resultIter))[cnt].copyFrom<double>(groupByFields[info.second].lastVal);
+              case ValueType::Double:(*(*resultIter))[cnt].copyFrom<double>(groupByFields[info.second].lastVal);
                 break;
-              case ValueType::String:
-                (*(*resultIter))[cnt].copyFrom<gsl::zstring<>>(groupByFields[info.second].lastVal);
+              case ValueType::String:(*(*resultIter))[cnt].copyFrom<gsl::zstring<>>(groupByFields[info.second].lastVal);
                 break;
-              case ValueType::Currency:
-                (*(*resultIter))[cnt].copyFrom<Currency>(groupByFields[info.second].lastVal);
+              case ValueType::Currency:(*(*resultIter))[cnt].copyFrom<Currency>(groupByFields[info.second].lastVal);
                 break;
-              case ValueType::DateTime:
-                (*(*resultIter))[cnt].copyFrom<DateTime>(groupByFields[info.second].lastVal);
+              case ValueType::DateTime:(*(*resultIter))[cnt].copyFrom<DateTime>(groupByFields[info.second].lastVal);
                 break;
             }
             break;
@@ -355,39 +328,30 @@ void DataBase::AggregationMaker::aggregateView(
       switch (info.first) {
         case AgrOperator::sum:
           switch (sumFields[info.second].field->getFieldType()) {
-            case ValueType::Integer:
-              (*(*resultIter))[cnt].copyFrom<int>(sumFields[info.second].sum);
+            case ValueType::Integer:(*(*resultIter))[cnt].copyFrom<int>(sumFields[info.second].sum);
               break;
-            case ValueType::Double:
-              (*(*resultIter))[cnt].copyFrom<double>(sumFields[info.second].sum);
+            case ValueType::Double:(*(*resultIter))[cnt].copyFrom<double>(sumFields[info.second].sum);
               break;
-            case ValueType::Currency:
-              (*(*resultIter))[cnt].copyFrom<Currency>(sumFields[info.second].sum);
+            case ValueType::Currency:(*(*resultIter))[cnt].copyFrom<Currency>(sumFields[info.second].sum);
               break;
           }
           break;
         case AgrOperator::avg:break;
-        case AgrOperator::count:
-          (*(*resultIter))[cnt]._integer = countFields[info.second].count;
+        case AgrOperator::count:(*(*resultIter))[cnt]._integer = countFields[info.second].count;
           break;
         case AgrOperator::min:break;
         case AgrOperator::max:break;
         case AgrOperator::group:
           switch (groupByFields[info.second].field->getFieldType()) {
-            case ValueType::Integer:
-              (*(*resultIter))[cnt].copyFrom<int>(groupByFields[info.second].lastVal);
+            case ValueType::Integer:(*(*resultIter))[cnt].copyFrom<int>(groupByFields[info.second].lastVal);
               break;
-            case ValueType::Double:
-              (*(*resultIter))[cnt].copyFrom<double>(groupByFields[info.second].lastVal);
+            case ValueType::Double:(*(*resultIter))[cnt].copyFrom<double>(groupByFields[info.second].lastVal);
               break;
-            case ValueType::String:
-              (*(*resultIter))[cnt].copyFrom<gsl::zstring<>>(groupByFields[info.second].lastVal);
+            case ValueType::String:(*(*resultIter))[cnt].copyFrom<gsl::zstring<>>(groupByFields[info.second].lastVal);
               break;
-            case ValueType::Currency:
-              (*(*resultIter))[cnt].copyFrom<Currency>(groupByFields[info.second].lastVal);
+            case ValueType::Currency:(*(*resultIter))[cnt].copyFrom<Currency>(groupByFields[info.second].lastVal);
               break;
-            case ValueType::DateTime:
-              (*(*resultIter))[cnt].copyFrom<DateTime>(groupByFields[info.second].lastVal);
+            case ValueType::DateTime:(*(*resultIter))[cnt].copyFrom<DateTime>(groupByFields[info.second].lastVal);
               break;
           }
           break;

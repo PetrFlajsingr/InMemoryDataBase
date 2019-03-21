@@ -20,6 +20,11 @@ struct BaseAgr {
 struct Unique : public BaseAgr {
   DataContainer lastVal;
   explicit Unique(DataSets::BaseField *field);
+  /**
+   *
+   * @param newVal
+   * @return true if newVal doesn't equal lastVal, false otherwise
+   */
   bool check(const DataContainer &newVal);
 };
 
