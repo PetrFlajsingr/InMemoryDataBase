@@ -8,75 +8,42 @@
 #include <QueryCommon.h>
 #include <BaseField.h>
 #include <MemoryDataSet.h>
+#include <AggregationStructures.h>
 
 namespace DataBase {
 struct Table;
 struct View;
 
-struct BaseAgr {
-  std::pair<gsl::index, gsl::index> fieldIndex;
-  DataSets::BaseField *field;
-  explicit BaseAgr(DataSets::BaseField *field);
-};
-
-struct Unique : public BaseAgr {
-  DataContainer lastVal;
-  explicit Unique(DataSets::BaseField *field);
-  bool check(const DataContainer &newVal);
-};
-
-struct Sum : public BaseAgr {
-  DataContainer sum;
-  explicit Sum(DataSets::BaseField *field);
-  void accumulate(const DataContainer &val);
-  void reset();
-};
-
-struct Min : public BaseAgr {
-  DataContainer min;
-  explicit Min(DataSets::BaseField *field);
-  void check();
-  void reset();
-};
-
-struct Max : public BaseAgr {
-  DataContainer max;
-  explicit Max(DataSets::BaseField *field);
-  void check();
-  void reset();
-};
-
-struct Count : public BaseAgr {
-  uint64_t count = 0;
-  explicit Count(DataSets::BaseField *field);
-  void add();
-  void reset();
-};
-
-struct Avg : public Sum, public Count {
-  explicit Avg(DataSets::BaseField *field);
-  Avg(DataSets::BaseField *field, DataSets::BaseField *field1);
-  void accumulate(const DataContainer &val);
-  void reset();
-  DataContainer getResult();
-};
-
+/**
+ * Class doing aggregation on views/tables.
+ */
 class AggregationMaker {
  public:
+  /**
+   *
+   * @param table table to aggregate
+   */
   explicit AggregationMaker(const std::shared_ptr<Table> &table);
+  /**
+   *
+   * @param view view to aggregate
+   */
   explicit AggregationMaker(const std::shared_ptr<View> &view);
-
+  /**
+   * Do aggregation operation defined in query.
+   * @param structuredQuery query containing info about required aggregation operations
+   * @return Table containing aggregated values
+   */
   std::shared_ptr<Table> aggregate(const StructuredQuery &structuredQuery);
+
  private:
   std::shared_ptr<Table> table = nullptr;
   std::shared_ptr<View> view = nullptr;
 
   std::shared_ptr<DataSets::MemoryDataSet> prepareDataSet(const DataBase::StructuredQuery &structuredQuery);
 
-  void aggregateDataSet(DataSets::MemoryDataSet *ds,
-                        DataSets::MemoryDataSet *result);
-  void aggregateView(DataSets::MemoryViewDataSet *ds,
-                     DataSets::MemoryDataSet *result);
+  void aggregateDataSet(DataSets::MemoryDataSet *ds, DataSets::MemoryDataSet *result);
+  void aggregateView(DataSets::MemoryViewDataSet *ds, DataSets::MemoryDataSet *result);
 
   std::vector<Unique> groupByFields;
   std::vector<Sum> sumFields;

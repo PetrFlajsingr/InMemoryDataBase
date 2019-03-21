@@ -14,28 +14,17 @@ namespace DataProviders {
 
 /**
  * Simple interface for reading a moving forward in records.
- *
- * Usage:
- *  DataProviders::SomeProvider provider(...);
- *  while (provider.next()) {
- *      auto row = provider.getRow();
- *      // work with data
- *
- *  }
- *
- * Usage with iterator:
- *  DataProviders::SomeProvider provider(...);
- *  for (const auto &row : provider) {
- *      // work with data
- *  }
  */
 class BaseDataProvider {
  public:
   BaseDataProvider()
       : convert(false) {}
-
-  explicit BaseDataProvider(CharSet sourceCharSet) : convert(
-      true), converter(std::make_unique<CharSetConverter>(sourceCharSet)) {}
+  /**
+   *
+   * @param charSet source charset
+   */
+  explicit BaseDataProvider(CharSet charSet) : convert(
+      true), converter(std::make_unique<CharSetConverter>(charSet)) {}
   /**
    * Get a record divided into fields
    * @return
@@ -138,7 +127,6 @@ class BaseDataProvider {
   iterator begin() {
     return iterator(this);
   }
-
   iterator end() {
     return iterator(this);
   }
