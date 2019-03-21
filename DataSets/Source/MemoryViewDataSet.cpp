@@ -307,10 +307,6 @@ std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryViewDataSet::filter(
   return resultView;
 }
 
-bool DataSets::MemoryViewDataSet::findFirst(DataSets::FilterItem &item) {
-  throw NotImplementedException();
-}
-
 void DataSets::MemoryViewDataSet::resetBegin() {
   currentRecord = 0;
 }

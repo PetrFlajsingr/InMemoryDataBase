@@ -18,15 +18,24 @@ class MemoryDataBase;
 
 namespace DataSets {
 class MemoryDataSet;
-
+/**
+ * View to MemoryDataSet.
+ * May point to multiple data sets at the same time.
+ */
 class MemoryViewDataSet : public ViewDataSet {
  public:
+  /**
+   *
+   * @param dataSetName name of the view
+   * @param fieldNames names of fields
+   * @param fieldTypes types of values stored in columns
+   * @param fieldIndices indices of fields see @code BaseField @endcode for explanation @see BaseField
+   */
   MemoryViewDataSet(std::string_view dataSetName,
                     const std::vector<std::string> &fieldNames,
                     const std::vector<ValueType> &fieldTypes,
-                    const std::vector<std::pair<int,
-                                                int>> &fieldIndices);
-
+                    const std::vector<std::pair<int, int>> &fieldIndices);
+  // BaseDataSet
   void open(DataProviders::BaseDataProvider &dataProvider,
             const std::vector<ValueType> &fieldTypes) override;
   void openEmpty(const std::vector<std::string> &fieldNames,
@@ -49,21 +58,40 @@ class MemoryViewDataSet : public ViewDataSet {
   void append(DataProviders::BaseDataProvider &dataProvider) override;
   void sort(SortOptions &options) override;
   std::shared_ptr<ViewDataSet> filter(const FilterOptions &options) override;
-  bool findFirst(FilterItem &item) override;
   void resetBegin() override;
   void resetEnd() override;
   void setData(void *data, gsl::index index, ValueType type) override;
-
+  //\ BaseDataSet
+  /**
+   * Get inner data representation
+   * @return inner data
+   */
   std::vector<std::vector<DataSetRow *>> *rawData();
-
+  /**
+   *
+   * @return number of data sets this view points to
+   */
   gsl::index getTableCount();
-
+  /**
+   * Add shared_ptr to parent to not lose data this view points to
+   */
   void addParent(std::shared_ptr<MemoryDataSet> &parent);
+  /**
+   * Add shared_ptr to parent to not lose data this view points to
+   */
   void addParents(const std::vector<std::shared_ptr<MemoryDataSet>> &parents);
+  /**
+   * @return data sets this view points to
+   */
   const std::vector<std::shared_ptr<MemoryDataSet>> &getParents() const;
-
+  /**
+   * Create a data set from data this view points to.
+   * @return materialised view
+   */
   std::shared_ptr<MemoryDataSet> toDataSet();
-
+  /**
+   * Iterate over raw data.
+   */
   class iterator : public std::iterator<std::random_access_iterator_tag, int> {
    public:
     iterator() = default;
@@ -181,15 +209,21 @@ class MemoryViewDataSet : public ViewDataSet {
   };
 
   iterator begin();
-
   iterator end();
-
+  /**
+   * Null row for empty table records.
+   * @param tableIndex
+   * @return
+   */
   DataSetRow *getNullRow(gsl::index tableIndex);
+  /**
+   * Set fields to limit view to data.
+   * @param fieldNames names of fields to allow
+   */
+  void setAllowedFields(const std::vector<std::string> &fieldNames);
 
  private:
-  friend class DataBase::MemoryDataBase;
   std::vector<BaseField *> allowedFields;
-  void setAllowedFields(const std::vector<std::string> &fieldNames);
 
   std::vector<std::vector<DataSetRow *>> data;
 
@@ -201,11 +235,9 @@ class MemoryViewDataSet : public ViewDataSet {
 
   void createFields(const std::vector<std::string> &columns,
                     const std::vector<ValueType> &types,
-                    const std::vector<std::pair<int,
-                                                int>> &fieldIndices);
+                    const std::vector<std::pair<int, int>> &fieldIndices);
 
-  void createNullRows(const std::vector<std::pair<int,
-                                                  int>> &fieldIndices,
+  void createNullRows(const std::vector<std::pair<int, int>> &fieldIndices,
                       const std::vector<ValueType> &fieldTypes);
 
   friend class MemoryDataSet;

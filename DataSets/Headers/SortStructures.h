@@ -11,8 +11,8 @@
 namespace DataSets {
 
 struct SortItem {
-  BaseField *field;  //< index field v data set
-  SortOrder order;  //< Ascending/Descending
+  BaseField *field;
+  SortOrder order;
 };
 
 struct SortOptions {

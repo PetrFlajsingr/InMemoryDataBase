@@ -13,7 +13,6 @@ namespace DataSets {
 class ViewDataSet : public BaseDataSet {
  public:
   explicit ViewDataSet(const std::string_view &dataSetName);
-
 };
 }  // namespace DataSets
 

@@ -26,48 +26,13 @@
 namespace DataSets {
 class MemoryViewDataSet;
 /**
- * Dataset ukladajici data primo v operacni pameti.
- *
- *
- * Ukazka pouziti:
-    auto dataSet = new DataSets::MemoryDataSet("dataSetName");
-    dataSet->setDataProvider(dataProvider);
-    dataSet->setFieldTypes({ValueType::IntegerValue, ValueType::CurrencyValue});
-    dataSet->open();
-
-    auto fieldID = dynamic_cast<DataSets::IntegerField *>(dataSet->fieldByName("ID"));
-    auto fieldWage = dynamic_cast<DataSets::CurrencyField *>(dataSet->fieldByName("wage"));
-
-    DataSets::SortOptions sortOptions;
-    sortOptions.addOption(fieldID->getIndex(), SortOrder::Ascending);
-    sortOptions.addOption(fieldWage->getIndex(), SortOrder::Descending);
-    dataSet->sort(sortOptions);
-
-    DataSets::FilterOptions filterOptions;
-    filterOptions.addOption(fieldID->getIndex(),
-                            ValueType::IntegerValue,
-                            {{._integer=10}},
-                            DataSets::FilterOption::EQUALS);
-    dataSet->filter(filterOptions);
-
-    while (dataSet->eof()) {
-      auto id = fieldID->getAsInteger();
-      auto wage = fieldWage->getAsCurrency();
-
-      auto newWage = wage + dec::decimal_cast<2>(10);
-      fieldWage->setAsCurrency(newWage);
-
-      dataSet->next();
-    }
-
-    dataSet->close();
-    delete dataSet;
+ * Data set saving data in memory.
  */
 class MemoryDataSet : public BaseDataSet {
  public:
   explicit MemoryDataSet(std::string_view dataSetName);
   ~MemoryDataSet() override;
-
+  // BaseDataSet
   void open(DataProviders::BaseDataProvider &dataProvider,
             const std::vector<ValueType> &fieldTypes) override;
   void openEmpty(const std::vector<std::string> &fieldNames,
@@ -87,22 +52,25 @@ class MemoryDataSet : public BaseDataSet {
   std::vector<std::string> getFieldNames() const override;
   void append() override;
   void append(DataProviders::BaseDataProvider &dataProvider) override;
-  bool findFirst(FilterItem &item) override;
   bool isBegin() const override;
   bool isEnd() const override;
   gsl::index getCurrentRecord() const override;
   void resetBegin() override;
   void resetEnd() override;
-
+  //\ BaseDataSet
+  /**
+   * Create a view to all records.
+   * @return view pointing to all records.
+   */
   std::shared_ptr<MemoryViewDataSet> fullView();
-
+  /**
+   * Random access iterator for iteration on raw data saved in memory.
+   */
   class iterator : public std::iterator<std::random_access_iterator_tag, int> {
    public:
     iterator() = default;
-
     iterator(gsl::not_null<MemoryDataSet *> dataSet, gsl::index row)
         : dataSet(dataSet), currentRecord(row) {}
-
     iterator(const iterator &other) : dataSet(other.dataSet),
                                       currentRecord(other.currentRecord) {}
 
@@ -218,10 +186,6 @@ class MemoryDataSet : public BaseDataSet {
   void setData(void *data, gsl::index index, ValueType type) override;
 
  private:
-  /**
-   * Struktura pro vnitrni reprezentaci dat
-   */
-
   bool isOpen = false;
 
   gsl::index currentRecord = 0;  //< Pocitadlo zaznamu
@@ -231,28 +195,28 @@ class MemoryDataSet : public BaseDataSet {
   inline gsl::index getFirst() const;
   inline gsl::index getLast() const;
   /**
-   * Nacteni dat do this->data
+   * Load all data from provider to memory.
+   * @param dataProvider provider to read data from
    */
   void loadData(DataProviders::BaseDataProvider &dataProvider);
   /**
-   * Pridani zaznamu do this->data()
+   * Add a single record from provider.
    */
   void addRecord(DataProviders::BaseDataProvider &dataProvider);
   /**
-   * Vytvoreni Fields se jmeny podle nazvu sloupcu.
-   * @param columns nazvy sloupcu
+   * Create fields with provided names and types.
+   * @param columns names of columns/fields
+   * @param types types of fields
    */
   void createFields(std::vector<std::string> columns,
                     std::vector<ValueType> types);
   /**
-   * Nastaveni hodnot this->fields.
-   *
-   * Vynechava zaznamy s dataValidity == false
+   * Set values of current row to fields.
    * @param index Index Field
    * @param searchForward Smer vyhledavani validniho zaznamu
    * @return
    */
-  bool setFieldValues();
+  void setFieldValues();
 
   inline DataContainer &getCell(gsl::index row, gsl::index column);
 };

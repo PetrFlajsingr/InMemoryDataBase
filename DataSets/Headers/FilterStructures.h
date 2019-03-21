@@ -13,10 +13,10 @@
 #include "Types.h"
 #include <QueryCommon.h>
 
-// TODO: predelat tak, aby podporoval double, integer, currency...
-// TODO: predelat pro prehlednost - vytvorit DataContainer for FilterOptions uvnitr automaticky
-//  - pretizena funkce pro vsechny mozne hodnoty?
 namespace DataSets {
+/**
+ * Types of filter operations.
+ */
 enum class FilterOption {
   Equals,
   NotEquals,
@@ -33,7 +33,9 @@ enum class FilterOption {
 };
 
 FilterOption condOpToFilterOp(DataBase::CondOperator op);
-
+/**
+ * Single item to filter by.
+ */
 struct FilterItem {
   const DataSets::BaseField *field;
   std::vector<DataContainer> searchData;
@@ -43,12 +45,14 @@ struct FilterItem {
              const std::vector<DataContainer> &searchData,
              FilterOption filterOption);
 };
-
+/**
+ * Structure holding options for filtering.
+ */
 struct FilterOptions {
   std::vector<FilterItem> options;
 
   void addOption(const DataSets::BaseField *field,
-                 const std::vector<DataContainer> &searchString,
+                 const std::vector<DataContainer> &values,
                  const FilterOption filterOption);
 
   void addOption(const DataSets::BaseField *field,

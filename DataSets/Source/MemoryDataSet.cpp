@@ -110,8 +110,7 @@ void DataSets::MemoryDataSet::close() {
   }
 }
 
-// TODO: rework
-bool DataSets::MemoryDataSet::setFieldValues() {
+void DataSets::MemoryDataSet::setFieldValues() {
   for (size_t i = 0; i < fields.size(); i++) {
     auto currentCell = getCell(currentRecord, i);
     switch (fields[i]->getFieldType()) {
@@ -138,7 +137,6 @@ bool DataSets::MemoryDataSet::setFieldValues() {
       default:throw IllegalStateException("Internal error.");
     }
   }
-  return true;
 }
 
 void DataSets::MemoryDataSet::first() {
@@ -412,68 +410,6 @@ DataSets::MemoryDataSet::MemoryDataSet(std::string_view dataSetName)
 
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "OCDFAInspection"
-// TODO: implement more filter functions
-bool DataSets::MemoryDataSet::findFirst(FilterItem &item) {
-  unsigned long min = getFirst(), max = getLast() + 1;
-  currentRecord = (min + max) >> 1;
-
-  bool breakLoop = false;
-
-  do {
-    int8_t comparisonResult;
-    switch (item.field->getFieldType()) {
-      case ValueType::String:
-        comparisonResult = Utilities::compareString(
-            getCell(currentRecord, item.field->getIndex())._string,
-            item.searchData[0]._string);
-        break;
-      case ValueType::Integer:
-        comparisonResult = Utilities::compareInt(
-            getCell(currentRecord, item.field->getIndex())._integer,
-            item.searchData[0]._integer);
-        break;
-      case ValueType::Double:
-        comparisonResult = Utilities::compareDouble(
-            getCell(currentRecord, item.field->getIndex())._double,
-            item.searchData[0]._double);
-        break;
-      case ValueType::Currency:
-        comparisonResult = Utilities::compareCurrency(
-            *getCell(currentRecord, item.field->getIndex())._currency,
-            *item.searchData[0]._currency);
-        break;
-      case ValueType::DateTime:
-        comparisonResult =
-            Utilities::compareDateTime(
-                *getCell(currentRecord, item.field->getIndex())._dateTime,
-                *item.searchData[0]._dateTime);
-        break;
-    }
-    switch (comparisonResult) {
-      case 0:setFieldValues();
-        return true;
-      case -1:min = currentRecord;
-        currentRecord = (min + max) >> 1;
-        break;
-      case 1:max = currentRecord;
-        currentRecord = (min + max) >> 1;
-        break;
-      default:
-        throw IllegalStateException(
-            "Internal error DataSets::MemoryDataSet::findFirst");
-    }
-    if (currentRecord < getFirst() || currentRecord > getLast()) {
-      return false;
-    }
-    //setFieldValues(currentRecord, true);
-    if (max - min < 2) {
-      if (breakLoop) {
-        return false;
-      }
-      breakLoop = true;
-    }
-  } while (currentRecord >= getFirst() && currentRecord <= getLast());
-}
 
 std::vector<DataSets::BaseField *> DataSets::MemoryDataSet::getFields() const {
   std::vector<BaseField *> result;
