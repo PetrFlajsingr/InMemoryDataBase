@@ -14,7 +14,6 @@ namespace DataBase {
 class SemanticAnalyser {
  public:
   void setInput(StructuredQuery &structuredQuery);
-
   StructuredQuery analyse();
  private:
   StructuredQuery structuredQuery;

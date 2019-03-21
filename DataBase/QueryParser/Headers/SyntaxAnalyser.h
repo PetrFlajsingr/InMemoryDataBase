@@ -19,6 +19,7 @@ class SyntaxAnalyser {
                                              bool>> &tokens);
 
   StructuredQuery analyse();
+
  private:
   enum class SynState {
     start,
@@ -88,13 +89,10 @@ class SyntaxAnalyser {
 
   gsl::index currentToken = 0;
 
-  const std::vector<Token> cmpFunc
-      {Token::less, Token::lessEqual, Token::greater, Token::greaterEqual,
-       Token::equal, Token::notEqual};
-  const std::vector<Token>
-      constants{Token::number, Token::numberFloat, Token::string};
-  const std::vector<Token>
-      agrFunc{Token::sum, Token::avg, Token::min, Token::max, Token::count};
+  const std::vector<Token> cmpFunc{
+      Token::less, Token::lessEqual, Token::greater, Token::greaterEqual, Token::equal, Token::notEqual};
+  const std::vector<Token> constants{Token::number, Token::numberFloat, Token::string};
+  const std::vector<Token> agrFunc{Token::sum, Token::avg, Token::min, Token::max, Token::count};
 
   std::vector<std::tuple<Token, std::string, bool>> tokens;
 

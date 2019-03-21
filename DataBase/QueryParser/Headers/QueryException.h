@@ -13,9 +13,7 @@ class QueryException : public std::exception {
  private:
   const std::string errorMessage;
  public:
-  explicit QueryException(const std::string &message)
-      : errorMessage(message) {}
-
+  explicit QueryException(const std::string &message) : errorMessage(message) {}
   char const *what() const noexcept override {
     return errorMessage.c_str();
   }
@@ -28,20 +26,17 @@ class LexException : public QueryException {
 
 class SyntaxException : public QueryException {
  public:
-  explicit SyntaxException(const std::string &message)
-      : QueryException(message) {}
+  explicit SyntaxException(const std::string &message) : QueryException(message) {}
 };
 
 class SemanticException : public QueryException {
  public:
-  explicit SemanticException(const std::string &message) : QueryException(
-      message) {}
+  explicit SemanticException(const std::string &message) : QueryException(message) {}
 };
 
 class DataBaseQueryException : public QueryException {
  public:
-  explicit DataBaseQueryException(const std::string &message)
-      : QueryException(message) {}
+  explicit DataBaseQueryException(const std::string &message) : QueryException(message) {}
 };
 }
 

@@ -10,7 +10,9 @@
 #include <utility>
 
 namespace DataBase {
-
+/*
+ * Types for query parsing and its inner representation.
+ */
 enum class CondOperator {
   greater, greaterEqual, less, lessEqual, equal, notEqual
 };

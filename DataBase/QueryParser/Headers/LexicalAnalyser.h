@@ -11,14 +11,28 @@
 #include <QueryCommon.h>
 #include <QueryException.h>
 #include <Utilities.h>
+#include <tuple>
 
 namespace DataBase {
+/**
+ * Analyse and tokenize query inputs.
+ */
 class LexicalAnalyser {
  public:
+  /**
+   *
+   * @param input string to tokenize
+   */
   void setInput(const std::string &input);
-
+  /**
+   * Parse another token
+   * @return parsed token, string form of the token, true if this is not last token, false otherwise
+   */
   std::tuple<Token, std::string, bool> getNextToken();
-
+  /**
+   * Tokenize the entire input
+   * @return same as getNextToken() @see LexicalAnalyser::getNextToken()
+   */
   std::vector<std::tuple<Token, std::string, bool>> getAllTokens();
 
  private:
