@@ -169,7 +169,7 @@ void DataSets::MemoryViewDataSet::sort(DataSets::SortOptions &options) {
 
   std::sort(data.begin() + 1, data.end() - 1, compareFunction);
 
-  currentRecord = 0;
+  resetBegin();
 }
 
 // TODO: implement more filter functions

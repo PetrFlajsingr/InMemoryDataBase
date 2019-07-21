@@ -12,6 +12,7 @@
 #include <boost/locale.hpp>
 #include <XlntReader.h>
 #include <Logger.h>
+#include <Tree.h>
 
 int main() {
   auto tst = DateTime("08/06/1995", "%d/%m/%Y");

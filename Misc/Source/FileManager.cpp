@@ -77,6 +77,19 @@ bool Folder::isFile(std::string_view name) {
   auto filePath = boost::filesystem::path(sPath);
   return boost::filesystem::is_regular_file(filePath);
 }
+
+std::vector<std::string> Folder::getFileNames() const {
+  namespace fs = boost::filesystem;
+  std::vector<std::string> result;
+  fs::directory_iterator end;
+
+  for (fs::directory_iterator i(path); i != end; ++i) {
+    const fs::path cp = (*i);
+    result.emplace_back(cp.string());
+  }
+  return result;
+}
+
 File::File(const boost::filesystem::path &path) : path(path) {}
 std::ifstream File::inStream() {
   return std::ifstream(path.string());

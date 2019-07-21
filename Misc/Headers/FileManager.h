@@ -75,6 +75,8 @@ class Folder {
   bool isFile(std::string_view name);
 
   const boost::filesystem::path &getPath() const;
+
+  std::vector<std::string> getFileNames() const;
 };
 /**
  * Basic access point to File/Folder classes.

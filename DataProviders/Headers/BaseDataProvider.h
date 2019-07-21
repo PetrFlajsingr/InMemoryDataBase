@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include <Converters.h>
+#include <ostream>
 
 namespace DataProviders {
 
@@ -126,6 +127,14 @@ class BaseDataProvider {
   }
   iterator end() {
     return iterator(this);
+  }
+
+  friend std::ostream &operator<<(std::ostream &os, BaseDataProvider &provider) {
+    provider.next();
+    for (const auto &val : provider.getRow()) {
+      os << val << " ";
+    }
+    return os;
   }
 
  protected:

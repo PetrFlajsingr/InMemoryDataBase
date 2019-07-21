@@ -29,6 +29,7 @@ class IOException : public std::exception {
 class InvalidArgumentException : public std::invalid_argument {
  public:
   explicit InvalidArgumentException(const gsl::czstring<> message) : invalid_argument(message) {}
+  explicit InvalidArgumentException(const std::string message) : invalid_argument(message.c_str()) {}
 };
 
 class IllegalStateException : public std::exception {

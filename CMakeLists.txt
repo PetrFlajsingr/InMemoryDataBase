@@ -10,6 +10,8 @@ if (APPLE)
     add_definitions(-D__GLIBCXX__)
 endif (APPLE)
 
+link_directories(/usr/local/lib/)
+
 include_directories(third_party)
 include_directories(Misc/tests)
 include_directories(Misc/Headers)
@@ -22,7 +24,6 @@ include_directories(third_party/Decimal)
 include_directories(CLI/Headers)
 include_directories(DataBase/Headers)
 include_directories(DataBase/QueryParser/Headers)
-include_directories(third_party/xlsxio/include)
 include_directories(Messages/Headers)
 include_directories(Templates/Headers)
 
@@ -67,10 +68,6 @@ FILE(GLOB CommandHeaders Messages/Headers/*.h)
 
 FILE(GLOB moorSources third_party/moor/*.cpp)
 
-# third party:
-FILE(GLOB xlsxioHeaders third_party/xlsxio/include/*.h)
-FILE(GLOB decimalHeaders third_party/decimal/*.h)
-
 set(SOURCE_FILES
         ${DataProviderSources}
         ${DataSetSources}
@@ -82,7 +79,8 @@ set(SOURCE_FILES
         ${FileDownloaderSources}
         ${CLISources}
         ${moorSources}
-        ${CommandSources})
+        ${CommandSources}
+        Combiner.cpp)
 
 set(TEST_SOURCE_FILES
         ${SOURCE_FILES}
@@ -97,28 +95,41 @@ FIND_PACKAGE(CURL REQUIRED)
 include_directories(${CURL_INCLUDE_DIR})
 FIND_PACKAGE(LibArchive REQUIRED)
 include_directories(${LibArchive_INCLUDE_DIR})
-FIND_PACKAGE(Boost 1.68 COMPONENTS locale date_time filesystem REQUIRED)
-
+FIND_PACKAGE(Boost COMPONENTS locale date_time filesystem REQUIRED)
+include_directories(${Boost_INCLUDE_DIRS})
 
 add_executable(cedr cedr.cpp ${SOURCE_FILES})
 add_executable(test test.cpp ${SOURCE_FILES})
 add_executable(zdrav zdrav.cpp ${SOURCE_FILES})
 add_executable(catch_tests ${TEST_SOURCE_FILES})
 
+add_executable(csv_to_xlsx csv_to_xlsx.cpp ${SOURCE_FILES})
+
+FILE(GLOB ARESSources ARES/*.cpp)
+
+add_executable(xml_test xml_test.cpp ${SOURCE_FILES} ${ARESSources})
+
 target_link_libraries(cedr xlsxio_read)
 target_link_libraries(cedr xlsxio_write)
-target_link_libraries(cedr Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
+target_link_libraries(cedr Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 
 target_link_libraries(zdrav xlsxio_read)
 target_link_libraries(zdrav xlsxio_write)
-target_link_libraries(zdrav Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
+target_link_libraries(zdrav Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 
 target_link_libraries(catch_tests xlsxio_read)
 target_link_libraries(catch_tests xlsxio_write)
-target_link_libraries(catch_tests Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
+target_link_libraries(catch_tests Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 
 target_link_libraries(test xlsxio_read)
 target_link_libraries(test xlsxio_write)
-target_link_libraries(test Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
+target_link_libraries(test Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 
+target_link_libraries(xml_test libxlsxio_read.dylib)
+target_link_libraries(xml_test libxlsxio_write.dylib)
+target_link_libraries(xml_test Boost::boost Boost::locale Boost::date_time libxlnt.dylib Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
+
+target_link_libraries(csv_to_xlsx xlsxio_read)
+target_link_libraries(csv_to_xlsx xlsxio_write)
+target_link_libraries(csv_to_xlsx Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 

@@ -9,61 +9,84 @@
 #include <cereal/cereal.hpp>
 #include <cereal/types/memory.hpp>
 #include <cereal/archives/json.hpp>
+#include <ArrayDataProvider.h>
+#include <StdoutWriter.h>
+#include <CsvReader.h>
+#include <XlntReader.h>
+#include <XlsxIOReader.h>
+#include "Combiner.h"
 
 void terminate_handler();
 
-class Test {
- public:
-  Test() {
-
-  }
-
-  Property<std::shared_ptr<Bindable<int>>, Test, RW>
-      s = std::make_shared<Bindable<int>>();
-};
-
 int main(int argc, char **argv) {
-  CLIController cl;
-  cl.runApp();
+  //CLIController cl;
+  //cl.runApp();
 
-  /*moor::ArchiveReader reader("/Users/petr/Downloads/libarchive-3.3.3.tar");
-  bool ex = true;
-  while (ex) {
-    auto va = reader.ExtractNext();
-    if (va.first.empty()) {
-      ex = false;
-    }
-    std::cout << va.first <<std::endl;
-  }
+  DataBase::MemoryDataBase db("jo");
 
-  return 0;*/
-  /*FileDownloadManager man;
-  Obs obs;
-  man.enqueueDownload("/Users/petr/Desktop/dl/",
-                      "https://en.cppreference.com/w/cpp",
-                      obs, false);
-  man.enqueueDownload("/Users/petr/Desktop/dl/",
-                      "https://en.cppreference.com/w/cpp/language",
-                      obs, false);
-  man.enqueueDownload("/Users/petr/Desktop/dl/",
-                      "https://en.cppreference.com/w/cpp/memory_model",
-                      obs, true);
-  man.enqueueDownload("/Users/petr/Desktop/dl/",
-                      "https://en.cppreference.com/w/cpp/namespace_alias",
-                      obs, false);
-  man.enqueueDownload("/Users/petr/Desktop/dl/",
-                      "https://en.cppreference.com/w/cpp/operator_other",
-                      obs, false);
-  man.enqueueDownload("/Users/petr/Desktop/dl/",
-                      "https://en.cppreference.com/w/cpp/adl",
-                      obs, true);
-  man.enqueueDownload("/Users/petr/Desktop/dl/",
-                      "https://en.cppreference.com/w/cpp/partial_specialization",
-                      obs,
-                      false);
+  auto providerRes = DataProviders::XlsxIOReader("/Users/petr/Desktop/muni_last/NNO_RES_2019-03-30.xlsx");
+  auto dsRes = std::make_shared<DataSets::MemoryDataSet>("res");
+  dsRes->open(providerRes, {ValueType::Integer,
+                            ValueType::String,
+                            ValueType::String,
+                            ValueType::String,
+                            ValueType::String,
+                            ValueType::String,
+                            ValueType::String,
+                            ValueType::String,
+                            ValueType::String,
+                            ValueType::String,
+                            ValueType::String,
+                            ValueType::String,
+                            ValueType::String,
+                            ValueType::String,
+                            ValueType::String,
+                            ValueType::String,
+                            ValueType::String,
+                            ValueType::String,
+                            ValueType::String,
+                            ValueType::String,
+                            ValueType::String,
+                            ValueType::String,
+                            ValueType::String,
+                            ValueType::String});
+  db.addTable(dsRes);
 
-  std::this_thread::sleep_for(std::chrono::seconds(10));
-  return 0;*/
+  auto providerSbirky = DataProviders::CsvReader("/Users/petr/Desktop/muni_last/Verejne_sbirky.csv", ";");
+  auto dsSbirky = std::make_shared<DataSets::MemoryDataSet>("sbirky");
+  dsSbirky->open(providerSbirky, {ValueType::String,
+                                  ValueType::String,
+                                  ValueType::Integer,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String,
+                                  ValueType::String});
+  db.addTable(dsSbirky);
+
+  auto result = db.execSimpleQuery(R"(select res.*, sbirky.* from res join sbirky on res.ICO=sbirky.IČO:)",
+                                   false,
+                                   "test");
+
+  std::cout << "done";
 }
 
 void terminate_handler() {

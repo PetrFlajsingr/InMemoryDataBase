@@ -1,6 +1,4 @@
 #pragma clang diagnostic push
-#pragma ide diagnostic ignored "google-explicit-constructor"
-#pragma ide diagnostic ignored "cppcoreguidelines-c-copy-assignment-signature"
 //
 // Created by Petr Flajsingr on 2019-02-26.
 //
@@ -197,5 +195,3 @@ Property<T, Owner, SetGet> make_property(Args ...args) {
 }
 
 #endif //PROJECT_PROPERTY_H
-
-#pragma clang diagnostic pop
