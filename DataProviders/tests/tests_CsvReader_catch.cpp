@@ -3,9 +3,9 @@
 //
 
 #include <Catch2Define.h>
-#include <catch2/catch.hpp>
 #include <CsvReader.h>
 #include <ArrayWriter.h>
+#include <catch2/catch.hpp>
 
 #define SMALL_COLUMN_COUNT 5
 #define SMALL_ROW_COUNT 3

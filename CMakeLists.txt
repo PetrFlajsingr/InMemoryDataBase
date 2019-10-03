@@ -115,7 +115,7 @@ add_executable(xml_test xml_test.cpp ${SOURCE_FILES} ${ARESSources})
 
 target_link_libraries(cedr xlsxio_read)
 target_link_libraries(cedr xlsxio_write)
-target_link_libraries(cedr Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
+target_link_libraries(cedr -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 
 target_link_libraries(cedr_new xlsxio_read)
 target_link_libraries(cedr_new xlsxio_write)
@@ -124,21 +124,21 @@ target_link_libraries(cedr_new -pthread Boost::boost Boost::locale Boost::date_t
 
 target_link_libraries(zdrav xlsxio_read)
 target_link_libraries(zdrav xlsxio_write)
-target_link_libraries(zdrav Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
+target_link_libraries(zdrav -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 
 target_link_libraries(catch_tests xlsxio_read)
 target_link_libraries(catch_tests xlsxio_write)
-target_link_libraries(catch_tests Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
+target_link_libraries(catch_tests -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 
 target_link_libraries(test xlsxio_read)
 target_link_libraries(test xlsxio_write)
-target_link_libraries(test Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
+target_link_libraries(test -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 
 target_link_libraries(xml_test libxlsxio_read.dylib)
 target_link_libraries(xml_test libxlsxio_write.dylib)
-target_link_libraries(xml_test Boost::boost Boost::locale Boost::date_time libxlnt.dylib Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
+target_link_libraries(xml_test -pthread Boost::boost Boost::locale Boost::date_time libxlnt.dylib Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 
 target_link_libraries(csv_to_xlsx xlsxio_read)
 target_link_libraries(csv_to_xlsx xlsxio_write)
-target_link_libraries(csv_to_xlsx Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
+target_link_libraries(csv_to_xlsx -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 
