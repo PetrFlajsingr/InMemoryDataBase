@@ -5,6 +5,7 @@
 #include <CsvStreamReader.h>
 #include <catch2/catch.hpp>
 #include <ArrayWriter.h>
+#include <csvstream.h>
 
 #define SMALL_COLUMN_COUNT 5
 #define SMALL_ROW_COUNT 3
@@ -25,6 +26,8 @@ SCENARIO("Reading csv file using via BaseDataProvider StreamReader interface", "
 
         DataProviders::CsvStreamReader csvStreamReader("../DataProviders/tests/Files/small.csv",
                                            ';');
+        DataProviders::CsvStreamReader csvStreamReaderBad("../DataProviders/tests/Files/bad.csv",
+                                                       ';');
 
         WHEN("reading the header") {
 
@@ -85,6 +88,12 @@ SCENARIO("Reading csv file using via BaseDataProvider StreamReader interface", "
                 for(auto i =0; i < SMALL_COLUMN_COUNT; ++i){
                     REQUIRE((csvStreamReader.getColumnName(i)) == columnNamesSmall[i]);
                 }
+            }
+        }
+
+        WHEN("Reading column that doesnt match with header"){
+            THEN("Throw exception"){
+                    REQUIRE_THROWS(csvStreamReaderBad.next());
             }
         }
     }

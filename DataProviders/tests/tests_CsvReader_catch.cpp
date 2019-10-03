@@ -27,6 +27,8 @@ SCENARIO("Reading csv file via BaseDataProvider interface", "[CsvReader]") {
 
     DataProviders::CsvReader csvReader("../DataProviders/tests/Files/small.csv",
                                        ";");
+    DataProviders::CsvReader csvReaderBad("../DataProviders/tests/Files/bad.csv",
+                                         ";");
 
     WHEN("reading the header") {
 
@@ -89,6 +91,12 @@ SCENARIO("Reading csv file via BaseDataProvider interface", "[CsvReader]") {
             }
         }
     }
+
+      WHEN("Reading column that doesnt match with header"){
+          THEN("Throw exception"){
+              REQUIRE_THROWS(csvReaderBad.next());
+          }
+      }
   }
 
   GIVEN("A bit complex csv") {
