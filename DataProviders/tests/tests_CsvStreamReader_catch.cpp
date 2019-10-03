@@ -305,7 +305,7 @@ SCENARIO("Writing parsed csv directly to DataWriter using StreamReader iterator"
         };
 
         DataProviders::CsvStreamReader csvStreamReader("../DataProviders/tests/Files/small.csv",
-                                           ',');
+                                                       ';');
 
         DataWriters::ArrayWriter writer;
         WHEN("reading the content") {

@@ -56,12 +56,16 @@ struct Count : public BaseAgr {
   void reset();
 };
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "HidingNonVirtualFunction"
 struct Avg : Sum, Count {
   explicit Avg(DataSets::BaseField *field);
   void accumulate(const DataContainer &val);
   void reset();
   DataContainer getResult();
 };
+
+#pragma clang diagnostic pop
 }
 
 #endif //PROJECT_AGGREGATIONSTRUCTURES_H

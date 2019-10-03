@@ -5,9 +5,11 @@
 #include <AggregationMaker.h>
 #include <MemoryDataBase.h>
 
-DataBase::AggregationMaker::AggregationMaker(const std::shared_ptr<DataBase::Table> &table) : table(table) {}
+#include <utility>
 
-DataBase::AggregationMaker::AggregationMaker(const std::shared_ptr<DataBase::View> &view) : view(view) {}
+DataBase::AggregationMaker::AggregationMaker(std::shared_ptr<DataBase::Table> table) : table(std::move(table)) {}
+
+DataBase::AggregationMaker::AggregationMaker(std::shared_ptr<DataBase::View> view) : view(std::move(view)) {}
 
 std::shared_ptr<DataBase::Table>
 DataBase::AggregationMaker::aggregate(const DataBase::StructuredQuery &structuredQuery) {
@@ -121,6 +123,8 @@ void DataBase::AggregationMaker::aggregateDataSet(DataSets::MemoryDataSet *ds,
       for (const auto &info : writeOrder) {
         switch (info.first) {
           case AgrOperator::sum:
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wswitch"
             switch (sumFields[info.second].field->getFieldType()) {
               case ValueType::Integer:(*(*resultIter))[cnt].copyFrom<int>(sumFields[info.second].sum);
                 break;
@@ -129,6 +133,7 @@ void DataBase::AggregationMaker::aggregateDataSet(DataSets::MemoryDataSet *ds,
               case ValueType::Currency:(*(*resultIter))[cnt].copyFrom<Currency>(sumFields[info.second].sum);
                 break;
             }
+#pragma clang diagnostic pop
             break;
           case AgrOperator::avg:break;
           case AgrOperator::count:(*(*resultIter))[cnt]._integer = countFields[info.second].count;
@@ -188,6 +193,8 @@ void DataBase::AggregationMaker::aggregateDataSet(DataSets::MemoryDataSet *ds,
     for (const auto &info : writeOrder) {
       switch (info.first) {
         case AgrOperator::sum:
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wswitch"
           switch (sumFields[info.second].field->getFieldType()) {
             case ValueType::Integer:(*(*resultIter))[cnt].copyFrom<int>(sumFields[info.second].sum);
               break;
@@ -196,6 +203,7 @@ void DataBase::AggregationMaker::aggregateDataSet(DataSets::MemoryDataSet *ds,
             case ValueType::Currency:(*(*resultIter))[cnt].copyFrom<Currency>(sumFields[info.second].sum);
               break;
           }
+#pragma clang diagnostic pop
           break;
         case AgrOperator::avg:break;
         case AgrOperator::count:(*(*resultIter))[cnt]._integer = countFields[info.second].count;
@@ -257,6 +265,8 @@ void DataBase::AggregationMaker::aggregateView(DataSets::MemoryViewDataSet *ds,
       for (const auto &info : writeOrder) {
         switch (info.first) {
           case AgrOperator::sum:
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wswitch"
             switch (sumFields[info.second].field->getFieldType()) {
               case ValueType::Integer:(*(*resultIter))[cnt].copyFrom<int>(sumFields[info.second].sum);
                 break;
@@ -265,6 +275,7 @@ void DataBase::AggregationMaker::aggregateView(DataSets::MemoryViewDataSet *ds,
               case ValueType::Currency:(*(*resultIter))[cnt].copyFrom<Currency>(sumFields[info.second].sum);
                 break;
             }
+#pragma clang diagnostic pop
             break;
           case AgrOperator::avg:break;
           case AgrOperator::count:(*(*resultIter))[cnt]._integer = countFields[info.second].count;
@@ -324,6 +335,8 @@ void DataBase::AggregationMaker::aggregateView(DataSets::MemoryViewDataSet *ds,
     for (const auto &info : writeOrder) {
       switch (info.first) {
         case AgrOperator::sum:
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wswitch"
           switch (sumFields[info.second].field->getFieldType()) {
             case ValueType::Integer:(*(*resultIter))[cnt].copyFrom<int>(sumFields[info.second].sum);
               break;
@@ -332,6 +345,7 @@ void DataBase::AggregationMaker::aggregateView(DataSets::MemoryViewDataSet *ds,
             case ValueType::Currency:(*(*resultIter))[cnt].copyFrom<Currency>(sumFields[info.second].sum);
               break;
           }
+#pragma clang diagnostic pop
           break;
         case AgrOperator::avg:break;
         case AgrOperator::count:(*(*resultIter))[cnt]._integer = countFields[info.second].count;

@@ -9,6 +9,7 @@
 #include <MemoryDataBase.h>
 #include <QueryCommon.h>
 #include <algorithm>
+#include <utility>
 #include <vector>
 
 namespace DataBase {
@@ -32,9 +33,9 @@ class JoinMaker {
    * @param t2 second table/view
    * @param field2 field from second table/view to join on
    */
-  JoinMaker(const std::shared_ptr<T1> &t1, const std::string &field1,
-            const std::shared_ptr<T2> &t2, const std::string &field2)
-      : t1(t1), t2(t2), col1(field1), col2(field2) {
+  JoinMaker(const std::shared_ptr<T1> &t1, std::string field1,
+            const std::shared_ptr<T2> &t2, std::string field2)
+          : t1(t1), t2(t2), col1(std::move(field1)), col2(std::move(field2)) {
     static_assert(std::is_same<T1, Table>{} || std::is_same<T1, View>{});
     static_assert(std::is_same<T2, Table>{} || std::is_same<T2, View>{});
   }

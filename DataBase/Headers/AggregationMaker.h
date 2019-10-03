@@ -23,12 +23,12 @@ class AggregationMaker {
    *
    * @param table table to aggregate
    */
-  explicit AggregationMaker(const std::shared_ptr<Table> &table);
+  explicit AggregationMaker(std::shared_ptr<Table> table);
   /**
    *
    * @param view view to aggregate
    */
-  explicit AggregationMaker(const std::shared_ptr<View> &view);
+  explicit AggregationMaker(std::shared_ptr<View> view);
   /**
    * Do aggregation operation defined in query.
    * @param structuredQuery query containing info about required aggregation operations

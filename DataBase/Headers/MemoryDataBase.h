@@ -43,7 +43,7 @@ class MemoryDataBase {
   void removeTable(std::string_view tableName);
   void removeView(std::string_view viewName);
 
-  std::shared_ptr<Table> tableByName(std::string_view tableName) const;
+    [[nodiscard]] std::shared_ptr<Table> tableByName(std::string_view tableName) const;
   /**
    * Execute a query not containing aggregation.
    * @param query query to execute
@@ -60,9 +60,9 @@ class MemoryDataBase {
    */
   std::shared_ptr<View> execAggregateQuery(std::string_view query, std::string_view viewName);
 
-  std::string_view getName() const;
+    [[nodiscard]] std::string_view getName() const;
 
-  const std::vector<std::shared_ptr<Table>> &getTables() const;
+    [[nodiscard]] const std::vector<std::shared_ptr<Table>> &getTables() const;
 
  private:
   std::vector<std::shared_ptr<Table>> tables;
