@@ -124,7 +124,7 @@ class Logger {
    */
   void printElapsedTime() {
     auto tmp = endTimeMs - startTimeMs;
-    log(LogLevel::Verbose, "Time elapsed: " + std::to_string(tmp.count()) + " ms");
+    log<LogLevel::Verbose>("Time elapsed: " + std::to_string(tmp.count()) + " ms");
   }
 };
 

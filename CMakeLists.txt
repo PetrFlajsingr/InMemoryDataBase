@@ -106,6 +106,7 @@ add_executable(cedr_new cedr_new.cpp ${SOURCE_FILES})
 add_executable(test test.cpp ${SOURCE_FILES})
 add_executable(zdrav zdrav.cpp ${SOURCE_FILES})
 add_executable(catch_tests ${TEST_SOURCE_FILES})
+add_executable(export1 export1.cpp ${SOURCE_FILES})
 
 add_executable(csv_to_xlsx csv_to_xlsx.cpp ${SOURCE_FILES})
 
@@ -141,4 +142,8 @@ target_link_libraries(xml_test -pthread Boost::boost Boost::locale Boost::date_t
 target_link_libraries(csv_to_xlsx xlsxio_read)
 target_link_libraries(csv_to_xlsx xlsxio_write)
 target_link_libraries(csv_to_xlsx -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
+
+target_link_libraries(export1 xlsxio_read)
+target_link_libraries(export1 xlsxio_write)
+target_link_libraries(export1 -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 
