@@ -76,6 +76,7 @@ bool DataProviders::CsvReader::next() {
 
   parseRecord();
   if (currentRecord.size() != header.size()) {
+      _eof = true;
     return false;
   }
   currentRecordNumber++;

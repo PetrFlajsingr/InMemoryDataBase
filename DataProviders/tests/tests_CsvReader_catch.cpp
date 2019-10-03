@@ -127,25 +127,23 @@ SCENARIO("Reading csv file via BaseDataProvider interface", "[CsvReader]") {
 
       THEN("the read contents are the same") {
         std::vector<std::vector<std::string>> toCheck;
-        while (!csvReader.eof()) {
+        while (csvReader.next()) {
           std::vector<std::string> row;
           for (const auto &value : csvReader.getRow()) {
             row.emplace_back(value);
           }
           toCheck.emplace_back(row);
-          csvReader.next();
         }
 
         csvReader.first();
 
         int i = 0;
-        while (!csvReader.eof()) {
+        while (csvReader.next()) {
           REQUIRE(csvReader.getRow().size() == ADV_COLUMN_COUNT);
           for (int j = 0; j < toCheck[i].size(); ++j) {
             CHECK(csvReader.getRow()[j] == toCheck[i][j]);
           }
           csvReader.next();
-          i++;
         }
       }
     }
