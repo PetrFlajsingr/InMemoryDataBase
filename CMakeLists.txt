@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 
+project(csv_reader)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 
@@ -99,6 +101,7 @@ FIND_PACKAGE(Boost COMPONENTS locale date_time filesystem REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 
 add_executable(cedr cedr.cpp ${SOURCE_FILES})
+add_executable(cedr_new cedr_new.cpp ${SOURCE_FILES})
 add_executable(test test.cpp ${SOURCE_FILES})
 add_executable(zdrav zdrav.cpp ${SOURCE_FILES})
 add_executable(catch_tests ${TEST_SOURCE_FILES})
@@ -112,6 +115,11 @@ add_executable(xml_test xml_test.cpp ${SOURCE_FILES} ${ARESSources})
 target_link_libraries(cedr xlsxio_read)
 target_link_libraries(cedr xlsxio_write)
 target_link_libraries(cedr Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
+
+target_link_libraries(cedr_new xlsxio_read)
+target_link_libraries(cedr_new xlsxio_write)
+target_link_libraries(cedr_new Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem -L/usr/local/opt/curl/lib ${LibArchive_LIBRARIES})
+
 
 target_link_libraries(zdrav xlsxio_read)
 target_link_libraries(zdrav xlsxio_write)

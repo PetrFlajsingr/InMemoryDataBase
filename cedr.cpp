@@ -53,16 +53,8 @@ const std::string QUERY_AGR =
     "main.rozpoctoveObdobi, "
     "prijemce_subjekty.idPrijemce, prijemce_subjekty.ico, prijemce_subjekty.obchodniJmeno, "
     "prijemce_subjekty.Id_GIS, prijemce_subjekty.Y, prijemce_subjekty.X "
-    //"operacniProgram.operacniProgramNazev, "
-    //"grantoveSchema.grantoveSchemaNazev, "
-    //"dotaceTitul.dotaceTitulNazev, "
-    //"poskytovatelDotace.dotacePoskytovatelNazev "
     "FROM main "
     "JOIN prijemce_subjekty ON main.idPrijemce = prijemce_subjekty.idPrijemce";
-//"LEFT JOIN operacniProgram ON main.iriOperacniProgram = operacniProgram.idOperacniProgram "
-//"LEFT JOIN grantoveSchema ON main.iriGrantoveSchema = grantoveSchema.idGrantoveSchema "
-//"LEFT JOIN dotaceTitul ON main.iriDotacniTitul = dotaceTitul.idDotaceTitul "
-//"LEFT JOIN poskytovatelDotace ON main.iriPoskytovatelDotace = poskytovatelDotace.id";
 
 const std::string
     QUERY_AGR_2017 = QUERY_AGR + " WHERE main.rozpoctoveObdobi = 2017";

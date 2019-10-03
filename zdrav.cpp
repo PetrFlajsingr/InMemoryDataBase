@@ -15,16 +15,6 @@
 #include <Tree.h>
 
 int main() {
-  auto tst = DateTime("08/06/1995", "%d/%m/%Y");
-  std::cout << tst.toString("%d-%m-%Y") << std::endl;
-  tst = DateTime("08/06/1995 083011", "%d/%m/%Y %H%M%S");
-  std::cout << tst.toString() << std::endl;
-  tst = DateTime("08:30:11", "%H:%M:%S");
-  std::cout << tst.toString() << std::endl;
-  tst = DateTime("08/06/1995", DateTimeType::Date);
-  std::cout << tst.toString("%d-%m-%Y") << std::endl;
-
-  return 0;
   Logger::GetInstance().log(LogLevel::Debug, "Start", true);
   auto nnoProvider =
       DataProviders::XlsxIOReader("/Users/petr/Desktop/NNO_subjekty6ver2.4.xlsx",
