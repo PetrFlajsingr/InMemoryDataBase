@@ -78,6 +78,15 @@ SCENARIO("Reading csv file using via BaseDataProvider StreamReader interface", "
                 REQUIRE(recordCount == SMALL_ROW_COUNT);
             }
         }
+
+        WHEN("Reading column name and count"){
+            THEN("Column names and count are matching"){
+                REQUIRE(csvStreamReader.getColumnCount() == SMALL_COLUMN_COUNT);
+                for(auto i =0; i < SMALL_COLUMN_COUNT; ++i){
+                    REQUIRE((csvStreamReader.getColumnName(i)) == columnNamesSmall[i]);
+                }
+            }
+        }
     }
 
     GIVEN("A bit complex csv") {
@@ -151,6 +160,10 @@ SCENARIO("Reading csv file using via BaseDataProvider StreamReader interface", "
 SCENARIO("Reading csv file via iterator StreamReader", "[CsvStreamReader]") {
 
     GIVEN("A simple csv file") {
+        const std::string columnNamesSmall[SMALL_COLUMN_COUNT]{
+                "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4", "COLUMN5"
+        };
+
         const std::string recordsSmall[SMALL_ROW_COUNT][SMALL_COLUMN_COUNT]{
                 {"RECORD11", "RECORD12", "RECORD13", "RECORD14", "RECOR15"},
                 {"RECORD21", "RECORD22", "RECORD23", "RECORD24", "RECORD25"},
@@ -194,6 +207,15 @@ SCENARIO("Reading csv file via iterator StreamReader", "[CsvStreamReader]") {
                     ++recordCount;
                 }
                 REQUIRE(recordCount == SMALL_ROW_COUNT);
+            }
+        }
+
+        WHEN("Reading column name and count"){
+            THEN("Column names and count are matching"){
+                REQUIRE(reader.getColumnCount() == SMALL_COLUMN_COUNT);
+                for(auto i =0; i < SMALL_COLUMN_COUNT; ++i){
+                    REQUIRE((reader.getColumnName(i)) == columnNamesSmall[i]);
+                }
             }
         }
     }
