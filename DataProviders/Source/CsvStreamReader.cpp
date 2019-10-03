@@ -4,12 +4,15 @@
 
 #include "CsvStreamReader.h"
 
-DataProviders::CsvStreamReader::CsvStreamReader(std::string filePath, char delimiter) : BaseDataProvider(), csvStream(std::make_unique<csvstream>(filePath, delimiter)), filePath(filePath), delimiter(delimiter) {
+DataProviders::CsvStreamReader::CsvStreamReader(const std::string &filePath, char delimiter)
+        : BaseDataProvider(), csvStream(std::make_unique<csvstream>(filePath, delimiter)), filePath(filePath),
+          delimiter(delimiter) {
     header = csvStream->getheader();
 }
 
-DataProviders::CsvStreamReader::CsvStreamReader(std::string filePath, CharSet inputCharSet,
-                                                char delimiter) : BaseDataProvider(inputCharSet), csvStream(std::make_unique<csvstream>(filePath, delimiter)), filePath(filePath), delimiter(delimiter) {
+DataProviders::CsvStreamReader::CsvStreamReader(const std::string &filePath, CharSet inputCharSet,
+                                                char delimiter) : BaseDataProvider(inputCharSet), csvStream(
+        std::make_unique<csvstream>(filePath, delimiter)), filePath(filePath), delimiter(delimiter) {
     header = csvStream->getheader();
 }
 
@@ -30,4 +33,5 @@ bool DataProviders::CsvStreamReader::eof() const {
 void DataProviders::CsvStreamReader::first() {
     _eof = false;
     csvStream = std::make_unique<csvstream>(filePath, delimiter);
+    next();
 }

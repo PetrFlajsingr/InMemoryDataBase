@@ -9,57 +9,57 @@
 #include <csvstream.h>
 
 namespace DataProviders {
-class CsvStreamReader : public BaseDataProvider {
-public:
-    /**
-     * If the file can not be opened throws IOException.
-     * @param filePath path to file
-     * @param delimiter csv delimiter
-     */
-    explicit CsvStreamReader(std::string filePath, char delimiter = ',');
+    class CsvStreamReader : public BaseDataProvider {
+    public:
+        /**
+         * If the file can not be opened throws IOException.
+         * @param filePath path to file
+         * @param delimiter csv delimiter
+         */
+        explicit CsvStreamReader(const std::string &filePath, char delimiter = ',');
 
-    explicit CsvStreamReader(std::string filePath, CharSet inputCharSet, char delimiter = ',');
+        explicit CsvStreamReader(const std::string &filePath, CharSet inputCharSet, char delimiter = ',');
 
-    inline const std::vector<std::string> &getRow() const override {
-        return currentRecord;
-    }
+        inline const std::vector<std::string> &getRow() const override {
+            return currentRecord;
+        }
 
-    inline std::string getColumnName(unsigned int columnIndex) const override {
-        return header.at(columnIndex);
-    }
+        inline std::string getColumnName(unsigned int columnIndex) const override {
+            return header.at(columnIndex);
+        }
 
-    bool next() override;
+        bool next() override;
 
-    void first() override;
+        void first() override;
 
-    int getCurrentRecordNumber() const override {
-        return currentRecordNumber;
-    }
+        int getCurrentRecordNumber() const override {
+            return currentRecordNumber;
+        }
 
-    inline const std::vector<std::string> &getHeader() const override {
-        return header;
-    }
+        inline const std::vector<std::string> &getHeader() const override {
+            return header;
+        }
 
-    inline uint64_t getColumnCount() const override {
-        return header.size();
-    }
+        inline uint64_t getColumnCount() const override {
+            return header.size();
+        }
 
-    bool eof() const override;
+        bool eof() const override;
 
-private:
-    int currentRecordNumber = -1;
+    private:
+        int currentRecordNumber = -1;
 
-    std::vector<std::string> header;
+        std::vector<std::string> header;
 
-    std::vector<std::string> currentRecord;
+        std::vector<std::string> currentRecord;
 
-    std::unique_ptr<csvstream> csvStream;
+        std::unique_ptr<csvstream> csvStream;
 
-    std::string filePath;
-    char delimiter;
-    bool _eof = false;
+        std::string filePath;
+        char delimiter;
+        bool _eof = false;
 
-};
+    };
 }  // namespace DataProviders
 
 
