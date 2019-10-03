@@ -342,7 +342,7 @@ csvstream &csvstream::operator>>(std::vector<std::string> &row) {
     }
 
     // Check length of data
-    if (row.size() != header.size()) {
+    if (data.size() != header.size()) {
         auto msg = "Number of items in row does not match header. " +
                    filename + ":L" + std::to_string(line_no) + " " +
                    "header.size() = " + std::to_string(header.size()) + " " +
