@@ -31,7 +31,7 @@ bool DataProviders::CsvStreamReader::eof() const {
 }
 
 void DataProviders::CsvStreamReader::first() {
+    currentRecordNumber = -1;
     _eof = false;
     csvStream = std::make_unique<csvstream>(filePath, delimiter);
-    next();
 }
