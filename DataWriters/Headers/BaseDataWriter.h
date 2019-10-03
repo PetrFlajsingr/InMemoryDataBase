@@ -63,7 +63,8 @@ class BaseDataWriter {
     iterator &operator++() {
       return *this;
     }
-    const iterator operator++(int) {
+
+      iterator operator++(int) {
       return *this;
     }
   };

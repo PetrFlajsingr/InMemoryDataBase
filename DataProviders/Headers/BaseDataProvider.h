@@ -63,7 +63,7 @@ class BaseDataProvider {
    */
   virtual void first() = 0;
 
-  inline virtual bool eof() const = 0;
+    virtual bool eof() const = 0;
 
   virtual ~BaseDataProvider() = default;
 

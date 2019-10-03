@@ -13,11 +13,11 @@ bool FileDownloader::downloadFile(std::string_view url) {
   CURL *curl;
   CURLcode res;
 
-  // curl = curl_easy_init();
+    curl = curl_easy_init();
   std::string readBuffer;
   if (curl) {
-    // curl_easy_setopt(curl, CURLOPT_URL, url);
-    // curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+      curl_easy_setopt(curl, CURLOPT_URL, url);
+      curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
 
     auto parts = Utilities::splitStringByDelimiter(url, "/");
     auto name = parts.back();
@@ -25,11 +25,11 @@ bool FileDownloader::downloadFile(std::string_view url) {
     FILE *fp;
     fp = fopen((downloadLocation + name).c_str(), "wb");
 
-    // curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
-    // curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+      curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);
+      curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
 
     notifyDownloadStarted(url);
-    // res = curl_easy_perform(curl);
+      res = curl_easy_perform(curl);
 
     if (res != CURLE_OK) {
       notifyDownloadFailed(url, "dunno");
@@ -40,7 +40,7 @@ bool FileDownloader::downloadFile(std::string_view url) {
     notifyDownloadFinished(url, downloadLocation + name);
 
     fclose(fp);
-    // curl_easy_cleanup(curl);
+      curl_easy_cleanup(curl);
   }
   return true;
 }

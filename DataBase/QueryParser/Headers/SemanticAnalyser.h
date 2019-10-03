@@ -22,7 +22,7 @@ class SemanticAnalyser {
     where, joinMain, joinSecond, group, order, project, having
   };
 
-  std::string getErrorMsg(SemErrType errType, const std::string &value);
+    static std::string getErrorMsg(SemErrType errType, const std::string &value);
 };
 }  // namespace DataBase
 

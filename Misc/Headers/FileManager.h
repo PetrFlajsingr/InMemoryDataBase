@@ -23,7 +23,7 @@ class File {
  private:
   boost::filesystem::path path;
  public:
-  explicit File(const boost::filesystem::path &path);
+    explicit File(boost::filesystem::path path);
   std::unique_ptr<DataProviders::BaseDataProvider> createProvider();
   std::unique_ptr<DataWriters::BaseDataWriter> createWriter();
   std::ifstream inStream();
@@ -36,7 +36,7 @@ class Folder {
  private:
   boost::filesystem::path path;
  public:
-  explicit Folder(const boost::filesystem::path &path);
+    explicit Folder(boost::filesystem::path path);
   /**
    *
    * @param name relative path
@@ -74,9 +74,9 @@ class Folder {
    */
   bool isFile(std::string_view name);
 
-  const boost::filesystem::path &getPath() const;
+    [[nodiscard]] const boost::filesystem::path &getPath() const;
 
-  std::vector<std::string> getFileNames() const;
+    [[nodiscard]] std::vector<std::string> getFileNames() const;
 };
 /**
  * Basic access point to File/Folder classes.
@@ -88,13 +88,13 @@ class FileManager {
    * @param path absolute path
    * @return folder on path
    */
-  Folder getFolder(std::string_view path);
+  static Folder getFolder(std::string_view path);
   /**
    *
    * @param path absolute path
    * @return file on path
    */
-  File getFile(std::string_view path);
+  static File getFile(std::string_view path);
 };
 
 #endif //PROJECT_FILEMANAGER_H

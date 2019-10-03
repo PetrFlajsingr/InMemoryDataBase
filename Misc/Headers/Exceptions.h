@@ -21,7 +21,7 @@ class IOException : public std::exception {
   explicit IOException(const gsl::czstring<> message) : errorMessage(message) {}
   explicit IOException(const std::string &message) : errorMessage(message.c_str()) {}
 
-  char const *what() const noexcept override {
+    [[nodiscard]] char const *what() const noexcept override {
     return errorMessage;
   }
 };
@@ -29,7 +29,8 @@ class IOException : public std::exception {
 class InvalidArgumentException : public std::invalid_argument {
  public:
   explicit InvalidArgumentException(const gsl::czstring<> message) : invalid_argument(message) {}
-  explicit InvalidArgumentException(const std::string message) : invalid_argument(message.c_str()) {}
+
+    explicit InvalidArgumentException(const std::string &message) : invalid_argument(message.c_str()) {}
 };
 
 class IllegalStateException : public std::exception {
@@ -38,7 +39,7 @@ class IllegalStateException : public std::exception {
  public:
   explicit IllegalStateException(const gsl::czstring<> message) : errorMessage(message) {}
 
-  char const *what() const noexcept override {
+    [[nodiscard]] char const *what() const noexcept override {
     return errorMessage;
   }
 };
@@ -49,7 +50,7 @@ class UnsupportedOperationException : public std::exception {
  public:
   explicit UnsupportedOperationException(const gsl::czstring<> message) : errorMessage(message) {}
 
-  char const *what() const noexcept override {
+    [[nodiscard]] char const *what() const noexcept override {
     return errorMessage;
   }
 };
@@ -61,7 +62,7 @@ class DataBaseException : public std::exception {
   explicit DataBaseException(const std::string &errorMessage) : errorMessage(errorMessage.c_str()) {}
   explicit DataBaseException(const gsl::czstring<> message) : errorMessage(message) {}
 
-  char const *what() const noexcept override {
+    [[nodiscard]] char const *what() const noexcept override {
     return errorMessage;
   }
 };
@@ -73,7 +74,7 @@ class ResourceNotFoundException : public std::exception {
   explicit ResourceNotFoundException(const std::string &errorMessage) : errorMessage(errorMessage.c_str()) {}
   explicit ResourceNotFoundException(const gsl::czstring<> message) : errorMessage(message) {}
 
-  char const *what() const noexcept override {
+    [[nodiscard]] char const *what() const noexcept override {
     return errorMessage;
   }
 };

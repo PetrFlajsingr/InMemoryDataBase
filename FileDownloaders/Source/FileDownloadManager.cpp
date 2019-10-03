@@ -9,7 +9,7 @@ FileDownloadManager::FileDownloadManager(const std::shared_ptr<MessageManager> &
     : MessageSender(commandManager), threadPool(threadPool) {
   commandManager->registerMsg<Download>(this);
   commandManager->registerMsg<DownloadNoBlock>(this);
-  // curl_global_init(CURL_GLOBAL_DEFAULT);
+    curl_global_init(CURL_GLOBAL_DEFAULT);
 }
 
 void FileDownloadManager::enqueueDownload(const std::string &localFolder, const std::string &url,

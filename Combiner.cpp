@@ -32,7 +32,7 @@ std::shared_ptr<DataBase::View> Combiner::viewByName(const std::string &name) {
   return nullptr;
 }
 
-void Combiner::addDataSource(std::shared_ptr<DataBase::View> view) {
+void Combiner::addDataSource(const std::shared_ptr<DataBase::View> &view) {
   views.emplace_back(view);
 }
 
@@ -57,7 +57,8 @@ Combiner::prepareJoinFields(const std::map<std::string,
   }
   return std::make_pair(views, joinFields);
 }
-std::shared_ptr<DataBase::Table> Combiner::combineOn(std::map<std::string, std::string> tableAndColumn) {
+
+std::shared_ptr<DataBase::Table> Combiner::combineOn(const std::map<std::string, std::string> &tableAndColumn) {
   sortDataSets(tableAndColumn);
 
   auto dataSet = std::make_shared<DataSets::MemoryDataSet>("result");

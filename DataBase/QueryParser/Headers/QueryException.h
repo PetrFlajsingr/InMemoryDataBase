@@ -8,14 +8,16 @@
 #include <exception>
 #include <gsl/gsl>
 #include <string>
+#include <utility>
 
 namespace DataBase {
 class QueryException : public std::exception {
  private:
   const std::string errorMessage;
  public:
-  explicit QueryException(const std::string &message) : errorMessage(message) {}
-  char const *what() const noexcept override {
+    explicit QueryException(std::string message) : errorMessage(std::move(message)) {}
+
+    [[nodiscard]] char const *what() const noexcept override {
     return errorMessage.c_str();
   }
 };

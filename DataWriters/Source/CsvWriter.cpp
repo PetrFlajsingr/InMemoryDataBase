@@ -41,7 +41,7 @@ void DataWriters::CsvWriter::writeRecord(const std::vector<std::string> &record)
 }
 
 void DataWriters::CsvWriter::writeRow(const std::vector<std::string> &data) {
-  for (auto i = 0; i < columnCount - 1; ++i) {
+    for (gsl::index i = 0; i < columnCount - 1; ++i) {
     if (convert) {
       *outputStream << converter->convertBack(data[i]) << delimiter;
     } else {

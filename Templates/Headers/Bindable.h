@@ -139,7 +139,7 @@ class TransformBinding : public Bindable<T>, public Observer {
 template<typename T>
 class Bindable : public Observable<T>, public std::enable_shared_from_this<Bindable<T>> {
  public:
-  Bindable() {}
+    Bindable() = default;
   explicit Bindable(T value) : Observable<T>(value) {}
   /**
    * Bind this to provided Bindable and the Bindable to this.

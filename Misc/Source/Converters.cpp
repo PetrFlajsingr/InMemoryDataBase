@@ -6,6 +6,8 @@
 #include "Converters.h"
 #include <Utilities.h>
 
+#include <utility>
+
 std::string CharSetConverter::convert(const std::string &value) const {
   switch (charsetIn) {
     case CharSet::Latin1:
@@ -80,7 +82,7 @@ std::string StringDoubleConverter::convertBack(const double &value) const {
   return std::to_string(value);
 }
 
-StringSplitConverter::StringSplitConverter(const std::string &delimiter) : delimiter(delimiter) {}
+StringSplitConverter::StringSplitConverter(std::string delimiter) : delimiter(std::move(delimiter)) {}
 std::vector<std::string> StringSplitConverter::convert(const std::string &value) const {
   return Utilities::splitStringByDelimiter(value, delimiter);
 }

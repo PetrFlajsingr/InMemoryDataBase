@@ -6,6 +6,8 @@
 
 #include "FileManager.h"
 
+#include <utility>
+
 FileException::FileException(const char *message) : IOException(message) {}
 FileException::FileException(const std::string &message) : IOException(message) {}
 
@@ -29,7 +31,8 @@ File FileManager::getFile(std::string_view path) {
 const boost::filesystem::path &Folder::getPath() const {
   return path;
 }
-Folder::Folder(const boost::filesystem::path &path) : path(path) {}
+
+Folder::Folder(boost::filesystem::path path) : path(std::move(path)) {}
 Folder Folder::getFolder(std::string_view name) {
   std::string sPath = path.string();
   sPath.append(name);
@@ -90,7 +93,7 @@ std::vector<std::string> Folder::getFileNames() const {
   return result;
 }
 
-File::File(const boost::filesystem::path &path) : path(path) {}
+File::File(boost::filesystem::path path) : path(std::move(path)) {}
 std::ifstream File::inStream() {
   return std::ifstream(path.string());
 }

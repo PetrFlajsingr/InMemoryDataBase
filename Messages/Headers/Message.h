@@ -29,7 +29,7 @@ class DataMessage : public Message {
  protected:
   T data;
  public:
-  T getData() const {
+    [[nodiscard]] T getData() const {
     return data;
   }
 };
@@ -42,10 +42,11 @@ class FncMessage : public Message {
  protected:
   T fnc;
  public:
-  explicit FncMessage(T fnc) : fnc(fnc) {
+    explicit FncMessage(T fnc) : fnc(std::move(fnc)) {
     static_assert(std::is_invocable<T>::value, "T has to be invocable");
   }
-  T getFnc() const {
+
+    [[nodiscard]] T getFnc() const {
     return fnc;
   }
 };

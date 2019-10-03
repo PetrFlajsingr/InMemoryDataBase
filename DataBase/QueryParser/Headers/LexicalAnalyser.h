@@ -40,7 +40,7 @@ class LexicalAnalyser {
 
   gsl::index currentIndex;
 
-  Token keyWordCheck(std::string_view str);
+    static Token keyWordCheck(std::string_view str);
 
   std::string getErrorPrint();
 

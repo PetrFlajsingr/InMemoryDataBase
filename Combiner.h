@@ -18,9 +18,9 @@ using namespace std::string_literals;
 
 class Combiner {
  public:
-  void addDataSource(std::shared_ptr<DataBase::View> view);
+    void addDataSource(const std::shared_ptr<DataBase::View> &view);
 
-  std::shared_ptr<DataBase::Table> combineOn(std::map<std::string, std::string> tableAndColumn);
+    std::shared_ptr<DataBase::Table> combineOn(const std::map<std::string, std::string> &tableAndColumn);
 
  private:
   std::vector<std::shared_ptr<DataBase::View>> views;

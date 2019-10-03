@@ -26,7 +26,7 @@ class Logger {
    *
    * @return Current time as HH-MM-SS
    */
-  std::string getTime() const {
+  [[nodiscard]] std::string getTime() const {
     auto t = std::time(nullptr);
     auto tm = *std::localtime(&t);
     std::stringstream ss;
@@ -38,7 +38,7 @@ class Logger {
    * @param level
    * @return
    */
-  std::string levelToString(LogLevel level) const {
+  [[nodiscard]] std::string levelToString(LogLevel level) const {
     switch (level) {
       case LogLevel::Verbose:return "";
       case LogLevel::Info: return "[INFO]";

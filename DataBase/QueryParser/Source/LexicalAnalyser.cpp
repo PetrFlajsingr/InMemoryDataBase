@@ -227,7 +227,7 @@ DataBase::Token DataBase::LexicalAnalyser::keyWordCheck(std::string_view str) {
 
 std::string DataBase::LexicalAnalyser::getErrorPrint() {
   std::string fill;
-  for (int i = 0; i < currentIndex; ++i) {
+    for (gsl::index i = 0; i < currentIndex; ++i) {
     fill += " ";
   }
   fill += "^";

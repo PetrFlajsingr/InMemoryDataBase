@@ -82,7 +82,7 @@ struct HavingStructure {
 };
 
 struct OrderItem {
-  Order order;
+    Order order = Order::asc;
   FieldId field;
 };
 struct OrderStructure {

@@ -95,7 +95,7 @@ class Property final {
 
   template<PropType Type = SetGet,
       typename = typename std::enable_if<Type != PropType::W, void>::type>
-  operator T&() {
+  operator T &() {
     return get();
   }
 

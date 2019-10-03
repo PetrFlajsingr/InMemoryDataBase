@@ -44,17 +44,17 @@ class DateTime {
    */
   DateTime(std::string_view str, std::string_view fmt);
 
-  DateTimeType getType() const;
+    [[nodiscard]] DateTimeType getType() const;
   /**
    * Convert to string using default formats.
    * @return string representation of this
    */
-  std::string toString() const;
+  [[nodiscard]] std::string toString() const;
   /**
    * Convert to string using user defined format.
    * @return string representation of this
    */
-  std::string toString(std::string_view fmt) const;
+  [[nodiscard]] std::string toString(std::string_view fmt) const;
 
   /**
    * Set datetime from string using default formats.
@@ -72,7 +72,7 @@ class DateTime {
   xlnt::time toXlntTime();
   xlnt::datetime toXlntDateTime();
 
-  const boost::posix_time::ptime &getTime() const;
+    [[nodiscard]] const boost::posix_time::ptime &getTime() const;
 
   bool operator==(const DateTime &rhs) const;
   bool operator!=(const DateTime &rhs) const;
@@ -91,8 +91,8 @@ class DateTime {
   static const std::string dateDefFmt;
   static const std::string timeDefFmt;
 
-  std::pair<DateTimeType, boost::posix_time::ptime> innerFromString(std::string_view str,
-                                                                    std::string_view fmt);
+    static std::pair<DateTimeType, boost::posix_time::ptime> innerFromString(std::string_view str,
+                                                                             std::string_view fmt);
 };
 
 enum class ValueType {
@@ -154,7 +154,7 @@ union DataContainer {
   }
 
   template<typename T>
-  int compare(const DataContainer &val) const {
+  [[nodiscard]] int compare(const DataContainer &val) const {
     if constexpr (std::is_same<T, int>{}) {
       return Utilities::compareInt(_integer, val._integer);
     }
