@@ -41,7 +41,7 @@ enum PropType {
 template<typename T, typename Owner, PropType SetGet>
 class Property final {
   friend Owner;
-  using Getter = std::function<const T &()>;
+  using Getter = std::function<T &()>;
   using Setter = std::function<void(const T &)>;
 
  public:
@@ -70,14 +70,14 @@ class Property final {
       typename = typename std::enable_if<Type == PropType::W, void>::type>
   explicit Property(const Setter &set) : set(set) {}
   ~Property() = default;
-  Property<T, Owner>(const Property<T, Owner, SetGet> &) = delete;
+  Property<T, Owner, SetGet>(const Property<T, Owner, SetGet> &) = delete;
   Property<T, Owner, SetGet> &operator=(const Property<T, Owner, SetGet> &) = delete;
   /**
    * Set value using Setter function
    */
   template<PropType Type = SetGet,
       typename = typename std::enable_if<Type != PropType::R, void>::type>
-  typename std::conditional<std::is_compound<T>::value, T &, T>::type operator=(
+  T& operator=(
       const T &f) {
     set(f);
     return value;
@@ -95,9 +95,7 @@ class Property final {
 
   template<PropType Type = SetGet,
       typename = typename std::enable_if<Type != PropType::W, void>::type>
-  operator typename std::conditional<std::is_compound<T>::value,
-                                     const T &,
-                                     T>::type() const {
+  operator T&() {
     return get();
   }
 

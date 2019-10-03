@@ -97,9 +97,9 @@ std::ifstream File::inStream() {
 std::ofstream File::ofStream() {
   return std::ofstream(path.string());
 }
-DataProviders::BaseDataProvider File::createProvider() {
+std::unique_ptr<DataProviders::BaseDataProvider> File::createProvider() {
   throw NotImplementedException();
 }
-DataWriters::BaseDataWriter File::createWriter() {
+std::unique_ptr<DataWriters::BaseDataWriter> File::createWriter() {
   throw NotImplementedException();
 }

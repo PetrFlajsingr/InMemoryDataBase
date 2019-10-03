@@ -92,15 +92,16 @@ std::string DataBase::SemanticAnalyser::getErrorMsg(DataBase::SemanticAnalyser::
                                                     const std::string &value) {
   std::string result = "Semantic error: ";
   switch (errType) {
-    case SemErrType::where:result += "Used of undeclared table \'" + value + "\' in WHERE clause";
+    case SemErrType::where:result += "Use of undeclared table \'" + value + "\' in WHERE clause";
       break;
-    case SemErrType::joinMain:result += "Used of undeclared table \'" + value + "\' in WHERE clause";
+    case SemErrType::joinMain:result += "Use of undeclared table \'" + value + "\' in JOIN clause";
       break;
-    case SemErrType::joinSecond:break; // TODO
-    case SemErrType::group:break; // TODO
-    case SemErrType::order:break; // TODO
-    case SemErrType::project:break; // TODO
-    case SemErrType::having:break; // TODO
+    case SemErrType::joinSecond:result += "Use of undeclared table \'" + value + "\' in JOIN clause";break;
+    case SemErrType::group:result += "Use of undeclared table \'" + value + "\' in GROUP BY clause";break;
+    case SemErrType::order:result += "Use of undeclared table \'" + value + "\' in ORDER BY clause";break;
+    case SemErrType::project:result += "Use of undeclared table \'" + value + "\' in SELECT clause";
+          break;
+    case SemErrType::having:result += "Use of undeclared table \'" + value + "\' in HAVING clause";break;
   }
   return result;
 }

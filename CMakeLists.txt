@@ -15,6 +15,7 @@ endif (APPLE)
 link_directories(/usr/local/lib/)
 
 include_directories(third_party)
+include_directories(third_party/xlsxio/include)
 include_directories(Misc/tests)
 include_directories(Misc/Headers)
 include_directories(DataSets/Headers)
@@ -22,7 +23,7 @@ include_directories(DataProviders/Headers)
 include_directories(DataWriters/Headers)
 include_directories(DataSets/Fields/Headers)
 include_directories(FileDownloaders/Headers)
-include_directories(third_party/Decimal)
+include_directories(third_party/decimal)
 include_directories(CLI/Headers)
 include_directories(DataBase/Headers)
 include_directories(DataBase/QueryParser/Headers)
@@ -118,7 +119,7 @@ target_link_libraries(cedr Boost::boost Boost::locale Boost::date_time xlnt Boos
 
 target_link_libraries(cedr_new xlsxio_read)
 target_link_libraries(cedr_new xlsxio_write)
-target_link_libraries(cedr_new Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem -L/usr/local/opt/curl/lib ${LibArchive_LIBRARIES})
+target_link_libraries(cedr_new -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 
 
 target_link_libraries(zdrav xlsxio_read)

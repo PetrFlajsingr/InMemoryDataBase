@@ -59,7 +59,7 @@ class Logger {
   }
   template <LogLevel Level, bool PrintTime = false, typename ...T>
   void log(T&&... message) const {
-    if constexpr (Debug && Level == LogLevel::Debug) {
+    if constexpr (!Debug && Level == LogLevel::Debug) {
       return;
     }
     if constexpr (Level != LogLevel::Verbose) {

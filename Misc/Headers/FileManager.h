@@ -24,8 +24,8 @@ class File {
   boost::filesystem::path path;
  public:
   explicit File(const boost::filesystem::path &path);
-  DataProviders::BaseDataProvider createProvider();
-  DataWriters::BaseDataWriter createWriter();
+  std::unique_ptr<DataProviders::BaseDataProvider> createProvider();
+  std::unique_ptr<DataWriters::BaseDataWriter> createWriter();
   std::ifstream inStream();
   std::ofstream ofStream();
 };

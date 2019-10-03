@@ -21,10 +21,10 @@ class ArrayWriter : public BaseDataWriter {
    * Print data to stdout.
    */
   void print() const;
-  const std::vector<const std::vector<std::string>> &getArray() const;
+  [[nodiscard]] const std::vector<std::vector<std::string>> &getArray() const;
 
  private:
-  std::vector<const std::vector<std::string>> result;
+  std::vector<std::vector<std::string>> result;
 };
 
 }  // namespace DataWriters

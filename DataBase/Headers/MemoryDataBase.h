@@ -16,6 +16,7 @@
 #include <SemanticAnalyser.h>
 #include <MemoryDataSet.h>
 #include <AggregationMaker.h>
+#include <mutex>
 
 namespace DataBase {
 

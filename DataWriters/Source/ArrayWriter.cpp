@@ -22,6 +22,6 @@ void DataWriters::ArrayWriter::print() const {
   }
 }
 
-const std::vector<const std::vector<std::string>> &DataWriters::ArrayWriter::getArray() const {
+const std::vector<std::vector<std::string>> &DataWriters::ArrayWriter::getArray() const {
   return result;
 }

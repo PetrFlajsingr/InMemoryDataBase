@@ -2,54 +2,55 @@
 // Created by Petr Flajsingr on 02/10/2019.
 //
 #include <CsvReader.h>
+#include <CsvStreamReader.h>
 #include <MemoryDataBase.h>
 #include <MemoryDataSet.h>
 #include <XlsxIOReader.h>
 #include <XlsxIOWriter.h>
 #include <string>
+#include <Logger.h>
+#include <CsvWriter.h>
 
-const std::string csvPath = "/Users/petr/Desktop/cedr/";
+using namespace std::string_literals;
+
+const std::string csvPath = "/home/petr/Desktop/cedr/";
 const std::string outPath = csvPath + "out/";
-const std::string dotaceCSVName = "dotace.csv";
-const std::string rozhodnutiCSVName = "rozhodnuti.csv";
-const std::string obdobiCSVName = "rozpoctoveObdobi.csv";
-const std::string prijemceCSVName = "prijemcePomoci.csv";
+const std::string dotaceCSVName = "Dotace.csv";
+const std::string rozhodnutiCSVName = "Rozhodnuti.csv";
+const std::string obdobiCSVName = "RozpoctoveObdobi.csv";
+const std::string prijemceCSVName = "PrijemcePomoci.csv";
 const std::string outputCSVName = "cedr_output.csv";
 const std::string outputCSVAgrName = "cedr_output_agr.csv";
 const std::string subjektyCSVName = "NNO.xlsx";
 
-const std::string operacniProgramCSVName = "operacniProgram.csv";
-const std::string grantoveSchemaCSVName = "grantoveSchema.csv";
-const std::string dotacniTitulCSVName = "dotaceTitul.csv";
-const std::string poskytovatelDotaceCSVName = "poskytovatelDotace.csv";
+const std::string operacniProgramCSVName = "ciselnikCedrOperacniProgramv01.csv";
+const std::string grantoveSchemaCSVName = "ciselnikCedrGrantoveSchemav01.csv";
+const std::string dotacniTitulCSVName = "ciselnikDotaceTitulv01.csv";
+const std::string poskytovatelDotaceCSVName = "ciselnikDotacePoskytovatelv01.csv";
 
 const std::string QUERY =
     "SELECT dotace.idDotace, dotace.projektIdnetifikator, dotace.idPrijemce, "
     "dotace.projektNazev, dotace.iriOperacniProgram, "
-    "dotace.iriGrantoveSchema, dotace.idRozhodnuti, dotace.castkaCerpana, "
-    "dotace.castkaUvolnena, "
-    "dotace.iriDotacniTitul, dotace.iriPoskytovatelDotace, "
-    "dotace.rozpoctoveObdobi, "
-    "prijemce.idPrijemce, "
-    "prijemce.obchodniJmeno, "
+    "dotace.iriGrantoveSchema, rozhodnuti.idRozhodnuti, obdobi.castkaCerpana, "
+    "obdobi.castkaUvolnena, obdobi.iriDotacniTitul, rozhodnuti.iriPoskytovatelDotace, "
+    "obdobi.rozpoctoveObdobi, "
+    "prijemce.idPrijemce, prijemce.obchodniJmeno, "
     "subjekty.*, "
     "operacniProgram.operacniProgramNazev, "
     "grantoveSchema.grantoveSchemaNazev, "
-    "dotaceTitul.dotaceTitulNazev "
+    "dotaceTitul.dotaceTitulNazev, "
     "poskytovatelDotace.dotacePoskytovatelNazev "
     "FROM dotace "
     "JOIN prijemce ON dotace.idPrijemce = prijemce.idPrijemce "
     "JOIN subjekty ON prijemce.ico = subjekty.ICOnum "
-    "LEFT JOIN operacniProgram ON dotace.iriOperacniProgram = "
-    "operacniProgram.idOperacniProgram "
-    "LEFT JOIN grantoveSchema ON dotace.iriGrantoveSchema = "
-    "grantoveSchema.idGrantoveSchema "
-    "LEFT JOIN dotaceTitul ON dotace.iriDotacniTitul = "
-    "dotaceTitul.idDotaceTitul "
-    "LEFT JOIN poskytovatelDotace ON dotace.iriPoskytovatelDotace = "
-    "poskytovatelDotace.id";
+    "JOIN rozhodnuti ON dotace.idDotace = rozhodnuti.idDotace "
+    "JOIN obdobi ON rozhodnuti.idRozhodnuti = obdobi.idRozhodnuti "
+    "LEFT JOIN operacniProgram ON dotace.iriOperacniProgram = operacniProgram.idOperacniProgram "
+    "LEFT JOIN grantoveSchema ON dotace.iriGrantoveSchema = grantoveSchema.idGrantoveSchema "
+    "LEFT JOIN dotaceTitul ON obdobi.iriDotacniTitul = dotaceTitul.idDotaceTitul "
+    "LEFT JOIN poskytovatelDotace ON rozhodnuti.iriPoskytovatelDotace = poskytovatelDotace.id";
 
-const std::string QUERY_2018 = QUERY + " WHERE dotace.rozpoctoveObdobi = 2018";
+const std::string QUERY_2018 = QUERY + " WHERE obdobi.rozpoctoveObdobi = 2017;";
 
 const std::string QUERY_AGR =
     "SELECT dotace.idPrijemce, SUM(dotace.castkaCerpana), "
@@ -69,77 +70,194 @@ std::shared_ptr<DataSets::MemoryDataSet> make_dataset(const std::string &name) {
   return std::make_shared<DataSets::MemoryDataSet>(name);
 }
 
+auto logger = Logger<true>::GetInstance();
+
 int main() {
   DataBase::MemoryDataBase dataBase("db");
 
-  DataProviders::CsvReader dotaceProvider(csvPath + dotaceCSVName, ",");
-  DataProviders::CsvReader rozhodnutiProvider(csvPath + rozhodnutiCSVName, ",");
-  DataProviders::CsvReader obdobiProvider(csvPath + obdobiCSVName, ",");
-  DataProviders::CsvReader prijemceProvider(csvPath + prijemceCSVName, ",");
+  DataProviders::CsvStreamReader dotaceProvider(csvPath + dotaceCSVName, ',');
+  DataProviders::CsvStreamReader rozhodnutiProvider(csvPath + rozhodnutiCSVName, ',');
+  DataProviders::CsvStreamReader obdobiProvider(csvPath + obdobiCSVName, ',');
+  DataProviders::CsvStreamReader prijemceProvider(csvPath + prijemceCSVName, ',');
   DataProviders::XlsxIOReader subjektyProvider(csvPath + subjektyCSVName);
 
   auto dotaceDataSet = make_dataset("dotace");
-  dotaceDataSet->open(dotaceProvider, {ValueType::String, ValueType::String,
-                                       ValueType::String, ValueType::String,
-                                       ValueType::String, ValueType::String});
+  dotaceDataSet->open(dotaceProvider, {ValueType::String,
+                                       ValueType::String,
+                                       ValueType::String,
+                                       ValueType::String,
+                                       ValueType::String,
+                                       ValueType::String,
+                                       ValueType::String,
+                                       ValueType::String,
+                                       ValueType::String,
+                                       ValueType::String,
+                                       ValueType::String,
+                                       ValueType::String,
+                                       ValueType::String,
+                                       ValueType::String,
+                                       ValueType::String,
+                                       ValueType::String,
+                                       ValueType::String,
+                                       ValueType::String,
+                                       ValueType::String,
+                                       ValueType::String,
+                                       ValueType::String,
+                                       ValueType::String,
+                                       ValueType::String});
   dataBase.addTable(dotaceDataSet);
+    logger.log<LogLevel::Status>("Loaded: "s + dotaceDataSet->getName());
+    dotaceDataSet->resetEnd();
+    logger.log<LogLevel::Debug>("Count:", dotaceDataSet->getCurrentRecord());
+
 
   auto rozhodnutiDataSet = make_dataset("rozhodnuti");
   rozhodnutiDataSet->open(
       rozhodnutiProvider,
-      {ValueType::String, ValueType::String, ValueType::String});
+      {ValueType::String,
+       ValueType::String,
+       ValueType::String,
+       ValueType::String,
+       ValueType::String,
+       ValueType::String,
+       ValueType::String,
+       ValueType::String,
+       ValueType::String,
+       ValueType::String,
+       ValueType::String,
+       ValueType::String,
+       ValueType::String});
   dataBase.addTable(rozhodnutiDataSet);
+    logger.log<LogLevel::Status>("Loaded: "s + rozhodnutiDataSet->getName());
+    rozhodnutiDataSet->resetEnd();
+    logger.log<LogLevel::Debug>("Count:", rozhodnutiDataSet->getCurrentRecord());
 
   auto obdobiDataSet = make_dataset("obdobi");
-  obdobiDataSet->open(obdobiProvider, {ValueType::String, ValueType::String,
-                                       ValueType::Currency, ValueType::Currency,
-                                       ValueType::String, ValueType::String});
+  obdobiDataSet->open(obdobiProvider, {ValueType::String,
+                                       ValueType::String,
+                                       ValueType::Currency,
+                                       ValueType::Currency,
+                                       ValueType::String,
+                                       ValueType::String,
+                                       ValueType::String,
+                                       ValueType::String,
+                                       ValueType::String,
+                                       ValueType::String,
+                                       ValueType::String,
+                                       ValueType::String});
   dataBase.addTable(obdobiDataSet);
+    logger.log<LogLevel::Status>("Loaded: "s + obdobiDataSet->getName());
+    obdobiDataSet->resetEnd();
+    logger.log<LogLevel::Debug>("Count:", obdobiDataSet->getCurrentRecord());
 
   auto prijemceDataSet = make_dataset("prijemce");
   prijemceDataSet->open(
       prijemceProvider,
-      {ValueType::String, ValueType::Integer, ValueType::String});
+      {ValueType::String,
+       ValueType::Integer,
+       ValueType::String,
+       ValueType::String,
+       ValueType::String,
+       ValueType::String,
+       ValueType::String,
+       ValueType::String,
+       ValueType::String,
+       ValueType::String,
+       ValueType::String,
+       ValueType::String,});
   dataBase.addTable(prijemceDataSet);
+    logger.log<LogLevel::Status>("Loaded: "s + prijemceDataSet->getName());
+    prijemceDataSet->resetEnd();
+    logger.log<LogLevel::Debug>("Count:", prijemceDataSet->getCurrentRecord());
 
   auto subjektyDataSet = make_dataset("subjekty");
   subjektyDataSet->open(subjektyProvider,
-                        {ValueType::Integer, ValueType::Integer,
-                         ValueType::Integer, ValueType::String,
-                         ValueType::String, ValueType::String,
-                         ValueType::String});
+                        {ValueType::Integer,
+                         ValueType::Integer,
+                         ValueType::String,
+                         ValueType::String,
+                         ValueType::String,
+                         ValueType::String,
+                         ValueType::String,
+                         ValueType::String,
+                         ValueType::String,
+                         ValueType::String,
+                         ValueType::String,
+                         ValueType::String,
+                         ValueType::String,
+                         ValueType::String,
+                         ValueType::String,
+                         ValueType::String,
+                         ValueType::String,});
   dataBase.addTable(subjektyDataSet);
+    logger.log<LogLevel::Status>("Loaded: "s + subjektyDataSet->getName());
+    subjektyDataSet->resetEnd();
+    logger.log<LogLevel::Debug>("Count:", subjektyDataSet->getCurrentRecord());
 
   DataProviders::CsvReader operacniProgramProvider(
       csvPath + operacniProgramCSVName, ",");
   auto operacniProgramDataSet = make_dataset("operacniProgram");
   operacniProgramDataSet->open(operacniProgramProvider,
-                               {ValueType::String, ValueType::String});
+                               {ValueType::String,
+                                ValueType::String,
+                                ValueType::String,
+                                ValueType::String,
+                                ValueType::String,
+                                ValueType::String,});
   dataBase.addTable(operacniProgramDataSet);
+    logger.log<LogLevel::Status>("Loaded: "s + operacniProgramDataSet->getName());
+    operacniProgramDataSet->resetEnd();
+    logger.log<LogLevel::Debug>("Count:", operacniProgramDataSet->getCurrentRecord());
 
   DataProviders::CsvReader grantoveSchemaProvider(
       csvPath + grantoveSchemaCSVName, ",");
   auto grantoveSchemaDataSet = make_dataset("grantoveSchema");
   grantoveSchemaDataSet->open(grantoveSchemaProvider,
-                              {ValueType::String, ValueType::String});
+                              {ValueType::String,
+                               ValueType::String,
+                               ValueType::String,
+                               ValueType::String,
+                               ValueType::String,
+                               ValueType::String,});
   dataBase.addTable(grantoveSchemaDataSet);
+    logger.log<LogLevel::Status>("Loaded: "s + grantoveSchemaDataSet->getName());
+    grantoveSchemaDataSet->resetEnd();
+    logger.log<LogLevel::Debug>("Count:", grantoveSchemaDataSet->getCurrentRecord());
 
   DataProviders::CsvReader dotaceTitulProvider(csvPath + dotacniTitulCSVName,
                                                ",");
   auto dotaceTitulDataSet = make_dataset("dotaceTitul");
   dotaceTitulDataSet->open(dotaceTitulProvider,
-                           {ValueType::String, ValueType::String});
+                           {ValueType::String,
+                            ValueType::String,
+                            ValueType::String,
+                            ValueType::String,
+                            ValueType::String,
+                            ValueType::String,
+                            ValueType::String,
+                            ValueType::String,});
   dataBase.addTable(dotaceTitulDataSet);
+    logger.log<LogLevel::Status>("Loaded: "s + dotaceTitulDataSet->getName());
+    dotaceTitulDataSet->resetEnd();
+    logger.log<LogLevel::Debug>("Count:", dotaceTitulDataSet->getCurrentRecord());
 
   DataProviders::CsvReader poskytovatelDotaceProvider(
       csvPath + poskytovatelDotaceCSVName, ",");
   auto poskytovatelDotaceDataSet = make_dataset("poskytovatelDotace");
   poskytovatelDotaceDataSet->open(poskytovatelDotaceProvider,
-                                  {ValueType::String, ValueType::String});
+                                  {ValueType::String,
+                                   ValueType::String,
+                                   ValueType::String,
+                                   ValueType::String,
+                                   ValueType::String,
+                                   ValueType::String,});
   dataBase.addTable(poskytovatelDotaceDataSet);
+    logger.log<LogLevel::Status>("Loaded: "s + poskytovatelDotaceDataSet->getName());
+    poskytovatelDotaceDataSet->resetEnd();
+    logger.log<LogLevel::Debug>("Count:", poskytovatelDotaceDataSet->getCurrentRecord());
 
   auto result = dataBase.execSimpleQuery(QUERY_2018, false, "cedr");
-  DataWriters::XlsxIOWriter writer(outPath + outputCSVName);
+  DataWriters::CsvWriter writer(outPath + outputCSVName);
 
   writer.writeHeader(result->dataSet->getFieldNames());
   auto fields = result->dataSet->getFields();

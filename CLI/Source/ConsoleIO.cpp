@@ -16,7 +16,7 @@ void ConsoleIO::write(std::string_view str) {
 void ConsoleIO::writeLn(std::string_view str) {
   std::unique_lock lck{mutex};
   std::cout << ConsoleIO::form << str << std::endl;
-  if (mode == Mode::arrow) {
+  if (*mode == Mode::arrow) {
     std::cout << ConsoleIO::form;
   }
 }

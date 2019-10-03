@@ -5,6 +5,27 @@
 #include <utility>
 #include <CsvReader.h>
 
+void myGetLine(std::istream &stream, gsl::span<char> &buffer, char lineDelimiter = '\n') {
+    using stream_traits = std::istream::traits_type;
+    int c;
+    auto streamBuffer = stream.rdbuf();
+    uint32_t bufferPos = 0;
+    while ((c = streamBuffer->sgetc()) != lineDelimiter && !stream_traits::eq_int_type(c, stream_traits::eof())) {
+        if (c == '\0') {
+            streamBuffer->snextc();
+            continue;
+        }
+        buffer[bufferPos] = c;
+        ++bufferPos;
+        streamBuffer->snextc();
+    }
+    if (c == lineDelimiter) {
+        streamBuffer->snextc();
+    }
+
+    buffer[bufferPos] = '\0';
+}
+
 DataProviders::CsvReader::CsvReader(std::string_view filePath, std::string_view delimiter)
     : BaseDataProvider() {
   init(filePath, delimiter);
@@ -64,9 +85,11 @@ bool DataProviders::CsvReader::next() {
 
 void DataProviders::CsvReader::parseRecord() {
   char buffer[BUFFER_SIZE];
+  gsl::span<char> spanBuffer{buffer, BUFFER_SIZE};
 
-  file.getline(buffer, BUFFER_SIZE);
-  auto line = std::string_view(buffer);
+  //file.getline(buffer, BUFFER_SIZE, '\n');
+  myGetLine(file, spanBuffer);
+  auto line = std::string_view(spanBuffer.data());
   if (!line.empty() && line[line.length() - 1] == '\r') {
     line = line.substr(0, line.length() - 1);
   }

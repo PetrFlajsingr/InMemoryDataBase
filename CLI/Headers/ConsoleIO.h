@@ -10,6 +10,7 @@
 #include <MessageSender.h>
 #include <Property.h>
 #include <memory>
+#include <mutex>
 
 class ConsoleIO : public MessageSender, public MessageReceiver {
  public:

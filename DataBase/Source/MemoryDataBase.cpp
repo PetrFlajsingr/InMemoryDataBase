@@ -155,7 +155,10 @@ DataBase::StructuredQuery DataBase::MemoryDataBase::validateQuery(StructuredQuer
       auto fieldNames = table->dataSet->getFieldNames();
       std::transform(fieldNames.begin(), fieldNames.end(), std::back_inserter(transformedProjects),
                      [&tableName](const std::string &str) {
-                       return ProjectItem{.table = tableName, .column = str};
+                       ProjectItem result;
+                       result.table = tableName;
+                       result.column = str;
+                       return result;
                      });
     } else {
       transformedProjects.emplace_back(i);
