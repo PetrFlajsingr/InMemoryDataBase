@@ -18,10 +18,10 @@ SCENARIO("Operations with DB", "[MemoryDataBase]"){
                 {"2","\"Bruce\"","\"Don\""}
         };
 
-        const std::string query = "SELECT table1.* FROM table1";
+        const std::string query = "SELECT table1.* FROM table1;";
 
         DataProviders::CsvReader csvReader("../DataBase/tests/files/basic_table.csv",
-                                           ";");
+                                           ",");
         DataBase::MemoryDataBase db("testDB");
 
         WHEN("Adding table"){
@@ -30,14 +30,15 @@ SCENARIO("Operations with DB", "[MemoryDataBase]"){
                                        ValueType::String,
                                        ValueType::String});
             db.addTable(dsTable1);
+
             THEN("Correct values are in table"){
                 auto result = db.execSimpleQuery(query, false, "table1View");
                 auto rowCount = 0;
                 while(result->dataSet->next()){
                     for(auto i = 0; i < TABLE1_COLUMN_COUNT; ++i) {
                        REQUIRE(result->dataSet->fieldByIndex(i)->getAsString() == dbData[rowCount][i]);
-                       ++rowCount;
                     }
+                    ++rowCount;
                 }
             }
         }

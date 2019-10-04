@@ -16,6 +16,26 @@
 #include <XlsxIOReader.h>
 #include "Combiner.h"
 
+enum class ErrorPolicy {
+    Throw, NoThrow
+};
+
+template<ErrorPolicy errorPolicy = ErrorPolicy::NoThrow>
+class Demo {
+
+    bool next() {
+        bool fail = true;
+
+        if (fail) {
+            if constexpr (errorPolicy == ErrorPolicy::Throw) {
+                throw std::exception();
+            } else {
+                return false;
+            }
+        }
+    }
+};
+
 void terminate_handler();
 
 int main(int argc, char **argv) {
