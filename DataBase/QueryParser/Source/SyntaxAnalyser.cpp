@@ -620,12 +620,12 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
 }
 
 std::string DataBase::SyntaxAnalyser::getErrorMsg(DataBase::SyntaxAnalyser::SynErrType errType,
-                                                  const std::vector<DataBase::Token> &tokens,
+                                                  const std::vector<DataBase::Token> &expectedTokens,
                                                   std::tuple<Token, std::string, bool> token2) {
   const std::string header = "Syntax error: ";
-  std::string tok1Info = tokenToString(tokens[0]);
-  for (int i = 1; i < tokens.size(); ++i) {
-    tok1Info += " or " + tokenToString(tokens[i]);
+    std::string tok1Info = tokenToString(expectedTokens[0]);
+    for (int i = 1; i < static_cast<gsl::index>(expectedTokens.size()); ++i) {
+        tok1Info += " or " + tokenToString(expectedTokens[i]);
   }
   auto tok2Info = tokenToString(std::get<0>(token2)) + " \"" + std::get<1>(token2) + "\"";
 
@@ -638,7 +638,7 @@ std::string DataBase::SyntaxAnalyser::getErrorMsg(DataBase::SyntaxAnalyser::SynE
     } else {
       query += std::get<1>(val);
     }
-    if (query.size() > lenLimit) {
+      if (static_cast<gsl::index>(query.size()) > lenLimit) {
       lenLimit += query.size();
       query += "\n";
     }
@@ -650,4 +650,5 @@ std::string DataBase::SyntaxAnalyser::getErrorMsg(DataBase::SyntaxAnalyser::SynE
     case SynErrType::wrong:
       return header + "Unexpected token: " + tok2Info + ", expected: " + tok1Info + "\n" + query;
   }
+    throw std::runtime_error("SyntaxAnalyser::getErrorMsg()");
 }

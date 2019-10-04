@@ -123,8 +123,6 @@ void DataBase::AggregationMaker::aggregateDataSet(DataSets::MemoryDataSet *ds,
       for (const auto &info : writeOrder) {
         switch (info.first) {
           case AgrOperator::sum:
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wswitch"
             switch (sumFields[info.second].field->getFieldType()) {
               case ValueType::Integer:(*(*resultIter))[cnt].copyFrom<int>(sumFields[info.second].sum);
                 break;
@@ -132,8 +130,9 @@ void DataBase::AggregationMaker::aggregateDataSet(DataSets::MemoryDataSet *ds,
                 break;
               case ValueType::Currency:(*(*resultIter))[cnt].copyFrom<Currency>(sumFields[info.second].sum);
                 break;
+                default:
+                    throw std::runtime_error("AggregationMaker::aggregateDataSet(): sum op");
             }
-#pragma clang diagnostic pop
             break;
           case AgrOperator::avg:break;
           case AgrOperator::count:(*(*resultIter))[cnt]._integer = countFields[info.second].count;
@@ -152,8 +151,12 @@ void DataBase::AggregationMaker::aggregateDataSet(DataSets::MemoryDataSet *ds,
                 break;
               case ValueType::DateTime:(*(*resultIter))[cnt].copyFrom<DateTime>(groupByFields[info.second].lastVal);
                 break;
+                default:
+                    throw std::runtime_error("AggregationMaker::aggregateDataSet(): group op");
             }
             break;
+            default:
+                throw std::runtime_error("AggregationMaker::aggregateDataSet()");
         }
         ++cnt;
       }
@@ -193,8 +196,6 @@ void DataBase::AggregationMaker::aggregateDataSet(DataSets::MemoryDataSet *ds,
     for (const auto &info : writeOrder) {
       switch (info.first) {
         case AgrOperator::sum:
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wswitch"
           switch (sumFields[info.second].field->getFieldType()) {
             case ValueType::Integer:(*(*resultIter))[cnt].copyFrom<int>(sumFields[info.second].sum);
               break;
@@ -202,8 +203,9 @@ void DataBase::AggregationMaker::aggregateDataSet(DataSets::MemoryDataSet *ds,
               break;
             case ValueType::Currency:(*(*resultIter))[cnt].copyFrom<Currency>(sumFields[info.second].sum);
               break;
+              default:
+                  throw std::runtime_error("AggregationMaker::aggregateDataSet(): sum op");
           }
-#pragma clang diagnostic pop
           break;
         case AgrOperator::avg:break;
         case AgrOperator::count:(*(*resultIter))[cnt]._integer = countFields[info.second].count;
@@ -222,6 +224,8 @@ void DataBase::AggregationMaker::aggregateDataSet(DataSets::MemoryDataSet *ds,
               break;
             case ValueType::DateTime:(*(*resultIter))[cnt].copyFrom<DateTime>(groupByFields[info.second].lastVal);
               break;
+              default:
+                  throw std::runtime_error("AggregationMaker::aggregateDataSet(): group op");
           }
           break;
       }
@@ -265,8 +269,6 @@ void DataBase::AggregationMaker::aggregateView(DataSets::MemoryViewDataSet *ds,
       for (const auto &info : writeOrder) {
         switch (info.first) {
           case AgrOperator::sum:
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wswitch"
             switch (sumFields[info.second].field->getFieldType()) {
               case ValueType::Integer:(*(*resultIter))[cnt].copyFrom<int>(sumFields[info.second].sum);
                 break;
@@ -274,8 +276,9 @@ void DataBase::AggregationMaker::aggregateView(DataSets::MemoryViewDataSet *ds,
                 break;
               case ValueType::Currency:(*(*resultIter))[cnt].copyFrom<Currency>(sumFields[info.second].sum);
                 break;
+                default:
+                    throw std::runtime_error("AggregationMaker::aggregateView()");
             }
-#pragma clang diagnostic pop
             break;
           case AgrOperator::avg:break;
           case AgrOperator::count:(*(*resultIter))[cnt]._integer = countFields[info.second].count;
@@ -335,8 +338,6 @@ void DataBase::AggregationMaker::aggregateView(DataSets::MemoryViewDataSet *ds,
     for (const auto &info : writeOrder) {
       switch (info.first) {
         case AgrOperator::sum:
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wswitch"
           switch (sumFields[info.second].field->getFieldType()) {
             case ValueType::Integer:(*(*resultIter))[cnt].copyFrom<int>(sumFields[info.second].sum);
               break;
@@ -344,8 +345,9 @@ void DataBase::AggregationMaker::aggregateView(DataSets::MemoryViewDataSet *ds,
               break;
             case ValueType::Currency:(*(*resultIter))[cnt].copyFrom<Currency>(sumFields[info.second].sum);
               break;
+              default:
+                  throw std::runtime_error("AggregationMaker::aggregateView()");
           }
-#pragma clang diagnostic pop
           break;
         case AgrOperator::avg:break;
         case AgrOperator::count:(*(*resultIter))[cnt]._integer = countFields[info.second].count;

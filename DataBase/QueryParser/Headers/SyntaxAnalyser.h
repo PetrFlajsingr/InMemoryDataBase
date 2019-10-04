@@ -94,7 +94,7 @@ class SyntaxAnalyser {
   std::vector<std::tuple<Token, std::string, bool>> tokens;
 
   std::string getErrorMsg(DataBase::SyntaxAnalyser::SynErrType errType,
-                          const std::vector<DataBase::Token> &tokens,
+                          const std::vector<DataBase::Token> &expectedTokens,
                           std::tuple<Token, std::string, bool> token2);
 };
 }  // namespace DataBase

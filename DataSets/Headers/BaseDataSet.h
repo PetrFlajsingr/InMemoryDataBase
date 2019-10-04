@@ -167,7 +167,7 @@ class BaseDataSet {
    * @param field field to set data to
    * @param data data to set
    */
-  void setFieldData(BaseField *field, void *data);
+  void setFieldData(BaseField *field, const void *data);
   /**
    * Set inner data set data.
    * This method is called via BaseField.

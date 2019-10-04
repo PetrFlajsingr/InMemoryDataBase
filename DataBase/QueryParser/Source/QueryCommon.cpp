@@ -49,6 +49,7 @@ std::string DataBase::tokenToString(DataBase::Token token) {
     case Token::as: return "as";
     case Token::unknown: return "unknown";
   }
+    throw std::runtime_error("tokenToString");
 }
 
 DataBase::CondOperator DataBase::tokenToCondOperator(DataBase::Token token) {

@@ -4,6 +4,8 @@
 
 #include <FilterStructures.h>
 
+#include <utility>
+
 DataSets::FilterOption DataSets::condOpToFilterOp(DataBase::CondOperator op) {
   switch (op) {
     case DataBase::CondOperator::greater:return FilterOption::Greater;
@@ -12,13 +14,15 @@ DataSets::FilterOption DataSets::condOpToFilterOp(DataBase::CondOperator op) {
     case DataBase::CondOperator::lessEqual:return FilterOption::LessEqual;
     case DataBase::CondOperator::equal:return FilterOption::Equals;
     case DataBase::CondOperator::notEqual:return FilterOption::NotEquals;
+      default:
+          throw std::runtime_error("condOpToFilterOp()");
   }
 }
 
 DataSets::FilterItem::FilterItem(const DataSets::BaseField *field,
-                                 const std::vector<DataContainer> &searchData,
+                                 std::vector<DataContainer> searchData,
                                  DataSets::FilterOption filterOption)
-    : field(field), searchData(searchData), filterOption(filterOption) {}
+        : field(field), searchData(std::move(searchData)), filterOption(filterOption) {}
 
 void DataSets::FilterOptions::addOption(const DataSets::BaseField *field,
                                         const std::vector<DataContainer> &values,

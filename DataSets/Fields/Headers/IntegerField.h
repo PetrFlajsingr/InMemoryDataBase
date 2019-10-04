@@ -24,17 +24,19 @@ class IntegerField : public BaseField {
    */
   IntegerField(std::string_view fieldName, gsl::index index, BaseDataSet *dataSet);
   ValueType getFieldType() const override;
-  void setAsString(std::string_view value) override;
+
+    void setAsString(std::string_view newValue) override;
   std::string getAsString() const override;
 
-  void setAsInteger(int value);
+    void setAsInteger(int newValue);
   int getAsInteger() const;
 
   std::function<int8_t(const DataSetRow *, const DataSetRow *)> getCompareFunction() const override;
 
  protected:
-  void setValue(void *data) override;
-  int data;
+    void setValue(const void *data) override;
+
+    int value;
 };
 }
 

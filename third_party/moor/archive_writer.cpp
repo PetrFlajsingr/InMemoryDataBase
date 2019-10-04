@@ -41,8 +41,8 @@ int (*format_tab[])(archive*)
         , archive_write_set_format_zip, archive_write_set_format_7zip};
 
 int (*compression_tab[])(archive*)
-    = {archive_write_set_compression_none, archive_write_set_compression_gzip,
-      archive_write_set_compression_bzip2 , archive_write_set_compression_lzma};
+= {archive_write_add_filter_none, archive_write_add_filter_gzip,
+   archive_write_add_filter_bzip2, archive_write_add_filter_lzma};
 
 int archive_file_type[] = {AE_IFREG, AE_IFDIR};
 

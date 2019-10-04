@@ -178,6 +178,8 @@ void CLIController::handleInput(std::string_view input) {
               ctx.ui->writeLn(val->getName());
             }
             break;
+            case CmdType::unknown:
+                break;
         }
       }
     } else {

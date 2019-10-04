@@ -14,7 +14,8 @@ int compareDataContainers(const DataContainer &data1, const DataContainer &data2
   }
   throw IllegalStateException("Internal error. compareDataContainers");
 }
-DataContainer &DataContainer::operator=(gsl::zstring<> val) {
+
+DataContainer &DataContainer::operator=(gsl::czstring<> val) {
   _string = val;
   return *this;
 }
@@ -58,10 +59,11 @@ std::string DateTime::toString() const {
     case DateTimeType::Time: return toString(timeDefFmt);
     case DateTimeType::DateTime: return toString(dateTimeDefFmt);
   }
+    throw std::runtime_error("DateTime::toString()");
 }
 
 std::string DateTime::toString(std::string_view fmt) const {
-  boost::posix_time::time_facet *facet = new boost::posix_time::time_facet(std::string(fmt).c_str());
+    auto *facet = new boost::posix_time::time_facet(std::string(fmt).c_str());
   std::ostringstream os;
   os.imbue(std::locale(os.getloc(), facet));
   os << ptime;
@@ -105,7 +107,8 @@ std::ostream &operator<<(std::ostream &os, const DateTime &timeB) {
   os << timeB.toString();
   return os;
 }
-std::istream &operator>>(std::istream &is, DateTime &timeB) {
+
+std::istream &operator>>(std::istream &, DateTime &) {
   throw NotImplementedException();
 }
 std::pair<DateTimeType, boost::posix_time::ptime> DateTime::innerFromString(std::string_view str,
@@ -140,7 +143,8 @@ void DateTime::fromString(std::string_view str) {
   }
 }
 void DateTime::fromString(std::string_view str, std::string_view fmt) {
-  auto[type, t] = innerFromString(str, fmt);
+    auto[_, t] = innerFromString(str, fmt);
+    _ = _;
   this->ptime = t;
 }
 xlnt::date DateTime::toXlntDate() {

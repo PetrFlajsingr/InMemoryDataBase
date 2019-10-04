@@ -12,22 +12,22 @@ ValueType DataSets::StringField::getFieldType() const {
   return ValueType::String;
 }
 
-void DataSets::StringField::setAsString(std::string_view value) {
-  data = value;
+void DataSets::StringField::setAsString(std::string_view newValue) {
+    value = newValue;
   BaseField::setData(Utilities::copyStringToNewChar(value),
                      getFieldType());
 }
 
 std::string DataSets::StringField::getAsString() const {
-  return data;
+    return value;
 }
 
-void DataSets::StringField::setValue(void *data) {
+void DataSets::StringField::setValue(const void *data) {
   if (data == nullptr) {
-    this->data = "";
+      this->value = "";
     return;
   }
-  this->data = std::string(reinterpret_cast<gsl::zstring<>>(data));
+    this->value = std::string(reinterpret_cast<gsl::czstring<>>(data));
 }
 
 std::function<int8_t(const DataSetRow *,

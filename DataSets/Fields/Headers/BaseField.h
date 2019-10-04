@@ -39,7 +39,7 @@ class BaseField {
    * Set value as string - convert to inner value and set it in data set
    * @param value value to set
    */
-  virtual void setAsString(std::string_view value) = 0;
+  virtual void setAsString(std::string_view newValue) = 0;
   /**
    * Convert inner value to string
    * @return value as string
@@ -92,7 +92,7 @@ class BaseField {
    * Set inner field value.
    * @param data pointer to data
    */
-  virtual void setValue(void *data) = 0;
+  virtual void setValue(const void *data) = 0;
   // TODO: predavat pointer na DataContainer
   /**
    * Set data in data set.

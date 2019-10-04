@@ -24,7 +24,7 @@ class ArrayDataProvider : public BaseDataProvider {
   explicit ArrayDataProvider(const std::vector<std::vector<std::string>> &data)
       : BaseDataProvider(), data(data) {
     header.reserve(data[0].size());
-    for (gsl::index i = 0; i < data[0].size(); ++i) {
+      for (gsl::index i = 0; i < static_cast<gsl::index>(data[0].size()); ++i) {
       header.emplace_back(std::to_string(i));
     }
   }
@@ -44,7 +44,7 @@ class ArrayDataProvider : public BaseDataProvider {
     return currentRow;
   }
   bool next() override {
-    if (currentRow == -1 || currentRow < data.size() - 1) {
+      if (currentRow == -1 || currentRow < static_cast<gsl::index>(data.size() - 1)) {
       currentRow++;
       return true;
     }
@@ -64,7 +64,7 @@ class ArrayDataProvider : public BaseDataProvider {
 
   std::vector<std::string> header;
 
-  int currentRow = -1;
+    gsl::index currentRow = -1;
 
   bool _eof = false;
 };

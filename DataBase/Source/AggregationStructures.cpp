@@ -30,6 +30,8 @@ DataBase::Unique::Unique(DataSets::BaseField *field) : BaseAgr(field) {
       break;
     case ValueType::DateTime: lastVal = DateTime();
       break;
+      default:
+          break;
   }
 }
 DataBase::Sum::Sum(DataSets::BaseField *field) : BaseAgr(field) {
@@ -52,6 +54,8 @@ void DataBase::Sum::accumulate(const DataContainer &val) {
       break;
     case ValueType::Currency: *sum._currency += *val._currency;
       break;
+      default:
+          throw std::runtime_error("Sum::accumulate()");
   }
 }
 void DataBase::Sum::reset() {
@@ -62,6 +66,8 @@ void DataBase::Sum::reset() {
       break;
     case ValueType::Currency: sum = Currency(0);
       break;
+      default:
+          throw std::runtime_error("Sum::reset()");
   }
 }
 DataBase::BaseAgr::BaseAgr(DataSets::BaseField *field) : field(field) {
@@ -74,26 +80,28 @@ DataBase::Min::Min(DataSets::BaseField *field) : BaseAgr(field) {
 void DataBase::Min::check() {
   switch (field->getFieldType()) {
     case ValueType::Integer: {
-      auto val = static_cast<DataSets::IntegerField *>(field)->getAsInteger();
+        auto val = dynamic_cast<DataSets::IntegerField *>(field)->getAsInteger();
       if (val < min._integer) {
         min._integer = val;
       }
     }
       break;
     case ValueType::Double: {
-      auto val = static_cast<DataSets::DoubleField *>(field)->getAsDouble();
+        auto val = dynamic_cast<DataSets::DoubleField *>(field)->getAsDouble();
       if (val < min._double) {
         min._double = val;
       }
     }
       break;
     case ValueType::Currency: {
-      auto val = static_cast<DataSets::CurrencyField *>(field)->getAsCurrency();
+        auto val = dynamic_cast<DataSets::CurrencyField *>(field)->getAsCurrency();
       if (val < *min._currency) {
         *min._currency = val;
       }
     }
       break;
+      default:
+          throw std::runtime_error("Min::check()");
   }
 }
 void DataBase::Min::reset() {
@@ -104,6 +112,8 @@ void DataBase::Min::reset() {
       break;
     case ValueType::Currency:*min._currency = DEC_MIN_INT64;
       break;
+      default:
+          throw std::runtime_error("Min::reset()");
   }
 }
 
@@ -113,26 +123,28 @@ DataBase::Max::Max(DataSets::BaseField *field) : BaseAgr(field) {
 void DataBase::Max::check() {
   switch (field->getFieldType()) {
     case ValueType::Integer: {
-      auto val = static_cast<DataSets::IntegerField *>(field)->getAsInteger();
+        auto val = dynamic_cast<DataSets::IntegerField *>(field)->getAsInteger();
       if (val > max._integer) {
         max._integer = val;
       }
     }
       break;
     case ValueType::Double: {
-      auto val = static_cast<DataSets::DoubleField *>(field)->getAsDouble();
+        auto val = dynamic_cast<DataSets::DoubleField *>(field)->getAsDouble();
       if (val > max._double) {
         max._double = val;
       }
     }
       break;
     case ValueType::Currency: {
-      auto val = static_cast<DataSets::CurrencyField *>(field)->getAsCurrency();
+        auto val = dynamic_cast<DataSets::CurrencyField *>(field)->getAsCurrency();
       if (val > *max._currency) {
         *max._currency = val;
       }
     }
       break;
+      default:
+          throw std::runtime_error("Max::check()");
   }
 }
 void DataBase::Max::reset() {
@@ -143,6 +155,8 @@ void DataBase::Max::reset() {
       break;
     case ValueType::Currency:*max._currency = DEC_MAX_INT64;
       break;
+      default:
+          throw std::runtime_error("Max::reset()");
   }
 }
 
@@ -172,6 +186,8 @@ DataContainer DataBase::Avg::getResult() {
       break;
     case ValueType::Currency:*result._currency = *Sum::sum._currency / (int64_t) Count::count;
       break;
+      default:
+          throw std::runtime_error("Avg::getResult()");
   }
   return result;
 }

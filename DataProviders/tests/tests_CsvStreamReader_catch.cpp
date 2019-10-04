@@ -73,7 +73,7 @@ SCENARIO("Reading csv file using via BaseDataProvider StreamReader interface", "
                 int recordCount = 0;
                 while (csvStreamReader.next()) {
                     REQUIRE(csvStreamReader.getRow().size() == SMALL_COLUMN_COUNT);
-                    for (int j = 0; j < toCheck[recordCount].size(); ++j) {
+                    for (gsl::index j = 0; j < static_cast<gsl::index>(toCheck[recordCount].size()); ++j) {
                         CHECK(csvStreamReader.getRow()[j] == toCheck[recordCount][j]);
                     }
                     recordCount++;
@@ -156,7 +156,7 @@ SCENARIO("Reading csv file using via BaseDataProvider StreamReader interface", "
                 int i = 0;
                 while (csvStreamReader.next()) {
                     REQUIRE(csvStreamReader.getRow().size() == ADV_COLUMN_COUNT);
-                    for (int j = 0; j < toCheck[i].size(); ++j) {
+                    for (gsl::index j = 0; j < static_cast<gsl::index>(toCheck[i].size()); ++j) {
                         CHECK(csvStreamReader.getRow()[j] == toCheck[i][j]);
                     }
                     csvStreamReader.next();
@@ -210,7 +210,7 @@ SCENARIO("Reading csv file via iterator StreamReader", "[CsvStreamReader]") {
                 int recordCount = 0;
                 for (const auto &value : reader) {
                     REQUIRE(value.size() == SMALL_COLUMN_COUNT);
-                    for (auto j = 0; j < toCheck[recordCount].size(); ++j) {
+                    for (gsl::index j = 0; j < static_cast<gsl::index>(toCheck[recordCount].size()); ++j) {
                         CHECK(value[j] == toCheck[recordCount][j]);
                     }
                     ++recordCount;
@@ -266,7 +266,7 @@ SCENARIO("Reading csv file via iterator StreamReader", "[CsvStreamReader]") {
                 int recordCount = 0;
                 for (const auto &value : csvStreamReader) {
                     REQUIRE(value.size() == ADV_COLUMN_COUNT);
-                    for (auto j = 0; j < toCheck[recordCount].size(); ++j) {
+                    for (gsl::index j = 0; j < static_cast<gsl::index>(toCheck[recordCount].size()); ++j) {
                         CHECK(value[j] == toCheck[recordCount][j]);
                     }
                     ++recordCount;

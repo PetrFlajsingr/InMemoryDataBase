@@ -9,7 +9,8 @@ std::pair<std::vector<std::string>,
                                                                              std::string> &tableAndColumn) {
   std::pair<std::vector<std::string>, std::vector<ValueType>> result;
   for (auto[name, _] : tableAndColumn) {
-    if (auto view = viewByName(name)) {
+      _ = _;
+      if (auto view = viewByName(name)) {
       for (const auto &field : view->dataSet->getFields()) {
         result.first.emplace_back(name + "$" + field->getName().data());
         result.second.emplace_back(field->getFieldType());

@@ -295,6 +295,7 @@ class JoinMaker {
         }
       }
     }
+      throw std::runtime_error("JoinMaker::getJoinFunction()");
   }
 };
 }

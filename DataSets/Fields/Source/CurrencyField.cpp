@@ -9,21 +9,21 @@
 DataSets::CurrencyField::CurrencyField(std::string_view fieldName, gsl::index index, BaseDataSet *dataSet)
     : BaseField(fieldName, index, dataSet) {}
 
-void DataSets::CurrencyField::setValue(void *data) {
-  this->data = *reinterpret_cast<Currency *>(data);
+void DataSets::CurrencyField::setValue(const void *data) {
+    this->value = *reinterpret_cast<const Currency *>(data);
 }
 
 ValueType DataSets::CurrencyField::getFieldType() const {
   return ValueType::Currency;
 }
 
-void DataSets::CurrencyField::setAsString(std::string_view value) {
-  data = dec::fromString<Currency>(std::string(value));
-  setData(&data, getFieldType());
+void DataSets::CurrencyField::setAsString(std::string_view newValue) {
+    value = dec::fromString<Currency>(std::string(newValue));
+    setData(&value, getFieldType());
 }
 
 std::string DataSets::CurrencyField::getAsString() const {
-  return dec::toString(data);
+    return dec::toString(value);
 }
 
 std::function<int8_t(const DataSetRow *,
@@ -34,11 +34,11 @@ std::function<int8_t(const DataSetRow *,
   };
 }
 
-void DataSets::CurrencyField::setAsCurrency(const Currency &value) {
-  data = value;
-  BaseField::setData(&data, getFieldType());
+void DataSets::CurrencyField::setAsCurrency(const Currency &newValue) {
+    value = newValue;
+    BaseField::setData(&value, getFieldType());
 }
 
 Currency DataSets::CurrencyField::getAsCurrency() const {
-  return data;
+    return value;
 }

@@ -69,11 +69,11 @@ void FileDownloadManager::Dispatcher::onDownloadStarted(std::string_view fileNam
   dispatch(new DownloadProgress(DownloadState::started, std::string(fileName)));
 }
 void FileDownloadManager::Dispatcher::onDownloadFailed(std::string_view fileName,
-                                                       std::string_view errorMessage) {
+                                                       std::string_view) {
   dispatch(new DownloadProgress(DownloadState::failed, std::string(fileName)));
 }
 void FileDownloadManager::Dispatcher::onDownloadFinished(std::string_view fileName,
-                                                         std::string_view filePath) {
+                                                         std::string_view) {
   dispatch(new DownloadProgress(DownloadState::finished, std::string(fileName)));
 }
 

@@ -4,7 +4,7 @@
 
 #include <BaseDataSet.h>
 
-void DataSets::BaseDataSet::setFieldData(BaseField *field, void *data) {
+void DataSets::BaseDataSet::setFieldData(BaseField *field, const void *data) {
   field->setValue(data);
 }
 

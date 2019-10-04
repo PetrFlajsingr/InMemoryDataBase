@@ -249,7 +249,7 @@ std::string ScriptParser::ReplaceResources(std::string input) {
   std::smatch matches;
   std::string output;
   while (std::regex_search(input, matches, rx)) {
-    for (gsl::index i = 0; i < matches.size(); ++i) {
+      for (gsl::index i = 0; i < static_cast<gsl::index>(matches.size()); ++i) {
       output += input.substr(0, matches.position(i));
 
       std::string match(matches[i]);

@@ -44,7 +44,7 @@ void DataSets::MemoryDataSet::createFields(std::vector<std::string> columns, std
     throw InvalidArgumentException(std::string(
         "Column size doesn't match type size in table " + getName()).c_str());
   }
-  for (gsl::index i = 0; i < columns.size(); ++i) {
+    for (gsl::index i = 0; i < static_cast<gsl::index>(columns.size()); ++i) {
     fields.emplace_back(FieldFactory::GetInstance().CreateField(columns[i], i, types[i], this));
   }
   columnCount = fields.size();
@@ -55,7 +55,7 @@ void DataSets::MemoryDataSet::addRecord(DataProviders::BaseDataProvider &dataPro
   data.emplace_back(new DataSetRow());
 
   data.back()->reserve(columnCount);
-  for (gsl::index i = 0; i < record.size(); ++i) {
+    for (gsl::index i = 0; i < static_cast<gsl::index>(record.size()); ++i) {
     switch (fields[i]->getFieldType()) {
       case ValueType::Integer:
         data.back()->emplace_back(DataContainer{._integer = Utilities::stringToInt(record[i])});
@@ -131,7 +131,7 @@ void DataSets::MemoryDataSet::last() {
 
 bool DataSets::MemoryDataSet::next() {
   currentRecord++;
-  if (currentRecord >= data.size() - 1) {
+    if (currentRecord >= static_cast<gsl::index>(data.size()) - 1) {
     return false;
   }
   setFieldValues();
@@ -165,7 +165,7 @@ void DataSets::MemoryDataSet::sort(SortOptions &options) {
 
   auto optionArray = options.options;
   auto compareFunction = [&optionArray, &compareFunctions](const DataSetRow *a, const DataSetRow *b) {
-    for (gsl::index i = 0; i < optionArray.size(); ++i) {
+      for (gsl::index i = 0; i < static_cast<gsl::index>(optionArray.size()); ++i) {
       int compareResult = compareFunctions[i](a, b);
       if (compareResult < 0) {
         return optionArray[i].order == SortOrder::Ascending;
@@ -229,6 +229,8 @@ std::shared_ptr<DataSets::ViewDataSet> DataSets::MemoryDataSet::filter(const Fil
               break;
             case FilterOption::NotEndsWith:valid = !Utilities::endsWith(toCompare, search._string);
               break;
+              default:
+                  throw std::runtime_error("MemoryDataSet::Filter(): invalid filterOption");
           }
           if (valid) {
             break;
@@ -393,7 +395,7 @@ bool DataSets::MemoryDataSet::isBegin() const {
 }
 
 bool DataSets::MemoryDataSet::isEnd() const {
-  return currentRecord == data.size() - 1;
+    return currentRecord == static_cast<gsl::index>(data.size() - 1);
 }
 gsl::index DataSets::MemoryDataSet::getCurrentRecord() const {
   return getLast();

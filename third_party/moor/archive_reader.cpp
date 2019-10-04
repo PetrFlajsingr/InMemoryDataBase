@@ -51,7 +51,7 @@ ArchiveReader::ArchiveReader(const std::string& _archive_file_name)
   }
 
   init();
-  checkError(archive_read_open_file(m_archive, m_archive_file_name.c_str()
+    checkError(archive_read_open_filename(m_archive, m_archive_file_name.c_str()
     , 10240), true);
 
 }
@@ -75,7 +75,7 @@ ArchiveReader::ArchiveReader(std::vector<unsigned char>&& _in_buffer)
 void ArchiveReader::init()
 {
   checkError(archive_read_support_format_all(m_archive), true);
-  checkError(archive_read_support_compression_all(m_archive), true);
+    checkError(archive_read_support_filter_all(m_archive), true);
 }
 
 ArchiveReader::~ArchiveReader()
@@ -171,7 +171,7 @@ std::pair<std::string, std::vector<unsigned char>> ArchiveReader::ExtractNext()
         checkError (r);
 
       read_index += r;
-      if (read_index == entry_size)
+        if (read_index == static_cast<size_t>(entry_size))
         break;
     }
   }

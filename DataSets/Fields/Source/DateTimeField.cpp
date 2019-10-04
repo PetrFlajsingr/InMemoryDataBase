@@ -11,13 +11,13 @@ ValueType DataSets::DateTimeField::getFieldType() const {
   return ValueType::DateTime;
 }
 
-void DataSets::DateTimeField::setAsString(std::string_view value) {
-  data.fromString(value);
-  setData(&data, ValueType::DateTime);
+void DataSets::DateTimeField::setAsString(std::string_view newValue) {
+    value.fromString(newValue);
+    setData(&value, ValueType::DateTime);
 }
 
 std::string DataSets::DateTimeField::getAsString() const {
-  return data.toString();
+    return value.toString();
 }
 
 std::function<int8_t(const DataSetRow *,
@@ -28,14 +28,14 @@ std::function<int8_t(const DataSetRow *,
   };
 }
 
-void DataSets::DateTimeField::setValue(void *data) {
-  this->data = *reinterpret_cast<DateTime *>(data);
+void DataSets::DateTimeField::setValue(const void *data) {
+    this->value = *reinterpret_cast<const DateTime *>(data);
 }
 
-void DataSets::DateTimeField::setAsDateTime(const DateTime &dateTime) {
-  data = dateTime;
+void DataSets::DateTimeField::setAsDateTime(const DateTime &newValue) {
+    value = newValue;
 }
 
 DateTime DataSets::DateTimeField::getAsDateTime() const {
-  return data;
+    return value;
 }

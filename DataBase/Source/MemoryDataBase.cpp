@@ -251,7 +251,7 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doJoin(const DataBase:
   auto joinResult = joinMaker.join(joinItem1.type);
   joinResult->dataSet->addParents({table1->dataSet, table2->dataSet});
 
-  for (gsl::index i = 1; i < query.joins.data.size(); ++i) {
+    for (gsl::index i = 1; i < static_cast<gsl::index>(query.joins.data.size()); ++i) {
     auto parents = joinResult->dataSet->getParents();
     auto joinItem = query.joins.data[i];
     auto joinTable = tableByName(joinItem.secondField.table);

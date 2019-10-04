@@ -71,10 +71,10 @@ SCENARIO("Reading csv file via BaseDataProvider interface", "[CsvReader]") {
 
         csvReader.first();
 
-        int recordCount = 0;
+          gsl::index recordCount = 0;
         while (csvReader.next()) {
           REQUIRE(csvReader.getRow().size() == SMALL_COLUMN_COUNT);
-          for (int j = 0; j < toCheck[recordCount].size(); ++j) {
+            for (gsl::index j = 0; j < static_cast<gsl::index>(toCheck[recordCount].size()); ++j) {
             CHECK(csvReader.getRow()[j] == toCheck[recordCount][j]);
           }
           recordCount++;
@@ -86,7 +86,7 @@ SCENARIO("Reading csv file via BaseDataProvider interface", "[CsvReader]") {
     WHEN("Reading column name and count"){
         THEN("Column names and count are matching"){
             REQUIRE(csvReader.getColumnCount() == SMALL_COLUMN_COUNT);
-            for(auto i =0; i < SMALL_COLUMN_COUNT; ++i){
+            for (gsl::index i = 0; i < SMALL_COLUMN_COUNT; ++i) {
              REQUIRE((csvReader.getColumnName(i)) == columnNamesSmall[i]);
             }
         }
@@ -116,7 +116,7 @@ SCENARIO("Reading csv file via BaseDataProvider interface", "[CsvReader]") {
 
       THEN("header is the same as test value") {
         REQUIRE(csvReader.getHeader().size() == ADV_COLUMN_COUNT);
-        int i = 0;
+          gsl::index i = 0;
         for (const auto &value : csvReader.getHeader()) {
           CHECK(value == advancedHeader[i]);
           i++;
@@ -127,7 +127,7 @@ SCENARIO("Reading csv file via BaseDataProvider interface", "[CsvReader]") {
     WHEN("reading the file contents") {
 
       THEN("values correspond to test values") {
-        int i = 0;
+          gsl::index i = 0;
         while (csvReader.next()) {
           REQUIRE(csvReader.getRow().size() == ADV_COLUMN_COUNT);
           int j = 0;
@@ -154,10 +154,10 @@ SCENARIO("Reading csv file via BaseDataProvider interface", "[CsvReader]") {
 
         csvReader.first();
 
-        int i = 0;
+          gsl::index i = 0;
         while (csvReader.next()) {
           REQUIRE(csvReader.getRow().size() == ADV_COLUMN_COUNT);
-          for (int j = 0; j < toCheck[i].size(); ++j) {
+            for (gsl::index j = 0; j < static_cast<gsl::index>(toCheck[i].size()); ++j) {
             CHECK(csvReader.getRow()[j] == toCheck[i][j]);
           }
           csvReader.next();
@@ -211,7 +211,7 @@ SCENARIO("Reading csv file via iterator", "[CsvReader]") {
         int recordCount = 0;
         for (const auto &value : reader) {
           REQUIRE(value.size() == SMALL_COLUMN_COUNT);
-          for (auto j = 0; j < toCheck[recordCount].size(); ++j) {
+            for (gsl::index j = 0; j < static_cast<gsl::index>(toCheck[recordCount].size()); ++j) {
             CHECK(value[j] == toCheck[recordCount][j]);
           }
           ++recordCount;
@@ -267,7 +267,7 @@ SCENARIO("Reading csv file via iterator", "[CsvReader]") {
         int recordCount = 0;
         for (const auto &value : csvReader) {
           REQUIRE(value.size() == ADV_COLUMN_COUNT);
-          for (auto j = 0; j < toCheck[recordCount].size(); ++j) {
+            for (gsl::index j = 0; j < static_cast<gsl::index>(toCheck[recordCount].size()); ++j) {
             CHECK(value[j] == toCheck[recordCount][j]);
           }
           ++recordCount;

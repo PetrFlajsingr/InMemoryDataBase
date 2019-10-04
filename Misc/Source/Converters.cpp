@@ -29,6 +29,7 @@ std::string CharSetConverter::convert(const std::string &value) const {
       return boost::locale::conv::to_utf<char>(value,
                                                "ANSI");
   }
+    throw std::runtime_error("CharSetConverter::convert");
 }
 std::string CharSetConverter::convertBack(const std::string &value) const {
   switch (charsetIn) {
@@ -51,6 +52,7 @@ std::string CharSetConverter::convertBack(const std::string &value) const {
       return boost::locale::conv::from_utf<char>(value,
                                                  "ANSI");
   }
+    throw std::runtime_error("CharSetConverter::convertBack");
 }
 
 CharSetConverter::CharSetConverter(CharSet charsetIn) : charsetIn(charsetIn) {}
@@ -88,7 +90,7 @@ std::vector<std::string> StringSplitConverter::convert(const std::string &value)
 }
 std::string StringSplitConverter::convertBack(const std::vector<std::string> &value) const {
   std::string result;
-  for (gsl::index i = 0; i < value.size() - 1; ++i) {
+    for (gsl::index i = 0; i < static_cast<gsl::index>(value.size() - 1); ++i) {
     result.append(value[i]);
     result.append(delimiter);
   }

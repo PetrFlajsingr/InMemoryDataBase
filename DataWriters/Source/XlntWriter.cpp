@@ -18,7 +18,7 @@ DataWriters::XlntWriter::XlntWriter(std::string_view fileName, CharSet outCharSe
 }
 
 void DataWriters::XlntWriter::writeHeader(const std::vector<std::string> &header) {
-  for (gsl::index i = 0; i < header.size(); ++i) {
+    for (gsl::index i = 0; i < static_cast<gsl::index>(header.size()); ++i) {
     if (convert) {
       ws.cell(i + 1, 1).value(converter->convertBack(header[i]));
     } else {
@@ -28,7 +28,7 @@ void DataWriters::XlntWriter::writeHeader(const std::vector<std::string> &header
 }
 void DataWriters::XlntWriter::writeRecord(const std::vector<std::string> &record) {
   ++recordNumber;
-  for (gsl::index i = 0; i < record.size(); ++i) {
+    for (gsl::index i = 0; i < static_cast<gsl::index>(record.size()); ++i) {
     if (convert) {
       ws.cell(i + 1, recordNumber).value(converter->convertBack(record[i]));
     } else {

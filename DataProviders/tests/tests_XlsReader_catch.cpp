@@ -69,7 +69,7 @@ SCENARIO("Reading xlsx file via BaseDataProvider interface", "[XlsReader]") {
 
         int i = 0;
         while (xlsReader.next()) {
-          for (int j = 0; j < toCheck[i].size(); ++j) {
+            for (gsl::index j = 0; j < static_cast<gsl::index>(toCheck[i].size()); ++j) {
             REQUIRE(xlsReader.getRow()[j] == toCheck[i][j]);
           }
           i++;
@@ -98,7 +98,6 @@ SCENARIO("Reading xlsx file via iterator", "[XlsReader]") {
         int recordCount = 0;
         for (const auto &value : xlsReader) {
           REQUIRE(value.size() == COLUMN_COUNT);
-          int j = 0;
           for (auto j = 0; j < COLUMN_COUNT; ++j) {
             REQUIRE(value[j] == recordsSmall[recordCount][j]);
           }
@@ -120,7 +119,7 @@ SCENARIO("Reading xlsx file via iterator", "[XlsReader]") {
 
         int i = 0;
         for (const auto &value : xlsReader) {
-          for (auto j = 0; j < toCheck[i].size(); ++j) {
+            for (gsl::index j = 0; j < static_cast<gsl::index>(toCheck[i].size()); ++j) {
             REQUIRE(value[j] == toCheck[i][j]);
           }
           ++i;

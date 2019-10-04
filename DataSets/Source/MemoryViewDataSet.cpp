@@ -16,20 +16,20 @@ void DataSets::MemoryViewDataSet::createFields(const std::vector<std::string> &c
                                                const std::vector<ValueType> &types,
                                                const std::vector<std::pair<int, int>> &fieldIndices) {
   createNullRows(fieldIndices, types);
-  for (gsl::index i = 0; i < columns.size(); ++i) {
+    for (gsl::index i = 0; i < static_cast<gsl::index>(columns.size()); ++i) {
     auto index = (fieldIndices[i].first << BaseField::maskTableShift) + fieldIndices[i].second;
     fields.emplace_back(FieldFactory::GetInstance().CreateField(columns[i], index, types[i], this));
   }
   columnCount = fields.size();
 }
 
-void DataSets::MemoryViewDataSet::open(DataProviders::BaseDataProvider &dataProvider,
-                                       const std::vector<ValueType> &fieldTypes) {
+void DataSets::MemoryViewDataSet::open(DataProviders::BaseDataProvider &,
+                                       const std::vector<ValueType> &) {
   throw UnsupportedOperationException("View can't be opened.");
 }
 
-void DataSets::MemoryViewDataSet::openEmpty(const std::vector<std::string> &fieldNames,
-                                            const std::vector<ValueType> &fieldTypes) {
+void DataSets::MemoryViewDataSet::openEmpty(const std::vector<std::string> &,
+                                            const std::vector<ValueType> &) {
   throw UnsupportedOperationException("View can't be opened.");
 }
 
@@ -47,7 +47,7 @@ void DataSets::MemoryViewDataSet::last() {
 
 bool DataSets::MemoryViewDataSet::next() {
   currentRecord++;
-  if (currentRecord >= data.size() - 1) {
+    if (currentRecord >= static_cast<gsl::index>(data.size() - 1)) {
     return false;
   }
   setFieldValues(currentRecord);
@@ -72,11 +72,11 @@ bool DataSets::MemoryViewDataSet::isBegin() const {
 }
 
 bool DataSets::MemoryViewDataSet::isLast() const {
-  return currentRecord == data.size() - 2;
+    return currentRecord == static_cast<gsl::index>(data.size() - 2);
 }
 
 bool DataSets::MemoryViewDataSet::isEnd() const {
-  return currentRecord == data.size() - 1;
+    return currentRecord == static_cast<gsl::index>(data.size() - 1);
 }
 
 DataSets::BaseField *DataSets::MemoryViewDataSet::fieldByName(std::string_view name) const {
@@ -137,7 +137,7 @@ void DataSets::MemoryViewDataSet::append() {
   throw UnsupportedOperationException("View can't be appended to.");
 }
 
-void DataSets::MemoryViewDataSet::append(DataProviders::BaseDataProvider &dataProvider) {
+void DataSets::MemoryViewDataSet::append(DataProviders::BaseDataProvider &) {
   throw UnsupportedOperationException("View can't be appended to.");
 }
 
@@ -153,10 +153,11 @@ void DataSets::MemoryViewDataSet::sort(DataSets::SortOptions &options) {
                  });
 
   auto optionArray = options.options;
-  auto compareFunction = [this, &optionArray, &compareFunctions](const std::vector<DataSetRow *> &a,
-                                                                 const std::vector<DataSetRow *> &b) {
-    for (gsl::index i = 0; i < optionArray.size(); ++i) {
-      auto[tableIndex, _] = BaseField::convertIndex(*optionArray[i].field);
+    auto compareFunction = [&optionArray, &compareFunctions](const std::vector<DataSetRow *> &a,
+                                                             const std::vector<DataSetRow *> &b) {
+        for (gsl::index i = 0; i < static_cast<gsl::index>(optionArray.size()); ++i) {
+            [[maybe_unused]] auto[tableIndex, _] = BaseField::convertIndex(*optionArray[i].field);
+            _ = _;
       int compareResult = compareFunctions[i](a[tableIndex], b[tableIndex]);
       if (compareResult < 0) {
         return optionArray[i].order == SortOrder::Ascending;
@@ -287,11 +288,11 @@ void DataSets::MemoryViewDataSet::resetEnd() {
   currentRecord = data.size() - 1;
 }
 
-void DataSets::MemoryViewDataSet::setData(void *data, gsl::index index, ValueType type) {
+void DataSets::MemoryViewDataSet::setData(void *, gsl::index, ValueType) {
   throw UnsupportedOperationException("View is immutable.");
 }
 
-void DataSets::MemoryViewDataSet::setFieldValues(gsl::index index) {
+void DataSets::MemoryViewDataSet::setFieldValues(gsl::index) {
   for (auto &field : fields) {
     auto[tableIndex, columnIndex] = BaseField::convertIndex(*field);
 
@@ -325,10 +326,10 @@ DataSets::MemoryViewDataSet::iterator DataSets::MemoryViewDataSet::end() {
 }
 void DataSets::MemoryViewDataSet::createNullRows(const std::vector<std::pair<int, int>> &fieldIndices,
                                                  const std::vector<ValueType> &fieldTypes) {
-  static gsl::zstring<> nullStr = "null";
+    static gsl::czstring<> nullStr = "null";
   int last = fieldIndices[0].first;
   std::vector<DataContainer> nullData;
-  for (gsl::index i = 0; i < fieldIndices.size(); ++i) {
+    for (gsl::index i = 0; i < static_cast<gsl::index>(fieldIndices.size()); ++i) {
     if (fieldIndices[i].first == last) {
       switch (fieldTypes[i]) {
         case ValueType::Integer:nullData.emplace_back(DataContainer{._integer = 0});
@@ -402,7 +403,7 @@ std::shared_ptr<DataSets::MemoryDataSet> DataSets::MemoryViewDataSet::toDataSet(
   auto resFields = result->getFields();
   while (next()) {
     result->append();
-    for (int i = 0; i < resFields.size(); ++i) {
+      for (int i = 0; i < static_cast<gsl::index>(resFields.size()); ++i) {
       if (allowedFields.empty()) {
         resFields[i]->setAsString(fields[i]->getAsString());
       } else {

@@ -53,11 +53,11 @@ namespace moor
     void checkError(const int _err_code, const bool _close_before_throw=false);
     void close();
 
+      const std::string m_archive_file_name;
+      std::vector<unsigned char> m_in_buffer;
+
     archive* m_archive;
     bool m_open;
-
-    const std::string m_archive_file_name;
-    std::vector<unsigned char> m_in_buffer;
   };
 }
 

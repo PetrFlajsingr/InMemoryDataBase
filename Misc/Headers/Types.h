@@ -114,13 +114,13 @@ typedef dec::decimal<2> Currency;
  * Main data container for data sets.
  */
 union DataContainer {
-  gsl::zstring<> _string = nullptr;
+    gsl::czstring<> _string = nullptr;
   int _integer;
   double _double;
   Currency *_currency;
   DateTime *_dateTime;
 
-  explicit operator gsl::zstring<>() const { return _string; }
+    explicit operator gsl::czstring<>() const { return _string; }
   explicit operator int() const { return _integer; }
   explicit operator double() const { return _double; }
   explicit operator Currency() const { return *_currency; }
@@ -128,7 +128,7 @@ union DataContainer {
   template<typename T>
   explicit operator T() const { return *this; }
 
-  DataContainer &operator=(gsl::zstring<> val);
+    DataContainer &operator=(gsl::czstring<> val);
   DataContainer &operator=(int val);
   DataContainer &operator=(double val);
   DataContainer &operator=(const Currency &val);

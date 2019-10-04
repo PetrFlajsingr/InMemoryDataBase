@@ -11,26 +11,26 @@ ValueType DataSets::DoubleField::getFieldType() const {
   return ValueType::Double;
 }
 
-void DataSets::DoubleField::setAsString(std::string_view value) {
-  data = Utilities::stringToDouble(value);
-  setData(&data, getFieldType());
+void DataSets::DoubleField::setAsString(std::string_view newValue) {
+    value = Utilities::stringToDouble(newValue);
+    setData(&value, getFieldType());
 }
 
 std::string DataSets::DoubleField::getAsString() const {
-  return std::to_string(data);
+    return std::to_string(value);
 }
 
-void DataSets::DoubleField::setValue(void *data) {
-  this->data = *reinterpret_cast<double *>(data);
+void DataSets::DoubleField::setValue(const void *data) {
+    this->value = *reinterpret_cast<const double *>(data);
 }
 
-void DataSets::DoubleField::setAsDouble(double value) {
-  data = value;
-  setData(&data, getFieldType());
+void DataSets::DoubleField::setAsDouble(double newValue) {
+    value = newValue;
+    setData(&value, getFieldType());
 }
 
 double DataSets::DoubleField::getAsDouble() const {
-  return data;
+    return value;
 }
 
 std::function<int8_t(const DataSetRow *,
