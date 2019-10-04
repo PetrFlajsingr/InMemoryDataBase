@@ -6,7 +6,6 @@
 #define DATASETS_FIELDS_HEADERS_DOUBLEFIELD_H_
 
 #include "BaseField.h"
-#include "Utilities.h"
 #include <string>
 
 namespace DataSets {

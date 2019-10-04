@@ -3,6 +3,7 @@
 //
 #include "DoubleField.h"
 #include "MemoryDataSet.h"
+#include "Utilities.h"
 
 DataSets::DoubleField::DoubleField(std::string_view fieldName, gsl::index index, BaseDataSet *dataSet)
     : BaseField(fieldName, index, dataSet) {}
@@ -17,7 +18,7 @@ void DataSets::DoubleField::setAsString(std::string_view newValue) {
 }
 
 std::string DataSets::DoubleField::getAsString() const {
-    return std::to_string(value);
+    return Utilities::doubleToString(value);
 }
 
 void DataSets::DoubleField::setValue(const void *data) {

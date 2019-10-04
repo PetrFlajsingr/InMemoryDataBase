@@ -102,6 +102,7 @@ int8_t Utilities::compareInt(int a, int b) {
   return 1;
 }
 
+// TODO: epsilon
 int8_t Utilities::compareDouble(double a, double b) {
   if (a == b) {
     return 0;

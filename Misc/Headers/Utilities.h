@@ -12,6 +12,7 @@
 #include <vector>
 #include "Exceptions.h"
 #include <decimal.h>
+#include <dtoa_milo.h>
 
 typedef dec::decimal<2> Currency;
 class DateTime;
@@ -124,7 +125,17 @@ std::string getRandomString(size_t length);
 
 std::string toLower(const std::string &str);
 
+template<int maxDigit=64>
+std::string doubleToString(double value);
+
 int getCoreCount();
 }  // namespace Utilities
+
+template<int maxDigit>
+std::string Utilities::doubleToString(double value) {
+    static char buffer[maxDigit];
+    dtoa_milo(value, buffer);
+    return std::string(buffer);
+}
 
 #endif //  MISC_HEADERS_UTILITIES_H_
