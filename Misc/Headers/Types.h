@@ -136,7 +136,7 @@ union DataContainer {
 
   template<typename T>
   bool operator==(T &rhs) {
-    if constexpr (std::is_same<T, int>{}) {
+      if constexpr (std::is_same_v<T, int>{
       return Utilities::compareInt(_integer, rhs);
     }
     if constexpr (std::is_same<T, double>{}) {
@@ -151,6 +151,7 @@ union DataContainer {
     if constexpr (std::is_same<T, DateTime>{}) {
       return Utilities::compareDateTime(*_dateTime, rhs);
     }
+      throw IllegalStateException("DataContainer::operator==()): invalid type");
   }
 
   template<typename T>

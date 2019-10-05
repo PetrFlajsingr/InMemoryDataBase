@@ -71,45 +71,6 @@ class Logger {
     }
     (std::cout << ... << message) << std::endl;
   }
-  /**
-   * Print to stdout
-   * @param logLevel
-   * @param message
-   * @param printTime
-   */
-  /*void log(LogLevel logLevel, std::string message, bool printTime = false) {
-    if (Debug && logLevel == LogLevel::Debug) {
-      return;
-    }
-    if (logLevel != LogLevel::Verbose) {
-      if (printTime) {
-        message = levelToString(logLevel) + " " + getTime() + ": " + message;
-      } else {
-        message = levelToString(logLevel) + ": " + message;
-      }
-    }
-    std::cout << message << std::endl;
-  }*/
-  /**
-   * Exception logging
-   * @param logLevel
-   * @param exception exception to print out
-   * @param printTime
-   */
-  /*void log(LogLevel logLevel, const std::exception &exception, bool printTime = false) {
-    if (Debug && logLevel == LogLevel::Debug) {
-      return;
-    }
-    std::string message = exception.what();
-    if (logLevel != LogLevel::Verbose) {
-      if (printTime) {
-        message = levelToString(logLevel) + " " + getTime() + ": " + message;
-      } else {
-        message = levelToString(logLevel) + ": " + message;
-      }
-    }
-    std::cout << message << std::endl;
-  }*/
   void startTime() {
     startTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(
         std::chrono::system_clock::now().time_since_epoch());

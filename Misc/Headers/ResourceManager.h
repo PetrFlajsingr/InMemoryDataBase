@@ -44,7 +44,7 @@ class ResourceManager {
  private:
   Config config = Config("./test.conf");
 
-  Folder resourceFolder = FileManager().getFolder("./resources");
+    Folder resourceFolder = FileManager::getFolder("./resources");
 };
 
 #endif //PROJECT_RESOURCEMANAGER_H
