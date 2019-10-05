@@ -49,11 +49,11 @@ class CsvReader : public BaseDataProvider {
    */
   ~CsvReader() override;
 
-  inline const std::vector<std::string> &getRow() const override {
+    [[nodiscard]] inline const std::vector<std::string> &getRow() const override {
     return currentRecord;
   }
 
-  inline std::string getColumnName(unsigned int columnIndex) const override {
+    [[nodiscard]] inline std::string getColumnName(unsigned int columnIndex) const override {
     return header.at(columnIndex);
   }
 
@@ -61,22 +61,22 @@ class CsvReader : public BaseDataProvider {
 
   void first() override;
 
-  int getCurrentRecordNumber() const override {
+    [[nodiscard]] int getCurrentRecordNumber() const override {
     return currentRecordNumber;
   }
 
-  inline const std::vector<std::string> &getHeader() const override {
+    [[nodiscard]] inline const std::vector<std::string> &getHeader() const override {
     return header;
   }
 
-  inline uint64_t getColumnCount() const override {
+    [[nodiscard]] inline uint64_t getColumnCount() const override {
     return header.size();
   }
 
-  bool eof() const override;
+    [[nodiscard]] bool eof() const override;
 
  private:
-  void init(std::string_view filePath, std::string_view delimiter);
+    void init(std::string_view filePath, std::string_view delim);
   /**
    * FSM states for csv parsing.
    */

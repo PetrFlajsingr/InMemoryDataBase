@@ -29,28 +29,28 @@ class BaseDataProvider {
    * Get a record divided into fields
    * @return
    */
-  virtual const std::vector<std::string> &getRow() const = 0;
+  [[nodiscard]] virtual const std::vector<std::string> &getRow() const = 0;
 
   /**
    * Get a name of a column - usually first row in a file...
    * @param columnIndex Index of desired column name
    * @return name of the column
    */
-  virtual std::string getColumnName(unsigned int columnIndex) const = 0;
+  [[nodiscard]] virtual std::string getColumnName(unsigned int columnIndex) const = 0;
 
-  virtual uint64_t getColumnCount() const = 0;
+    [[nodiscard]] virtual uint64_t getColumnCount() const = 0;
 
   /**
    *
    * @return vector of all column names
    */
-  virtual const std::vector<std::string> &getHeader() const = 0;
+  [[nodiscard]] virtual const std::vector<std::string> &getHeader() const = 0;
 
   /**
    *
    * @return amount of records that have been read already
    */
-  virtual int getCurrentRecordNumber() const = 0;
+  [[nodiscard]] virtual int getCurrentRecordNumber() const = 0;
 
   /**
    * Move to the next record.
@@ -63,7 +63,7 @@ class BaseDataProvider {
    */
   virtual void first() = 0;
 
-    virtual bool eof() const = 0;
+    [[nodiscard]] virtual bool eof() const = 0;
 
   virtual ~BaseDataProvider() = default;
 
@@ -86,6 +86,11 @@ class BaseDataProvider {
       provider = other.provider;
     }
 
+      iterator &operator=(const iterator &other) {
+          provider = other.provider;
+          return *this;
+      }
+
     /**
      * Move to next record
      * @return
@@ -95,7 +100,7 @@ class BaseDataProvider {
       return *this;
     }
 
-    const iterator operator++(int) {
+      iterator operator++(int) {
       iterator result = *this;
       ++(*this);
       return result;

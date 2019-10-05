@@ -38,8 +38,8 @@ DataProviders::CsvReader::CsvReader(std::string_view filePath,
   init(filePath, delimiter);
 }
 
-void DataProviders::CsvReader::init(std::string_view filePath, std::string_view delimiter) {
-  this->delimiter = delimiter;
+void DataProviders::CsvReader::init(std::string_view filePath, std::string_view delim) {
+    this->delimiter = delim;
   file.open(std::string(filePath));
   if (!file.is_open()) {
     std::string errMsg = "File could not be open: " + std::string(filePath);

@@ -16,14 +16,19 @@ class XlntReader : public BaseDataProvider {
   explicit XlntReader(std::string_view fileName, std::string_view sheetName = "");
   XlntReader(std::string_view fileName, CharSet inputCharSet, std::string_view sheetName = "");
 
-  const std::vector<std::string> &getRow() const override;
-  std::string getColumnName(unsigned int columnIndex) const override;
-  uint64_t getColumnCount() const override;
-  const std::vector<std::string> &getHeader() const override;
-  int getCurrentRecordNumber() const override;
+    [[nodiscard]] const std::vector<std::string> &getRow() const override;
+
+    [[nodiscard]] std::string getColumnName(unsigned int columnIndex) const override;
+
+    [[nodiscard]] uint64_t getColumnCount() const override;
+
+    [[nodiscard]] const std::vector<std::string> &getHeader() const override;
+
+    [[nodiscard]] int getCurrentRecordNumber() const override;
   bool next() override;
   void first() override;
-  bool eof() const override;
+
+    [[nodiscard]] bool eof() const override;
 
  private:
   xlnt::streaming_workbook_reader wb;

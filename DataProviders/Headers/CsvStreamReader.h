@@ -20,11 +20,11 @@ namespace DataProviders {
 
         explicit CsvStreamReader(const std::string &filePath, CharSet inputCharSet, char delimiter = ',');
 
-        inline const std::vector<std::string> &getRow() const override {
+        [[nodiscard]] inline const std::vector<std::string> &getRow() const override {
             return currentRecord;
         }
 
-        inline std::string getColumnName(unsigned int columnIndex) const override {
+        [[nodiscard]] inline std::string getColumnName(unsigned int columnIndex) const override {
             return header.at(columnIndex);
         }
 
@@ -32,19 +32,19 @@ namespace DataProviders {
 
         void first() override;
 
-        int getCurrentRecordNumber() const override {
+        [[nodiscard]] int getCurrentRecordNumber() const override {
             return currentRecordNumber;
         }
 
-        inline const std::vector<std::string> &getHeader() const override {
+        [[nodiscard]] inline const std::vector<std::string> &getHeader() const override {
             return header;
         }
 
-        inline uint64_t getColumnCount() const override {
+        [[nodiscard]] inline uint64_t getColumnCount() const override {
             return header.size();
         }
 
-        bool eof() const override;
+        [[nodiscard]] bool eof() const override;
 
     private:
         int currentRecordNumber = -1;

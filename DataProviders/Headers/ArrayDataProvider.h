@@ -28,19 +28,24 @@ class ArrayDataProvider : public BaseDataProvider {
       header.emplace_back(std::to_string(i));
     }
   }
-  const std::vector<std::string> &getRow() const override {
+
+    [[nodiscard]] const std::vector<std::string> &getRow() const override {
     return data[currentRow];
   }
-  std::string getColumnName(unsigned int columnIndex) const override {
+
+    [[nodiscard]] std::string getColumnName(unsigned int columnIndex) const override {
     return std::to_string(columnIndex);
   }
-  uint64_t getColumnCount() const override {
+
+    [[nodiscard]] uint64_t getColumnCount() const override {
     return data[0].size();
   }
-  const std::vector<std::string> &getHeader() const override {
+
+    [[nodiscard]] const std::vector<std::string> &getHeader() const override {
     return header;
   }
-  int getCurrentRecordNumber() const override {
+
+    [[nodiscard]] int getCurrentRecordNumber() const override {
     return currentRow;
   }
   bool next() override {
@@ -55,7 +60,8 @@ class ArrayDataProvider : public BaseDataProvider {
     currentRow = -1;
     _eof = false;
   }
-  bool eof() const override {
+
+    [[nodiscard]] bool eof() const override {
     return _eof;
   }
 

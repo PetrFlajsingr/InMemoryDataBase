@@ -29,21 +29,21 @@ class RandomDataProvider : public BaseDataProvider {
    */
   RandomDataProvider(int columnCount, int minDataLength, int maxDataLength, int recordCount);
 
-  const std::vector<std::string> &getRow() const override;
+    [[nodiscard]] const std::vector<std::string> &getRow() const override;
 
-  std::string getColumnName(unsigned int columnIndex) const override;
+    [[nodiscard]] std::string getColumnName(unsigned int columnIndex) const override;
 
-  uint64_t getColumnCount() const override;
+    [[nodiscard]] uint64_t getColumnCount() const override;
 
-  const std::vector<std::string> &getHeader() const override;
+    [[nodiscard]] const std::vector<std::string> &getHeader() const override;
 
-  int getCurrentRecordNumber() const override;
+    [[nodiscard]] int getCurrentRecordNumber() const override;
 
   bool next() override;
 
   void first() override;
 
-  bool eof() const override;
+    [[nodiscard]] bool eof() const override;
 
  private:
   int columnCount;
