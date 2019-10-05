@@ -34,7 +34,7 @@ class BaseField {
    *
    * @return type of data provided by this
    */
-  virtual ValueType getFieldType() const = 0;
+  [[nodiscard]] virtual ValueType getFieldType() const = 0;
   /**
    * Set value as string - convert to inner value and set it in data set
    * @param value value to set
@@ -44,19 +44,19 @@ class BaseField {
    * Convert inner value to string
    * @return value as string
    */
-  virtual std::string getAsString() const = 0;
+  [[nodiscard]] virtual std::string getAsString() const = 0;
   /**
    *
    * @return index of a field in data set
    */
-  gsl::index getIndex() const {
+  [[nodiscard]] gsl::index getIndex() const {
     return index;
   }
   /**
    *
    * @return Name of field/column
    */
-  std::string_view getName() const {
+  [[nodiscard]] std::string_view getName() const {
     return fieldName;
   }
   /**
@@ -73,7 +73,7 @@ class BaseField {
    *    1   -   first is greater
    *    -1  -   second is greater
    */
-  virtual std::function<int8_t(const DataSetRow *, const DataSetRow *)> getCompareFunction() const = 0;
+  [[nodiscard]] virtual std::function<int8_t(const DataSetRow *, const DataSetRow *)> getCompareFunction() const = 0;
   /**
    * Index conversion for MemoryViewDataSet.
    * @param field field whose index we need to convert

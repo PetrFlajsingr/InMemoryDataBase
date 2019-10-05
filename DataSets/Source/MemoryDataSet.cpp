@@ -45,7 +45,7 @@ void DataSets::MemoryDataSet::createFields(std::vector<std::string> columns, std
         "Column size doesn't match type size in table " + getName()).c_str());
   }
     for (gsl::index i = 0; i < static_cast<gsl::index>(columns.size()); ++i) {
-    fields.emplace_back(FieldFactory::GetInstance().CreateField(columns[i], i, types[i], this));
+        fields.emplace_back(FieldFactory::CreateField(columns[i], i, types[i], this));
   }
   columnCount = fields.size();
 }
@@ -305,20 +305,22 @@ DataSets::MemoryDataSet::~MemoryDataSet() {
   close();
 }
 
-void DataSets::MemoryDataSet::setData(void *data, gsl::index index, ValueType type) {
+void DataSets::MemoryDataSet::setData(void *newData, gsl::index index, ValueType type) {
   switch (type) {
-    case ValueType::Integer:getCell(currentRecord, index)._integer = *reinterpret_cast<int *>(data);
+      case ValueType::Integer:
+          getCell(currentRecord, index)._integer = *reinterpret_cast<int *>(newData);
       break;
-    case ValueType::Double:getCell(currentRecord, index)._double = *reinterpret_cast<int *>(data);
+      case ValueType::Double:
+          getCell(currentRecord, index)._double = *reinterpret_cast<int *>(newData);
       break;
     case ValueType::String:delete[] getCell(currentRecord, index)._string;
-      getCell(currentRecord, index)._string = reinterpret_cast<gsl::zstring<>>(data);
+          getCell(currentRecord, index)._string = reinterpret_cast<gsl::zstring<>>(newData);
       break;
     case ValueType::Currency:
-      *(getCell(currentRecord, index)._currency) = *(reinterpret_cast<Currency *>(data));
+        *(getCell(currentRecord, index)._currency) = *(reinterpret_cast<Currency *>(newData));
       break;
     case ValueType::DateTime:
-      *(getCell(currentRecord, index)._dateTime) = *(reinterpret_cast<DateTime *>(data));
+        *(getCell(currentRecord, index)._dateTime) = *(reinterpret_cast<DateTime *>(newData));
       break;
     default:throw IllegalStateException("Invalid value type.");
   }

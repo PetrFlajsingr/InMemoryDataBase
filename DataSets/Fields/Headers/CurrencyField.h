@@ -24,15 +24,18 @@ class CurrencyField : public BaseField {
    * @param dataSet owner data set
    */
   CurrencyField(std::string_view fieldName, gsl::index index, BaseDataSet *dataSet);
-  ValueType getFieldType() const override;
+
+    [[nodiscard]] ValueType getFieldType() const override;
 
     void setAsString(std::string_view newValue) override;
-  std::string getAsString() const override;
+
+    [[nodiscard]] std::string getAsString() const override;
 
     void setAsCurrency(const Currency &newValue);
-  Currency getAsCurrency() const;
 
-  std::function<int8_t(const DataSetRow *, const DataSetRow *)> getCompareFunction() const override;
+    [[nodiscard]] Currency getAsCurrency() const;
+
+    [[nodiscard]] std::function<int8_t(const DataSetRow *, const DataSetRow *)> getCompareFunction() const override;
 
  protected:
     void setValue(const void *data) override;

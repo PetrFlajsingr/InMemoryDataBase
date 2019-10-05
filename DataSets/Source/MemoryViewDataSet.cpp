@@ -80,7 +80,7 @@ bool DataSets::MemoryViewDataSet::isEnd() const {
 }
 
 DataSets::BaseField *DataSets::MemoryViewDataSet::fieldByName(std::string_view name) const {
-  if (auto it = std::find_if(fields.begin(), fields.end(), [name](const std::shared_ptr<BaseField> field) {
+    if (auto it = std::find_if(fields.begin(), fields.end(), [name](const std::shared_ptr<BaseField> &field) {
       return field->getName() == name;
     }); it != fields.end()) {
     return (*it).get();
@@ -100,7 +100,7 @@ std::vector<DataSets::BaseField *> DataSets::MemoryViewDataSet::getFields() cons
     std::transform(fields.begin(),
                    fields.end(),
                    std::back_inserter(result),
-                   [](const std::shared_ptr<BaseField> field) {
+                   [](const std::shared_ptr<BaseField> &field) {
                      return field.get();
                    });
   } else {
@@ -115,7 +115,7 @@ std::vector<std::string> DataSets::MemoryViewDataSet::getFieldNames() const {
     std::transform(fields.begin(),
                    fields.end(),
                    std::back_inserter(result),
-                   [](const std::shared_ptr<BaseField> field) {
+                   [](const std::shared_ptr<BaseField> &field) {
                      return std::string(field->getName());
                    });
   } else {

@@ -23,12 +23,14 @@ class StringField : public BaseField {
    * @param dataSet owner data set
    */
   StringField(std::string_view fieldName, gsl::index index, BaseDataSet *dataSet);
-  ValueType getFieldType() const override;
+
+    [[nodiscard]] ValueType getFieldType() const override;
 
     void setAsString(std::string_view newValue) override;
-  std::string getAsString() const override;
 
-  std::function<int8_t(const DataSetRow *, const DataSetRow *)> getCompareFunction() const override;
+    [[nodiscard]] std::string getAsString() const override;
+
+    [[nodiscard]] std::function<int8_t(const DataSetRow *, const DataSetRow *)> getCompareFunction() const override;
 
  protected:
     std::string value;

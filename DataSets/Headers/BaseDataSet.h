@@ -62,54 +62,54 @@ class BaseDataSet {
    *
    * @return true if the current record is the first one, false otherwise
    */
-  virtual bool isFirst() const = 0;
+  [[nodiscard]] virtual bool isFirst() const = 0;
   /**
    *
    * @return true if the first record can be accessed by calling next(), false otherwise
    */
-  virtual bool isBegin() const = 0;
+  [[nodiscard]] virtual bool isBegin() const = 0;
   /**
    *
    * @return true if the current record is the last one, false otherwise
    */
-  virtual bool isLast() const = 0;
+  [[nodiscard]] virtual bool isLast() const = 0;
   /**
    *
    * @return true if the last record can be accessed by calling previous(), false otherwise
    */
-  virtual bool isEnd() const = 0;
+  [[nodiscard]] virtual bool isEnd() const = 0;
   /**
    * Find field with a provided name.
    * @param name name of the desired field
    * @return field with the desired name
    */
-  virtual BaseField *fieldByName(std::string_view name) const = 0;
+  [[nodiscard]] virtual BaseField *fieldByName(std::string_view name) const = 0;
   /**
    * Get field by its index.
    * @param index index of a field in the data set
    * @return field with the desired index
    */
-  virtual BaseField *fieldByIndex(gsl::index index) const = 0;
+  [[nodiscard]] virtual BaseField *fieldByIndex(gsl::index index) const = 0;
   /**
    * Get all fields in data set in the same order they were created.
    * @return all fields in data set
    */
-  virtual std::vector<BaseField *> getFields() const = 0;
+  [[nodiscard]] virtual std::vector<BaseField *> getFields() const = 0;
   /**
    *
    * @return names of all fields in data set
    */
-  virtual std::vector<std::string> getFieldNames() const = 0;
+  [[nodiscard]] virtual std::vector<std::string> getFieldNames() const = 0;
   /**
    *
    * @return count of columns/fields in data set
    */
-  gsl::index getColumnCount() const;
+  [[nodiscard]] gsl::index getColumnCount() const;
   /**
    * Get index of current record in data set
    * @return index of current record
    */
-  virtual gsl::index getCurrentRecord() const = 0;
+  [[nodiscard]] virtual gsl::index getCurrentRecord() const = 0;
   /**
    * Create an empty row at the end of the data set.
    */
@@ -149,7 +149,7 @@ class BaseDataSet {
    *
    * @return name of the data set
    */
-  std::string getName() const {
+  [[nodiscard]] std::string getName() const {
     return dataSetName;
   }
   virtual ~BaseDataSet() = default;
@@ -167,7 +167,7 @@ class BaseDataSet {
    * @param field field to set data to
    * @param data data to set
    */
-  void setFieldData(BaseField *field, const void *data);
+  static void setFieldData(BaseField *field, const void *data);
   /**
    * Set inner data set data.
    * This method is called via BaseField.

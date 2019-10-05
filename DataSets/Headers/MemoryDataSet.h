@@ -42,18 +42,27 @@ class MemoryDataSet : public BaseDataSet {
   bool next() override;
   bool previous() override;
   void sort(SortOptions &options) override;
-  std::shared_ptr<ViewDataSet> filter(const FilterOptions &options) override;
-  BaseField *fieldByName(std::string_view name) const override;
-  BaseField *fieldByIndex(gsl::index index) const override;
+
+    [[nodiscard]] std::shared_ptr<ViewDataSet> filter(const FilterOptions &options) override;
+
+    [[nodiscard]] BaseField *fieldByName(std::string_view name) const override;
+
+    [[nodiscard]] BaseField *fieldByIndex(gsl::index index) const override;
   std::vector<BaseField *> getFields() const override;
-  bool isFirst() const override;
-  bool isLast() const override;
-  std::vector<std::string> getFieldNames() const override;
+
+    [[nodiscard]] bool isFirst() const override;
+
+    [[nodiscard]] bool isLast() const override;
+
+    [[nodiscard]] std::vector<std::string> getFieldNames() const override;
   void append() override;
   void append(DataProviders::BaseDataProvider &dataProvider) override;
-  bool isBegin() const override;
-  bool isEnd() const override;
-  gsl::index getCurrentRecord() const override;
+
+    [[nodiscard]] bool isBegin() const override;
+
+    [[nodiscard]] bool isEnd() const override;
+
+    [[nodiscard]] gsl::index getCurrentRecord() const override;
   void resetBegin() override;
   void resetEnd() override;
   //\ BaseDataSet
@@ -61,7 +70,7 @@ class MemoryDataSet : public BaseDataSet {
    * Create a view to all records.
    * @return view pointing to all records.
    */
-  std::shared_ptr<MemoryViewDataSet> fullView();
+  [[nodiscard]] std::shared_ptr<MemoryViewDataSet> fullView();
   /**
    * Random access iterator for iteration on raw data saved in memory.
    */
@@ -180,7 +189,7 @@ class MemoryDataSet : public BaseDataSet {
   iterator end();
 
  protected:
-  void setData(void *data, gsl::index index, ValueType type) override;
+    void setData(void *newData, gsl::index index, ValueType type) override;
 
  private:
   bool isOpen = false;

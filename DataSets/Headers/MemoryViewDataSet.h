@@ -44,15 +44,24 @@ class MemoryViewDataSet : public ViewDataSet {
   void last() override;
   bool next() override;
   bool previous() override;
-  bool isFirst() const override;
-  bool isBegin() const override;
-  bool isLast() const override;
-  bool isEnd() const override;
-  BaseField *fieldByName(std::string_view name) const override;
-  BaseField *fieldByIndex(gsl::index index) const override;
-  std::vector<BaseField *> getFields() const override;
-  std::vector<std::string> getFieldNames() const override;
-  gsl::index getCurrentRecord() const override;
+
+    [[nodiscard]] bool isFirst() const override;
+
+    [[nodiscard]] bool isBegin() const override;
+
+    [[nodiscard]] bool isLast() const override;
+
+    [[nodiscard]] bool isEnd() const override;
+
+    [[nodiscard]] BaseField *fieldByName(std::string_view name) const override;
+
+    [[nodiscard]] BaseField *fieldByIndex(gsl::index index) const override;
+
+    [[nodiscard]] std::vector<BaseField *> getFields() const override;
+
+    [[nodiscard]] std::vector<std::string> getFieldNames() const override;
+
+    [[nodiscard]] gsl::index getCurrentRecord() const override;
   void append() override;
   void append(DataProviders::BaseDataProvider &dataProvider) override;
   void sort(SortOptions &options) override;
@@ -82,7 +91,7 @@ class MemoryViewDataSet : public ViewDataSet {
   /**
    * @return data sets this view points to
    */
-  const std::vector<std::shared_ptr<MemoryDataSet>> &getParents() const;
+  [[nodiscard]] const std::vector<std::shared_ptr<MemoryDataSet>> &getParents() const;
   /**
    * Create a data set from data this view points to.
    * @return materialised view
@@ -121,7 +130,7 @@ class MemoryViewDataSet : public ViewDataSet {
       return *this;
     }
 
-    const iterator operator++(int) {
+      iterator operator++(int) {
       iterator result = *this;
       ++(*this);
       return result;
@@ -152,7 +161,7 @@ class MemoryViewDataSet : public ViewDataSet {
       return *this;
     }
 
-    const iterator operator--(int) {
+      iterator operator--(int) {
       iterator result = *this;
       --(*this);
       return result;

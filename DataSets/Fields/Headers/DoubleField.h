@@ -21,15 +21,18 @@ class DoubleField : public BaseField {
    * @param dataSet owner data set
    */
   DoubleField(std::string_view fieldName, gsl::index index, BaseDataSet *dataSet);
-  ValueType getFieldType() const override;
+
+    [[nodiscard]] ValueType getFieldType() const override;
 
     void setAsString(std::string_view newValue) override;
-  std::string getAsString() const override;
+
+    [[nodiscard]] std::string getAsString() const override;
 
     void setAsDouble(double newValue);
-  double getAsDouble() const;
 
-  std::function<int8_t(const DataSetRow *, const DataSetRow *)> getCompareFunction() const override;
+    [[nodiscard]] double getAsDouble() const;
+
+    [[nodiscard]] std::function<int8_t(const DataSetRow *, const DataSetRow *)> getCompareFunction() const override;
 
  protected:
     void setValue(const void *newValue) override;

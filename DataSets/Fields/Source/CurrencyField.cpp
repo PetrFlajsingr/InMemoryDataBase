@@ -3,7 +3,6 @@
 //
 
 #include <CurrencyField.h>
-
 #include "MemoryDataSet.h"
 
 DataSets::CurrencyField::CurrencyField(std::string_view fieldName, gsl::index index, BaseDataSet *dataSet)

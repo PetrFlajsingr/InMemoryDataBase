@@ -22,15 +22,18 @@ class DateTimeField : public BaseField {
    * @param dataSet owner data set
    */
   DateTimeField(std::string_view fieldName, gsl::index index, BaseDataSet *dataSet);
-  ValueType getFieldType() const override;
+
+    [[nodiscard]] ValueType getFieldType() const override;
 
     void setAsString(std::string_view newValue) override;
-  std::string getAsString() const override;
+
+    [[nodiscard]] std::string getAsString() const override;
 
     void setAsDateTime(const DateTime &newValue);
-  DateTime getAsDateTime() const;
 
-  std::function<int8_t(const DataSetRow *, const DataSetRow *)> getCompareFunction() const override;
+    [[nodiscard]] DateTime getAsDateTime() const;
+
+    [[nodiscard]] std::function<int8_t(const DataSetRow *, const DataSetRow *)> getCompareFunction() const override;
 
  protected:
     void setValue(const void *data) override;

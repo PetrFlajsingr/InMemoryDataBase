@@ -32,8 +32,8 @@ class FieldFactory {
    * @param dataSet owner data set
    * @return field created based on provided parameters
    */
-  std::shared_ptr<DataSets::BaseField> CreateField(std::string_view name, gsl::index index,
-                                                   ValueType type, BaseDataSet *dataSet);
+  static std::shared_ptr<DataSets::BaseField> CreateField(std::string_view name, gsl::index index,
+                                                          ValueType type, BaseDataSet *dataSet);
 
   FieldFactory(const FieldFactory &) = delete;
   FieldFactory &operator=(const FieldFactory &) = delete;
