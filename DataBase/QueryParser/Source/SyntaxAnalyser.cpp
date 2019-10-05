@@ -4,8 +4,8 @@
 
 #include <SyntaxAnalyser.h>
 
-void DataBase::SyntaxAnalyser::setInput(const std::vector<std::tuple<Token, std::string, bool>> &tokens) {
-  this->tokens = tokens;
+void DataBase::SyntaxAnalyser::setInput(const std::vector<std::tuple<Token, std::string, bool>> &inputTokens) {
+    this->tokens = inputTokens;
 }
 
 DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {

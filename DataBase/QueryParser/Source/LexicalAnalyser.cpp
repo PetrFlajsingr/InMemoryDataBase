@@ -4,8 +4,8 @@
 
 #include <LexicalAnalyser.h>
 
-void DataBase::LexicalAnalyser::setInput(const std::string &input) {
-  this->input = input;
+void DataBase::LexicalAnalyser::setInput(const std::string &newInput) {
+    this->input = newInput;
   currentIndex = 0;
 }
 

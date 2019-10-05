@@ -7,22 +7,23 @@
 #include <MemoryDataBase.h>
 #include <JoinMaker.h>
 
-DataBase::Table::Table(const std::shared_ptr<DataSets::MemoryDataSet> &dataSet) : dataSet(dataSet) {}
+DataBase::Table::Table(std::shared_ptr<DataSets::MemoryDataSet> dataSet) : dataSet(std::move(dataSet)) {}
 std::string_view DataBase::Table::getName() {
   return dataSet->getName();
 }
-DataBase::View::View(const std::shared_ptr<DataSets::MemoryViewDataSet> &dataSet) : dataSet(dataSet) {}
+
+DataBase::View::View(std::shared_ptr<DataSets::MemoryViewDataSet> dataSet) : dataSet(std::move(dataSet)) {}
 std::string_view DataBase::View::getName() {
   return dataSet->getName();
 }
 
-DataBase::MemoryDataBase::MemoryDataBase(const std::string &name) : name(name) {}
+DataBase::MemoryDataBase::MemoryDataBase(std::string name) : name(std::move(name)) {}
 
 std::string_view DataBase::MemoryDataBase::getName() const {
   return name;
 }
 
-void DataBase::MemoryDataBase::addTable(std::shared_ptr<DataSets::MemoryDataSet> dataSet) {
+void DataBase::MemoryDataBase::addTable(const std::shared_ptr<DataSets::MemoryDataSet> &dataSet) {
   tables.emplace_back(std::make_shared<Table>(dataSet));
 }
 
@@ -120,8 +121,8 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::execAggregateQuery(
 }
 
 DataBase::StructuredQuery DataBase::MemoryDataBase::validateQuery(StructuredQuery &query) const {
-  std::vector<std::pair<std::string, bool>> tables;
-  tables.emplace_back(query.mainTable, false);
+    std::vector<std::pair<std::string, bool>> queryTables;
+    queryTables.emplace_back(query.mainTable, false);
 
   std::vector<std::string> savedTables;
   std::transform(this->tables.begin(), this->tables.end(), std::back_inserter(savedTables),
@@ -129,15 +130,15 @@ DataBase::StructuredQuery DataBase::MemoryDataBase::validateQuery(StructuredQuer
                    return table->dataSet->getName();
                  });
 
-  for (auto &val : tables) {
+    for (auto &val : queryTables) {
     val.second = std::find(savedTables.begin(), savedTables.end(), val.first) != savedTables.end();
   }
 
   for (const auto &val : query.joins.data) {
-    tables.emplace_back(val.joinedTable, false);
+      queryTables.emplace_back(val.joinedTable, false);
   }
   std::string errMsg;
-  for (auto &val : tables) {
+    for (auto &val : queryTables) {
     val.second = std::find(savedTables.begin(), savedTables.end(), val.first) != savedTables.end();
     if (!val.second) {
       errMsg += "Unknown table: " + val.first + "\n";

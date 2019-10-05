@@ -4,8 +4,8 @@
 
 #include <SemanticAnalyser.h>
 
-void DataBase::SemanticAnalyser::setInput(StructuredQuery &structuredQuery) {
-  this->structuredQuery = structuredQuery;
+void DataBase::SemanticAnalyser::setInput(StructuredQuery &newStructuredQuery) {
+    this->structuredQuery = newStructuredQuery;
 }
 
 DataBase::StructuredQuery DataBase::SemanticAnalyser::analyse() {

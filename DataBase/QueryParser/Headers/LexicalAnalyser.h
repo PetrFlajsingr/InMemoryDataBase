@@ -19,11 +19,11 @@ namespace DataBase {
  */
 class LexicalAnalyser {
  public:
-  /**
-   *
-   * @param input string to tokenize
-   */
-  void setInput(const std::string &input);
+    /**
+     *
+     * @param newInput string to tokenize
+     */
+    void setInput(const std::string &newInput);
   /**
    * Parse another token
    * @return parsed token, string form of the token, true if this is not last token, false otherwise
