@@ -38,7 +38,7 @@ class ConsoleIO : public MessageSender, public MessageReceiver {
       }
   };
 
-  void setMode(Mode mode);
+    void setMode(Mode newMode);
 
  private:
   std::mutex mutex;

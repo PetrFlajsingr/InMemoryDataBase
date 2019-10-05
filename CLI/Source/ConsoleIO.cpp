@@ -33,8 +33,9 @@ std::string ConsoleIO::readLn() {
   std::getline(std::cin, str);
   return str;
 }
-void ConsoleIO::setMode(ConsoleIO::Mode mode) {
-  switch (mode) {
+
+void ConsoleIO::setMode(ConsoleIO::Mode newMode) {
+    switch (newMode) {
     case Mode::simple:ConsoleIO::form = "";
       break;
     case Mode::arrow:ConsoleIO::form = ">> ";
