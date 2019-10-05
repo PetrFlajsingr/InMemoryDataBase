@@ -20,7 +20,7 @@
 class FileDownloadManager : public MessageReceiver, public MessageSender {
  public:
   FileDownloadManager(const std::shared_ptr<MessageManager> &commandManager,
-                      const std::shared_ptr<ThreadPool> &threadPool);
+                      std::shared_ptr<ThreadPool> threadPool);
   virtual ~FileDownloadManager();
 
   void enqueueDownload(const std::string &localFolder, const std::string &url,

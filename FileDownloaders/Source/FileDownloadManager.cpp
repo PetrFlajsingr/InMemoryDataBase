@@ -4,9 +4,11 @@
 
 #include <FileDownloadManager.h>
 
+#include <utility>
+
 FileDownloadManager::FileDownloadManager(const std::shared_ptr<MessageManager> &commandManager,
-                                         const std::shared_ptr<ThreadPool> &threadPool)
-    : MessageSender(commandManager), threadPool(threadPool) {
+                                         std::shared_ptr<ThreadPool> threadPool)
+        : MessageSender(commandManager), threadPool(std::move(threadPool)) {
   commandManager->registerMsg<Download>(this);
   commandManager->registerMsg<DownloadNoBlock>(this);
     curl_global_init(CURL_GLOBAL_DEFAULT);
@@ -14,7 +16,7 @@ FileDownloadManager::FileDownloadManager(const std::shared_ptr<MessageManager> &
 
 void FileDownloadManager::enqueueDownload(const std::string &localFolder, const std::string &url,
                                           FileDownloadObserver &observer, bool blocking) {
-  auto downloadTask = [=, &observer] {
+    auto download = [=, &observer] {
     FileDownloader downloader(localFolder);
     auto cntObs = CountObserver(this);
     downloader.addObserver(&cntObs);
@@ -22,9 +24,9 @@ void FileDownloadManager::enqueueDownload(const std::string &localFolder, const 
     downloader.downloadFile(url);
   };
   if (!blocking) {
-    threadPool->enqueue(downloadTask);
+      threadPool->enqueue(download);
   } else {
-    downloadTask();
+      download();
   }
 }
 
