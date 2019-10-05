@@ -49,6 +49,11 @@ class BaseDataWriter {
     iterator(const iterator &other) {
       dataWriter = other.dataWriter;
     }
+
+      iterator &operator=(const iterator &rhs) {
+          dataWriter = rhs.dataWriter;
+          return *this;
+      }
     /**
      * Write data to ouput.
      * @param rhs data to write
