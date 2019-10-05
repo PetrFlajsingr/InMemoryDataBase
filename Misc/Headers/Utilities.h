@@ -93,7 +93,7 @@ int8_t compareInt(int a, int b);
  * @param b
  * @return -1 pokud a < b, 0 pokud a == b, 1 pokud a > b
  */
-int8_t compareDouble(double a, double b);
+    int8_t compareDouble(double a, double b, double epsilon = 1e-7);
 /**
  * Srovnani Currency hodnot
  * @param a

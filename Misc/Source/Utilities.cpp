@@ -103,8 +103,8 @@ int8_t Utilities::compareInt(int a, int b) {
 }
 
 // TODO: epsilon
-int8_t Utilities::compareDouble(double a, double b) {
-  if (a == b) {
+int8_t Utilities::compareDouble(double a, double b, double epsilon) {
+    if (std::abs(a - b) < epsilon) {
     return 0;
   }
   if (a < b) {
