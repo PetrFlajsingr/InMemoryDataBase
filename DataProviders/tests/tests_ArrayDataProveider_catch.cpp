@@ -19,6 +19,7 @@
 SCENARIO("Reading string array using via ArrayDataProvider interface", "[ArrayDataProvider]"){
     GIVEN("Simple array"){
         const std::vector<std::vector<std::string>> recordsSmall{
+                {"COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4", "COLUMN5"},
                 {"RECORD11", "RECORD12", "RECORD13", "RECORD14", "RECOR15"},
                 {"RECORD21", "RECORD22", "RECORD23", "RECORD24", "RECORD25"},
                 {"RECORD31", "RECORD32", "RECORD33", "RECORD34", "RECORD35"}
@@ -32,7 +33,7 @@ SCENARIO("Reading string array using via ArrayDataProvider interface", "[ArrayDa
                 REQUIRE(dataProvider.getHeader().size() == SMALL_COLUMN_COUNT);
                 int i = 0;
                 for (const auto &value : dataProvider.getHeader()) {
-                    CHECK(value == std::to_string(i));
+                    CHECK(value == recordsSmall[0][i]);
                     i++;
                 }
             }
@@ -41,7 +42,7 @@ SCENARIO("Reading string array using via ArrayDataProvider interface", "[ArrayDa
         WHEN("reading the array contents") {
 
             THEN("values correspond to test values") {
-                int recordCount = 0;
+                int recordCount = 1;
                 while (dataProvider.next()) {
                     REQUIRE(dataProvider.getRow().size() == SMALL_COLUMN_COUNT);
                     for (auto j = 0; j < SMALL_COLUMN_COUNT; ++j) {
@@ -49,7 +50,7 @@ SCENARIO("Reading string array using via ArrayDataProvider interface", "[ArrayDa
                     }
                     ++recordCount;
                 }
-                REQUIRE(recordCount == SMALL_ROW_COUNT);
+                REQUIRE(recordCount-1 == SMALL_ROW_COUNT);
             }
         }
 
@@ -83,7 +84,7 @@ SCENARIO("Reading string array using via ArrayDataProvider interface", "[ArrayDa
             THEN("Column names and count are matching"){
                 REQUIRE(dataProvider.getColumnCount() == SMALL_COLUMN_COUNT);
                 for(auto i =0; i < SMALL_COLUMN_COUNT; ++i){
-                    REQUIRE((dataProvider.getColumnName(i)) == std::to_string(i));
+                    REQUIRE((dataProvider.getColumnName(i)) == recordsSmall[0][i]);
                 }
             }
         }
@@ -91,6 +92,7 @@ SCENARIO("Reading string array using via ArrayDataProvider interface", "[ArrayDa
 
     GIVEN("A bit complex array") {
         const std::vector<std::vector<std::string>> advancedRecord{
+                {"A       ", "B", "C"},
                 {"\"Ah, oj\"", "B", "C"},
                 {"\"Ah, oj\"", "B", R"("test man"", jojo")"},
         };
@@ -103,7 +105,7 @@ SCENARIO("Reading string array using via ArrayDataProvider interface", "[ArrayDa
                 REQUIRE(dataProvider.getHeader().size() == ADV_COLUMN_COUNT);
                 int i = 0;
                 for (const auto &value : dataProvider.getHeader()) {
-                    CHECK(value == std::to_string(i));
+                    CHECK(value == advancedRecord[0][i]);
                     i++;
                 }
             }
@@ -112,7 +114,7 @@ SCENARIO("Reading string array using via ArrayDataProvider interface", "[ArrayDa
         WHEN("reading the array contents") {
 
             THEN("values correspond to test values") {
-                int i = 0;
+                int i = 1;
                 while (dataProvider.next()) {
                     REQUIRE(dataProvider.getRow().size() == ADV_COLUMN_COUNT);
                     int j = 0;
@@ -155,7 +157,8 @@ SCENARIO("Reading string array using via ArrayDataProvider interface", "[ArrayDa
 SCENARIO("Reading array via iterator ArrayDataProvider", "[ArrayDataProvider]") {
 
     GIVEN("A simple array") {
-        const std::vector<std::vector<std::string>> recordsSmall{
+        std::vector<std::vector<std::string>> recordsSmall{
+                {"COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4", "COLUMN5"},
                 {"RECORD11", "RECORD12", "RECORD13", "RECORD14", "RECOR15"},
                 {"RECORD21", "RECORD22", "RECORD23", "RECORD24", "RECORD25"},
                 {"RECORD31", "RECORD32", "RECORD33", "RECORD34", "RECORD35"}
@@ -166,7 +169,7 @@ SCENARIO("Reading array via iterator ArrayDataProvider", "[ArrayDataProvider]") 
         WHEN("reading the array contents") {
 
             THEN("values correspond to test values") {
-                int recordCount = 0;
+                int recordCount = 1;
                 for (const auto &value : dataProvider) {
                     REQUIRE(value.size() == SMALL_COLUMN_COUNT);
                     for (auto j = 0; j < SMALL_COLUMN_COUNT; ++j) {
@@ -174,7 +177,7 @@ SCENARIO("Reading array via iterator ArrayDataProvider", "[ArrayDataProvider]") 
                     }
                     recordCount++;
                 }
-                REQUIRE(recordCount == SMALL_ROW_COUNT);
+                REQUIRE(recordCount-1 == SMALL_ROW_COUNT);
             }
         }
 
@@ -204,7 +207,7 @@ SCENARIO("Reading array via iterator ArrayDataProvider", "[ArrayDataProvider]") 
             THEN("Column names and count are matching"){
                 REQUIRE(dataProvider.getColumnCount() == SMALL_COLUMN_COUNT);
                 for(auto i =0; i < SMALL_COLUMN_COUNT; ++i){
-                    REQUIRE((dataProvider.getColumnName(i)) == std::to_string((i)));
+                    REQUIRE((dataProvider.getColumnName(i)) == recordsSmall[0][i]);
                 }
             }
         }
@@ -212,6 +215,7 @@ SCENARIO("Reading array via iterator ArrayDataProvider", "[ArrayDataProvider]") 
 
     GIVEN("A bit complex array") {
         const std::vector<std::vector<std::string>> advancedRecord{
+                {"A       ", "B", "C"},
                 {"\"Ah, oj\"", "B", "C"},
                 {"\"Ah, oj\"", "B", R"("test man"", jojo")"},
         };
@@ -221,7 +225,7 @@ SCENARIO("Reading array via iterator ArrayDataProvider", "[ArrayDataProvider]") 
         WHEN("reading the array contents") {
 
             THEN("values correspond to test values") {
-                int recordCount = 0;
+                int recordCount = 1;
                 for (const auto &value : dataProvider) {
                     REQUIRE(value.size() == ADV_COLUMN_COUNT);
                     for (auto j = 0; j < ADV_COLUMN_COUNT; ++j) {
@@ -229,7 +233,7 @@ SCENARIO("Reading array via iterator ArrayDataProvider", "[ArrayDataProvider]") 
                     }
                     recordCount++;
                 }
-                REQUIRE(recordCount == ADV_ROW_COUNT);
+                REQUIRE(recordCount-1 == ADV_ROW_COUNT);
             }
         }
 

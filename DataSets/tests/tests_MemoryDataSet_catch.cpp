@@ -56,7 +56,7 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
         auto fields = dataSet.getFields();
         REQUIRE(fields.size() == COL_COUNT);
 
-        int rowCount = 0;
+        int rowCount = 1;
         while (dataSet.next()) {
           for (auto field : fields) {
             CHECK(field->getAsString() == data[rowCount][field->getIndex()]);
@@ -74,7 +74,7 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
           auto wat2 = data[rowCount][0];
           rowCount--;
         }
-        REQUIRE(rowCount == -1);
+        REQUIRE(rowCount == 0);
       }
 
       THEN("The data can be sorted") {
@@ -180,7 +180,7 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
         auto fields = dataSet.getFields();
         REQUIRE(fields.size() == COL_COUNT);
 
-        int rowCount = 0;
+        int rowCount = 1;
         while (dataSet.next()) {
           for (auto field : fields) {
             if (auto intField = dynamic_cast<DataSets::IntegerField *>(field);
@@ -210,7 +210,7 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
           auto wat2 = data[rowCount][0];
           rowCount--;
         }
-        REQUIRE(rowCount == -1);
+        REQUIRE(rowCount == 0);
       }
 
       THEN("The data can be sorted") {
@@ -323,7 +323,7 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
         auto fields = dataSet.getFields();
         REQUIRE(fields.size() == COL_COUNT);
 
-        int rowCount = 0;
+        int rowCount = 1;
         while (dataSet.next()) {
           for (auto field : fields) {
             if (auto doubleField = dynamic_cast<DataSets::DoubleField *>(field);
@@ -353,7 +353,7 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
           auto wat2 = data[rowCount][0];
           rowCount--;
         }
-        REQUIRE(rowCount == -1);
+        REQUIRE(rowCount == 0);
       }
 
       THEN("The data can be sorted") {
@@ -466,7 +466,7 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
         auto fields = dataSet.getFields();
         REQUIRE(fields.size() == COL_COUNT);
 
-        int rowCount = 0;
+        int rowCount = 1;
         while (dataSet.next()) {
           for (auto field : fields) {
             if (auto currencyField =
@@ -498,7 +498,7 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
           auto wat2 = data[rowCount][0];
           rowCount--;
         }
-        REQUIRE(rowCount == -1);
+        REQUIRE(rowCount == 0);
       }
 
       THEN("The data can be sorted") {

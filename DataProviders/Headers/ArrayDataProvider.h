@@ -22,10 +22,11 @@ class ArrayDataProvider : public BaseDataProvider {
    * Prepares header names as indexes of fields.
    */
   explicit ArrayDataProvider(const std::vector<std::vector<std::string>> &data)
-      : BaseDataProvider(), data(data) {
+      : BaseDataProvider() {
+      this->data = std::vector<std::vector<std::string>>(data.begin()+1, data.end());
     header.reserve(data[0].size());
-      for (gsl::index i = 0; i < static_cast<gsl::index>(data[0].size()); ++i) {
-      header.emplace_back(std::to_string(i));
+      for (const auto & i : data[0]) {
+      header.emplace_back(i);
     }
   }
 
@@ -34,7 +35,7 @@ class ArrayDataProvider : public BaseDataProvider {
   }
 
     [[nodiscard]] std::string getColumnName(unsigned int columnIndex) const override {
-    return std::to_string(columnIndex);
+    return header[columnIndex];
   }
 
     [[nodiscard]] uint64_t getColumnCount() const override {
