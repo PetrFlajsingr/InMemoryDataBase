@@ -5,15 +5,15 @@
 #ifndef PROJECT_CLICONTROLLER_H
 #define PROJECT_CLICONTROLLER_H
 
-#include "ScriptParser.h"
 #include "AppContext.h"
+#include "ScriptParser.h"
 #include <MessageReceiver.h>
 #include <memory>
 #include <string>
 
 // TODO: unarchive, async query, async unarchive, wait async query/unarchive
 class CLIController : public MessageReceiver, public MessageSender {
- public:
+public:
   CLIController();
   void runApp();
   /**
@@ -22,15 +22,15 @@ class CLIController : public MessageReceiver, public MessageSender {
    */
   static void RunScript(std::string_view scriptPath);
 
- private:
+private:
   void receive(std::shared_ptr<Message> message) override;
   enum class CmdType {
     runScript,
     queryModeStart, // query start/qs
-    queryModeEnd, // >> query end/>> qe
-    clear, // clear
-    help, // help/h/?
-    exit, // exit/quit/e/q
+    queryModeEnd,   // >> query end/>> qe
+    clear,          // clear
+    help,           // help/h/?
+    exit,           // exit/quit/e/q
     listDBs,
     listTables,
     download,
@@ -56,4 +56,4 @@ class CLIController : public MessageReceiver, public MessageSender {
   void printHelp();
 };
 
-#endif //PROJECT_CLICONTROLLER_H
+#endif // PROJECT_CLICONTROLLER_H

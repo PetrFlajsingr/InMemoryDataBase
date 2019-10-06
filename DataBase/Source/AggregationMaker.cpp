@@ -17,9 +17,7 @@ DataBase::AggregationMaker::aggregate(const DataBase::StructuredQuery &structure
 
   DataSets::SortOptions options;
   std::for_each(groupByFields.begin(), groupByFields.end(),
-                [&options](Unique &un) {
-                  options.addOption(un.field, SortOrder::Ascending);
-                });
+                [&options](Unique &un) { options.addOption(un.field, SortOrder::Ascending); });
   if (view != nullptr) {
     auto workDs = view->dataSet.get();
     workDs->sort(options);
@@ -52,27 +50,30 @@ DataBase::AggregationMaker::prepareDataSet(const DataBase::StructuredQuery &stru
   for (const auto &val : structuredQuery.agr.data) {
     auto field = dataSet->fieldByName(val.field.column);
     switch (val.op) {
-      case AgrOperator::group:groupByFields.emplace_back(field);
-        writeOrder.emplace_back(AgrOperator::group, groupByFields.size() - 1);
-        break;
-      case AgrOperator::min:
-        //minFields.emplace_back(field);
-        //writeOrder.emplace_back(AgrOperator::min, minFields.size() - 1);
-        break;
-      case AgrOperator::max:
-        //maxFields.emplace_back(field);
-        //writeOrder.emplace_back(AgrOperator::max, maxFields.size() - 1);
-        break;
-      case AgrOperator::count:countFields.emplace_back(field);
-        writeOrder.emplace_back(AgrOperator::count, countFields.size() - 1);
-        break;
-      case AgrOperator::sum:sumFields.emplace_back(field);
-        writeOrder.emplace_back(AgrOperator::sum, sumFields.size() - 1);
-        break;
-      case AgrOperator::avg:
-        //avgFields.emplace_back(field);
-        //writeOrder.emplace_back(AgrOperator::avg, avgFields.size() - 1);
-        break;
+    case AgrOperator::group:
+      groupByFields.emplace_back(field);
+      writeOrder.emplace_back(AgrOperator::group, groupByFields.size() - 1);
+      break;
+    case AgrOperator::min:
+      // minFields.emplace_back(field);
+      // writeOrder.emplace_back(AgrOperator::min, minFields.size() - 1);
+      break;
+    case AgrOperator::max:
+      // maxFields.emplace_back(field);
+      // writeOrder.emplace_back(AgrOperator::max, maxFields.size() - 1);
+      break;
+    case AgrOperator::count:
+      countFields.emplace_back(field);
+      writeOrder.emplace_back(AgrOperator::count, countFields.size() - 1);
+      break;
+    case AgrOperator::sum:
+      sumFields.emplace_back(field);
+      writeOrder.emplace_back(AgrOperator::sum, sumFields.size() - 1);
+      break;
+    case AgrOperator::avg:
+      // avgFields.emplace_back(field);
+      // writeOrder.emplace_back(AgrOperator::avg, avgFields.size() - 1);
+      break;
     }
     fieldNames.emplace_back(field->getName());
     if (val.op == AgrOperator::count) {
@@ -88,22 +89,26 @@ DataBase::AggregationMaker::prepareDataSet(const DataBase::StructuredQuery &stru
 
   return result;
 }
-void DataBase::AggregationMaker::aggregateDataSet(DataSets::MemoryDataSet *ds,
-                                                  DataSets::MemoryDataSet *result) {
+void DataBase::AggregationMaker::aggregateDataSet(DataSets::MemoryDataSet *ds, DataSets::MemoryDataSet *result) {
   bool write = false;
   auto data = *ds->begin();
   for (auto &unique : groupByFields) {
     switch (unique.field->getFieldType()) {
-      case ValueType::Integer:unique.lastVal.copyFrom<int>((*data)[unique.fieldIndex.second]);
-        break;
-      case ValueType::Double:unique.lastVal.copyFrom<double>((*data)[unique.fieldIndex.second]);
-        break;
-      case ValueType::String:unique.lastVal.copyFrom<gsl::zstring<>>((*data)[unique.fieldIndex.second]);
-        break;
-      case ValueType::Currency:unique.lastVal.copyFrom<Currency>((*data)[unique.fieldIndex.second]);
-        break;
-      case ValueType::DateTime:unique.lastVal.copyFrom<DateTime>((*data)[unique.fieldIndex.second]);
-        break;
+    case ValueType::Integer:
+      unique.lastVal.copyFrom<int>((*data)[unique.fieldIndex.second]);
+      break;
+    case ValueType::Double:
+      unique.lastVal.copyFrom<double>((*data)[unique.fieldIndex.second]);
+      break;
+    case ValueType::String:
+      unique.lastVal.copyFrom<gsl::zstring<>>((*data)[unique.fieldIndex.second]);
+      break;
+    case ValueType::Currency:
+      unique.lastVal.copyFrom<Currency>((*data)[unique.fieldIndex.second]);
+      break;
+    case ValueType::DateTime:
+      unique.lastVal.copyFrom<DateTime>((*data)[unique.fieldIndex.second]);
+      break;
     }
   }
 
@@ -122,56 +127,73 @@ void DataBase::AggregationMaker::aggregateDataSet(DataSets::MemoryDataSet *ds,
       int cnt = 0;
       for (const auto &info : writeOrder) {
         switch (info.first) {
-          case AgrOperator::sum:
-            switch (sumFields[info.second].field->getFieldType()) {
-              case ValueType::Integer:(*(*resultIter))[cnt].copyFrom<int>(sumFields[info.second].sum);
-                break;
-              case ValueType::Double:(*(*resultIter))[cnt].copyFrom<double>(sumFields[info.second].sum);
-                break;
-              case ValueType::Currency:(*(*resultIter))[cnt].copyFrom<Currency>(sumFields[info.second].sum);
-                break;
-                default:
-                    throw std::runtime_error("AggregationMaker::aggregateDataSet(): sum op");
-            }
+        case AgrOperator::sum:
+          switch (sumFields[info.second].field->getFieldType()) {
+          case ValueType::Integer:
+            (*(*resultIter))[cnt].copyFrom<int>(sumFields[info.second].sum);
             break;
-          case AgrOperator::avg:break;
-          case AgrOperator::count:(*(*resultIter))[cnt]._integer = countFields[info.second].count;
+          case ValueType::Double:
+            (*(*resultIter))[cnt].copyFrom<double>(sumFields[info.second].sum);
             break;
-          case AgrOperator::min:break;
-          case AgrOperator::max:break;
-          case AgrOperator::group:
-            switch (groupByFields[info.second].field->getFieldType()) {
-              case ValueType::Integer:(*(*resultIter))[cnt].copyFrom<int>(groupByFields[info.second].lastVal);
-                break;
-              case ValueType::Double:(*(*resultIter))[cnt].copyFrom<double>(groupByFields[info.second].lastVal);
-                break;
-              case ValueType::String:(*(*resultIter))[cnt].copyFrom<gsl::zstring<>>(groupByFields[info.second].lastVal);
-                break;
-              case ValueType::Currency:(*(*resultIter))[cnt].copyFrom<Currency>(groupByFields[info.second].lastVal);
-                break;
-              case ValueType::DateTime:(*(*resultIter))[cnt].copyFrom<DateTime>(groupByFields[info.second].lastVal);
-                break;
-                default:
-                    throw std::runtime_error("AggregationMaker::aggregateDataSet(): group op");
-            }
+          case ValueType::Currency:
+            (*(*resultIter))[cnt].copyFrom<Currency>(sumFields[info.second].sum);
             break;
-            default:
-                throw std::runtime_error("AggregationMaker::aggregateDataSet()");
+          default:
+            throw std::runtime_error("AggregationMaker::aggregateDataSet(): sum op");
+          }
+          break;
+        case AgrOperator::avg:
+          break;
+        case AgrOperator::count:
+          (*(*resultIter))[cnt]._integer = countFields[info.second].count;
+          break;
+        case AgrOperator::min:
+          break;
+        case AgrOperator::max:
+          break;
+        case AgrOperator::group:
+          switch (groupByFields[info.second].field->getFieldType()) {
+          case ValueType::Integer:
+            (*(*resultIter))[cnt].copyFrom<int>(groupByFields[info.second].lastVal);
+            break;
+          case ValueType::Double:
+            (*(*resultIter))[cnt].copyFrom<double>(groupByFields[info.second].lastVal);
+            break;
+          case ValueType::String:
+            (*(*resultIter))[cnt].copyFrom<gsl::zstring<>>(groupByFields[info.second].lastVal);
+            break;
+          case ValueType::Currency:
+            (*(*resultIter))[cnt].copyFrom<Currency>(groupByFields[info.second].lastVal);
+            break;
+          case ValueType::DateTime:
+            (*(*resultIter))[cnt].copyFrom<DateTime>(groupByFields[info.second].lastVal);
+            break;
+          default:
+            throw std::runtime_error("AggregationMaker::aggregateDataSet(): group op");
+          }
+          break;
+        default:
+          throw std::runtime_error("AggregationMaker::aggregateDataSet()");
         }
         ++cnt;
       }
       for (auto &unique : groupByFields) {
         switch (unique.field->getFieldType()) {
-          case ValueType::Integer:unique.lastVal.copyFrom<int>((*val)[unique.fieldIndex.second]);
-            break;
-          case ValueType::Double:unique.lastVal.copyFrom<double>((*val)[unique.fieldIndex.second]);
-            break;
-          case ValueType::String:unique.lastVal.copyFrom<gsl::zstring<>>((*val)[unique.fieldIndex.second]);
-            break;
-          case ValueType::Currency:unique.lastVal.copyFrom<Currency>((*val)[unique.fieldIndex.second]);
-            break;
-          case ValueType::DateTime:unique.lastVal.copyFrom<DateTime>((*val)[unique.fieldIndex.second]);
-            break;
+        case ValueType::Integer:
+          unique.lastVal.copyFrom<int>((*val)[unique.fieldIndex.second]);
+          break;
+        case ValueType::Double:
+          unique.lastVal.copyFrom<double>((*val)[unique.fieldIndex.second]);
+          break;
+        case ValueType::String:
+          unique.lastVal.copyFrom<gsl::zstring<>>((*val)[unique.fieldIndex.second]);
+          break;
+        case ValueType::Currency:
+          unique.lastVal.copyFrom<Currency>((*val)[unique.fieldIndex.second]);
+          break;
+        case ValueType::DateTime:
+          unique.lastVal.copyFrom<DateTime>((*val)[unique.fieldIndex.second]);
+          break;
         }
       }
       for (auto &sum : sumFields) {
@@ -195,61 +217,77 @@ void DataBase::AggregationMaker::aggregateDataSet(DataSets::MemoryDataSet *ds,
     int cnt = 0;
     for (const auto &info : writeOrder) {
       switch (info.first) {
-        case AgrOperator::sum:
-          switch (sumFields[info.second].field->getFieldType()) {
-            case ValueType::Integer:(*(*resultIter))[cnt].copyFrom<int>(sumFields[info.second].sum);
-              break;
-            case ValueType::Double:(*(*resultIter))[cnt].copyFrom<double>(sumFields[info.second].sum);
-              break;
-            case ValueType::Currency:(*(*resultIter))[cnt].copyFrom<Currency>(sumFields[info.second].sum);
-              break;
-              default:
-                  throw std::runtime_error("AggregationMaker::aggregateDataSet(): sum op");
-          }
+      case AgrOperator::sum:
+        switch (sumFields[info.second].field->getFieldType()) {
+        case ValueType::Integer:
+          (*(*resultIter))[cnt].copyFrom<int>(sumFields[info.second].sum);
           break;
-        case AgrOperator::avg:break;
-        case AgrOperator::count:(*(*resultIter))[cnt]._integer = countFields[info.second].count;
+        case ValueType::Double:
+          (*(*resultIter))[cnt].copyFrom<double>(sumFields[info.second].sum);
           break;
-        case AgrOperator::min:break;
-        case AgrOperator::max:break;
-        case AgrOperator::group:
-          switch (groupByFields[info.second].field->getFieldType()) {
-            case ValueType::Integer:(*(*resultIter))[cnt].copyFrom<int>(groupByFields[info.second].lastVal);
-              break;
-            case ValueType::Double:(*(*resultIter))[cnt].copyFrom<double>(groupByFields[info.second].lastVal);
-              break;
-            case ValueType::String:(*(*resultIter))[cnt].copyFrom<gsl::zstring<>>(groupByFields[info.second].lastVal);
-              break;
-            case ValueType::Currency:(*(*resultIter))[cnt].copyFrom<Currency>(groupByFields[info.second].lastVal);
-              break;
-            case ValueType::DateTime:(*(*resultIter))[cnt].copyFrom<DateTime>(groupByFields[info.second].lastVal);
-              break;
-              default:
-                  throw std::runtime_error("AggregationMaker::aggregateDataSet(): group op");
-          }
+        case ValueType::Currency:
+          (*(*resultIter))[cnt].copyFrom<Currency>(sumFields[info.second].sum);
           break;
+        default:
+          throw std::runtime_error("AggregationMaker::aggregateDataSet(): sum op");
+        }
+        break;
+      case AgrOperator::avg:
+        break;
+      case AgrOperator::count:
+        (*(*resultIter))[cnt]._integer = countFields[info.second].count;
+        break;
+      case AgrOperator::min:
+        break;
+      case AgrOperator::max:
+        break;
+      case AgrOperator::group:
+        switch (groupByFields[info.second].field->getFieldType()) {
+        case ValueType::Integer:
+          (*(*resultIter))[cnt].copyFrom<int>(groupByFields[info.second].lastVal);
+          break;
+        case ValueType::Double:
+          (*(*resultIter))[cnt].copyFrom<double>(groupByFields[info.second].lastVal);
+          break;
+        case ValueType::String:
+          (*(*resultIter))[cnt].copyFrom<gsl::zstring<>>(groupByFields[info.second].lastVal);
+          break;
+        case ValueType::Currency:
+          (*(*resultIter))[cnt].copyFrom<Currency>(groupByFields[info.second].lastVal);
+          break;
+        case ValueType::DateTime:
+          (*(*resultIter))[cnt].copyFrom<DateTime>(groupByFields[info.second].lastVal);
+          break;
+        default:
+          throw std::runtime_error("AggregationMaker::aggregateDataSet(): group op");
+        }
+        break;
       }
       ++cnt;
     }
   }
 }
 
-void DataBase::AggregationMaker::aggregateView(DataSets::MemoryViewDataSet *ds,
-                                               DataSets::MemoryDataSet *result) {
+void DataBase::AggregationMaker::aggregateView(DataSets::MemoryViewDataSet *ds, DataSets::MemoryDataSet *result) {
   bool write = false;
   auto data = *ds->begin();
   for (auto &unique : groupByFields) {
     switch (unique.field->getFieldType()) {
-      case ValueType::Integer:unique.lastVal.copyFrom<int>((*data[unique.fieldIndex.first])[unique.fieldIndex.second]);
-        break;
-      case ValueType::Double:unique.lastVal.copyFrom<double>((*data[unique.fieldIndex.first])[unique.fieldIndex.second]);
-        break;
-      case ValueType::String:unique.lastVal.copyFrom<gsl::zstring<>>((*data[unique.fieldIndex.first])[unique.fieldIndex.second]);
-        break;
-      case ValueType::Currency:unique.lastVal.copyFrom<Currency>((*data[unique.fieldIndex.first])[unique.fieldIndex.second]);
-        break;
-      case ValueType::DateTime:unique.lastVal.copyFrom<DateTime>((*data[unique.fieldIndex.first])[unique.fieldIndex.second]);
-        break;
+    case ValueType::Integer:
+      unique.lastVal.copyFrom<int>((*data[unique.fieldIndex.first])[unique.fieldIndex.second]);
+      break;
+    case ValueType::Double:
+      unique.lastVal.copyFrom<double>((*data[unique.fieldIndex.first])[unique.fieldIndex.second]);
+      break;
+    case ValueType::String:
+      unique.lastVal.copyFrom<gsl::zstring<>>((*data[unique.fieldIndex.first])[unique.fieldIndex.second]);
+      break;
+    case ValueType::Currency:
+      unique.lastVal.copyFrom<Currency>((*data[unique.fieldIndex.first])[unique.fieldIndex.second]);
+      break;
+    case ValueType::DateTime:
+      unique.lastVal.copyFrom<DateTime>((*data[unique.fieldIndex.first])[unique.fieldIndex.second]);
+      break;
     }
   }
 
@@ -268,52 +306,69 @@ void DataBase::AggregationMaker::aggregateView(DataSets::MemoryViewDataSet *ds,
       int cnt = 0;
       for (const auto &info : writeOrder) {
         switch (info.first) {
-          case AgrOperator::sum:
-            switch (sumFields[info.second].field->getFieldType()) {
-              case ValueType::Integer:(*(*resultIter))[cnt].copyFrom<int>(sumFields[info.second].sum);
-                break;
-              case ValueType::Double:(*(*resultIter))[cnt].copyFrom<double>(sumFields[info.second].sum);
-                break;
-              case ValueType::Currency:(*(*resultIter))[cnt].copyFrom<Currency>(sumFields[info.second].sum);
-                break;
-                default:
-                    throw std::runtime_error("AggregationMaker::aggregateView()");
-            }
+        case AgrOperator::sum:
+          switch (sumFields[info.second].field->getFieldType()) {
+          case ValueType::Integer:
+            (*(*resultIter))[cnt].copyFrom<int>(sumFields[info.second].sum);
             break;
-          case AgrOperator::avg:break;
-          case AgrOperator::count:(*(*resultIter))[cnt]._integer = countFields[info.second].count;
+          case ValueType::Double:
+            (*(*resultIter))[cnt].copyFrom<double>(sumFields[info.second].sum);
             break;
-          case AgrOperator::min:break;
-          case AgrOperator::max:break;
-          case AgrOperator::group:
-            switch (groupByFields[info.second].field->getFieldType()) {
-              case ValueType::Integer:(*(*resultIter))[cnt].copyFrom<int>(groupByFields[info.second].lastVal);
-                break;
-              case ValueType::Double:(*(*resultIter))[cnt].copyFrom<double>(groupByFields[info.second].lastVal);
-                break;
-              case ValueType::String:(*(*resultIter))[cnt].copyFrom<gsl::zstring<>>(groupByFields[info.second].lastVal);
-                break;
-              case ValueType::Currency:(*(*resultIter))[cnt].copyFrom<Currency>(groupByFields[info.second].lastVal);
-                break;
-              case ValueType::DateTime:(*(*resultIter))[cnt].copyFrom<DateTime>(groupByFields[info.second].lastVal);
-                break;
-            }
+          case ValueType::Currency:
+            (*(*resultIter))[cnt].copyFrom<Currency>(sumFields[info.second].sum);
             break;
+          default:
+            throw std::runtime_error("AggregationMaker::aggregateView()");
+          }
+          break;
+        case AgrOperator::avg:
+          break;
+        case AgrOperator::count:
+          (*(*resultIter))[cnt]._integer = countFields[info.second].count;
+          break;
+        case AgrOperator::min:
+          break;
+        case AgrOperator::max:
+          break;
+        case AgrOperator::group:
+          switch (groupByFields[info.second].field->getFieldType()) {
+          case ValueType::Integer:
+            (*(*resultIter))[cnt].copyFrom<int>(groupByFields[info.second].lastVal);
+            break;
+          case ValueType::Double:
+            (*(*resultIter))[cnt].copyFrom<double>(groupByFields[info.second].lastVal);
+            break;
+          case ValueType::String:
+            (*(*resultIter))[cnt].copyFrom<gsl::zstring<>>(groupByFields[info.second].lastVal);
+            break;
+          case ValueType::Currency:
+            (*(*resultIter))[cnt].copyFrom<Currency>(groupByFields[info.second].lastVal);
+            break;
+          case ValueType::DateTime:
+            (*(*resultIter))[cnt].copyFrom<DateTime>(groupByFields[info.second].lastVal);
+            break;
+          }
+          break;
         }
         ++cnt;
       }
       for (auto &unique : groupByFields) {
         switch (unique.field->getFieldType()) {
-          case ValueType::Integer:unique.lastVal.copyFrom<int>((*val[unique.fieldIndex.first])[unique.fieldIndex.second]);
-            break;
-          case ValueType::Double:unique.lastVal.copyFrom<double>((*val[unique.fieldIndex.first])[unique.fieldIndex.second]);
-            break;
-          case ValueType::String:unique.lastVal.copyFrom<gsl::zstring<>>((*val[unique.fieldIndex.first])[unique.fieldIndex.second]);
-            break;
-          case ValueType::Currency:unique.lastVal.copyFrom<Currency>((*val[unique.fieldIndex.first])[unique.fieldIndex.second]);
-            break;
-          case ValueType::DateTime:unique.lastVal.copyFrom<DateTime>((*val[unique.fieldIndex.first])[unique.fieldIndex.second]);
-            break;
+        case ValueType::Integer:
+          unique.lastVal.copyFrom<int>((*val[unique.fieldIndex.first])[unique.fieldIndex.second]);
+          break;
+        case ValueType::Double:
+          unique.lastVal.copyFrom<double>((*val[unique.fieldIndex.first])[unique.fieldIndex.second]);
+          break;
+        case ValueType::String:
+          unique.lastVal.copyFrom<gsl::zstring<>>((*val[unique.fieldIndex.first])[unique.fieldIndex.second]);
+          break;
+        case ValueType::Currency:
+          unique.lastVal.copyFrom<Currency>((*val[unique.fieldIndex.first])[unique.fieldIndex.second]);
+          break;
+        case ValueType::DateTime:
+          unique.lastVal.copyFrom<DateTime>((*val[unique.fieldIndex.first])[unique.fieldIndex.second]);
+          break;
         }
       }
       for (auto &sum : sumFields) {
@@ -337,37 +392,49 @@ void DataBase::AggregationMaker::aggregateView(DataSets::MemoryViewDataSet *ds,
     int cnt = 0;
     for (const auto &info : writeOrder) {
       switch (info.first) {
-        case AgrOperator::sum:
-          switch (sumFields[info.second].field->getFieldType()) {
-            case ValueType::Integer:(*(*resultIter))[cnt].copyFrom<int>(sumFields[info.second].sum);
-              break;
-            case ValueType::Double:(*(*resultIter))[cnt].copyFrom<double>(sumFields[info.second].sum);
-              break;
-            case ValueType::Currency:(*(*resultIter))[cnt].copyFrom<Currency>(sumFields[info.second].sum);
-              break;
-              default:
-                  throw std::runtime_error("AggregationMaker::aggregateView()");
-          }
+      case AgrOperator::sum:
+        switch (sumFields[info.second].field->getFieldType()) {
+        case ValueType::Integer:
+          (*(*resultIter))[cnt].copyFrom<int>(sumFields[info.second].sum);
           break;
-        case AgrOperator::avg:break;
-        case AgrOperator::count:(*(*resultIter))[cnt]._integer = countFields[info.second].count;
+        case ValueType::Double:
+          (*(*resultIter))[cnt].copyFrom<double>(sumFields[info.second].sum);
           break;
-        case AgrOperator::min:break;
-        case AgrOperator::max:break;
-        case AgrOperator::group:
-          switch (groupByFields[info.second].field->getFieldType()) {
-            case ValueType::Integer:(*(*resultIter))[cnt].copyFrom<int>(groupByFields[info.second].lastVal);
-              break;
-            case ValueType::Double:(*(*resultIter))[cnt].copyFrom<double>(groupByFields[info.second].lastVal);
-              break;
-            case ValueType::String:(*(*resultIter))[cnt].copyFrom<gsl::zstring<>>(groupByFields[info.second].lastVal);
-              break;
-            case ValueType::Currency:(*(*resultIter))[cnt].copyFrom<Currency>(groupByFields[info.second].lastVal);
-              break;
-            case ValueType::DateTime:(*(*resultIter))[cnt].copyFrom<DateTime>(groupByFields[info.second].lastVal);
-              break;
-          }
+        case ValueType::Currency:
+          (*(*resultIter))[cnt].copyFrom<Currency>(sumFields[info.second].sum);
           break;
+        default:
+          throw std::runtime_error("AggregationMaker::aggregateView()");
+        }
+        break;
+      case AgrOperator::avg:
+        break;
+      case AgrOperator::count:
+        (*(*resultIter))[cnt]._integer = countFields[info.second].count;
+        break;
+      case AgrOperator::min:
+        break;
+      case AgrOperator::max:
+        break;
+      case AgrOperator::group:
+        switch (groupByFields[info.second].field->getFieldType()) {
+        case ValueType::Integer:
+          (*(*resultIter))[cnt].copyFrom<int>(groupByFields[info.second].lastVal);
+          break;
+        case ValueType::Double:
+          (*(*resultIter))[cnt].copyFrom<double>(groupByFields[info.second].lastVal);
+          break;
+        case ValueType::String:
+          (*(*resultIter))[cnt].copyFrom<gsl::zstring<>>(groupByFields[info.second].lastVal);
+          break;
+        case ValueType::Currency:
+          (*(*resultIter))[cnt].copyFrom<Currency>(groupByFields[info.second].lastVal);
+          break;
+        case ValueType::DateTime:
+          (*(*resultIter))[cnt].copyFrom<DateTime>(groupByFields[info.second].lastVal);
+          break;
+        }
+        break;
       }
       ++cnt;
     }

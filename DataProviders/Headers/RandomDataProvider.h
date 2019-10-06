@@ -5,13 +5,12 @@
 #ifndef PROJECT_RANDOMDATAPROVIDER_H
 #define PROJECT_RANDOMDATAPROVIDER_H
 
+#include <BaseDataProvider.h>
+#include <Utilities.h>
 #include <gsl/gsl>
+#include <random>
 #include <string>
 #include <vector>
-#include <random>
-#include <Utilities.h>
-#include <BaseDataProvider.h>
-
 
 namespace DataProviders {
 
@@ -19,7 +18,7 @@ namespace DataProviders {
  * Provide random data whose length is based on constructor parameters.
  */
 class RandomDataProvider : public BaseDataProvider {
- public:
+public:
   /**
    *
    * @param columnCount amount of records in each row
@@ -29,23 +28,23 @@ class RandomDataProvider : public BaseDataProvider {
    */
   RandomDataProvider(int columnCount, int minDataLength, int maxDataLength, int recordCount);
 
-    [[nodiscard]] const std::vector<std::string> &getRow() const override;
+  [[nodiscard]] const std::vector<std::string> &getRow() const override;
 
-    [[nodiscard]] std::string getColumnName(unsigned int columnIndex) const override;
+  [[nodiscard]] std::string getColumnName(unsigned int columnIndex) const override;
 
-    [[nodiscard]] uint64_t getColumnCount() const override;
+  [[nodiscard]] uint64_t getColumnCount() const override;
 
-    [[nodiscard]] const std::vector<std::string> &getHeader() const override;
+  [[nodiscard]] const std::vector<std::string> &getHeader() const override;
 
-    [[nodiscard]] int getCurrentRecordNumber() const override;
+  [[nodiscard]] int getCurrentRecordNumber() const override;
 
   bool next() override;
 
   void first() override;
 
-    [[nodiscard]] bool eof() const override;
+  [[nodiscard]] bool eof() const override;
 
- private:
+private:
   int columnCount;
 
   const int recordCount;
@@ -63,6 +62,6 @@ class RandomDataProvider : public BaseDataProvider {
   std::default_random_engine randomEngine;
 };
 
-}
+} // namespace DataProviders
 
-#endif //PROJECT_RANDOMDATAPROVIDER_H
+#endif // PROJECT_RANDOMDATAPROVIDER_H

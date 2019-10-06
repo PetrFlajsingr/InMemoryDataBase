@@ -32,44 +32,39 @@ namespace xlnt {
 /// Properties applied to a column in a worksheet.
 /// Columns can have a size and a style.
 /// </summary>
-class XLNT_API column_properties
-{
+class XLNT_API column_properties {
 public:
-    /// <summary>
-    /// The optional width of the column
-    /// </summary>
-    optional<double> width;
+  /// <summary>
+  /// The optional width of the column
+  /// </summary>
+  optional<double> width;
 
-    /// <summary>
-    /// If true, this is a custom width
-    /// </summary>
-    bool custom_width = false;
+  /// <summary>
+  /// If true, this is a custom width
+  /// </summary>
+  bool custom_width = false;
 
-    /// <summary>
-    /// The style index of this column. This shouldn't be used since style indices
-    /// aren't supposed to be used directly in xlnt. (TODO)
-    /// </summary>
-    optional<std::size_t> style;
+  /// <summary>
+  /// The style index of this column. This shouldn't be used since style indices
+  /// aren't supposed to be used directly in xlnt. (TODO)
+  /// </summary>
+  optional<std::size_t> style;
 
-    /// <summary>
-    /// Is this column sized to fit its content as best it can
-    /// serialise if true
-    /// </summary>
-    bool best_fit = false;
+  /// <summary>
+  /// Is this column sized to fit its content as best it can
+  /// serialise if true
+  /// </summary>
+  bool best_fit = false;
 
-    /// <summary>
-    /// If true, this column will be hidden
-    /// </summary>
-    bool hidden = false;
+  /// <summary>
+  /// If true, this column will be hidden
+  /// </summary>
+  bool hidden = false;
 };
 
-inline bool operator==(const column_properties &lhs, const column_properties &rhs)
-{
-    return lhs.width == rhs.width
-        && lhs.custom_width == rhs.custom_width
-        && lhs.style == rhs.style
-        && lhs.best_fit == rhs.best_fit
-        && lhs.hidden == rhs.hidden;
+inline bool operator==(const column_properties &lhs, const column_properties &rhs) {
+  return lhs.width == rhs.width && lhs.custom_width == rhs.custom_width && lhs.style == rhs.style &&
+         lhs.best_fit == rhs.best_fit && lhs.hidden == rhs.hidden;
 }
 
 } // namespace xlnt

@@ -38,8 +38,7 @@ class parser;
 namespace xlnt {
 
 class cell;
-template<typename T>
-class optional;
+template <typename T> class optional;
 class path;
 class workbook;
 class worksheet;
@@ -51,93 +50,92 @@ class xlsx_consumer;
 /// <summary>
 /// workbook is the container for all other parts of the document.
 /// </summary>
-class XLNT_API streaming_workbook_reader
-{
+class XLNT_API streaming_workbook_reader {
 public:
-    streaming_workbook_reader();
-    ~streaming_workbook_reader();
+  streaming_workbook_reader();
+  ~streaming_workbook_reader();
 
-    /// <summary>
-    /// Closes currently open read stream. This will be called automatically
-    /// by the destructor if it hasn't already been called manually.
-    /// </summary>
-    void close();
+  /// <summary>
+  /// Closes currently open read stream. This will be called automatically
+  /// by the destructor if it hasn't already been called manually.
+  /// </summary>
+  void close();
 
-    bool has_cell();
+  bool has_cell();
 
-    /// <summary>
-    /// Reads the next cell in the current worksheet and optionally returns it if
-    /// the last cell in the sheet has not yet been read.
-    /// </summary>
-    cell read_cell();
+  /// <summary>
+  /// Reads the next cell in the current worksheet and optionally returns it if
+  /// the last cell in the sheet has not yet been read.
+  /// </summary>
+  cell read_cell();
 
-    bool has_worksheet(const std::string &name);
+  bool has_worksheet(const std::string &name);
 
-    /// <summary>
-    /// Beings reading of the next worksheet in the workbook and optionally
-    /// returns its title if the last worksheet has not yet been read.
-    /// </summary>
-    void begin_worksheet(const std::string &name);
+  /// <summary>
+  /// Beings reading of the next worksheet in the workbook and optionally
+  /// returns its title if the last worksheet has not yet been read.
+  /// </summary>
+  void begin_worksheet(const std::string &name);
 
-    /// <summary>
-    /// Ends reading of the current worksheet in the workbook and optionally
-    /// returns a worksheet object corresponding to the worksheet with the title
-    /// returned by begin_worksheet().
-    /// </summary>
-    worksheet end_worksheet();
+  /// <summary>
+  /// Ends reading of the current worksheet in the workbook and optionally
+  /// returns a worksheet object corresponding to the worksheet with the title
+  /// returned by begin_worksheet().
+  /// </summary>
+  worksheet end_worksheet();
 
-    /// <summary>
-    /// Interprets byte vector data as an XLSX file and sets the content of this
-    /// workbook to match that file.
-    /// </summary>
-    void open(const std::vector<std::uint8_t> &data);
+  /// <summary>
+  /// Interprets byte vector data as an XLSX file and sets the content of this
+  /// workbook to match that file.
+  /// </summary>
+  void open(const std::vector<std::uint8_t> &data);
 
-    /// <summary>
-    /// Interprets file with the given filename as an XLSX file and sets
-    /// the content of this workbook to match that file.
-    /// </summary>
-    void open(const std::string &filename);
+  /// <summary>
+  /// Interprets file with the given filename as an XLSX file and sets
+  /// the content of this workbook to match that file.
+  /// </summary>
+  void open(const std::string &filename);
 
 #ifdef _MSC_VER
-    /// <summary>
-    /// Interprets file with the given filename as an XLSX file and sets
-    /// the content of this workbook to match that file.
-    /// </summary>
-    void open(const std::wstring &filename);
+  /// <summary>
+  /// Interprets file with the given filename as an XLSX file and sets
+  /// the content of this workbook to match that file.
+  /// </summary>
+  void open(const std::wstring &filename);
 #endif
 
-    /// <summary>
-    /// Interprets file with the given filename as an XLSX file and sets the
-    /// content of this workbook to match that file.
-    /// </summary>
-    void open(const path &filename);
+  /// <summary>
+  /// Interprets file with the given filename as an XLSX file and sets the
+  /// content of this workbook to match that file.
+  /// </summary>
+  void open(const path &filename);
 
-    /// <summary>
-    /// Interprets data in stream as an XLSX file and sets the content of this
-    /// workbook to match that file.
-    /// </summary>
-    void open(std::istream &stream);
+  /// <summary>
+  /// Interprets data in stream as an XLSX file and sets the content of this
+  /// workbook to match that file.
+  /// </summary>
+  void open(std::istream &stream);
 
-    /// <summary>
-    /// Holds the given streambuf internally, creates a std::istream backed
-    /// by the given buffer, and calls open(std::istream &) with that stream.
-    /// </summary>
-    void open(std::unique_ptr<std::streambuf> &&buffer);
+  /// <summary>
+  /// Holds the given streambuf internally, creates a std::istream backed
+  /// by the given buffer, and calls open(std::istream &) with that stream.
+  /// </summary>
+  void open(std::unique_ptr<std::streambuf> &&buffer);
 
-    /// <summary>
-    /// Returns a vector of the titles of sheets in the workbook in order.
-    /// </summary>
-    std::vector<std::string> sheet_titles();
+  /// <summary>
+  /// Returns a vector of the titles of sheets in the workbook in order.
+  /// </summary>
+  std::vector<std::string> sheet_titles();
 
 private:
-    std::string worksheet_rel_id_;
-    std::unique_ptr<detail::xlsx_consumer> consumer_;
-    std::unique_ptr<workbook> workbook_;
-    std::unique_ptr<std::istream> stream_;
-    std::unique_ptr<std::streambuf> stream_buffer_;
-    std::unique_ptr<std::istream> part_stream_;
-    std::unique_ptr<std::streambuf> part_stream_buffer_;
-    std::unique_ptr<xml::parser> parser_;
+  std::string worksheet_rel_id_;
+  std::unique_ptr<detail::xlsx_consumer> consumer_;
+  std::unique_ptr<workbook> workbook_;
+  std::unique_ptr<std::istream> stream_;
+  std::unique_ptr<std::streambuf> stream_buffer_;
+  std::unique_ptr<std::istream> part_stream_;
+  std::unique_ptr<std::streambuf> part_stream_buffer_;
+  std::unique_ptr<xml::parser> parser_;
 };
 
 } // namespace xlnt

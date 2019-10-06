@@ -5,11 +5,11 @@
 #ifndef DATASETS_FIELDS_HEADERS_BASEFIELD_H_
 #define DATASETS_FIELDS_HEADERS_BASEFIELD_H_
 
+#include "Exceptions.h"
+#include "Types.h"
+#include <functional>
 #include <string>
 #include <utility>
-#include <functional>
-#include "Types.h"
-#include "Exceptions.h"
 
 namespace DataSets {
 class BaseDataSet;
@@ -20,7 +20,7 @@ class BaseDataSet;
  * memory location.
  */
 class BaseField {
- public:
+public:
   /**
    *
    * @param fieldName name of the field (column)
@@ -49,23 +49,17 @@ class BaseField {
    *
    * @return index of a field in data set
    */
-  [[nodiscard]] gsl::index getIndex() const {
-    return index;
-  }
+  [[nodiscard]] gsl::index getIndex() const { return index; }
   /**
    *
    * @return Name of field/column
    */
-  [[nodiscard]] std::string_view getName() const {
-    return fieldName;
-  }
+  [[nodiscard]] std::string_view getName() const { return fieldName; }
   /**
    * Change field name
    * @param name new name
    */
-  void setName(std::string_view name) {
-    fieldName = name;
-  }
+  void setName(std::string_view name) { fieldName = name; }
   /**
    * Compare function for MemoryDataSet. Used for MemoryDataSet::Sort
    * @return compare function returning
@@ -84,7 +78,7 @@ class BaseField {
   static const gsl::index maskTableIndex = 0xFF0000;
   static const gsl::index maskColumnIndex = 0x00FFFF;
 
- protected:
+protected:
   friend class BaseDataSet; //< to allow for direct memory access
   BaseDataSet *dataSet;
   // TODO: predavat pointer na DataContainer
@@ -101,11 +95,11 @@ class BaseField {
    */
   void setData(void *data, ValueType type);
 
- private:
+private:
   std::string fieldName;
   gsl::index index;
 };
 
-}  // namespace DataSets
+} // namespace DataSets
 
-#endif  // DATASETS_FIELDS_HEADERS_BASEFIELD_H_
+#endif // DATASETS_FIELDS_HEADERS_BASEFIELD_H_

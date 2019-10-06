@@ -13,11 +13,10 @@
  * Call to invalidate forces the object to recalculate saved value on next access.
  * @tparam T type of value stored.
  */
-template<typename T>
-class Lazy {
+template <typename T> class Lazy {
   using InitFnc = std::function<T()>;
 
- public:
+public:
   explicit Lazy(const InitFnc &init) : init(init) {}
   /**
    * Calculate value on first call or if invalidate() was called.
@@ -33,14 +32,12 @@ class Lazy {
   /**
    * Mark value as invalid and force it to recompute on next acess.
    */
-  void invalidate() {
-    initialised = false;
-  }
+  void invalidate() { initialised = false; }
 
- private:
+private:
   T value;
   InitFnc init;
   bool initialised = false;
 };
 
-#endif //PROJECT_LAZY_H
+#endif // PROJECT_LAZY_H

@@ -5,16 +5,16 @@
 #ifndef FILEDOWNLOADERS_HEADERS_BASEFILEDOWNLOADER_H_
 #define FILEDOWNLOADERS_HEADERS_BASEFILEDOWNLOADER_H_
 
-#include <vector>
-#include <string>
 #include "Exceptions.h"
 #include "FileDownloadObserver.h"
 #include <curl/curl.h>
+#include <string>
+#include <vector>
 /**
  * Provides capability to download a file and save it.
  */
 class FileDownloader {
- public:
+public:
   /**
    *
    * @param downloadLocation folder where all downloaded files will be saved.
@@ -25,11 +25,11 @@ class FileDownloader {
    * @param url
    */
   bool downloadFile(std::string_view url);
-  
+
   void addObserver(gsl::not_null<FileDownloadObserver *> observer);
   void removeObserver(FileDownloadObserver *observer);
 
- protected:
+protected:
   std::vector<FileDownloadObserver *> observers;
   std::string downloadLocation;
 
@@ -44,4 +44,4 @@ class FileDownloader {
   void saveFile(std::string_view content, std::string_view location);
 };
 
-#endif  // FILEDOWNLOADERS_HEADERS_BASEFILEDOWNLOADER_H_
+#endif // FILEDOWNLOADERS_HEADERS_BASEFILEDOWNLOADER_H_

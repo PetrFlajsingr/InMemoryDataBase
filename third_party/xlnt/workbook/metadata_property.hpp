@@ -30,57 +30,55 @@ namespace xlnt {
 /// <summary>
 /// Every core property in a workbook must be one of these types.
 /// </summary>
-enum class core_property
-{
-    category,
-    content_status,
-    created,
-    creator,
-    description,
-    identifier,
-    keywords,
-    language,
-    last_modified_by,
-    last_printed,
-    modified,
-    revision,
-    subject,
-    title,
-    version
+enum class core_property {
+  category,
+  content_status,
+  created,
+  creator,
+  description,
+  identifier,
+  keywords,
+  language,
+  last_modified_by,
+  last_printed,
+  modified,
+  revision,
+  subject,
+  title,
+  version
 };
 
 /// <summary>
 /// Every extended property in a workbook must be one of these types.
 /// </summary>
-enum class extended_property
-{
-    application,
-    app_version,
-    characters,
-    characters_with_spaces,
-    company,
-    dig_sig,
-    doc_security,
-    heading_pairs,
-    hidden_slides,
-    h_links,
-    hyperlink_base,
-    hyperlinks_changed,
-    lines,
-    links_up_to_date,
-    manager,
-    m_m_clips,
-    notes,
-    pages,
-    paragraphs,
-    presentation_format,
-    scale_crop,
-    shared_doc,
-    slides,
-    template_,
-    titles_of_parts,
-    total_time,
-    words
+enum class extended_property {
+  application,
+  app_version,
+  characters,
+  characters_with_spaces,
+  company,
+  dig_sig,
+  doc_security,
+  heading_pairs,
+  hidden_slides,
+  h_links,
+  hyperlink_base,
+  hyperlinks_changed,
+  lines,
+  links_up_to_date,
+  manager,
+  m_m_clips,
+  notes,
+  pages,
+  paragraphs,
+  presentation_format,
+  scale_crop,
+  shared_doc,
+  slides,
+  template_,
+  titles_of_parts,
+  total_time,
+  words
 };
 
 } // namespace xlnt

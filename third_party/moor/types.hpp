@@ -24,30 +24,13 @@
 
 #pragma once
 
-namespace moor
-{
-  enum Formats
-  {
-    Format_pax = 0,
-    Format_tar = 1,
-    Format_ZIP = 2,
-    Format_7Zip = 3
-  };
+namespace moor {
+enum Formats { Format_pax = 0, Format_tar = 1, Format_ZIP = 2, Format_7Zip = 3 };
 
-  enum Compressions
-  {
-    Compression_none = 0,
-    Compression_gzip = 1,
-    Compression_bzip2 = 2,
-    Compression_lzma = 3
-  };
+enum Compressions { Compression_none = 0, Compression_gzip = 1, Compression_bzip2 = 2, Compression_lzma = 3 };
 
-  enum FileTypes
-  {
-    FileType_Regular = 0,
-    FileType_Directory = 1
-  };
+enum FileTypes { FileType_Regular = 0, FileType_Directory = 1 };
 
-  const char* const FORMAT_COMPRESSION_7ZIP = "compression";
-  const char* const FORMAT_COMPRESSION_7ZIP_STORE = "store";
-}
+const char *const FORMAT_COMPRESSION_7ZIP = "compression";
+const char *const FORMAT_COMPRESSION_7ZIP_STORE = "store";
+} // namespace moor

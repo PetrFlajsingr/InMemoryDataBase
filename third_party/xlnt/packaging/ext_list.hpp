@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include <xlnt/xlnt_config.hpp>
 #include <xlnt/packaging/uri.hpp>
+#include <xlnt/xlnt_config.hpp>
 
 #include <string>
 #include <vector>
@@ -32,7 +32,7 @@
 namespace xml {
 class parser;
 class serializer;
-}
+} // namespace xml
 
 namespace xlnt {
 
@@ -41,38 +41,35 @@ namespace xlnt {
 /// preservation is required for round-tripping even if extension is not understood
 /// [serialised: extLst]
 /// </summary>
-class XLNT_API ext_list
-{
+class XLNT_API ext_list {
 public:
-    struct ext
-    {
-        ext(xml::parser &parser, const std::string& ns);
-        ext(const uri& ID, const std::string& serialised);
-        void serialise(xml::serializer &serialiser, const std::string& ns);
+  struct ext {
+    ext(xml::parser &parser, const std::string &ns);
+    ext(const uri &ID, const std::string &serialised);
+    void serialise(xml::serializer &serialiser, const std::string &ns);
 
-        uri extension_ID_;
-        std::string serialised_value_;
-    };
-    ext_list() = default; // default ctor required by xlnt::optional
-    explicit ext_list(xml::parser &parser, const std::string& ns);
-    void serialize(xml::serializer &serialiser, const std::string& ns);
+    uri extension_ID_;
+    std::string serialised_value_;
+  };
+  ext_list() = default; // default ctor required by xlnt::optional
+  explicit ext_list(xml::parser &parser, const std::string &ns);
+  void serialize(xml::serializer &serialiser, const std::string &ns);
 
-    void add_extension(const uri &ID, const std::string &element);
+  void add_extension(const uri &ID, const std::string &element);
 
-    bool has_extension(const uri &extension_uri) const;
+  bool has_extension(const uri &extension_uri) const;
 
-    const ext &extension(const uri &extension_uri) const;
+  const ext &extension(const uri &extension_uri) const;
 
-    const std::vector<ext> &extensions() const;
+  const std::vector<ext> &extensions() const;
 
-    bool operator==(const ext_list& rhs) const;
+  bool operator==(const ext_list &rhs) const;
+
 private:
-    std::vector<ext> extensions_;
+  std::vector<ext> extensions_;
 };
 
-inline bool operator==(const ext_list::ext& lhs, const ext_list::ext& rhs)
-{
-    return lhs.extension_ID_ == rhs.extension_ID_
-        && lhs.serialised_value_ == rhs.serialised_value_;
+inline bool operator==(const ext_list::ext &lhs, const ext_list::ext &rhs) {
+  return lhs.extension_ID_ == rhs.extension_ID_ && lhs.serialised_value_ == rhs.serialised_value_;
 }
 } // namespace xlnt

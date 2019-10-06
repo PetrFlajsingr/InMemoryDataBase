@@ -2,9 +2,9 @@
 // Created by Petr Flajsingr on 2019-01-31.
 //
 
-#include <catch2/catch.hpp>
-#include <Utilities.h>
 #include <Types.h>
+#include <Utilities.h>
+#include <catch2/catch.hpp>
 #include <map>
 
 TEST_CASE("Compare integers", "[compareInt]") {
@@ -49,15 +49,8 @@ TEST_CASE("Compare doubles", "[compareDouble]") {
 
 TEST_CASE("Compare Currency", "[compareCurrency]") {
   std::map<double, Currency> testVals{
-      {0, Currency(0)},
-      {1, Currency(1)},
-      {100, Currency(100)},
-      {-1, Currency(-1)},
-      {-100, Currency(-100)},
-      {200, Currency(200)},
-      {-10, Currency(-10)},
-      {0.1, Currency(0.1)},
-      {0.11, Currency(0.11)},
+      {0, Currency(0)},     {1, Currency(1)},     {100, Currency(100)}, {-1, Currency(-1)},     {-100, Currency(-100)},
+      {200, Currency(200)}, {-10, Currency(-10)}, {0.1, Currency(0.1)}, {0.11, Currency(0.11)},
   };
   CHECK(Utilities::compareCurrency(testVals[0], testVals[0]) == 0);
   CHECK(Utilities::compareCurrency(testVals[1], testVals[1]) == 0);
@@ -126,26 +119,15 @@ TEST_CASE("Compare DateTime", "[compareDateTime]") {
   CHECK(Utilities::compareDateTime(dateTime4, dateTime3) == 1);
 }
 
-TEST_CASE("Create zstring from string", "[copyStringToNewChar]") {
+TEST_CASE("Create zstring from string", "[copyStringToNewChar]") {}
 
-}
+TEST_CASE("Check if string ends with substring", "[endsWith]") {}
 
-TEST_CASE("Check if string ends with substring", "[endsWith]") {
+TEST_CASE("Get type of string value", "[getType]") {}
 
-}
+TEST_CASE("Convert string to double", "[stringToDouble]") {}
 
-TEST_CASE("Get type of string value", "[getType]") {
-
-}
-
-TEST_CASE("Convert string to double", "[stringToDouble]") {
-
-}
-
-TEST_CASE("Split string by delimiter", "[splitStringByDelimiter]") {
-
-}
-
+TEST_CASE("Split string by delimiter", "[splitStringByDelimiter]") {}
 
 // TODO:
 //  DateTimeUtils

@@ -5,22 +5,22 @@
 #ifndef DATASETS_HEADERS_MEMORYDATASET_H_
 #define DATASETS_HEADERS_MEMORYDATASET_H_
 
-#include <string>
-#include <vector>
 #include <algorithm>
 #include <iostream>
+#include <string>
 #include <thread>
+#include <vector>
 
-#include <BaseDataSet.h>
-#include "Types.h"
-#include "FilterStructures.h"
+#include "CurrencyField.h"
+#include "DoubleField.h"
 #include "Exceptions.h"
+#include "FilterStructures.h"
 #include "IntegerField.h"
 #include "StringField.h"
-#include "DoubleField.h"
+#include "Types.h"
 #include "Utilities.h"
-#include "CurrencyField.h"
 #include <BaseDataProvider.h>
+#include <BaseDataSet.h>
 #include <DateTimeField.h>
 
 namespace DataSets {
@@ -29,13 +29,12 @@ class MemoryViewDataSet;
  * Data set saving data in memory.
  */
 class MemoryDataSet : public BaseDataSet {
- public:
+public:
   explicit MemoryDataSet(std::string_view dataSetName);
   ~MemoryDataSet() override;
   // BaseDataSet
   void open(DataProviders::BaseDataProvider &dataProvider, const std::vector<ValueType> &fieldTypes) override;
-  void openEmpty(const std::vector<std::string> &fieldNames,
-                 const std::vector<ValueType> &fieldTypes) override;
+  void openEmpty(const std::vector<std::string> &fieldNames, const std::vector<ValueType> &fieldTypes) override;
   void close() override;
   void first() override;
   void last() override;
@@ -43,26 +42,26 @@ class MemoryDataSet : public BaseDataSet {
   bool previous() override;
   void sort(SortOptions &options) override;
 
-    [[nodiscard]] std::shared_ptr<ViewDataSet> filter(const FilterOptions &options) override;
+  [[nodiscard]] std::shared_ptr<ViewDataSet> filter(const FilterOptions &options) override;
 
-    [[nodiscard]] BaseField *fieldByName(std::string_view name) const override;
+  [[nodiscard]] BaseField *fieldByName(std::string_view name) const override;
 
-    [[nodiscard]] BaseField *fieldByIndex(gsl::index index) const override;
+  [[nodiscard]] BaseField *fieldByIndex(gsl::index index) const override;
   std::vector<BaseField *> getFields() const override;
 
-    [[nodiscard]] bool isFirst() const override;
+  [[nodiscard]] bool isFirst() const override;
 
-    [[nodiscard]] bool isLast() const override;
+  [[nodiscard]] bool isLast() const override;
 
-    [[nodiscard]] std::vector<std::string> getFieldNames() const override;
+  [[nodiscard]] std::vector<std::string> getFieldNames() const override;
   void append() override;
   void append(DataProviders::BaseDataProvider &dataProvider) override;
 
-    [[nodiscard]] bool isBegin() const override;
+  [[nodiscard]] bool isBegin() const override;
 
-    [[nodiscard]] bool isEnd() const override;
+  [[nodiscard]] bool isEnd() const override;
 
-    [[nodiscard]] gsl::index getCurrentRecord() const override;
+  [[nodiscard]] gsl::index getCurrentRecord() const override;
   void resetBegin() override;
   void resetEnd() override;
   //\ BaseDataSet
@@ -75,7 +74,7 @@ class MemoryDataSet : public BaseDataSet {
    * Random access iterator for iteration on raw data saved in memory.
    */
   class iterator : public std::iterator<std::random_access_iterator_tag, int> {
-   public:
+  public:
     iterator() = default;
     iterator(gsl::not_null<MemoryDataSet *> dataSet, gsl::index row) : dataSet(dataSet), currentRecord(row) {}
     iterator(const iterator &other) : dataSet(other.dataSet), currentRecord(other.currentRecord) {}
@@ -107,25 +106,15 @@ class MemoryDataSet : public BaseDataSet {
       return result;
     }
 
-    bool operator==(const iterator &rhs) const {
-      return currentRecord == rhs.currentRecord;
-    }
+    bool operator==(const iterator &rhs) const { return currentRecord == rhs.currentRecord; }
 
-    bool operator!=(const iterator &other) const {
-      return !(*this == other);
-    }
+    bool operator!=(const iterator &other) const { return !(*this == other); }
 
-    DataSetRow *operator*() {
-      return dataSet->data[currentRecord];
-    }
+    DataSetRow *operator*() { return dataSet->data[currentRecord]; }
 
-    DataSetRow *operator*(int) {
-      return dataSet->data[currentRecord];
-    }
+    DataSetRow *operator*(int) { return dataSet->data[currentRecord]; }
 
-    DataSetRow *operator->() {
-      return dataSet->data[currentRecord];
-    }
+    DataSetRow *operator->() { return dataSet->data[currentRecord]; }
 
     iterator &operator--() {
       currentRecord--;
@@ -150,21 +139,13 @@ class MemoryDataSet : public BaseDataSet {
       return res;
     }
 
-    bool operator<(const iterator &rhs) {
-      return currentRecord < rhs.currentRecord;
-    }
+    bool operator<(const iterator &rhs) { return currentRecord < rhs.currentRecord; }
 
-    bool operator>(const iterator &rhs) {
-      return currentRecord > rhs.currentRecord;
-    }
+    bool operator>(const iterator &rhs) { return currentRecord > rhs.currentRecord; }
 
-    bool operator<=(const iterator &rhs) {
-      return currentRecord <= rhs.currentRecord;
-    }
+    bool operator<=(const iterator &rhs) { return currentRecord <= rhs.currentRecord; }
 
-    bool operator>=(const iterator &rhs) {
-      return currentRecord >= rhs.currentRecord;
-    }
+    bool operator>=(const iterator &rhs) { return currentRecord >= rhs.currentRecord; }
 
     iterator &operator+=(const int rhs) {
       currentRecord += rhs;
@@ -176,10 +157,9 @@ class MemoryDataSet : public BaseDataSet {
       return *this;
     }
 
-    DataSetRow *operator[](const int index) {
-      return dataSet->data[index];
-    }
-   private:
+    DataSetRow *operator[](const int index) { return dataSet->data[index]; }
+
+  private:
     MemoryDataSet *dataSet;
 
     gsl::index currentRecord;
@@ -188,13 +168,13 @@ class MemoryDataSet : public BaseDataSet {
   iterator begin();
   iterator end();
 
- protected:
-    void setData(void *newData, gsl::index index, ValueType type) override;
+protected:
+  void setData(void *newData, gsl::index index, ValueType type) override;
 
- private:
+private:
   bool isOpen = false;
 
-  gsl::index currentRecord = 0;  //< Pocitadlo zaznamu
+  gsl::index currentRecord = 0; //< Pocitadlo zaznamu
 
   std::vector<DataSetRow *> data;
 
@@ -225,6 +205,6 @@ class MemoryDataSet : public BaseDataSet {
 
   inline DataContainer &getCell(gsl::index row, gsl::index column);
 };
-}  // namespace DataSets
+} // namespace DataSets
 
 #endif //  DATASETS_HEADERS_MEMORYDATASET_H_

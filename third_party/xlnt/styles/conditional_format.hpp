@@ -27,8 +27,8 @@
 #include <cstdint>
 #include <string>
 
-#include <xlnt/xlnt_config.hpp>
 #include <xlnt/utils/optional.hpp>
+#include <xlnt/xlnt_config.hpp>
 
 namespace xlnt {
 
@@ -45,126 +45,112 @@ class xlsx_producer;
 
 } // namespace detail
 
-class XLNT_API condition
-{
+class XLNT_API condition {
 public:
-	static condition text_starts_with(const std::string &start);
-	static condition text_ends_with(const std::string &end);
-	static condition text_contains(const std::string &start);
-	static condition text_does_not_contain(const std::string &start);
+  static condition text_starts_with(const std::string &start);
+  static condition text_ends_with(const std::string &end);
+  static condition text_contains(const std::string &start);
+  static condition text_does_not_contain(const std::string &start);
 
-    bool operator==(const condition& rhs) const
-    {
-        return text_comparand_ == rhs.text_comparand_;
-    }
+  bool operator==(const condition &rhs) const { return text_comparand_ == rhs.text_comparand_; }
 
 private:
-	friend class detail::xlsx_producer;
+  friend class detail::xlsx_producer;
 
-	enum class type
-	{
-		contains_text
-	} type_;
+  enum class type { contains_text } type_;
 
-	enum class condition_operator
-	{
-		starts_with,
-		ends_with,
-		contains,
-		does_not_contain
-	} operator_;
+  enum class condition_operator { starts_with, ends_with, contains, does_not_contain } operator_;
 
-	std::string text_comparand_;
+  std::string text_comparand_;
 };
 
 /// <summary>
-/// Describes a conditional format that will be applied to all cells in the 
+/// Describes a conditional format that will be applied to all cells in the
 /// associated range that satisfy the condition. This can only be constructed
 /// using methods on worksheet or range.
 /// </summary>
-class XLNT_API conditional_format
-{
+class XLNT_API conditional_format {
 public:
-    /// <summary>
-    /// Delete zero-argument constructor
-    /// </summary>
-	conditional_format() = delete;
+  /// <summary>
+  /// Delete zero-argument constructor
+  /// </summary>
+  conditional_format() = delete;
 
-    /// <summary>
-    /// Default copy constructor. Constructs a format using the same PIMPL as other.
-    /// </summary>
-	conditional_format(const conditional_format &other) = default;
+  /// <summary>
+  /// Default copy constructor. Constructs a format using the same PIMPL as other.
+  /// </summary>
+  conditional_format(const conditional_format &other) = default;
 
-    // Formatting (xf) components
+  // Formatting (xf) components
 
-	/// <summary>
-	///
-	/// </summary>
-	bool has_border() const;
+  /// <summary>
+  ///
+  /// </summary>
+  bool has_border() const;
 
-    /// <summary>
-    ///
-    /// </summary>
-    class border border() const;
+  /// <summary>
+  ///
+  /// </summary>
+  class border border() const;
 
-    /// <summary>
-    ///
-    /// </summary>
-	conditional_format border(const xlnt::border &new_border);
+  /// <summary>
+  ///
+  /// </summary>
+  conditional_format border(const xlnt::border &new_border);
 
-	/// <summary>
-	///
-	/// </summary>
-	bool has_fill() const;
+  /// <summary>
+  ///
+  /// </summary>
+  bool has_fill() const;
 
-    /// <summary>
-    ///
-    /// </summary>
-    class fill fill() const;
+  /// <summary>
+  ///
+  /// </summary>
+  class fill fill() const;
 
-    /// <summary>
-    ///
-    /// </summary>
-	conditional_format fill(const xlnt::fill &new_fill);
+  /// <summary>
+  ///
+  /// </summary>
+  conditional_format fill(const xlnt::fill &new_fill);
 
-	/// <summary>
-	///
-	/// </summary>
-	bool has_font() const;
+  /// <summary>
+  ///
+  /// </summary>
+  bool has_font() const;
 
-    /// <summary>
-    ///
-    /// </summary>
-    class font font() const;
+  /// <summary>
+  ///
+  /// </summary>
+  class font font() const;
 
-    /// <summary>
-    ///
-    /// </summary>
-	conditional_format font(const xlnt::font &new_font);
+  /// <summary>
+  ///
+  /// </summary>
+  conditional_format font(const xlnt::font &new_font);
 
-    /// <summary>
-    /// Returns true if this format is equivalent to other.
-    /// </summary>
-    bool operator==(const conditional_format &other) const;
+  /// <summary>
+  /// Returns true if this format is equivalent to other.
+  /// </summary>
+  bool operator==(const conditional_format &other) const;
 
-	/// <summary>
-	/// Returns true if this format is not equivalent to other.
-	/// </summary>
-	bool operator!=(const conditional_format &other) const;
+  /// <summary>
+  /// Returns true if this format is not equivalent to other.
+  /// </summary>
+  bool operator!=(const conditional_format &other) const;
 
 private:
-    friend struct detail::stylesheet;
-    friend class detail::xlsx_consumer;
+  friend struct detail::stylesheet;
+  friend class detail::xlsx_consumer;
 
-    /// <summary>
-    ///
-    /// </summary>
-	conditional_format(detail::conditional_format_impl *d);
+  /// <summary>
+  ///
+  /// </summary>
+  conditional_format(detail::conditional_format_impl *d);
 
-    /// <summary>
-    ///
-    /// </summary>
-    detail::conditional_format_impl *d_;
+  /// <summary>
+  ///
+  /// </summary>
+  detail::conditional_format_impl *d_;
 };
 
 } // namespace xlnt

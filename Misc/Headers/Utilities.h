@@ -5,14 +5,14 @@
 #ifndef MISC_HEADERS_UTILITIES_H_
 #define MISC_HEADERS_UTILITIES_H_
 
-#include <gsl/gsl>
-#include <sstream>
-#include <regex>
-#include <string>
-#include <vector>
 #include "Exceptions.h"
 #include <decimal.h>
 #include <dtoa_milo.h>
+#include <gsl/gsl>
+#include <regex>
+#include <sstream>
+#include <string>
+#include <vector>
 
 typedef dec::decimal<2> Currency;
 class DateTime;
@@ -33,9 +33,7 @@ std::vector<std::string> splitStringByDelimiter(std::string_view str, std::strin
  * @param delimiter rozdelovac
  * @return vector casti
  */
-std::vector<std::string> splitStringByDelimiterReserve(std::string_view str,
-                                                       std::string_view delimiter,
-                                                       int reserve);
+std::vector<std::string> splitStringByDelimiterReserve(std::string_view str, std::string_view delimiter, int reserve);
 /**
  * Prevod string do int.
  *
@@ -78,8 +76,7 @@ bool endsWith(std::string_view value, std::string_view ending);
  * @return nove alokovany char* obsahujici str.data()
  */
 gsl::zstring<> copyStringToNewChar(std::string_view str);
-template<typename T>
-int8_t compare(const T &a, const T &b);
+template <typename T> int8_t compare(const T &a, const T &b);
 /**
  * Srovnani integer hodnot
  * @param a
@@ -93,7 +90,7 @@ int8_t compareInt(int a, int b);
  * @param b
  * @return -1 pokud a < b, 0 pokud a == b, 1 pokud a > b
  */
-    int8_t compareDouble(double a, double b, double epsilon = 1e-7);
+int8_t compareDouble(double a, double b, double epsilon = 1e-7);
 /**
  * Srovnani Currency hodnot
  * @param a
@@ -125,17 +122,15 @@ std::string getRandomString(size_t length);
 
 std::string toLower(const std::string &str);
 
-template<int maxDigit=64>
-std::string doubleToString(double value);
+template <int maxDigit = 64> std::string doubleToString(double value);
 
 int getCoreCount();
-}  // namespace Utilities
+} // namespace Utilities
 
-template<int maxDigit>
-std::string Utilities::doubleToString(double value) {
-    static char buffer[maxDigit];
-    dtoa_milo(value, buffer);
-    return std::string(buffer);
+template <int maxDigit> std::string Utilities::doubleToString(double value) {
+  static char buffer[maxDigit];
+  dtoa_milo(value, buffer);
+  return std::string(buffer);
 }
 
 #endif //  MISC_HEADERS_UTILITIES_H_

@@ -35,12 +35,14 @@ std::string ConsoleIO::readLn() {
 }
 
 void ConsoleIO::setMode(ConsoleIO::Mode newMode) {
-    switch (newMode) {
-    case Mode::simple:ConsoleIO::form = "";
-      break;
-    case Mode::arrow:ConsoleIO::form = ">> ";
-      write("");
-      break;
+  switch (newMode) {
+  case Mode::simple:
+    ConsoleIO::form = "";
+    break;
+  case Mode::arrow:
+    ConsoleIO::form = ">> ";
+    write("");
+    break;
   }
 }
 

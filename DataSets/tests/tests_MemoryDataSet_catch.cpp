@@ -2,10 +2,10 @@
 // Created by Petr Flajsingr on 2019-02-02.
 //
 
-#include <catch2/catch.hpp>
 #include <ArrayDataProvider.h>
 #include <MemoryDataSet.h>
 #include <MemoryViewDataSet.h>
+#include <catch2/catch.hpp>
 
 #define DATA_COUNT 10000
 #define COL_COUNT 5
@@ -44,11 +44,7 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
     WHEN("Reading the data from provider, string values") {
       DataSets::MemoryDataSet dataSet("test_dataset");
       auto fieldTypes = {
-          ValueType::String,
-          ValueType::String,
-          ValueType::String,
-          ValueType::String,
-          ValueType::String,
+          ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
       };
       dataSet.open(provider, fieldTypes);
 
@@ -122,29 +118,23 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
 
       THEN("The data can be filtered") {
         DataSets::FilterOptions options;
-        options.addOption(dataSet.fieldByIndex(2),
-                          {"2", "5", "6"},
-                          DataSets::FilterOption::Equals);
+        options.addOption(dataSet.fieldByIndex(2), {"2", "5", "6"}, DataSets::FilterOption::Equals);
         auto filteredView = dataSet.filter(options);
 
         auto field2 = filteredView->fieldByIndex(2);
 
         while (filteredView->next()) {
           INFO("The value is " << field2->getAsString());
-          REQUIRE((Utilities::compareString(field2->getAsString(), "2") == 0
-              || Utilities::compareString(field2->getAsString(), "5") == 0
-              || Utilities::compareString(field2->getAsString(), "6") == 0));
+          REQUIRE((Utilities::compareString(field2->getAsString(), "2") == 0 ||
+                   Utilities::compareString(field2->getAsString(), "5") == 0 ||
+                   Utilities::compareString(field2->getAsString(), "6") == 0));
         }
       }
 
       AND_THEN("The data can be filtered by multiple keys") {
         DataSets::FilterOptions options;
-        options.addOption(dataSet.fieldByIndex(2),
-                          {"2", "5", "6"},
-                          DataSets::FilterOption::Equals);
-        options.addOption(dataSet.fieldByIndex(4),
-                          {"1", "2", "3", "4", "5"},
-                          DataSets::FilterOption::Equals);
+        options.addOption(dataSet.fieldByIndex(2), {"2", "5", "6"}, DataSets::FilterOption::Equals);
+        options.addOption(dataSet.fieldByIndex(4), {"1", "2", "3", "4", "5"}, DataSets::FilterOption::Equals);
         auto filteredView = dataSet.filter(options);
 
         auto field4 = filteredView->fieldByIndex(4);
@@ -152,15 +142,15 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
 
         while (filteredView->next()) {
           INFO("The value is " << field4->getAsString());
-          REQUIRE((Utilities::compareString(field4->getAsString(), "1") == 0
-              || Utilities::compareString(field4->getAsString(), "2") == 0
-              || Utilities::compareString(field4->getAsString(), "3") == 0
-              || Utilities::compareString(field4->getAsString(), "4") == 0
-              || Utilities::compareString(field4->getAsString(), "5") == 0));
+          REQUIRE((Utilities::compareString(field4->getAsString(), "1") == 0 ||
+                   Utilities::compareString(field4->getAsString(), "2") == 0 ||
+                   Utilities::compareString(field4->getAsString(), "3") == 0 ||
+                   Utilities::compareString(field4->getAsString(), "4") == 0 ||
+                   Utilities::compareString(field4->getAsString(), "5") == 0));
           INFO("The value is " << field2->getAsString());
-          REQUIRE((Utilities::compareString(field2->getAsString(), "2") == 0
-              || Utilities::compareString(field2->getAsString(), "5") == 0
-              || Utilities::compareString(field2->getAsString(), "6") == 0));
+          REQUIRE((Utilities::compareString(field2->getAsString(), "2") == 0 ||
+                   Utilities::compareString(field2->getAsString(), "5") == 0 ||
+                   Utilities::compareString(field2->getAsString(), "6") == 0));
         }
       }
     }
@@ -168,11 +158,7 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
     WHEN("Reading the data from provider, integer values") {
       DataSets::MemoryDataSet dataSet("test_dataset");
       auto fieldTypes = {
-          ValueType::String,
-          ValueType::String,
-          ValueType::Integer,
-          ValueType::String,
-          ValueType::Integer,
+          ValueType::String, ValueType::String, ValueType::Integer, ValueType::String, ValueType::Integer,
       };
       dataSet.open(provider, fieldTypes);
 
@@ -183,10 +169,8 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
         int rowCount = 1;
         while (dataSet.next()) {
           for (auto field : fields) {
-            if (auto intField = dynamic_cast<DataSets::IntegerField *>(field);
-                intField != nullptr) {
-              CHECK(intField->getAsInteger()
-                        == Utilities::stringToInt(data[rowCount][field->getIndex()]));
+            if (auto intField = dynamic_cast<DataSets::IntegerField *>(field); intField != nullptr) {
+              CHECK(intField->getAsInteger() == Utilities::stringToInt(data[rowCount][field->getIndex()]));
             } else {
               CHECK(field->getAsString() == data[rowCount][field->getIndex()]);
             }
@@ -199,10 +183,8 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
         while (dataSet.previous()) {
           auto wat = data[rowCount][0];
           for (auto field : fields) {
-            if (auto intField = dynamic_cast<DataSets::IntegerField *>(field);
-                intField != nullptr) {
-              CHECK(intField->getAsInteger()
-                        == Utilities::stringToInt(data[rowCount][field->getIndex()]));
+            if (auto intField = dynamic_cast<DataSets::IntegerField *>(field); intField != nullptr) {
+              CHECK(intField->getAsInteger() == Utilities::stringToInt(data[rowCount][field->getIndex()]));
             } else {
               CHECK(field->getAsString() == data[rowCount][field->getIndex()]);
             }
@@ -217,8 +199,7 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
         DataSets::SortOptions sortOptions;
         sortOptions.addOption(dataSet.fieldByIndex(2), SortOrder::Descending);
         dataSet.sort(sortOptions);
-        auto field2 =
-            dynamic_cast<DataSets::IntegerField *>(dataSet.fieldByIndex(2));
+        auto field2 = dynamic_cast<DataSets::IntegerField *>(dataSet.fieldByIndex(2));
         int lastVal = std::numeric_limits<int>::max();
         while (dataSet.next()) {
           REQUIRE(lastVal >= field2->getAsInteger());
@@ -228,8 +209,7 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
         DataSets::SortOptions sortOptions2;
         sortOptions2.addOption(dataSet.fieldByIndex(4), SortOrder::Ascending);
         dataSet.sort(sortOptions2);
-        auto field4 =
-            dynamic_cast<DataSets::IntegerField *>(dataSet.fieldByIndex(4));
+        auto field4 = dynamic_cast<DataSets::IntegerField *>(dataSet.fieldByIndex(4));
 
         lastVal = std::numeric_limits<int>::min();
         while (dataSet.next()) {
@@ -244,12 +224,9 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
         sortOptions.addOption(dataSet.fieldByIndex(4), SortOrder::Descending);
         dataSet.sort(sortOptions);
 
-        auto field2 =
-            dynamic_cast<DataSets::IntegerField *>(dataSet.fieldByIndex(2));
-        auto field4 =
-            dynamic_cast<DataSets::IntegerField *>(dataSet.fieldByIndex(4));
-        int int2Last = std::numeric_limits<int>::min(),
-            int4Last = std::numeric_limits<int>::max();
+        auto field2 = dynamic_cast<DataSets::IntegerField *>(dataSet.fieldByIndex(2));
+        auto field4 = dynamic_cast<DataSets::IntegerField *>(dataSet.fieldByIndex(4));
+        int int2Last = std::numeric_limits<int>::min(), int4Last = std::numeric_limits<int>::max();
         while (dataSet.next()) {
           REQUIRE(int2Last <= field2->getAsInteger());
           if (int2Last == field2->getAsInteger()) {
@@ -262,48 +239,39 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
 
       THEN("The data can be filtered") {
         DataSets::FilterOptions options;
-        options.addOption(dataSet.fieldByIndex(2),
-                          {"2", "5", "6"},
-                          DataSets::FilterOption::Equals);
+        options.addOption(dataSet.fieldByIndex(2), {"2", "5", "6"}, DataSets::FilterOption::Equals);
         auto filteredView = dataSet.filter(options);
 
-        auto field2 =
-            dynamic_cast<DataSets::IntegerField *>(filteredView->fieldByIndex(2));
+        auto field2 = dynamic_cast<DataSets::IntegerField *>(filteredView->fieldByIndex(2));
 
         while (filteredView->next()) {
           INFO("The value is " << field2->getAsString());
-          REQUIRE((Utilities::compareInt(field2->getAsInteger(), 2) == 0
-              || Utilities::compareInt(field2->getAsInteger(), 5) == 0
-              || Utilities::compareInt(field2->getAsInteger(), 6) == 0));
+          REQUIRE((Utilities::compareInt(field2->getAsInteger(), 2) == 0 ||
+                   Utilities::compareInt(field2->getAsInteger(), 5) == 0 ||
+                   Utilities::compareInt(field2->getAsInteger(), 6) == 0));
         }
       }
 
       AND_THEN("The data can be filtered by multiple keys") {
         DataSets::FilterOptions options;
-        options.addOption(dataSet.fieldByIndex(2),
-                          {"2", "5", "6"},
-                          DataSets::FilterOption::Equals);
-        options.addOption(dataSet.fieldByIndex(4),
-                          {"1", "2", "3", "4", "5"},
-                          DataSets::FilterOption::Equals);
+        options.addOption(dataSet.fieldByIndex(2), {"2", "5", "6"}, DataSets::FilterOption::Equals);
+        options.addOption(dataSet.fieldByIndex(4), {"1", "2", "3", "4", "5"}, DataSets::FilterOption::Equals);
         auto filteredView = dataSet.filter(options);
 
-        auto field4 =
-            dynamic_cast<DataSets::IntegerField *>(filteredView->fieldByIndex(4));
-        auto field2 =
-            dynamic_cast<DataSets::IntegerField *>(filteredView->fieldByIndex(2));
+        auto field4 = dynamic_cast<DataSets::IntegerField *>(filteredView->fieldByIndex(4));
+        auto field2 = dynamic_cast<DataSets::IntegerField *>(filteredView->fieldByIndex(2));
 
         while (filteredView->next()) {
           INFO("The value is " << field4->getAsInteger());
-          REQUIRE((Utilities::compareInt(field4->getAsInteger(), 1) == 0
-              || Utilities::compareInt(field4->getAsInteger(), 2) == 0
-              || Utilities::compareInt(field4->getAsInteger(), 3) == 0
-              || Utilities::compareInt(field4->getAsInteger(), 4) == 0
-              || Utilities::compareInt(field4->getAsInteger(), 5) == 0));
+          REQUIRE((Utilities::compareInt(field4->getAsInteger(), 1) == 0 ||
+                   Utilities::compareInt(field4->getAsInteger(), 2) == 0 ||
+                   Utilities::compareInt(field4->getAsInteger(), 3) == 0 ||
+                   Utilities::compareInt(field4->getAsInteger(), 4) == 0 ||
+                   Utilities::compareInt(field4->getAsInteger(), 5) == 0));
           INFO("The value is " << field2->getAsInteger());
-          REQUIRE((Utilities::compareInt(field2->getAsInteger(), 2) == 0
-              || Utilities::compareInt(field2->getAsInteger(), 5) == 0
-              || Utilities::compareInt(field2->getAsInteger(), 6) == 0));
+          REQUIRE((Utilities::compareInt(field2->getAsInteger(), 2) == 0 ||
+                   Utilities::compareInt(field2->getAsInteger(), 5) == 0 ||
+                   Utilities::compareInt(field2->getAsInteger(), 6) == 0));
         }
       }
     }
@@ -311,11 +279,7 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
     WHEN("Reading the data from provider, double values") {
       DataSets::MemoryDataSet dataSet("test_dataset");
       auto fieldTypes = {
-          ValueType::String,
-          ValueType::String,
-          ValueType::Double,
-          ValueType::String,
-          ValueType::Double,
+          ValueType::String, ValueType::String, ValueType::Double, ValueType::String, ValueType::Double,
       };
       dataSet.open(provider, fieldTypes);
 
@@ -326,10 +290,8 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
         int rowCount = 1;
         while (dataSet.next()) {
           for (auto field : fields) {
-            if (auto doubleField = dynamic_cast<DataSets::DoubleField *>(field);
-                doubleField != nullptr) {
-              CHECK(doubleField->getAsDouble()
-                        == Utilities::stringToDouble(data[rowCount][field->getIndex()]));
+            if (auto doubleField = dynamic_cast<DataSets::DoubleField *>(field); doubleField != nullptr) {
+              CHECK(doubleField->getAsDouble() == Utilities::stringToDouble(data[rowCount][field->getIndex()]));
             } else {
               CHECK(field->getAsString() == data[rowCount][field->getIndex()]);
             }
@@ -342,10 +304,8 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
         while (dataSet.previous()) {
           auto wat = data[rowCount][0];
           for (auto field : fields) {
-            if (auto doubleField = dynamic_cast<DataSets::DoubleField *>(field);
-                doubleField != nullptr) {
-              CHECK(doubleField->getAsDouble()
-                        == Utilities::stringToDouble(data[rowCount][field->getIndex()]));
+            if (auto doubleField = dynamic_cast<DataSets::DoubleField *>(field); doubleField != nullptr) {
+              CHECK(doubleField->getAsDouble() == Utilities::stringToDouble(data[rowCount][field->getIndex()]));
             } else {
               CHECK(field->getAsString() == data[rowCount][field->getIndex()]);
             }
@@ -360,8 +320,7 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
         DataSets::SortOptions sortOptions;
         sortOptions.addOption(dataSet.fieldByIndex(2), SortOrder::Descending);
         dataSet.sort(sortOptions);
-        auto field2 =
-            dynamic_cast<DataSets::DoubleField *>(dataSet.fieldByIndex(2));
+        auto field2 = dynamic_cast<DataSets::DoubleField *>(dataSet.fieldByIndex(2));
         double lastVal = std::numeric_limits<double>::max();
         while (dataSet.next()) {
           REQUIRE(lastVal >= field2->getAsDouble());
@@ -371,8 +330,7 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
         DataSets::SortOptions sortOptions2;
         sortOptions2.addOption(dataSet.fieldByIndex(4), SortOrder::Ascending);
         dataSet.sort(sortOptions2);
-        auto field4 =
-            dynamic_cast<DataSets::DoubleField *>(dataSet.fieldByIndex(4));
+        auto field4 = dynamic_cast<DataSets::DoubleField *>(dataSet.fieldByIndex(4));
 
         lastVal = -1;
         while (dataSet.next()) {
@@ -387,10 +345,8 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
         sortOptions.addOption(dataSet.fieldByIndex(4), SortOrder::Descending);
         dataSet.sort(sortOptions);
 
-        auto field2 =
-            dynamic_cast<DataSets::DoubleField *>(dataSet.fieldByIndex(2));
-        auto field4 =
-            dynamic_cast<DataSets::DoubleField *>(dataSet.fieldByIndex(4));
+        auto field2 = dynamic_cast<DataSets::DoubleField *>(dataSet.fieldByIndex(2));
+        auto field4 = dynamic_cast<DataSets::DoubleField *>(dataSet.fieldByIndex(4));
         double double2Last = -1;
         double double4Last = std::numeric_limits<double>::max();
         while (dataSet.next()) {
@@ -405,48 +361,39 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
 
       THEN("The data can be filtered") {
         DataSets::FilterOptions options;
-        options.addOption(dataSet.fieldByIndex(2),
-                          {"2", "5", "6"},
-                          DataSets::FilterOption::Equals);
+        options.addOption(dataSet.fieldByIndex(2), {"2", "5", "6"}, DataSets::FilterOption::Equals);
         auto filteredView = dataSet.filter(options);
 
-        auto field2 =
-            dynamic_cast<DataSets::DoubleField *>(filteredView->fieldByIndex(2));
+        auto field2 = dynamic_cast<DataSets::DoubleField *>(filteredView->fieldByIndex(2));
 
         while (filteredView->next()) {
           INFO("The value is " << field2->getAsDouble());
-          REQUIRE((Utilities::compareDouble(field2->getAsDouble(), 2) == 0
-              || Utilities::compareDouble(field2->getAsDouble(), 5) == 0
-              || Utilities::compareDouble(field2->getAsDouble(), 6) == 0));
+          REQUIRE((Utilities::compareDouble(field2->getAsDouble(), 2) == 0 ||
+                   Utilities::compareDouble(field2->getAsDouble(), 5) == 0 ||
+                   Utilities::compareDouble(field2->getAsDouble(), 6) == 0));
         }
       }
 
       AND_THEN("The data can be filtered by multiple keys") {
         DataSets::FilterOptions options;
-        options.addOption(dataSet.fieldByIndex(2),
-                          {"2", "5", "6"},
-                          DataSets::FilterOption::Equals);
-        options.addOption(dataSet.fieldByIndex(4),
-                          {"1", "2", "3", "4", "5"},
-                          DataSets::FilterOption::Equals);
+        options.addOption(dataSet.fieldByIndex(2), {"2", "5", "6"}, DataSets::FilterOption::Equals);
+        options.addOption(dataSet.fieldByIndex(4), {"1", "2", "3", "4", "5"}, DataSets::FilterOption::Equals);
         auto filteredView = dataSet.filter(options);
 
-        auto field4 =
-            dynamic_cast<DataSets::DoubleField *>(filteredView->fieldByIndex(4));
-        auto field2 =
-            dynamic_cast<DataSets::DoubleField *>(filteredView->fieldByIndex(2));
+        auto field4 = dynamic_cast<DataSets::DoubleField *>(filteredView->fieldByIndex(4));
+        auto field2 = dynamic_cast<DataSets::DoubleField *>(filteredView->fieldByIndex(2));
 
         while (filteredView->next()) {
           INFO("The value is " << field4->getAsDouble());
-          REQUIRE((Utilities::compareDouble(field4->getAsDouble(), 1) == 0
-              || Utilities::compareDouble(field4->getAsDouble(), 2) == 0
-              || Utilities::compareDouble(field4->getAsDouble(), 3) == 0
-              || Utilities::compareDouble(field4->getAsDouble(), 4) == 0
-              || Utilities::compareDouble(field4->getAsDouble(), 5) == 0));
+          REQUIRE((Utilities::compareDouble(field4->getAsDouble(), 1) == 0 ||
+                   Utilities::compareDouble(field4->getAsDouble(), 2) == 0 ||
+                   Utilities::compareDouble(field4->getAsDouble(), 3) == 0 ||
+                   Utilities::compareDouble(field4->getAsDouble(), 4) == 0 ||
+                   Utilities::compareDouble(field4->getAsDouble(), 5) == 0));
           INFO("The value is " << field2->getAsDouble());
-          REQUIRE((Utilities::compareDouble(field2->getAsDouble(), 2) == 0
-              || Utilities::compareDouble(field2->getAsDouble(), 5) == 0
-              || Utilities::compareDouble(field2->getAsDouble(), 6) == 0));
+          REQUIRE((Utilities::compareDouble(field2->getAsDouble(), 2) == 0 ||
+                   Utilities::compareDouble(field2->getAsDouble(), 5) == 0 ||
+                   Utilities::compareDouble(field2->getAsDouble(), 6) == 0));
         }
       }
     }
@@ -454,11 +401,7 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
     WHEN("Reading the data from provider, currency values") {
       DataSets::MemoryDataSet dataSet("test_dataset");
       auto fieldTypes = {
-          ValueType::String,
-          ValueType::String,
-          ValueType::Currency,
-          ValueType::String,
-          ValueType::Currency,
+          ValueType::String, ValueType::String, ValueType::Currency, ValueType::String, ValueType::Currency,
       };
       dataSet.open(provider, fieldTypes);
 
@@ -469,11 +412,8 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
         int rowCount = 1;
         while (dataSet.next()) {
           for (auto field : fields) {
-            if (auto currencyField =
-                  dynamic_cast<DataSets::CurrencyField *>(field); currencyField
-                != nullptr) {
-              CHECK(currencyField->getAsCurrency()
-                        == dec::fromString<Currency>(data[rowCount][field->getIndex()]));
+            if (auto currencyField = dynamic_cast<DataSets::CurrencyField *>(field); currencyField != nullptr) {
+              CHECK(currencyField->getAsCurrency() == dec::fromString<Currency>(data[rowCount][field->getIndex()]));
             } else {
               CHECK(field->getAsString() == data[rowCount][field->getIndex()]);
             }
@@ -486,11 +426,8 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
         while (dataSet.previous()) {
           auto wat = data[rowCount][0];
           for (auto field : fields) {
-            if (auto currencyField =
-                  dynamic_cast<DataSets::CurrencyField *>(field); currencyField
-                != nullptr) {
-              CHECK(currencyField->getAsCurrency()
-                        == dec::fromString<Currency>(data[rowCount][field->getIndex()]));
+            if (auto currencyField = dynamic_cast<DataSets::CurrencyField *>(field); currencyField != nullptr) {
+              CHECK(currencyField->getAsCurrency() == dec::fromString<Currency>(data[rowCount][field->getIndex()]));
             } else {
               CHECK(field->getAsString() == data[rowCount][field->getIndex()]);
             }
@@ -505,8 +442,7 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
         DataSets::SortOptions sortOptions;
         sortOptions.addOption(dataSet.fieldByIndex(2), SortOrder::Descending);
         dataSet.sort(sortOptions);
-        auto field2 =
-            dynamic_cast<DataSets::CurrencyField *>(dataSet.fieldByIndex(2));
+        auto field2 = dynamic_cast<DataSets::CurrencyField *>(dataSet.fieldByIndex(2));
         Currency lastVal("10000000");
         while (dataSet.next()) {
           REQUIRE(lastVal >= field2->getAsCurrency());
@@ -516,8 +452,7 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
         DataSets::SortOptions sortOptions2;
         sortOptions2.addOption(dataSet.fieldByIndex(4), SortOrder::Ascending);
         dataSet.sort(sortOptions2);
-        auto field4 =
-            dynamic_cast<DataSets::CurrencyField *>(dataSet.fieldByIndex(4));
+        auto field4 = dynamic_cast<DataSets::CurrencyField *>(dataSet.fieldByIndex(4));
 
         lastVal = dec::fromString<Currency>("0");
         while (dataSet.next()) {
@@ -532,10 +467,8 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
         sortOptions.addOption(dataSet.fieldByIndex(4), SortOrder::Descending);
         dataSet.sort(sortOptions);
 
-        auto field2 =
-            dynamic_cast<DataSets::CurrencyField *>(dataSet.fieldByIndex(2));
-        auto field4 =
-            dynamic_cast<DataSets::CurrencyField *>(dataSet.fieldByIndex(4));
+        auto field2 = dynamic_cast<DataSets::CurrencyField *>(dataSet.fieldByIndex(2));
+        auto field4 = dynamic_cast<DataSets::CurrencyField *>(dataSet.fieldByIndex(4));
         Currency cur2Last = dec::fromString<Currency>("0");
         Currency cur4Last = dec::fromString<Currency>("100000000");
         while (dataSet.next()) {
@@ -550,59 +483,39 @@ SCENARIO("Using MemoryDataSet with DataProvider", "[MemoryDataSet]") {
 
       THEN("The data can be filtered") {
         DataSets::FilterOptions options;
-        options.addOption(dataSet.fieldByIndex(2),
-                          {"2", "5", "6"},
-                          DataSets::FilterOption::Equals);
+        options.addOption(dataSet.fieldByIndex(2), {"2", "5", "6"}, DataSets::FilterOption::Equals);
         auto filteredView = dataSet.filter(options);
 
-        auto field2 =
-            dynamic_cast<DataSets::CurrencyField *>(filteredView->fieldByIndex(2));
+        auto field2 = dynamic_cast<DataSets::CurrencyField *>(filteredView->fieldByIndex(2));
 
         while (filteredView->next()) {
           INFO("The value is " << field2->getAsCurrency());
-          REQUIRE((Utilities::compareCurrency(field2->getAsCurrency(),
-                                              Currency(2)) == 0
-              || Utilities::compareCurrency(field2->getAsCurrency(),
-                                            Currency(5)) == 0
-              || Utilities::compareCurrency(field2->getAsCurrency(),
-                                            Currency(6)) == 0));
+          REQUIRE((Utilities::compareCurrency(field2->getAsCurrency(), Currency(2)) == 0 ||
+                   Utilities::compareCurrency(field2->getAsCurrency(), Currency(5)) == 0 ||
+                   Utilities::compareCurrency(field2->getAsCurrency(), Currency(6)) == 0));
         }
       }
 
       AND_THEN("The data can be filtered by multiple keys") {
         DataSets::FilterOptions options;
-        options.addOption(dataSet.fieldByIndex(2),
-                          {"2", "5", "6"},
-                          DataSets::FilterOption::Equals);
-        options.addOption(dataSet.fieldByIndex(4),
-                          {"1", "2", "3", "4", "5"},
-                          DataSets::FilterOption::Equals);
+        options.addOption(dataSet.fieldByIndex(2), {"2", "5", "6"}, DataSets::FilterOption::Equals);
+        options.addOption(dataSet.fieldByIndex(4), {"1", "2", "3", "4", "5"}, DataSets::FilterOption::Equals);
         auto filteredView = dataSet.filter(options);
 
-        auto field4 =
-            dynamic_cast<DataSets::CurrencyField *>(filteredView->fieldByIndex(4));
-        auto field2 =
-            dynamic_cast<DataSets::CurrencyField *>(filteredView->fieldByIndex(2));
+        auto field4 = dynamic_cast<DataSets::CurrencyField *>(filteredView->fieldByIndex(4));
+        auto field2 = dynamic_cast<DataSets::CurrencyField *>(filteredView->fieldByIndex(2));
 
         while (filteredView->next()) {
           INFO("The value is " << field4->getAsCurrency());
-          REQUIRE((Utilities::compareCurrency(field4->getAsCurrency(),
-                                              Currency(1)) == 0
-              || Utilities::compareCurrency(field4->getAsCurrency(),
-                                            Currency(2)) == 0
-              || Utilities::compareCurrency(field4->getAsCurrency(),
-                                            Currency(3)) == 0
-              || Utilities::compareCurrency(field4->getAsCurrency(),
-                                            Currency(4)) == 0
-              || Utilities::compareCurrency(field4->getAsCurrency(),
-                                            Currency(5)) == 0));
+          REQUIRE((Utilities::compareCurrency(field4->getAsCurrency(), Currency(1)) == 0 ||
+                   Utilities::compareCurrency(field4->getAsCurrency(), Currency(2)) == 0 ||
+                   Utilities::compareCurrency(field4->getAsCurrency(), Currency(3)) == 0 ||
+                   Utilities::compareCurrency(field4->getAsCurrency(), Currency(4)) == 0 ||
+                   Utilities::compareCurrency(field4->getAsCurrency(), Currency(5)) == 0));
           INFO("The value is " << field2->getAsCurrency());
-          REQUIRE((Utilities::compareCurrency(field2->getAsCurrency(),
-                                              Currency(2)) == 0
-              || Utilities::compareCurrency(field2->getAsCurrency(),
-                                            Currency(5)) == 0
-              || Utilities::compareCurrency(field2->getAsCurrency(),
-                                            Currency(6)) == 0));
+          REQUIRE((Utilities::compareCurrency(field2->getAsCurrency(), Currency(2)) == 0 ||
+                   Utilities::compareCurrency(field2->getAsCurrency(), Currency(5)) == 0 ||
+                   Utilities::compareCurrency(field2->getAsCurrency(), Currency(6)) == 0));
         }
       }
     }

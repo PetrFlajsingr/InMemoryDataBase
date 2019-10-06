@@ -5,19 +5,19 @@
 #ifndef PROJECT_SYNTAXANALYSER_H
 #define PROJECT_SYNTAXANALYSER_H
 
-#include <string>
-#include <vector>
 #include <QueryCommon.h>
 #include <QueryException.h>
+#include <string>
+#include <vector>
 
 namespace DataBase {
 // TODO: agre functions
 class SyntaxAnalyser {
- public:
-    void setInput(const std::vector<std::tuple<Token, std::string, bool>> &inputTokens);
+public:
+  void setInput(const std::vector<std::tuple<Token, std::string, bool>> &inputTokens);
   StructuredQuery analyse();
 
- private:
+private:
   enum class SynState {
     start,
     selectList,
@@ -80,14 +80,12 @@ class SyntaxAnalyser {
     end
   };
 
-  enum class SynErrType {
-    missing, wrong
-  };
+  enum class SynErrType { missing, wrong };
 
   gsl::index currentToken = 0;
 
-  const std::vector<Token> cmpFunc{
-      Token::less, Token::lessEqual, Token::greater, Token::greaterEqual, Token::equal, Token::notEqual};
+  const std::vector<Token> cmpFunc{Token::less,         Token::lessEqual, Token::greater,
+                                   Token::greaterEqual, Token::equal,     Token::notEqual};
   const std::vector<Token> constants{Token::number, Token::numberFloat, Token::string};
   const std::vector<Token> agrFunc{Token::sum, Token::avg, Token::min, Token::max, Token::count};
 
@@ -97,6 +95,6 @@ class SyntaxAnalyser {
                           const std::vector<DataBase::Token> &expectedTokens,
                           std::tuple<Token, std::string, bool> token2);
 };
-}  // namespace DataBase
+} // namespace DataBase
 
-#endif //PROJECT_SYNTAXANALYSER_H
+#endif // PROJECT_SYNTAXANALYSER_H

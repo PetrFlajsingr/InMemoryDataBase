@@ -5,10 +5,10 @@
 #ifndef DATAWRITERS_HEADERS_CSVWRITER_H_
 #define DATAWRITERS_HEADERS_CSVWRITER_H_
 
+#include "BaseDataWriter.h"
+#include <fstream>
 #include <string>
 #include <vector>
-#include <fstream>
-#include "BaseDataWriter.h"
 
 namespace DataWriters {
 
@@ -17,7 +17,7 @@ namespace DataWriters {
  * Write csv data to file.
  */
 class CsvWriter : public BaseDataWriter {
- public:
+public:
   /**
    *
    * @param filePath destination
@@ -35,7 +35,7 @@ class CsvWriter : public BaseDataWriter {
   void writeHeader(const std::vector<std::string> &header) override;
   void writeRecord(const std::vector<std::string> &record) override;
 
- private:
+private:
   std::ofstream *outputStream;
   uint64_t columnCount = 0;
   std::string delimiter;
@@ -46,6 +46,6 @@ class CsvWriter : public BaseDataWriter {
   void writeRow(const std::vector<std::string> &data);
 };
 
-}  // namespace DataWriters
+} // namespace DataWriters
 
-#endif  //DATAWRITERS_HEADERS_CSVWRITER_H_
+#endif // DATAWRITERS_HEADERS_CSVWRITER_H_

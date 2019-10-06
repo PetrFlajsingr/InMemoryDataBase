@@ -5,18 +5,18 @@
 #ifndef PROJECT_MEMORYDATABASE_H
 #define PROJECT_MEMORYDATABASE_H
 
-#include <vector>
-#include <string>
-#include <BaseDataSet.h>
-#include <MemoryViewDataSet.h>
-#include <Exceptions.h>
-#include <QueryCommon.h>
-#include <LexicalAnalyser.h>
-#include <SyntaxAnalyser.h>
-#include <SemanticAnalyser.h>
-#include <MemoryDataSet.h>
 #include <AggregationMaker.h>
+#include <BaseDataSet.h>
+#include <Exceptions.h>
+#include <LexicalAnalyser.h>
+#include <MemoryDataSet.h>
+#include <MemoryViewDataSet.h>
+#include <QueryCommon.h>
+#include <SemanticAnalyser.h>
+#include <SyntaxAnalyser.h>
 #include <mutex>
+#include <string>
+#include <vector>
 
 namespace DataBase {
 
@@ -25,7 +25,7 @@ struct Table {
   std::string_view getName();
   std::mutex mutex;
 
-    explicit Table(std::shared_ptr<DataSets::MemoryDataSet> dataSet);
+  explicit Table(std::shared_ptr<DataSets::MemoryDataSet> dataSet);
 };
 
 struct View {
@@ -33,20 +33,20 @@ struct View {
   std::string_view getName();
   std::mutex mutex;
 
-    explicit View(std::shared_ptr<DataSets::MemoryViewDataSet> dataSet);
+  explicit View(std::shared_ptr<DataSets::MemoryViewDataSet> dataSet);
 };
 /**
  * Data base whose data are saved in memory.
  */
 class MemoryDataBase {
- public:
-    explicit MemoryDataBase(std::string name);
+public:
+  explicit MemoryDataBase(std::string name);
 
-    void addTable(const std::shared_ptr<DataSets::MemoryDataSet> &dataSet);
+  void addTable(const std::shared_ptr<DataSets::MemoryDataSet> &dataSet);
   void removeTable(std::string_view tableName);
   void removeView(std::string_view viewName);
 
-    [[nodiscard]] std::shared_ptr<Table> tableByName(std::string_view tableName) const;
+  [[nodiscard]] std::shared_ptr<Table> tableByName(std::string_view tableName) const;
   /**
    * Execute a query not containing aggregation.
    * @param query query to execute
@@ -63,11 +63,11 @@ class MemoryDataBase {
    */
   std::shared_ptr<View> execAggregateQuery(std::string_view query, std::string_view viewName);
 
-    [[nodiscard]] std::string_view getName() const;
+  [[nodiscard]] std::string_view getName() const;
 
-    [[nodiscard]] const std::vector<std::shared_ptr<Table>> &getTables() const;
+  [[nodiscard]] const std::vector<std::shared_ptr<Table>> &getTables() const;
 
- private:
+private:
   std::vector<std::shared_ptr<Table>> tables;
   std::vector<std::shared_ptr<View>> views;
 
@@ -90,6 +90,6 @@ class MemoryDataBase {
   std::shared_ptr<View> doHaving(const StructuredQuery &query, std::shared_ptr<View> &view);
 };
 
-}  // namespace DataBase
+} // namespace DataBase
 
-#endif //PROJECT_MEMORYDATABASE_H
+#endif // PROJECT_MEMORYDATABASE_H

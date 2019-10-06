@@ -25,142 +25,141 @@
 
 #include <string>
 
-#include <xlnt/xlnt_config.hpp>
 #include <xlnt/cell/rich_text.hpp>
+#include <xlnt/xlnt_config.hpp>
 
 namespace xlnt {
 
 /// <summary>
 /// A comment can be applied to a cell to provide extra information about its contents.
 /// </summary>
-class XLNT_API comment
-{
+class XLNT_API comment {
 public:
-    /// <summary>
-    /// Constructs a new blank comment.
-    /// </summary>
-    comment();
+  /// <summary>
+  /// Constructs a new blank comment.
+  /// </summary>
+  comment();
 
-    /// <summary>
-    /// Constructs a new comment with the given text and author.
-    /// </summary>
-    comment(const rich_text &text, const std::string &author);
+  /// <summary>
+  /// Constructs a new comment with the given text and author.
+  /// </summary>
+  comment(const rich_text &text, const std::string &author);
 
-    /// <summary>
-    /// Constructs a new comment with the given unformatted text and author.
-    /// </summary>
-    comment(const std::string &text, const std::string &author);
+  /// <summary>
+  /// Constructs a new comment with the given unformatted text and author.
+  /// </summary>
+  comment(const std::string &text, const std::string &author);
 
-    /// <summary>
-    /// Returns the text that will be displayed for this comment.
-    /// </summary>
-    rich_text text() const;
+  /// <summary>
+  /// Returns the text that will be displayed for this comment.
+  /// </summary>
+  rich_text text() const;
 
-    /// <summary>
-    /// Returns the plain text that will be displayed for this comment without formatting information.
-    /// </summary>
-    std::string plain_text() const;
+  /// <summary>
+  /// Returns the plain text that will be displayed for this comment without formatting information.
+  /// </summary>
+  std::string plain_text() const;
 
-    /// <summary>
-    /// Returns the author of this comment.
-    /// </summary>
-    std::string author() const;
+  /// <summary>
+  /// Returns the author of this comment.
+  /// </summary>
+  std::string author() const;
 
-    /// <summary>
-    /// Makes this comment only visible when the associated cell is hovered.
-    /// </summary>
-    void hide();
+  /// <summary>
+  /// Makes this comment only visible when the associated cell is hovered.
+  /// </summary>
+  void hide();
 
-    /// <summary>
-    /// Makes this comment always visible.
-    /// </summary>
-    void show();
+  /// <summary>
+  /// Makes this comment always visible.
+  /// </summary>
+  void show();
 
-    /// <summary>
-    /// Returns true if this comment is not hidden.
-    /// </summary>
-    bool visible() const;
+  /// <summary>
+  /// Returns true if this comment is not hidden.
+  /// </summary>
+  bool visible() const;
 
-    /// <summary>
-    /// Sets the absolute position of this cell to the given coordinates.
-    /// </summary>
-    void position(int left, int top);
+  /// <summary>
+  /// Sets the absolute position of this cell to the given coordinates.
+  /// </summary>
+  void position(int left, int top);
 
-    /// <summary>
-    /// Returns the distance from the left side of the sheet to the left side of the comment.
-    /// </summary>
-    int left() const;
+  /// <summary>
+  /// Returns the distance from the left side of the sheet to the left side of the comment.
+  /// </summary>
+  int left() const;
 
-    /// <summary>
-    /// Returns the distance from the top of the sheet to the top of the comment.
-    /// </summary>
-    int top() const;
+  /// <summary>
+  /// Returns the distance from the top of the sheet to the top of the comment.
+  /// </summary>
+  int top() const;
 
-    /// <summary>
-    /// Sets the size of the comment.
-    /// </summary>
-    void size(int width, int height);
+  /// <summary>
+  /// Sets the size of the comment.
+  /// </summary>
+  void size(int width, int height);
 
-    /// <summary>
-    /// Returns the width of this comment.
-    /// </summary>
-    int width() const;
+  /// <summary>
+  /// Returns the width of this comment.
+  /// </summary>
+  int width() const;
 
-    /// <summary>
-    /// Returns the height of this comment.
-    /// </summary>
-    int height() const;
+  /// <summary>
+  /// Returns the height of this comment.
+  /// </summary>
+  int height() const;
 
-    /// <summary>
-    /// Return true if this comment is equivalent to other.
-    /// </summary>
-    bool operator==(const comment &other) const;
+  /// <summary>
+  /// Return true if this comment is equivalent to other.
+  /// </summary>
+  bool operator==(const comment &other) const;
 
-    /// <summary>
-    /// Returns true if this comment is not equivalent to other.
-    /// </summary>
-    bool operator!=(const comment &other) const;
+  /// <summary>
+  /// Returns true if this comment is not equivalent to other.
+  /// </summary>
+  bool operator!=(const comment &other) const;
 
 private:
-    /// <summary>
-    /// The formatted textual content in this cell displayed directly after the author.
-    /// </summary>
-    rich_text text_;
+  /// <summary>
+  /// The formatted textual content in this cell displayed directly after the author.
+  /// </summary>
+  rich_text text_;
 
-    /// <summary>
-    /// The name of the person that created this comment.
-    /// </summary>
-    std::string author_;
+  /// <summary>
+  /// The name of the person that created this comment.
+  /// </summary>
+  std::string author_;
 
-    /// <summary>
-    /// True if this comment is not hidden.
-    /// </summary>
-    bool visible_ = false;
+  /// <summary>
+  /// True if this comment is not hidden.
+  /// </summary>
+  bool visible_ = false;
 
-    /// <summary>
-    /// The fill color
-    /// </summary>
-    std::string fill_;
+  /// <summary>
+  /// The fill color
+  /// </summary>
+  std::string fill_;
 
-    /// <summary>
-    /// Distance from the left side of the sheet.
-    /// </summary>
-    int left_ = 0;
+  /// <summary>
+  /// Distance from the left side of the sheet.
+  /// </summary>
+  int left_ = 0;
 
-    /// <summary>
-    /// Distance from the top of the sheet.
-    /// </summary>
-    int top_ = 0;
+  /// <summary>
+  /// Distance from the top of the sheet.
+  /// </summary>
+  int top_ = 0;
 
-    /// <summary>
-    /// Width of the comment box.
-    /// </summary>
-    int width_ = 0;
+  /// <summary>
+  /// Width of the comment box.
+  /// </summary>
+  int width_ = 0;
 
-    /// <summary>
-    /// Height of the comment box.
-    /// </summary>
-    int height_ = 0;
+  /// <summary>
+  /// Height of the comment box.
+  /// </summary>
+  int height_ = 0;
 };
 
 } // namespace xlnt

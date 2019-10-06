@@ -27,16 +27,15 @@
 #include <list>
 
 #if !defined(__MINGW32__) && !defined(__MINGW64__) && !defined(__CYGWIN__)
-#  if defined (_WIN64)
-     typedef long long ssize_t;
-#  elif defined (_WIN32)
-     typedef long ssize_t;
-#  endif
+#if defined(_WIN64)
+typedef long long ssize_t;
+#elif defined(_WIN32)
+typedef long ssize_t;
+#endif
 #endif
 
 struct archive;
 
-namespace moor
-{
-  int write_open_memory(struct archive *a, std::list<unsigned char>* _buff);
+namespace moor {
+int write_open_memory(struct archive *a, std::list<unsigned char> *_buff);
 }

@@ -2,8 +2,8 @@
 // Created by Petr Flajsingr on 24/08/2018.
 //
 
-#include <Utilities.h>
 #include <Types.h>
+#include <Utilities.h>
 #include <thread>
 
 std::vector<std::string> Utilities::splitStringByDelimiter(std::string_view str, std::string_view delimiter) {
@@ -25,8 +25,7 @@ std::vector<std::string> Utilities::splitStringByDelimiter(std::string_view str,
   return result;
 }
 
-std::vector<std::string> Utilities::splitStringByDelimiterReserve(std::string_view str,
-                                                                  std::string_view delimiter,
+std::vector<std::string> Utilities::splitStringByDelimiterReserve(std::string_view str, std::string_view delimiter,
                                                                   int reserve) {
   std::vector<std::string> result;
   result.reserve(reserve);
@@ -104,7 +103,7 @@ int8_t Utilities::compareInt(int a, int b) {
 
 // TODO: epsilon
 int8_t Utilities::compareDouble(double a, double b, double epsilon) {
-    if (std::abs(a - b) < epsilon) {
+  if (std::abs(a - b) < epsilon) {
     return 0;
   }
   if (a < b) {
@@ -147,10 +146,9 @@ int8_t Utilities::compareDateTime(const DateTime &a, const DateTime &b) {
 #pragma ide diagnostic ignored "cert-msc30-c"
 std::string Utilities::getRandomString(size_t length) {
   auto randChar = []() -> char {
-    const char charset[] =
-        "0123456789"
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        "abcdefghijklmnopqrstuvwxyz";
+    const char charset[] = "0123456789"
+                           "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                           "abcdefghijklmnopqrstuvwxyz";
     const size_t max_index = (sizeof(charset) - 1);
     return charset[rand() % max_index];
   };
@@ -166,8 +164,7 @@ std::string Utilities::toLower(const std::string &str) {
   return result;
 }
 
-template<class T>
-int8_t Utilities::compare(const T &a, const T &b) {
+template <class T> int8_t Utilities::compare(const T &a, const T &b) {
   if (a == b) {
     return 0;
   }

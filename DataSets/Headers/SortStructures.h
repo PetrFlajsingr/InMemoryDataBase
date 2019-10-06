@@ -5,8 +5,8 @@
 #ifndef CSV_READER_SORTSTRUCTURES_H
 #define CSV_READER_SORTSTRUCTURES_H
 
-#include <cstdint>
 #include <Types.h>
+#include <cstdint>
 #include <vector>
 namespace DataSets {
 
@@ -18,11 +18,9 @@ struct SortItem {
 struct SortOptions {
   std::vector<SortItem> options;
 
-  void addOption(BaseField *field, SortOrder order) {
-    options.emplace_back(SortItem{field, order});
-  }
+  void addOption(BaseField *field, SortOrder order) { options.emplace_back(SortItem{field, order}); }
 };
 
-}  // namespace DataSets
+} // namespace DataSets
 
-#endif //CSV_READER_SORTSTRUCTURES_H
+#endif // CSV_READER_SORTSTRUCTURES_H

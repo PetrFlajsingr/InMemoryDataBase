@@ -5,20 +5,18 @@
 #include <Exceptions.h>
 #include <XlntWriter.h>
 
-DataWriters::XlntWriter::XlntWriter(std::string_view fileName)
-    : BaseDataWriter() {
+DataWriters::XlntWriter::XlntWriter(std::string_view fileName) : BaseDataWriter() {
   ws = wb.active_sheet();
   destination = fileName;
 }
 
-DataWriters::XlntWriter::XlntWriter(std::string_view fileName, CharSet outCharSet)
-    : BaseDataWriter(outCharSet) {
+DataWriters::XlntWriter::XlntWriter(std::string_view fileName, CharSet outCharSet) : BaseDataWriter(outCharSet) {
   ws = wb.active_sheet();
   destination = fileName;
 }
 
 void DataWriters::XlntWriter::writeHeader(const std::vector<std::string> &header) {
-    for (gsl::index i = 0; i < static_cast<gsl::index>(header.size()); ++i) {
+  for (gsl::index i = 0; i < static_cast<gsl::index>(header.size()); ++i) {
     if (convert) {
       ws.cell(i + 1, 1).value(converter->convertBack(header[i]));
     } else {
@@ -28,7 +26,7 @@ void DataWriters::XlntWriter::writeHeader(const std::vector<std::string> &header
 }
 void DataWriters::XlntWriter::writeRecord(const std::vector<std::string> &record) {
   ++recordNumber;
-    for (gsl::index i = 0; i < static_cast<gsl::index>(record.size()); ++i) {
+  for (gsl::index i = 0; i < static_cast<gsl::index>(record.size()); ++i) {
     if (convert) {
       ws.cell(i + 1, recordNumber).value(converter->convertBack(record[i]));
     } else {
@@ -36,6 +34,4 @@ void DataWriters::XlntWriter::writeRecord(const std::vector<std::string> &record
     }
   }
 }
-DataWriters::XlntWriter::~XlntWriter() {
-  wb.save(destination);
-}
+DataWriters::XlntWriter::~XlntWriter() { wb.save(destination); }

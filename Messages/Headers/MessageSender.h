@@ -13,10 +13,10 @@
  * Allows usage of dispatch method to send messages to all Manager listeners.
  */
 class MessageSender {
- public:
-  explicit MessageSender(const std::shared_ptr<MessageManager> &commandManager) : commandManager(
-      commandManager) {}
- protected:
+public:
+  explicit MessageSender(const std::shared_ptr<MessageManager> &commandManager) : commandManager(commandManager) {}
+
+protected:
   void dispatch(Message *message) {
     if (auto tmp = commandManager.lock()) {
       tmp->dispatch(std::shared_ptr<Message>(message));
@@ -25,4 +25,4 @@ class MessageSender {
   std::weak_ptr<MessageManager> commandManager;
 };
 
-#endif //PROJECT_COMMANDSENDER_H
+#endif // PROJECT_COMMANDSENDER_H

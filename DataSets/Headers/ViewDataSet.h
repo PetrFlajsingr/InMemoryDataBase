@@ -11,9 +11,9 @@ namespace DataSets {
 
 // read only
 class ViewDataSet : public BaseDataSet {
- public:
+public:
   explicit ViewDataSet(const std::string_view &dataSetName);
 };
-}  // namespace DataSets
+} // namespace DataSets
 
-#endif //PROJECT_VIEWDATASET_H
+#endif // PROJECT_VIEWDATASET_H

@@ -23,44 +23,40 @@
 
 #pragma once
 
-#include <xlnt/xlnt_config.hpp>
 #include <xlnt/utils/optional.hpp>
+#include <xlnt/xlnt_config.hpp>
 
 namespace xlnt {
 
 /// <summary>
 /// General worksheet formatting properties.
 /// </summary>
-class XLNT_API sheet_format_properties
-{
+class XLNT_API sheet_format_properties {
 public:
-    /// <summary>
-    /// The base column width
-    /// </summary>
-    optional<double> base_col_width;
+  /// <summary>
+  /// The base column width
+  /// </summary>
+  optional<double> base_col_width;
 
-    /// <summary>
-    /// The default row height
-    /// </summary>
-    optional<double> default_row_height;
+  /// <summary>
+  /// The default row height
+  /// </summary>
+  optional<double> default_row_height;
 
-    /// <summary>
-    /// The default column width
-    /// </summary>
-    optional<double> default_column_width;
+  /// <summary>
+  /// The default column width
+  /// </summary>
+  optional<double> default_column_width;
 
-    /// <summary>
-    /// x14ac extension, dyDescent property
-    /// </summary>
-    optional<double> dy_descent;
+  /// <summary>
+  /// x14ac extension, dyDescent property
+  /// </summary>
+  optional<double> dy_descent;
 };
 
-inline bool operator==(const sheet_format_properties &lhs, const sheet_format_properties &rhs)
-{
-    return lhs.base_col_width == rhs.base_col_width
-        && lhs.default_column_width == rhs.default_column_width
-        && lhs.default_row_height == rhs.default_row_height
-        && lhs.dy_descent == rhs.dy_descent;
+inline bool operator==(const sheet_format_properties &lhs, const sheet_format_properties &rhs) {
+  return lhs.base_col_width == rhs.base_col_width && lhs.default_column_width == rhs.default_column_width &&
+         lhs.default_row_height == rhs.default_row_height && lhs.dy_descent == rhs.dy_descent;
 }
 
 } // namespace xlnt

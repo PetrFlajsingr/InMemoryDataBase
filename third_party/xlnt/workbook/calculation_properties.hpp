@@ -30,26 +30,23 @@ namespace xlnt {
 /// <summary>
 /// Workbook file properties relating to calculations.
 /// </summary>
-class XLNT_API calculation_properties
-{
+class XLNT_API calculation_properties {
 public:
-    /// <summary>
-    /// The version of calculation engine used to calculate cell formula values.
-    /// If this is older than the version of the Excel calculation engine opening
-    /// the workbook, cell values will be recalculated.
-    /// </summary>
-    std::size_t calc_id;
+  /// <summary>
+  /// The version of calculation engine used to calculate cell formula values.
+  /// If this is older than the version of the Excel calculation engine opening
+  /// the workbook, cell values will be recalculated.
+  /// </summary>
+  std::size_t calc_id;
 
-    /// <summary>
-    /// If this is true, concurrent calculation will be enabled for the workbook.
-    /// </summary>
-    bool concurrent_calc;
+  /// <summary>
+  /// If this is true, concurrent calculation will be enabled for the workbook.
+  /// </summary>
+  bool concurrent_calc;
 };
 
-inline bool operator==(const calculation_properties &lhs, const calculation_properties &rhs)
-{
-    return lhs.calc_id == rhs.calc_id
-        && lhs.concurrent_calc == rhs.concurrent_calc;
+inline bool operator==(const calculation_properties &lhs, const calculation_properties &rhs) {
+  return lhs.calc_id == rhs.calc_id && lhs.concurrent_calc == rhs.concurrent_calc;
 }
 
 } // namespace xlnt

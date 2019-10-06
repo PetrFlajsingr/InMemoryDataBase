@@ -5,13 +5,13 @@
 #ifndef DATASETS_HEADERS_BASEDATASET_H_
 #define DATASETS_HEADERS_BASEDATASET_H_
 
-#include <string>
-#include <vector>
-#include <cstring>
 #include "BaseDataProvider.h"
-#include "Types.h"
 #include "FilterStructures.h"
 #include "SortStructures.h"
+#include "Types.h"
+#include <cstring>
+#include <string>
+#include <vector>
 
 namespace DataSets {
 class BaseField;
@@ -20,22 +20,20 @@ class ViewDataSet;
  * Base class for data sets.
  */
 class BaseDataSet {
- public:
-  explicit BaseDataSet(std::string_view dataSetName) : dataSetName(dataSetName) {};
+public:
+  explicit BaseDataSet(std::string_view dataSetName) : dataSetName(dataSetName){};
   /**
    * Load data from data provider. Names of fields (columns) is loaded from provider header.
    * @param dataProvider source of data
    * @param fieldTypes type of data to store
    */
-  virtual void open(DataProviders::BaseDataProvider &dataProvider,
-                    const std::vector<ValueType> &fieldTypes) = 0;
+  virtual void open(DataProviders::BaseDataProvider &dataProvider, const std::vector<ValueType> &fieldTypes) = 0;
   /**
    * Open data set without filling it with data.
    * @param fieldNames names of fields
    * @param fieldTypes types of data to store
    */
-  virtual void openEmpty(const std::vector<std::string> &fieldNames,
-                         const std::vector<ValueType> &fieldTypes) = 0;
+  virtual void openEmpty(const std::vector<std::string> &fieldNames, const std::vector<ValueType> &fieldTypes) = 0;
   /**
    * Close data set making it unable to provide data.
    */
@@ -142,20 +140,16 @@ class BaseDataSet {
    * Change data set's name
    * @param name new name
    */
-  void setName(const std::string &name) {
-    dataSetName = name;
-  }
+  void setName(const std::string &name) { dataSetName = name; }
   /**
    *
    * @return name of the data set
    */
-  [[nodiscard]] std::string getName() const {
-    return dataSetName;
-  }
+  [[nodiscard]] std::string getName() const { return dataSetName; }
   virtual ~BaseDataSet() = default;
 
- protected:
-  friend class BaseField;  //< to access BaseField::setData(...)
+protected:
+  friend class BaseField; //< to access BaseField::setData(...)
 
   std::vector<std::shared_ptr<BaseField>> fields;
 
@@ -177,6 +171,6 @@ class BaseDataSet {
    */
   virtual void setData(void *data, gsl::index index, ValueType type) = 0;
 };
-}  // namespace DataSets
+} // namespace DataSets
 
 #endif //  DATASETS_HEADERS_BASEDATASET_H_

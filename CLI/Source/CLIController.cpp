@@ -22,33 +22,25 @@ void CLIController::handleQuery(std::string_view query) {
   try {
     inputParser.runCommand(cmd);
   } catch (const std::exception &e) {
-    ctx.ui->writeLnErr(
-        "Command could not be performed.\n"
-            + std::string(typeid(e).name()) + "\n"
-            + std::string(e.what()));
+    ctx.ui->writeLnErr("Command could not be performed.\n" + std::string(typeid(e).name()) + "\n" +
+                       std::string(e.what()));
   }
   ctx.ui->write("");
 }
 
 CLIController::CmdType CLIController::handleCommand(std::string_view input) {
   auto command = ScriptParser::ReplaceResources(std::string(input));
-  if (Utilities::compareString(command, "exit") == 0
-      || Utilities::compareString(command, "e") == 0
-      || Utilities::compareString(command, "quit") == 0
-      || Utilities::compareString(command, "q") == 0) {
+  if (Utilities::compareString(command, "exit") == 0 || Utilities::compareString(command, "e") == 0 ||
+      Utilities::compareString(command, "quit") == 0 || Utilities::compareString(command, "q") == 0) {
     return CmdType::exit;
-  } else if (Utilities::compareString(command, "query start") == 0
-      || Utilities::compareString(command, "qs") == 0) {
+  } else if (Utilities::compareString(command, "query start") == 0 || Utilities::compareString(command, "qs") == 0) {
     return CmdType::queryModeStart;
-  } else if (Utilities::compareString(command, "query end") == 0
-      || Utilities::compareString(command, "qe") == 0) {
+  } else if (Utilities::compareString(command, "query end") == 0 || Utilities::compareString(command, "qe") == 0) {
     return CmdType::queryModeEnd;
-  } else if (Utilities::compareString(command, "help") == 0
-      || Utilities::compareString(command, "h") == 0
-      || Utilities::compareString(command, "?") == 0) {
+  } else if (Utilities::compareString(command, "help") == 0 || Utilities::compareString(command, "h") == 0 ||
+             Utilities::compareString(command, "?") == 0) {
     return CmdType::help;
-  } else if (Utilities::compareString(command, "clear") == 0
-      || Utilities::compareString(command, "c") == 0) {
+  } else if (Utilities::compareString(command, "clear") == 0 || Utilities::compareString(command, "c") == 0) {
     return CmdType::clear;
   } else if (command.substr(0, 10) == "run script") {
     scriptPath = command.substr(11);
@@ -75,8 +67,7 @@ CLIController::CmdType CLIController::handleCommand(std::string_view input) {
     return CmdType::waitDownload;
   }
 
-  ctx.ui->writeLn(
-      "Ignoring unknown command.");
+  ctx.ui->writeLn("Ignoring unknown command.");
   return CmdType::unknown;
 }
 
@@ -106,9 +97,8 @@ void CLIController::RunScript(std::string_view scriptPath) {
     }
     context.ui->writeLn("Script finished successfully.");
   } catch (const std::exception &e) {
-    context.ui->writeLnErr("Messages could not be performed.\n"
-                               + std::string(typeid(e).name()) + "\n"
-                               + std::string(e.what()));
+    context.ui->writeLnErr("Messages could not be performed.\n" + std::string(typeid(e).name()) + "\n" +
+                           std::string(e.what()));
   }
   context.ui->write("");
 }
@@ -119,12 +109,15 @@ void CLIController::receive(std::shared_ptr<Message> message) {
   } else if (auto msg = std::dynamic_pointer_cast<DownloadProgress>(message)) {
     std::string outMsg = "Download of '" + msg->getData().second + "' has ";
     switch (msg->getData().first) {
-      case DownloadState::started:outMsg += "started.";
-        break;
-      case DownloadState::finished:outMsg += "finished.";
-        break;
-      case DownloadState::failed:outMsg += "failed.";
-        break;
+    case DownloadState::started:
+      outMsg += "started.";
+      break;
+    case DownloadState::finished:
+      outMsg += "finished.";
+      break;
+    case DownloadState::failed:
+      outMsg += "failed.";
+      break;
     }
     ctx.ui->writeLn(outMsg);
   }
@@ -136,65 +129,79 @@ void CLIController::handleInput(std::string_view input) {
         handleQuery(input.substr(1));
       } else {
         switch (handleCommand(input)) {
-          case CmdType::exit: {
-            dispatch(new UIEnd());
-            return;
+        case CmdType::exit: {
+          dispatch(new UIEnd());
+          return;
+        }
+        case CmdType::waitDownload:
+          ctx.ui->writeLn("Waiting for downloads...");
+          ctx.threadPool->wait(0);
+          ctx.ui->writeLn("Downloads finished...");
+          break;
+        case CmdType::download:
+          dispatch(new Download(fileName, savePath));
+          break;
+        case CmdType::downloadAsync:
+          dispatch(new DownloadNoBlock(fileName, savePath));
+          break;
+        case CmdType::queryModeStart:
+          ctx.mode = AppContext::Mode::query;
+          ctx.ui->setMode(ConsoleIO::Mode::arrow);
+          ctx.ui->writeLn("Query mode");
+          ctx.ui->writeLn("**********");
+          break;
+        case CmdType::queryModeEnd:
+          ctx.mode = AppContext::Mode::normal;
+          ctx.ui->setMode(ConsoleIO::Mode::simple);
+          ctx.ui->writeLn("Normal mode");
+          ctx.ui->writeLn("***********");
+          break;
+        case CmdType::clear:
+          ctx.DBs.clear();
+          break;
+        case CmdType::help:
+          printHelp();
+          break;
+        case CmdType::runScript:
+          RunScript(scriptPath);
+          break;
+        case CmdType::listDBs:
+          ctx.ui->writeLn("List of DataBases:");
+          for (const auto &db : ctx.DBs) {
+            ctx.ui->writeLn(db.first);
           }
-          case CmdType::waitDownload:ctx.ui->writeLn("Waiting for downloads...");
-            ctx.threadPool->wait(0);
-            ctx.ui->writeLn("Downloads finished...");
+          break;
+        case CmdType::listTables:
+          ctx.ui->writeLn("List of tables in " + dbName + ": ");
+          if (ctx.DBs.find(dbName) == ctx.DBs.end()) {
+            ctx.ui->writeLnErr("DataBase not found.");
             break;
-          case CmdType::download:dispatch(new Download(fileName, savePath));
-            break;
-          case CmdType::downloadAsync:dispatch(new DownloadNoBlock(fileName, savePath));
-            break;
-          case CmdType::queryModeStart:ctx.mode = AppContext::Mode::query;
-            ctx.ui->setMode(ConsoleIO::Mode::arrow);
-            ctx.ui->writeLn("Query mode");
-            ctx.ui->writeLn("**********");
-            break;
-          case CmdType::queryModeEnd:ctx.mode = AppContext::Mode::normal;
-            ctx.ui->setMode(ConsoleIO::Mode::simple);
-            ctx.ui->writeLn("Normal mode");
-            ctx.ui->writeLn("***********");
-            break;
-          case CmdType::clear:ctx.DBs.clear();
-            break;
-          case CmdType::help:printHelp();
-            break;
-          case CmdType::runScript:RunScript(scriptPath);
-            break;
-          case CmdType::listDBs:ctx.ui->writeLn("List of DataBases:");
-            for (const auto &db : ctx.DBs) {
-              ctx.ui->writeLn(db.first);
-            }
-            break;
-          case CmdType::listTables:ctx.ui->writeLn("List of tables in " + dbName + ": ");
-            if (ctx.DBs.find(dbName) == ctx.DBs.end()) {
-              ctx.ui->writeLnErr("DataBase not found.");
-              break;
-            }
-            for (const auto &val : ctx.DBs[dbName]->getTables()) {
-              ctx.ui->writeLn(val->getName());
-            }
-            break;
-            case CmdType::unknown:
-                break;
+          }
+          for (const auto &val : ctx.DBs[dbName]->getTables()) {
+            ctx.ui->writeLn(val->getName());
+          }
+          break;
+        case CmdType::unknown:
+          break;
         }
       }
     } else {
       if (input[0] == ':') {
         switch (handleCommand(input.substr(1))) {
-          case CmdType::queryModeEnd:ctx.mode = AppContext::Mode::normal;
-            ctx.ui->setMode(ConsoleIO::Mode::simple);
-            ctx.ui->writeLn("Normal mode");
-            ctx.ui->writeLn("***********");
-            break;
-          case CmdType::clear:ctx.DBs.clear();
-            break;
-          case CmdType::help:printHelp();
-            break;
-          default:break;
+        case CmdType::queryModeEnd:
+          ctx.mode = AppContext::Mode::normal;
+          ctx.ui->setMode(ConsoleIO::Mode::simple);
+          ctx.ui->writeLn("Normal mode");
+          ctx.ui->writeLn("***********");
+          break;
+        case CmdType::clear:
+          ctx.DBs.clear();
+          break;
+        case CmdType::help:
+          printHelp();
+          break;
+        default:
+          break;
         }
       } else {
         handleQuery(input);

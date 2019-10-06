@@ -34,66 +34,64 @@ namespace xlnt {
 /// Properties governing how the data in a workbook should be protected.
 /// These values can be ignored by consumers.
 /// </summary>
-class XLNT_API document_security
-{
+class XLNT_API document_security {
 public:
+  /// <summary>
+  /// Holds data describing the verifier that locks revisions or a workbook.
+  /// </summary>
+  struct lock_verifier {
     /// <summary>
-    /// Holds data describing the verifier that locks revisions or a workbook.
+    /// The algorithm used to create and verify this lock.
     /// </summary>
-    struct lock_verifier
-    {
-        /// <summary>
-        /// The algorithm used to create and verify this lock.
-        /// </summary>
-        std::string hash_algorithm;
-
-        /// <summary>
-        /// The initial salt combined with the password used to prevent rainbow table attacks
-        /// </summary>
-        std::string salt;
-
-        /// <summary>
-        /// The actual hash value represented as a string
-        /// </summary>
-        std::string hash;
-
-        /// <summary>
-        /// The number of times the hash should be applied to the password combined with the salt.
-        /// This allows the difficulty of the hash to be increased as computing power increases.
-        /// </summary>
-        std::size_t spin_count;
-    };
+    std::string hash_algorithm;
 
     /// <summary>
-    /// Constructs a new document security object with default values.
+    /// The initial salt combined with the password used to prevent rainbow table attacks
     /// </summary>
-    document_security() = default;
+    std::string salt;
 
     /// <summary>
-    /// If true, the workbook is locked for revisions.
+    /// The actual hash value represented as a string
     /// </summary>
-    bool lock_revision = false;
+    std::string hash;
 
     /// <summary>
-    /// If true, worksheets can't be moved, renamed, (un)hidden, inserted, or deleted.
+    /// The number of times the hash should be applied to the password combined with the salt.
+    /// This allows the difficulty of the hash to be increased as computing power increases.
     /// </summary>
-    bool lock_structure = false;
+    std::size_t spin_count;
+  };
 
-    /// <summary>
-    /// If true, workbook windows will be opened at the same position with the same size
-    /// every time they are loaded.
-    /// </summary>
-    bool lock_windows = false;
+  /// <summary>
+  /// Constructs a new document security object with default values.
+  /// </summary>
+  document_security() = default;
 
-    /// <summary>
-    /// The settings to allow the revision lock to be removed.
-    /// </summary>
-    lock_verifier revision_lock;
+  /// <summary>
+  /// If true, the workbook is locked for revisions.
+  /// </summary>
+  bool lock_revision = false;
 
-    /// <summary>
-    /// The settings to allow the structure and windows lock to be removed.
-    /// </summary>
-    lock_verifier workbook_lock;
+  /// <summary>
+  /// If true, worksheets can't be moved, renamed, (un)hidden, inserted, or deleted.
+  /// </summary>
+  bool lock_structure = false;
+
+  /// <summary>
+  /// If true, workbook windows will be opened at the same position with the same size
+  /// every time they are loaded.
+  /// </summary>
+  bool lock_windows = false;
+
+  /// <summary>
+  /// The settings to allow the revision lock to be removed.
+  /// </summary>
+  lock_verifier revision_lock;
+
+  /// <summary>
+  /// The settings to allow the structure and windows lock to be removed.
+  /// </summary>
+  lock_verifier workbook_lock;
 };
 
 } // namespace xlnt

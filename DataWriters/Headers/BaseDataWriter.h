@@ -5,12 +5,12 @@
 #ifndef CSV_READER_BASEDATAWRITER_H
 #define CSV_READER_BASEDATAWRITER_H
 
+#include <Converters.h>
 #include <gsl/gsl>
+#include <iterator>
+#include <memory>
 #include <string>
 #include <vector>
-#include <iterator>
-#include <Converters.h>
-#include <memory>
 
 namespace DataWriters {
 
@@ -18,7 +18,7 @@ namespace DataWriters {
  * Base class for data writers.
  */
 class BaseDataWriter {
- public:
+public:
   /**
    * Construct a data writer without encoding conversion.
    */
@@ -27,8 +27,7 @@ class BaseDataWriter {
    * Construct a data writer with encoding conversion from utf8.
    * @param charSet output encoding
    */
-  explicit BaseDataWriter(CharSet charSet)
-      : convert(true), converter(std::make_unique<CharSetConverter>(charSet)) {}
+  explicit BaseDataWriter(CharSet charSet) : convert(true), converter(std::make_unique<CharSetConverter>(charSet)) {}
   /**
    * Write column names.
    * @param header column names
@@ -42,18 +41,17 @@ class BaseDataWriter {
   virtual ~BaseDataWriter() = default;
 
   class iterator : public std::iterator<std::output_iterator_tag, std::vector<std::string>> {
-   private:
+  private:
     BaseDataWriter *dataWriter;
-   public:
-    explicit iterator(gsl::not_null<BaseDataWriter *> dataWriter) : dataWriter(dataWriter) {}
-    iterator(const iterator &other) {
-      dataWriter = other.dataWriter;
-    }
 
-      iterator &operator=(const iterator &rhs) {
-          dataWriter = rhs.dataWriter;
-          return *this;
-      }
+  public:
+    explicit iterator(gsl::not_null<BaseDataWriter *> dataWriter) : dataWriter(dataWriter) {}
+    iterator(const iterator &other) { dataWriter = other.dataWriter; }
+
+    iterator &operator=(const iterator &rhs) {
+      dataWriter = rhs.dataWriter;
+      return *this;
+    }
     /**
      * Write data to ouput.
      * @param rhs data to write
@@ -62,27 +60,19 @@ class BaseDataWriter {
       dataWriter->writeRecord(rhs);
       return *this;
     }
-    iterator &operator*() {
-      return *this;
-    }
-    iterator &operator++() {
-      return *this;
-    }
+    iterator &operator*() { return *this; }
+    iterator &operator++() { return *this; }
 
-      iterator operator++(int) {
-      return *this;
-    }
+    iterator operator++(int) { return *this; }
   };
 
-  iterator begin() {
-    return iterator(this);
-  }
+  iterator begin() { return iterator(this); }
 
- protected:
+protected:
   bool convert;
   std::unique_ptr<CharSetConverter> converter;
 };
 
-}  // namespace DataWriters
+} // namespace DataWriters
 
-#endif //CSV_READER_BASEDATAWRITER_H
+#endif // CSV_READER_BASEDATAWRITER_H

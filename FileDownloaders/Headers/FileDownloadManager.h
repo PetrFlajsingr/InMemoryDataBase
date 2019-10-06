@@ -5,29 +5,27 @@
 #ifndef PROJECT_FILEDOWNLOADMANAGER_H
 #define PROJECT_FILEDOWNLOADMANAGER_H
 
-#include <string>
-#include <ThreadPool.h>
 #include "FileDownloadObserver.h"
-#include <MessageSender.h>
-#include <MessageReceiver.h>
-#include <Utilities.h>
 #include <FileDownloader.h>
+#include <MessageReceiver.h>
+#include <MessageSender.h>
+#include <ThreadPool.h>
+#include <Utilities.h>
 #include <memory>
+#include <string>
 /**
  * Receives messages requiring file download. Provides information about download
  * progress and handles asynchronous downloads.
  */
 class FileDownloadManager : public MessageReceiver, public MessageSender {
- public:
-  FileDownloadManager(const std::shared_ptr<MessageManager> &commandManager,
-                      std::shared_ptr<ThreadPool> threadPool);
+public:
+  FileDownloadManager(const std::shared_ptr<MessageManager> &commandManager, std::shared_ptr<ThreadPool> threadPool);
   virtual ~FileDownloadManager();
 
-  void enqueueDownload(const std::string &localFolder, const std::string &url,
-                       FileDownloadObserver &observer,
+  void enqueueDownload(const std::string &localFolder, const std::string &url, FileDownloadObserver &observer,
                        bool blocking = false);
 
- private:
+private:
   void receive(std::shared_ptr<Message> message) override;
   std::shared_ptr<ThreadPool> threadPool;
 
@@ -39,8 +37,7 @@ class FileDownloadManager : public MessageReceiver, public MessageSender {
   void unfinished();
   void finished();
 
-  std::function<void(const std::shared_ptr<Download>)>
-      downloadTask = [=](const std::shared_ptr<Download> &msg) {
+  std::function<void(const std::shared_ptr<Download>)> downloadTask = [=](const std::shared_ptr<Download> &msg) {
     FileDownloader downloader(msg->getData().second);
     auto cntObs = CountObserver(this);
     downloader.addObserver(&cntObs);
@@ -54,19 +51,20 @@ class FileDownloadManager : public MessageReceiver, public MessageSender {
    * Observer used for keeping information about download state.
    */
   class CountObserver : public FileDownloadObserver {
-   public:
+  public:
     explicit CountObserver(FileDownloadManager *parent);
     void onDownloadStarted(std::string_view) override;
     void onDownloadFailed(std::string_view, std::string_view) override;
     void onDownloadFinished(std::string_view, std::string_view) override;
-   private:
+
+  private:
     FileDownloadManager *parent;
   };
   /**
    * Dispatches messages about download progress and state.
    */
   class Dispatcher : public FileDownloadObserver, public MessageSender {
-   public:
+  public:
     explicit Dispatcher(const std::shared_ptr<MessageManager> &commandManager);
     void onDownloadStarted(std::string_view fileName) override;
     void onDownloadFailed(std::string_view fileName, std::string_view errorMessage) override;
@@ -74,4 +72,4 @@ class FileDownloadManager : public MessageReceiver, public MessageSender {
   };
 };
 
-#endif //PROJECT_FILEDOWNLOADMANAGER_H
+#endif // PROJECT_FILEDOWNLOADMANAGER_H

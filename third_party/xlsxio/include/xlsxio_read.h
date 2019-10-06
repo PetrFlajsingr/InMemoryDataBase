@@ -109,11 +109,10 @@ DLL_EXPORT_XLSXIO xlsxioreader xlsxioread_open(const char *filename);
 DLL_EXPORT_XLSXIO xlsxioreader xlsxioread_open_filehandle(int filehandle);
 
 /*! \brief open .xlsx from memory buffer
- * \param  data          memory buffer containing .xlsx file (data must remain valid as long as any xlsxioread_ functions are called)
- * \param  datalen       size of memory buffer containing .xlsx file
- * \param  freedata      if non-zero data will be freed by xlsxioread_close()
- * \return read handle for .xlsx object or NULL on error
- * \sa     xlsxioread_close()
+ * \param  data          memory buffer containing .xlsx file (data must remain valid as long as any xlsxioread_
+ * functions are called) \param  datalen       size of memory buffer containing .xlsx file \param  freedata      if
+ * non-zero data will be freed by xlsxioread_close() \return read handle for .xlsx object or NULL on error \sa
+ * xlsxioread_close()
  */
 DLL_EXPORT_XLSXIO xlsxioreader xlsxioread_open_memory(void *data, uint64_t datalen, int freedata);
 
@@ -137,11 +136,8 @@ typedef int (*xlsxioread_list_sheets_callback_fn)(const XLSXIOCHAR *name, void *
  * \param  callbackdata  custom data as passed to quickmail_add_body_custom/quickmail_add_attachment_custom
  * \sa     xlsxioread_list_sheets_callback_fn
  */
-DLL_EXPORT_XLSXIO void xlsxioread_list_sheets(xlsxioreader handle,
-                                              xlsxioread_list_sheets_callback_fn callback,
+DLL_EXPORT_XLSXIO void xlsxioread_list_sheets(xlsxioreader handle, xlsxioread_list_sheets_callback_fn callback,
                                               void *callbackdata);
-
-
 
 /*! \brief possible values for the flags parameter of xlsxioread_process()
  * \sa     xlsxioread_process()
@@ -149,15 +145,15 @@ DLL_EXPORT_XLSXIO void xlsxioread_list_sheets(xlsxioreader handle,
  * \{
  */
 /*! \brief don't skip any rows or cells \hideinitializer */
-#define XLSXIOREAD_SKIP_NONE            0
+#define XLSXIOREAD_SKIP_NONE 0
 /*! \brief skip empty rows (note: cells may appear empty while they actually contain data) \hideinitializer */
-#define XLSXIOREAD_SKIP_EMPTY_ROWS      0x01
+#define XLSXIOREAD_SKIP_EMPTY_ROWS 0x01
 /*! \brief skip empty cells \hideinitializer */
-#define XLSXIOREAD_SKIP_EMPTY_CELLS     0x02
+#define XLSXIOREAD_SKIP_EMPTY_CELLS 0x02
 /*! \brief skip empty rows and cells \hideinitializer */
-#define XLSXIOREAD_SKIP_ALL_EMPTY       (XLSXIOREAD_SKIP_EMPTY_ROWS | XLSXIOREAD_SKIP_EMPTY_CELLS)
+#define XLSXIOREAD_SKIP_ALL_EMPTY (XLSXIOREAD_SKIP_EMPTY_ROWS | XLSXIOREAD_SKIP_EMPTY_CELLS)
 /*! \brief skip extra cells to the right of the rightmost header cell \hideinitializer */
-#define XLSXIOREAD_SKIP_EXTRA_CELLS     0x04
+#define XLSXIOREAD_SKIP_EXTRA_CELLS 0x04
 /*! @} */
 
 /*! \brief type of pointer to callback function for processing a worksheet cell value
@@ -192,12 +188,9 @@ typedef int (*xlsxioread_process_row_callback_fn)(size_t row, size_t maxcol, voi
  * \sa     xlsxioread_process_row_callback_fn
  * \sa     xlsxioread_process_cell_callback_fn
  */
-DLL_EXPORT_XLSXIO int xlsxioread_process(xlsxioreader handle,
-                                         const XLSXIOCHAR *sheetname,
-                                         unsigned int flags,
+DLL_EXPORT_XLSXIO int xlsxioread_process(xlsxioreader handle, const XLSXIOCHAR *sheetname, unsigned int flags,
                                          xlsxioread_process_cell_callback_fn cell_callback,
-                                         xlsxioread_process_row_callback_fn row_callback,
-                                         void *callbackdata);
+                                         xlsxioread_process_row_callback_fn row_callback, void *callbackdata);
 
 /*! \brief read handle for list of worksheet names */
 typedef struct xlsxio_read_sheetlist_struct *xlsxioreadersheetlist;
@@ -233,8 +226,7 @@ typedef struct xlsxio_read_sheet_struct *xlsxioreadersheet;
  * \sa     xlsxioread_sheet_close()
  * \sa     xlsxioread_open()
  */
-DLL_EXPORT_XLSXIO xlsxioreadersheet xlsxioread_sheet_open(xlsxioreader handle,
-                                                          const XLSXIOCHAR *sheetname,
+DLL_EXPORT_XLSXIO xlsxioreadersheet xlsxioread_sheet_open(xlsxioreader handle, const XLSXIOCHAR *sheetname,
                                                           unsigned int flags);
 
 /*! \brief close worksheet

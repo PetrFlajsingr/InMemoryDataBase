@@ -7,20 +7,19 @@
 #ifndef CSV_READER_LOGGER_H
 #define CSV_READER_LOGGER_H
 
-#include <string>
-#include <iostream>
-#include <iomanip>
-#include <sstream>
 #include <chrono>
+#include <iomanip>
+#include <iostream>
+#include <sstream>
+#include <string>
 
 /**
  * Types of log messages
  */
 enum class LogLevel { Verbose, Info, Status, Debug, Warning, Error };
 
-template <bool Debug>
-class Logger {
- private:
+template <bool Debug> class Logger {
+private:
   explicit Logger() = default;
   /**
    *
@@ -40,25 +39,30 @@ class Logger {
    */
   [[nodiscard]] std::string levelToString(LogLevel level) const {
     switch (level) {
-      case LogLevel::Verbose:return "";
-      case LogLevel::Info: return "[INFO]";
-      case LogLevel::Status: return "[STATUS]";
-      case LogLevel::Debug: return "[DEBUG]";
-      case LogLevel::Warning: return "[WARNING]";
-      case LogLevel::Error: return "[ERROR]";
+    case LogLevel::Verbose:
+      return "";
+    case LogLevel::Info:
+      return "[INFO]";
+    case LogLevel::Status:
+      return "[STATUS]";
+    case LogLevel::Debug:
+      return "[DEBUG]";
+    case LogLevel::Warning:
+      return "[WARNING]";
+    case LogLevel::Error:
+      return "[ERROR]";
     }
   }
 
   std::chrono::milliseconds startTimeMs;
   std::chrono::milliseconds endTimeMs;
 
- public:
+public:
   static Logger GetInstance() {
     static Logger instance;
     return instance;
   }
-  template <LogLevel Level, bool PrintTime = false, typename ...T>
-  void log(T&&... message) const {
+  template <LogLevel Level, bool PrintTime = false, typename... T> void log(T &&... message) const {
     if constexpr (!Debug && Level == LogLevel::Debug) {
       return;
     }
@@ -72,12 +76,12 @@ class Logger {
     (std::cout << ... << message) << std::endl;
   }
   void startTime() {
-    startTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::system_clock::now().time_since_epoch());
+    startTimeMs =
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
   }
   void endTime() {
-    endTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(
-        std::chrono::system_clock::now().time_since_epoch());
+    endTimeMs =
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
   }
 
   /**
@@ -89,6 +93,6 @@ class Logger {
   }
 };
 
-#endif //CSV_READER_LOGGER_H
+#endif // CSV_READER_LOGGER_H
 
 #pragma clang diagnostic pop

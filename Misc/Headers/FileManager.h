@@ -5,14 +5,14 @@
 #ifndef PROJECT_FILEMANAGER_H
 #define PROJECT_FILEMANAGER_H
 
-#include <string>
 #include <BaseDataProvider.h>
 #include <BaseDataWriter.h>
-#include <boost/filesystem.hpp>
 #include <Exceptions.h>
+#include <boost/filesystem.hpp>
+#include <string>
 
 class FileException : public IOException {
- public:
+public:
   explicit FileException(const char *message);
   explicit FileException(const std::string &message);
 };
@@ -20,10 +20,11 @@ class FileException : public IOException {
  * Represents a file. Provides methods to open said file.
  */
 class File {
- private:
+private:
   boost::filesystem::path path;
- public:
-    explicit File(boost::filesystem::path path);
+
+public:
+  explicit File(boost::filesystem::path path);
   std::unique_ptr<DataProviders::BaseDataProvider> createProvider();
   std::unique_ptr<DataWriters::BaseDataWriter> createWriter();
   std::ifstream inStream();
@@ -33,10 +34,11 @@ class File {
  * Represents a folder. Provides methods to move in file structure.
  */
 class Folder {
- private:
+private:
   boost::filesystem::path path;
- public:
-    explicit Folder(boost::filesystem::path path);
+
+public:
+  explicit Folder(boost::filesystem::path path);
   /**
    *
    * @param name relative path
@@ -74,15 +76,15 @@ class Folder {
    */
   bool isFile(std::string_view name);
 
-    [[nodiscard]] const boost::filesystem::path &getPath() const;
+  [[nodiscard]] const boost::filesystem::path &getPath() const;
 
-    [[nodiscard]] std::vector<std::string> getFileNames() const;
+  [[nodiscard]] std::vector<std::string> getFileNames() const;
 };
 /**
  * Basic access point to File/Folder classes.
  */
 class FileManager {
- public:
+public:
   /**
    *
    * @param path absolute path
@@ -97,4 +99,4 @@ class FileManager {
   static File getFile(std::string_view path);
 };
 
-#endif //PROJECT_FILEMANAGER_H
+#endif // PROJECT_FILEMANAGER_H

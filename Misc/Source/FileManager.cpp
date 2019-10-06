@@ -28,9 +28,7 @@ File FileManager::getFile(std::string_view path) {
   return File(folderPath);
 }
 
-const boost::filesystem::path &Folder::getPath() const {
-  return path;
-}
+const boost::filesystem::path &Folder::getPath() const { return path; }
 
 Folder::Folder(boost::filesystem::path path) : path(std::move(path)) {}
 Folder Folder::getFolder(std::string_view name) {
@@ -94,15 +92,7 @@ std::vector<std::string> Folder::getFileNames() const {
 }
 
 File::File(boost::filesystem::path path) : path(std::move(path)) {}
-std::ifstream File::inStream() {
-  return std::ifstream(path.string());
-}
-std::ofstream File::ofStream() {
-  return std::ofstream(path.string());
-}
-std::unique_ptr<DataProviders::BaseDataProvider> File::createProvider() {
-  throw NotImplementedException();
-}
-std::unique_ptr<DataWriters::BaseDataWriter> File::createWriter() {
-  throw NotImplementedException();
-}
+std::ifstream File::inStream() { return std::ifstream(path.string()); }
+std::ofstream File::ofStream() { return std::ofstream(path.string()); }
+std::unique_ptr<DataProviders::BaseDataProvider> File::createProvider() { throw NotImplementedException(); }
+std::unique_ptr<DataWriters::BaseDataWriter> File::createWriter() { throw NotImplementedException(); }

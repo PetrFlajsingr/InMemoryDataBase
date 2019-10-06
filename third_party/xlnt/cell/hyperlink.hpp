@@ -39,33 +39,31 @@ class relationship;
 /// <summary>
 /// Describes a hyperlink pointing from a cell to another cell or a URL.
 /// </summary>
-class XLNT_API hyperlink
-{
+class XLNT_API hyperlink {
 public:
-    bool external() const;
-    class relationship relationship() const;
-    // external target
-    std::string url() const;
-    // internal target
-    std::string target_range() const;
+  bool external() const;
+  class relationship relationship() const;
+  // external target
+  std::string url() const;
+  // internal target
+  std::string target_range() const;
 
-    bool has_display() const;
-    void display(const std::string &value);
-    const std::string& display() const;
+  bool has_display() const;
+  void display(const std::string &value);
+  const std::string &display() const;
 
-    bool has_tooltip() const;
-    void tooltip(const std::string &value);
-    const std::string& tooltip() const;
+  bool has_tooltip() const;
+  void tooltip(const std::string &value);
+  const std::string &tooltip() const;
 
-    bool has_location() const;
-    void location(const std::string &value);
-    const std::string& location() const;
+  bool has_location() const;
+  void location(const std::string &value);
+  const std::string &location() const;
 
 private:
-    friend class cell;
-    hyperlink(detail::hyperlink_impl *d);
-    detail::hyperlink_impl *d_;
+  friend class cell;
+  hyperlink(detail::hyperlink_impl *d);
+  detail::hyperlink_impl *d_;
 };
 
 } // namespace xlnt
-

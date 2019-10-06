@@ -5,10 +5,10 @@
 #ifndef PROJECT_AGGREGATONMAKER_H
 #define PROJECT_AGGREGATONMAKER_H
 
-#include <QueryCommon.h>
+#include <AggregationStructures.h>
 #include <BaseField.h>
 #include <MemoryDataSet.h>
-#include <AggregationStructures.h>
+#include <QueryCommon.h>
 
 namespace DataBase {
 struct Table;
@@ -18,7 +18,7 @@ struct View;
  * Class doing aggregation on views/tables.
  */
 class AggregationMaker {
- public:
+public:
   /**
    *
    * @param table table to aggregate
@@ -36,7 +36,7 @@ class AggregationMaker {
    */
   std::shared_ptr<Table> aggregate(const StructuredQuery &structuredQuery);
 
- private:
+private:
   std::shared_ptr<Table> table = nullptr;
   std::shared_ptr<View> view = nullptr;
 
@@ -52,6 +52,6 @@ class AggregationMaker {
 
   std::vector<std::pair<gsl::index, gsl::index>> fieldIndices;
 };
-}
+} // namespace DataBase
 
-#endif //PROJECT_AGGREGATONMAKER_H
+#endif // PROJECT_AGGREGATONMAKER_H

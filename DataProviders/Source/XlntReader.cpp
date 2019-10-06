@@ -6,34 +6,21 @@
 #include <XlntReader.h>
 
 DataProviders::XlntReader::XlntReader(std::string_view fileName, std::string_view sheetName)
-    : BaseDataProvider(), fileName(fileName), sheetName(sheetName),
-      lastUnusedCell((prepareSheet(), wb.read_cell())) {
+    : BaseDataProvider(), fileName(fileName), sheetName(sheetName), lastUnusedCell((prepareSheet(), wb.read_cell())) {
   readHeader();
 }
 
-DataProviders::XlntReader::XlntReader(std::string_view fileName,
-                                      CharSet inputCharSet,
-                                      std::string_view sheetName)
+DataProviders::XlntReader::XlntReader(std::string_view fileName, CharSet inputCharSet, std::string_view sheetName)
     : BaseDataProvider(inputCharSet), fileName(fileName), sheetName(sheetName),
       lastUnusedCell((prepareSheet(), wb.read_cell())) {
   readHeader();
 }
 
-const std::vector<std::string> &DataProviders::XlntReader::getRow() const {
-  return currentRecord;
-}
-std::string DataProviders::XlntReader::getColumnName(unsigned int columnIndex) const {
-  return header.at(columnIndex);
-}
-uint64_t DataProviders::XlntReader::getColumnCount() const {
-  return header.size();
-}
-const std::vector<std::string> &DataProviders::XlntReader::getHeader() const {
-  return header;
-}
-int DataProviders::XlntReader::getCurrentRecordNumber() const {
-  return currentRecordIndex;
-}
+const std::vector<std::string> &DataProviders::XlntReader::getRow() const { return currentRecord; }
+std::string DataProviders::XlntReader::getColumnName(unsigned int columnIndex) const { return header.at(columnIndex); }
+uint64_t DataProviders::XlntReader::getColumnCount() const { return header.size(); }
+const std::vector<std::string> &DataProviders::XlntReader::getHeader() const { return header; }
+int DataProviders::XlntReader::getCurrentRecordNumber() const { return currentRecordIndex; }
 bool DataProviders::XlntReader::next() {
   readRecord();
   return !eof();
@@ -46,9 +33,7 @@ void DataProviders::XlntReader::first() {
   readHeader();
   _eof = false;
 }
-bool DataProviders::XlntReader::eof() const {
-  return _eof;
-}
+bool DataProviders::XlntReader::eof() const { return _eof; }
 
 void DataProviders::XlntReader::readHeader() {
   header.clear();

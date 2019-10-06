@@ -2,44 +2,41 @@
 // Created by Petr Flajsingr on 24/08/2018.
 //
 
-#include <utility>
 #include <CsvReader.h>
+#include <utility>
 
 void myGetLine(std::istream &stream, gsl::span<char> &buffer, char lineDelimiter = '\n') {
-    using stream_traits = std::istream::traits_type;
-    int c;
-    auto streamBuffer = stream.rdbuf();
-    uint32_t bufferPos = 0;
-    while ((c = streamBuffer->sgetc()) != lineDelimiter && !stream_traits::eq_int_type(c, stream_traits::eof())) {
-        if (c == '\0') {
-            streamBuffer->snextc();
-            continue;
-        }
-        buffer[bufferPos] = c;
-        ++bufferPos;
-        streamBuffer->snextc();
+  using stream_traits = std::istream::traits_type;
+  int c;
+  auto streamBuffer = stream.rdbuf();
+  uint32_t bufferPos = 0;
+  while ((c = streamBuffer->sgetc()) != lineDelimiter && !stream_traits::eq_int_type(c, stream_traits::eof())) {
+    if (c == '\0') {
+      streamBuffer->snextc();
+      continue;
     }
-    if (c == lineDelimiter) {
-        streamBuffer->snextc();
-    }
+    buffer[bufferPos] = c;
+    ++bufferPos;
+    streamBuffer->snextc();
+  }
+  if (c == lineDelimiter) {
+    streamBuffer->snextc();
+  }
 
-    buffer[bufferPos] = '\0';
+  buffer[bufferPos] = '\0';
 }
 
-DataProviders::CsvReader::CsvReader(std::string_view filePath, std::string_view delimiter)
-    : BaseDataProvider() {
+DataProviders::CsvReader::CsvReader(std::string_view filePath, std::string_view delimiter) : BaseDataProvider() {
   init(filePath, delimiter);
 }
 
-DataProviders::CsvReader::CsvReader(std::string_view filePath,
-                                    CharSet inputCharSet,
-                                    std::string_view delimiter)
+DataProviders::CsvReader::CsvReader(std::string_view filePath, CharSet inputCharSet, std::string_view delimiter)
     : BaseDataProvider(inputCharSet) {
   init(filePath, delimiter);
 }
 
 void DataProviders::CsvReader::init(std::string_view filePath, std::string_view delim) {
-    this->delimiter = delim;
+  this->delimiter = delim;
   file.open(std::string(filePath));
   if (!file.is_open()) {
     std::string errMsg = "File could not be open: " + std::string(filePath);
@@ -76,7 +73,7 @@ bool DataProviders::CsvReader::next() {
 
   parseRecord();
   if (currentRecord.size() != header.size()) {
-      _eof = true;
+    _eof = true;
     return false;
   }
   currentRecordNumber++;
@@ -88,7 +85,7 @@ void DataProviders::CsvReader::parseRecord() {
   char buffer[BUFFER_SIZE];
   gsl::span<char> spanBuffer{buffer, BUFFER_SIZE};
 
-  //file.getline(buffer, BUFFER_SIZE, '\n');
+  // file.getline(buffer, BUFFER_SIZE, '\n');
   myGetLine(file, spanBuffer);
   auto line = std::string_view(spanBuffer.data());
   if (!line.empty() && line[line.length() - 1] == '\r') {
@@ -107,12 +104,9 @@ void DataProviders::CsvReader::first() {
   currentRecordNumber = -1;
 }
 
-bool DataProviders::CsvReader::eof() const {
-  return _eof;
-}
+bool DataProviders::CsvReader::eof() const { return _eof; }
 
-std::vector<std::string> DataProviders::CsvReader::tokenize(std::string_view line,
-                                                            unsigned int vectorReserve) const {
+std::vector<std::string> DataProviders::CsvReader::tokenize(std::string_view line, unsigned int vectorReserve) const {
   std::string innerLine = std::string(line);
   if (convert) {
     innerLine = converter->convert(innerLine);
@@ -131,41 +125,42 @@ std::vector<std::string> DataProviders::CsvReader::tokenize(std::string_view lin
   result.reserve(vectorReserve);
   for (auto character : innerLine) {
     switch (state) {
-      case ParseState::Read:  // normal read
-        if (character == '\"') {
-          state = ParseState::QuotMark1;
-        } else if (character == delimiter[0]) {
-          buffer[bufferIter] = '\0';
-          result.emplace_back(std::string(buffer));
-          bufferIter = 0;
-          break;
-        }
-        buffer[bufferIter] = character;
-        bufferIter++;
+    case ParseState::Read: // normal read
+      if (character == '\"') {
+        state = ParseState::QuotMark1;
+      } else if (character == delimiter[0]) {
+        buffer[bufferIter] = '\0';
+        result.emplace_back(std::string(buffer));
+        bufferIter = 0;
         break;
-      case ParseState::QuotMark1:  // read inside " "
-        if (character == '\"') {
-          state = ParseState::QuotMark2;
-        }
-        buffer[bufferIter] = character;
-        bufferIter++;
+      }
+      buffer[bufferIter] = character;
+      bufferIter++;
+      break;
+    case ParseState::QuotMark1: // read inside " "
+      if (character == '\"') {
+        state = ParseState::QuotMark2;
+      }
+      buffer[bufferIter] = character;
+      bufferIter++;
+      break;
+    case ParseState::QuotMark2:
+      if (character == '\"') {
+        state = ParseState::QuotMark1;
+      } else if (character == delimiter[0]) {
+        buffer[bufferIter] = '\0';
+        result.emplace_back(std::string(buffer));
+        bufferIter = 0;
+        state = ParseState::Read;
         break;
-      case ParseState::QuotMark2:
-        if (character == '\"') {
-          state = ParseState::QuotMark1;
-        } else if (character == delimiter[0]) {
-          buffer[bufferIter] = '\0';
-          result.emplace_back(std::string(buffer));
-          bufferIter = 0;
-          state = ParseState::Read;
-          break;
-        } else {
-          state = ParseState::Read;
-        }
-        buffer[bufferIter] = character;
-        bufferIter++;
-        break;
-      default:throw IllegalStateException("Internal error. DataProviders::CsvReader::tokenize");
+      } else {
+        state = ParseState::Read;
+      }
+      buffer[bufferIter] = character;
+      bufferIter++;
+      break;
+    default:
+      throw IllegalStateException("Internal error. DataProviders::CsvReader::tokenize");
     }
   }
   buffer[bufferIter] = '\0';

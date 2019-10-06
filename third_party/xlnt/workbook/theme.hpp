@@ -31,13 +31,9 @@ namespace xlnt {
 /// A theme is a combination of fonts, colors, and effects.
 /// This isn't really supported yet.
 /// </summary>
-class XLNT_API theme
-{
+class XLNT_API theme {
 public:
-    bool operator==(const theme&) const
-    {
-        return true;
-    }
+  bool operator==(const theme &) const { return true; }
 };
 
 } // namespace xlnt

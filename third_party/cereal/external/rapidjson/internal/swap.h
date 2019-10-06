@@ -19,7 +19,7 @@
 
 #if defined(__clang__)
 CEREAL_RAPIDJSON_DIAG_PUSH
-CEREAL_RAPIDJSON_DIAG_OFF(c++98-compat)
+CEREAL_RAPIDJSON_DIAG_OFF(c++ 98 - compat)
 #endif
 
 CEREAL_RAPIDJSON_NAMESPACE_BEGIN
@@ -29,11 +29,10 @@ namespace internal {
 /*! \tparam T Type of the arguments to swap, should be instantiated with primitive C++ types only.
     \note This has the same semantics as std::swap().
 */
-template <typename T>
-inline void Swap(T& a, T& b) CEREAL_RAPIDJSON_NOEXCEPT {
-    T tmp = a;
-        a = b;
-        b = tmp;
+template <typename T> inline void Swap(T &a, T &b) CEREAL_RAPIDJSON_NOEXCEPT {
+  T tmp = a;
+  a = b;
+  b = tmp;
 }
 
 } // namespace internal

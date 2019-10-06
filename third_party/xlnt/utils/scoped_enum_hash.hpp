@@ -31,17 +31,14 @@ namespace xlnt {
 /// Allows a scoped enum (aka "enum class") to be used as a key
 /// in a std::unordered_map.
 /// </summary>
-template<typename Enum>
-struct scoped_enum_hash
-{
-    /// <summary>
-    /// Cast the enumeration e to a std::size_t and hash that value using std::hash.
-    /// </summary>
-    std::size_t operator()(Enum e) const
-    {
-        static std::hash<std::size_t> hasher;
-        return hasher(static_cast<std::size_t>(e));
-    }
+template <typename Enum> struct scoped_enum_hash {
+  /// <summary>
+  /// Cast the enumeration e to a std::size_t and hash that value using std::hash.
+  /// </summary>
+  std::size_t operator()(Enum e) const {
+    static std::hash<std::size_t> hasher;
+    return hasher(static_cast<std::size_t>(e));
+  }
 };
 
 } // namespace xlnt

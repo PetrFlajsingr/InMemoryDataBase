@@ -24,8 +24,8 @@
 
 #include <cstddef>
 
-#include <xlnt/xlnt_config.hpp>
 #include <xlnt/utils/optional.hpp>
+#include <xlnt/xlnt_config.hpp>
 
 namespace xlnt {
 
@@ -33,86 +33,80 @@ namespace xlnt {
 /// A workbook can be opened in multiple windows with different views.
 /// This class represents a particular view used by one window.
 /// </summary>
-class XLNT_API workbook_view
-{
+class XLNT_API workbook_view {
 public:
-    /// <summary>
-    /// If true, dates will be grouped when presenting the user with filtering options.
-    /// </summary>
-    bool auto_filter_date_grouping = true;
+  /// <summary>
+  /// If true, dates will be grouped when presenting the user with filtering options.
+  /// </summary>
+  bool auto_filter_date_grouping = true;
 
-    /// <summary>
-    /// If true, the view will be minimized.
-    /// </summary>
-    bool minimized = false;
+  /// <summary>
+  /// If true, the view will be minimized.
+  /// </summary>
+  bool minimized = false;
 
-    /// <summary>
-    /// If true, the horizontal scroll bar will be displayed.
-    /// </summary>
-    bool show_horizontal_scroll = true;
+  /// <summary>
+  /// If true, the horizontal scroll bar will be displayed.
+  /// </summary>
+  bool show_horizontal_scroll = true;
 
-    /// <summary>
-    /// If true, the sheet tabs will be displayed.
-    /// </summary>
-    bool show_sheet_tabs = true;
+  /// <summary>
+  /// If true, the sheet tabs will be displayed.
+  /// </summary>
+  bool show_sheet_tabs = true;
 
-    /// <summary>
-    /// If true, the vertical scroll bar will be displayed.
-    /// </summary>
-    bool show_vertical_scroll = true;
+  /// <summary>
+  /// If true, the vertical scroll bar will be displayed.
+  /// </summary>
+  bool show_vertical_scroll = true;
 
-    /// <summary>
-    /// If true, the workbook window will be visible.
-    /// </summary>
-    bool visible = true;
+  /// <summary>
+  /// If true, the workbook window will be visible.
+  /// </summary>
+  bool visible = true;
 
-    /// <summary>
-    /// The optional index to the active sheet in this view.
-    /// </summary>
-    optional<std::size_t> active_tab;
+  /// <summary>
+  /// The optional index to the active sheet in this view.
+  /// </summary>
+  optional<std::size_t> active_tab;
 
-    /// <summary>
-    /// The optional index to the first sheet in this view.
-    /// </summary>
-    optional<std::size_t> first_sheet;
+  /// <summary>
+  /// The optional index to the first sheet in this view.
+  /// </summary>
+  optional<std::size_t> first_sheet;
 
-    /// <summary>
-    /// The optional ratio between the tabs bar and the horizontal scroll bar.
-    /// </summary>
-    optional<std::size_t> tab_ratio;
+  /// <summary>
+  /// The optional ratio between the tabs bar and the horizontal scroll bar.
+  /// </summary>
+  optional<std::size_t> tab_ratio;
 
-    /// <summary>
-    /// The width of the workbook window in twips.
-    /// </summary>
-    optional<std::size_t> window_width;
+  /// <summary>
+  /// The width of the workbook window in twips.
+  /// </summary>
+  optional<std::size_t> window_width;
 
-    /// <summary>
-    /// The height of the workbook window in twips.
-    /// </summary>
-    optional<std::size_t> window_height;
+  /// <summary>
+  /// The height of the workbook window in twips.
+  /// </summary>
+  optional<std::size_t> window_height;
 
-    /// <summary>
-    /// The distance of the workbook window from the left side of the screen in twips.
-    /// </summary>
-    optional<int> x_window;
+  /// <summary>
+  /// The distance of the workbook window from the left side of the screen in twips.
+  /// </summary>
+  optional<int> x_window;
 
-    /// <summary>
-    /// The distance of the workbook window from the top of the screen in twips.
-    /// </summary>
-    optional<int> y_window;
+  /// <summary>
+  /// The distance of the workbook window from the top of the screen in twips.
+  /// </summary>
+  optional<int> y_window;
 };
 
-inline bool operator==(const workbook_view &lhs, const workbook_view &rhs)
-{
-    return lhs.active_tab == rhs.active_tab
-        && lhs.auto_filter_date_grouping == rhs.auto_filter_date_grouping
-        && lhs.first_sheet == rhs.first_sheet
-        && lhs.minimized == rhs.minimized
-        && lhs.show_horizontal_scroll == rhs.show_horizontal_scroll
-        && lhs.show_sheet_tabs == rhs.show_sheet_tabs
-        && lhs.show_vertical_scroll == rhs.show_vertical_scroll
-        && lhs.tab_ratio == rhs.tab_ratio
-        && lhs.visible == rhs.visible;
+inline bool operator==(const workbook_view &lhs, const workbook_view &rhs) {
+  return lhs.active_tab == rhs.active_tab && lhs.auto_filter_date_grouping == rhs.auto_filter_date_grouping &&
+         lhs.first_sheet == rhs.first_sheet && lhs.minimized == rhs.minimized &&
+         lhs.show_horizontal_scroll == rhs.show_horizontal_scroll && lhs.show_sheet_tabs == rhs.show_sheet_tabs &&
+         lhs.show_vertical_scroll == rhs.show_vertical_scroll && lhs.tab_ratio == rhs.tab_ratio &&
+         lhs.visible == rhs.visible;
 }
 
 } // namespace xlnt

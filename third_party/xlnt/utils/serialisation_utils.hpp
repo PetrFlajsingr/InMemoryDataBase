@@ -23,22 +23,20 @@
 
 #pragma once
 
-#include <xlnt/xlnt_config.hpp>
 #include <sstream>
+#include <xlnt/xlnt_config.hpp>
 
 namespace xlnt {
 /// <summary>
 /// Takes in any nuber and outputs a string form of that number which will
 /// serialise and deserialise without loss of precision
 /// </summary>
-template <typename Number>
-std::string serialize_number_to_string(Number num)
-{
-    // more digits and excel won't match
-    constexpr int Excel_Digit_Precision = 15; //sf
-    std::stringstream ss;
-    ss.precision(Excel_Digit_Precision);
-    ss << num;
-    return ss.str();
+template <typename Number> std::string serialize_number_to_string(Number num) {
+  // more digits and excel won't match
+  constexpr int Excel_Digit_Precision = 15; // sf
+  std::stringstream ss;
+  ss.precision(Excel_Digit_Precision);
+  ss << num;
+  return ss.str();
 }
-}
+} // namespace xlnt

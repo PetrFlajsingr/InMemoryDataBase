@@ -5,12 +5,12 @@
 #ifndef DATAPROVIDERS_HEADERS_CSVREADER_H_
 #define DATAPROVIDERS_HEADERS_CSVREADER_H_
 
-#include <fstream>
-#include <iostream>
-#include <vector>
-#include <string>
 #include <BaseDataProvider.h>
 #include <Exceptions.h>
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <vector>
 
 namespace DataProviders {
 /**
@@ -34,7 +34,7 @@ namespace DataProviders {
  *
  */
 class CsvReader : public BaseDataProvider {
- public:
+public:
   /**
    * If the file can not be opened throws IOException.
    * @param filePath path to file
@@ -49,11 +49,9 @@ class CsvReader : public BaseDataProvider {
    */
   ~CsvReader() override;
 
-    [[nodiscard]] inline const std::vector<std::string> &getRow() const override {
-    return currentRecord;
-  }
+  [[nodiscard]] inline const std::vector<std::string> &getRow() const override { return currentRecord; }
 
-    [[nodiscard]] inline std::string getColumnName(unsigned int columnIndex) const override {
+  [[nodiscard]] inline std::string getColumnName(unsigned int columnIndex) const override {
     return header.at(columnIndex);
   }
 
@@ -61,22 +59,16 @@ class CsvReader : public BaseDataProvider {
 
   void first() override;
 
-    [[nodiscard]] int getCurrentRecordNumber() const override {
-    return currentRecordNumber;
-  }
+  [[nodiscard]] int getCurrentRecordNumber() const override { return currentRecordNumber; }
 
-    [[nodiscard]] inline const std::vector<std::string> &getHeader() const override {
-    return header;
-  }
+  [[nodiscard]] inline const std::vector<std::string> &getHeader() const override { return header; }
 
-    [[nodiscard]] inline uint64_t getColumnCount() const override {
-    return header.size();
-  }
+  [[nodiscard]] inline uint64_t getColumnCount() const override { return header.size(); }
 
-    [[nodiscard]] bool eof() const override;
+  [[nodiscard]] bool eof() const override;
 
- private:
-    void init(std::string_view filePath, std::string_view delim);
+private:
+  void init(std::string_view filePath, std::string_view delim);
   /**
    * FSM states for csv parsing.
    */
@@ -113,8 +105,7 @@ class CsvReader : public BaseDataProvider {
    * @return tokenized vector from line
    */
   std::vector<std::string> tokenize(std::string_view line, unsigned int vectorReserve) const;
-
 };
-}  // namespace DataProviders
+} // namespace DataProviders
 
-#endif  // DATAPROVIDERS_HEADERS_CSVREADER_H_
+#endif // DATAPROVIDERS_HEADERS_CSVREADER_H_

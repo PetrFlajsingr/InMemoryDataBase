@@ -5,10 +5,10 @@
 #ifndef CSV_READER_XLSXWRITER_H
 #define CSV_READER_XLSXWRITER_H
 
-#include <xlsxio_write.h>
-#include <vector>
-#include <string>
 #include "BaseDataWriter.h"
+#include <string>
+#include <vector>
+#include <xlsxio_write.h>
 
 namespace DataWriters {
 
@@ -16,7 +16,7 @@ namespace DataWriters {
  * Write data to xlsx file using XlsxIO library.
  */
 class XlsxIOWriter : public BaseDataWriter {
- public:
+public:
   /**
    *
    * @param fileName destination
@@ -34,10 +34,10 @@ class XlsxIOWriter : public BaseDataWriter {
   void writeHeader(const std::vector<std::string> &header) override;
   void writeRecord(const std::vector<std::string> &record) override;
 
- private:
+private:
   xlsxiowriter xlsxWriterHandle;
 };
 
-}  // namespace DataWriters
+} // namespace DataWriters
 
-#endif //CSV_READER_XLSXWRITER_H
+#endif // CSV_READER_XLSXWRITER_H

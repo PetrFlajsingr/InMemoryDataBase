@@ -25,24 +25,23 @@
 
 #include <string>
 
-#include <xlnt/xlnt_config.hpp>
 #include <xlnt/styles/font.hpp>
 #include <xlnt/utils/optional.hpp>
+#include <xlnt/xlnt_config.hpp>
 
 namespace xlnt {
 
 /// <summary>
 /// Typedef a rich_text_run as a pair of string and optional font.
 /// </summary>
-struct XLNT_API rich_text_run
-{
-    std::string first;
-    optional<font> second;
-    bool preserve_space;
+struct XLNT_API rich_text_run {
+  std::string first;
+  optional<font> second;
+  bool preserve_space;
 
-    bool operator==(const rich_text_run &other) const;
+  bool operator==(const rich_text_run &other) const;
 
-    bool operator!=(const rich_text_run &other) const;
+  bool operator!=(const rich_text_run &other) const;
 };
 
 } // namespace xlnt

@@ -5,14 +5,14 @@
 #ifndef PROJECT_DOWNLOADTHREADPOOL_H
 #define PROJECT_DOWNLOADTHREADPOOL_H
 
-#include <functional>
-#include <vector>
-#include <queue>
-#include <condition_variable>
-#include <thread>
-#include <future>
 #include <MessageReceiver.h>
+#include <condition_variable>
+#include <functional>
+#include <future>
 #include <map>
+#include <queue>
+#include <thread>
+#include <vector>
 /**
  * Synchronisation structure for tasks in the same group.
  */
@@ -26,10 +26,10 @@ struct TagSync {
  * via a message.
  */
 class ThreadPool final : public MessageReceiver {
- public:
+public:
   using Task = std::function<void()>;
 
- private:
+private:
   std::vector<std::thread> threads;
   std::queue<Task> tasks;
 
@@ -39,7 +39,7 @@ class ThreadPool final : public MessageReceiver {
 
   std::map<int, TagSync> tagCounters;
 
- public:
+public:
   explicit ThreadPool(std::size_t numThreads);
   ~ThreadPool();
   ThreadPool(const ThreadPool &c) = delete;
@@ -50,14 +50,11 @@ class ThreadPool final : public MessageReceiver {
    * @param task invocable
    * @return std::future to wait for task execution
    */
-  template<class T>
-  auto enqueue(T task) -> std::future<decltype(task())> {
+  template <class T> auto enqueue(T task) -> std::future<decltype(task())> {
     auto wrapper = std::make_shared<std::packaged_task<decltype(task())()>>(std::move(task));
     {
       std::unique_lock<std::mutex> lock(mutex);
-      tasks.emplace([=] {
-        (*wrapper)();
-      });
+      tasks.emplace([=] { (*wrapper)(); });
     }
     event.notify_one();
     return wrapper->get_future();
@@ -68,7 +65,7 @@ class ThreadPool final : public MessageReceiver {
    */
   void wait(std::size_t tag);
 
- private:
+private:
   /**
    * Start threadpool.
    * @param numThreads thread count in thread pool
@@ -80,4 +77,4 @@ class ThreadPool final : public MessageReceiver {
   void stop() noexcept;
   void receive(std::shared_ptr<Message> message) override;
 };
-#endif //PROJECT_DOWNLOADTHREADPOOL_H
+#endif // PROJECT_DOWNLOADTHREADPOOL_H

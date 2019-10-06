@@ -5,15 +5,15 @@
 #ifndef PROJECT_CONSOLEIO_H
 #define PROJECT_CONSOLEIO_H
 
-#include <iostream>
-#include <string>
 #include <MessageSender.h>
 #include <Property.h>
+#include <iostream>
 #include <memory>
 #include <mutex>
+#include <string>
 
 class ConsoleIO : public MessageSender, public MessageReceiver {
- public:
+public:
   explicit ConsoleIO(const std::shared_ptr<MessageManager> &commandManager);
   virtual ~ConsoleIO();
 
@@ -25,26 +25,22 @@ class ConsoleIO : public MessageSender, public MessageReceiver {
   void writeLnErr(std::string_view str);
   std::string readLn();
 
-  enum class Mode {
-    simple, arrow
-  };
+  enum class Mode { simple, arrow };
 
-  Property<Mode, ConsoleIO, RW> mode{
-      [this]() -> Mode & { return mode.value; },
-      [this](const Mode &val) -> Mode & {
-        mode.value = val;
-        setMode(val);
-        return mode.value;
-      }
-  };
+  Property<Mode, ConsoleIO, RW> mode{[this]() -> Mode & { return mode.value; },
+                                     [this](const Mode &val) -> Mode & {
+                                       mode.value = val;
+                                       setMode(val);
+                                       return mode.value;
+                                     }};
 
-    void setMode(Mode newMode);
+  void setMode(Mode newMode);
 
- private:
+private:
   std::mutex mutex;
   void receive(std::shared_ptr<Message> message) override;
   std::string form;
   bool listen = true;
 };
 
-#endif //PROJECT_CONSOLEIO_H
+#endif // PROJECT_CONSOLEIO_H

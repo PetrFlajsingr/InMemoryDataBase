@@ -8,20 +8,19 @@
 #ifndef PROJECT_OBSERVABLE_H
 #define PROJECT_OBSERVABLE_H
 
-#include <list>
 #include "Property.h"
-#include <iostream>
 #include <Types.h>
+#include <iostream>
+#include <list>
 
-template<typename T>
-class Binder;
+template <typename T> class Binder;
 
 class ObservableBase;
 /**
  * Interface allowing object to receive an update when watched value is changed.
  */
 class Observer {
- public:
+public:
   /**
    * Called when an observed value is changed.
    * @param obs Observable whose value has changed
@@ -33,71 +32,56 @@ class Observer {
  * Allows for disabling of notification on change.
  */
 class ObservableBase {
- public:
+public:
   /**
    * Add observer whose update method will be called when this's value changes.
    * @param observer observer to notify on value change
    */
-  void addObserver(Observer *observer) {
-    observers.emplace_back(observer);
-  }
+  void addObserver(Observer *observer) { observers.emplace_back(observer); }
   /**
    * Delete observer to prevent further update notifications.
    * @param observer Observer to delete from notify list
    */
   void deleteObserver(Observer *observer) {
-    if (auto it = std::find(observers.begin(), observers.end(), observer); it
-        != observers.end()) {
+    if (auto it = std::find(observers.begin(), observers.end(), observer); it != observers.end()) {
       observers.erase(it);
     }
   }
   /**
    * Clear all observers, preventing further notifications of change to any of already registered.
    */
-  void deleteObservers() {
-    observers.clear();
-  }
+  void deleteObservers() { observers.clear(); }
   /**
    *
    * @return count of observers currently watching this's value
    */
-  size_t countObservers() {
-    return observers.size();
-  }
+  size_t countObservers() { return observers.size(); }
   /**
    *
    * @return true if value has been changed, false otherwise
    */
-  bool hasChanged() {
-    return changed;
-  }
+  bool hasChanged() { return changed; }
   /**
    * Disable observer notification until enable() is called.
    */
-  void disable() {
-    enabled = false;
-  }
+  void disable() { enabled = false; }
   /**
    * Enable observer notification. On by default.
    */
-  void enable() {
-    enabled = true;
-  }
+  void enable() { enabled = true; }
   /**
    * Notify observers of a value change in this.
    * The changed and enabled flags have to be set for the notifications to go through.
    */
   void notifyObservers() {
     if (changed && enabled) {
-      std::for_each(observers.begin(), observers.end(), [this](auto observer) {
-        observer->update(this);
-      });
+      std::for_each(observers.begin(), observers.end(), [this](auto observer) { observer->update(this); });
       changed = false;
     }
   }
   virtual ~ObservableBase() = default;
 
- protected:
+protected:
   bool changed = false;
   bool enabled = true;
   std::list<Observer *> observers;
@@ -106,9 +90,8 @@ class ObservableBase {
  * Concrete implementation of Observable.
  * @tparam T type of observable value
  */
-template<typename T>
-class Observable : public ObservableBase {
- public:
+template <typename T> class Observable : public ObservableBase {
+public:
   Observable() = default;
   explicit Observable(T value) : value(value) {}
   /**
@@ -116,8 +99,7 @@ class Observable : public ObservableBase {
    * Doesn't notify observers if disable() has been called.
    * @param f new value
    */
-  typename std::conditional<std::is_compound<T>::value, T &, T>::type operator=(
-      const T &f) {
+  typename std::conditional<std::is_compound<T>::value, T &, T>::type operator=(const T &f) {
     value = f;
     changed = true;
     notifyObservers();
@@ -126,14 +108,13 @@ class Observable : public ObservableBase {
   /**
    * Implicit cast to stored value.
    */
-  operator typename std::conditional<std::is_compound<T>::value,
-                                     const T &,
-                                     T>::type() const { return value; }
- protected:
+  operator typename std::conditional<std::is_compound<T>::value, const T &, T>::type() const { return value; }
+
+protected:
   T value;
   friend class Binder<T>;
 };
 
-#endif //PROJECT_OBSERVABLE_H
+#endif // PROJECT_OBSERVABLE_H
 
 #pragma clang diagnostic pop

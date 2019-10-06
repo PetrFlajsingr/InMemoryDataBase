@@ -23,139 +23,106 @@
 
 #pragma once
 
-#include <xlnt/xlnt_config.hpp>
 #include <xlnt/cell/cell_reference.hpp>
 #include <xlnt/worksheet/pane.hpp>
 #include <xlnt/worksheet/range_reference.hpp>
+#include <xlnt/xlnt_config.hpp>
 
 namespace xlnt {
 
 /// <summary>
 /// The selected area of a worksheet.
 /// </summary>
-class XLNT_API selection
-{
+class XLNT_API selection {
 public:
-    /// <summary>
-    /// default ctor
-    /// </summary>
-    explicit selection() = default;
+  /// <summary>
+  /// default ctor
+  /// </summary>
+  explicit selection() = default;
 
-    /// <summary>
-    /// ctor when no range selected
-    /// sqref == active_cell
-    /// </summary>
-    explicit selection(pane_corner quadrant, cell_reference active_cell)
-        : active_cell_(active_cell), sqref_(range_reference(active_cell, active_cell)), pane_(quadrant)
-    {}
+  /// <summary>
+  /// ctor when no range selected
+  /// sqref == active_cell
+  /// </summary>
+  explicit selection(pane_corner quadrant, cell_reference active_cell)
+      : active_cell_(active_cell), sqref_(range_reference(active_cell, active_cell)), pane_(quadrant) {}
 
-    /// <summary>
-    /// ctor with selected range
-    /// sqref must contain active_cell
-    /// </summary>
-    explicit selection(pane_corner quadrant, cell_reference active_cell, range_reference selected)
-        : active_cell_(active_cell), sqref_(selected), pane_(quadrant)
-    {}
+  /// <summary>
+  /// ctor with selected range
+  /// sqref must contain active_cell
+  /// </summary>
+  explicit selection(pane_corner quadrant, cell_reference active_cell, range_reference selected)
+      : active_cell_(active_cell), sqref_(selected), pane_(quadrant) {}
 
-    /// <summary>
-    /// Returns true if this selection has a defined active cell.
-    /// </summary>
-    bool has_active_cell() const
-    {
-        return active_cell_.is_set();
-    }
+  /// <summary>
+  /// Returns true if this selection has a defined active cell.
+  /// </summary>
+  bool has_active_cell() const { return active_cell_.is_set(); }
 
-    /// <summary>
-    /// Returns the cell reference of the active cell.
-    /// </summary>
-    cell_reference active_cell() const
-    {
-        return active_cell_.get();
-    }
+  /// <summary>
+  /// Returns the cell reference of the active cell.
+  /// </summary>
+  cell_reference active_cell() const { return active_cell_.get(); }
 
-    /// <summary>
-    /// Sets the active cell to that pointed to by ref.
-    /// </summary>
-    void active_cell(const cell_reference &ref)
-    {
-        active_cell_ = ref;
-    }
+  /// <summary>
+  /// Sets the active cell to that pointed to by ref.
+  /// </summary>
+  void active_cell(const cell_reference &ref) { active_cell_ = ref; }
 
-    /// <summary>
-    /// Returns true if this selection has a defined sqref.
-    /// </summary>
-    bool has_sqref() const
-    {
-        return sqref_.is_set();
-    }
+  /// <summary>
+  /// Returns true if this selection has a defined sqref.
+  /// </summary>
+  bool has_sqref() const { return sqref_.is_set(); }
 
-    /// <summary>
-    /// Returns the range encompassed by this selection.
-    /// </summary>
-    range_reference sqref() const
-    {
-        return sqref_.get();
-    }
+  /// <summary>
+  /// Returns the range encompassed by this selection.
+  /// </summary>
+  range_reference sqref() const { return sqref_.get(); }
 
-    /// <summary>
-    /// Sets the range encompassed by this selection.
-    /// </summary>
-    void sqref(const range_reference &ref)
-    {
-        sqref_ = ref;
-    }
+  /// <summary>
+  /// Sets the range encompassed by this selection.
+  /// </summary>
+  void sqref(const range_reference &ref) { sqref_ = ref; }
 
-    /// <summary>
-    /// Sets the range encompassed by this selection.
-    /// </summary>
-    void sqref(const std::string &ref)
-    {
-        sqref(range_reference(ref));
-    }
+  /// <summary>
+  /// Sets the range encompassed by this selection.
+  /// </summary>
+  void sqref(const std::string &ref) { sqref(range_reference(ref)); }
 
-    /// <summary>
-    /// Returns the sheet quadrant of this selection.
-    /// </summary>
-    pane_corner pane() const
-    {
-        return pane_;
-    }
+  /// <summary>
+  /// Returns the sheet quadrant of this selection.
+  /// </summary>
+  pane_corner pane() const { return pane_; }
 
-    /// <summary>
-    /// Sets the sheet quadrant of this selection to corner.
-    /// </summary>
-    void pane(pane_corner corner)
-    {
-        pane_ = corner;
-    }
+  /// <summary>
+  /// Sets the sheet quadrant of this selection to corner.
+  /// </summary>
+  void pane(pane_corner corner) { pane_ = corner; }
 
-    /// <summary>
-    /// Returns true if this selection is equal to rhs based on its active cell,
-    /// sqref, and pane.
-    /// </summary>
-    bool operator==(const selection &rhs) const
-    {
-        return active_cell_ == rhs.active_cell_
-            && sqref_ == rhs.sqref_
-            && pane_ == rhs.pane_;
-    }
+  /// <summary>
+  /// Returns true if this selection is equal to rhs based on its active cell,
+  /// sqref, and pane.
+  /// </summary>
+  bool operator==(const selection &rhs) const {
+    return active_cell_ == rhs.active_cell_ && sqref_ == rhs.sqref_ && pane_ == rhs.pane_;
+  }
 
 private:
-    /// <summary>
-    /// The last selected cell in the selection
-    /// </summary>
-    optional<cell_reference> active_cell_;
+  /// <summary>
+  /// The last selected cell in the selection
+  /// </summary>
+  optional<cell_reference> active_cell_;
 
-    /// <summary>
-    /// The last selected block in the selection
-    /// contains active_cell_, normally == to active_cell_
-    /// </summary>
-    optional<range_reference> sqref_;
+  /// <summary>
+  /// The last selected block in the selection
+  /// contains active_cell_, normally == to active_cell_
+  /// </summary>
+  optional<range_reference> sqref_;
 
-    /// <summary>
-    /// The corner of the worksheet that this selection extends to
-    /// </summary>
-    pane_corner pane_;
+  /// <summary>
+  /// The corner of the worksheet that this selection extends to
+  /// </summary>
+  pane_corner pane_;
 };
 
 } // namespace xlnt

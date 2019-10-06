@@ -6,11 +6,11 @@
 #define PROJECT_FIELDFACTORY_H
 
 #include <BaseField.h>
-#include <IntegerField.h>
-#include <DoubleField.h>
-#include <StringField.h>
 #include <CurrencyField.h>
 #include <DateTimeField.h>
+#include <DoubleField.h>
+#include <IntegerField.h>
+#include <StringField.h>
 
 namespace DataSets {
 
@@ -19,7 +19,7 @@ namespace DataSets {
  * Singleton.
  */
 class FieldFactory {
- public:
+public:
   static FieldFactory &GetInstance() {
     static FieldFactory instance;
     return instance;
@@ -32,15 +32,16 @@ class FieldFactory {
    * @param dataSet owner data set
    * @return field created based on provided parameters
    */
-  static std::shared_ptr<DataSets::BaseField> CreateField(std::string_view name, gsl::index index,
-                                                          ValueType type, BaseDataSet *dataSet);
+  static std::shared_ptr<DataSets::BaseField> CreateField(std::string_view name, gsl::index index, ValueType type,
+                                                          BaseDataSet *dataSet);
 
   FieldFactory(const FieldFactory &) = delete;
   FieldFactory &operator=(const FieldFactory &) = delete;
- private:
+
+private:
   FieldFactory() = default;
 };
 
-}  // namespace DataSets
+} // namespace DataSets
 
-#endif //PROJECT_FIELDFACTORY_H
+#endif // PROJECT_FIELDFACTORY_H

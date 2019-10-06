@@ -5,27 +5,18 @@
 #ifndef PROJECT_SCRIPTPARSER_H
 #define PROJECT_SCRIPTPARSER_H
 
+#include <Types.h>
+#include <string>
 #include <string_view>
 #include <vector>
-#include <string>
-#include <Types.h>
 
 class ScriptParser {
- public:
-  enum class SaveMode {
-    normal
-  };
+public:
+  enum class SaveMode { normal };
 
-  enum class FileTypes {
-    csv, xlsx
-  };
+  enum class FileTypes { csv, xlsx };
 
-  enum class Command {
-    createDB, removeDB,
-    load, append,
-    removeTab,
-    query, save, unknown
-  };
+  enum class Command { createDB, removeDB, load, append, removeTab, query, save, unknown };
 
   static ScriptParser &GetInstance();
 
@@ -47,8 +38,8 @@ class ScriptParser {
 
   static std::string ReplaceResources(std::string input);
 
- private:
+private:
   std::vector<std::string> tokenize(std::string_view input);
 };
 
-#endif //PROJECT_SCRIPTPARSER_H
+#endif // PROJECT_SCRIPTPARSER_H

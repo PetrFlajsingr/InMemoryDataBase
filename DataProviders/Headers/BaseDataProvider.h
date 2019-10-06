@@ -5,11 +5,11 @@
 #ifndef DATAPROVIDERS_HEADERS_BASEDATAPROVIDER_H_
 #define DATAPROVIDERS_HEADERS_BASEDATAPROVIDER_H_
 
+#include <Converters.h>
 #include <gsl/gsl>
+#include <ostream>
 #include <string>
 #include <vector>
-#include <Converters.h>
-#include <ostream>
 
 namespace DataProviders {
 
@@ -17,14 +17,13 @@ namespace DataProviders {
  * Simple interface for reading a moving forward in records.
  */
 class BaseDataProvider {
- public:
+public:
   BaseDataProvider() : convert(false) {}
   /**
    *
    * @param charSet source charset
    */
-  explicit BaseDataProvider(CharSet charSet)
-      : convert(true), converter(std::make_unique<CharSetConverter>(charSet)) {}
+  explicit BaseDataProvider(CharSet charSet) : convert(true), converter(std::make_unique<CharSetConverter>(charSet)) {}
   /**
    * Get a record divided into fields
    * @return
@@ -38,7 +37,7 @@ class BaseDataProvider {
    */
   [[nodiscard]] virtual std::string getColumnName(unsigned int columnIndex) const = 0;
 
-    [[nodiscard]] virtual uint64_t getColumnCount() const = 0;
+  [[nodiscard]] virtual uint64_t getColumnCount() const = 0;
 
   /**
    *
@@ -63,15 +62,15 @@ class BaseDataProvider {
    */
   virtual void first() = 0;
 
-    [[nodiscard]] virtual bool eof() const = 0;
+  [[nodiscard]] virtual bool eof() const = 0;
 
   virtual ~BaseDataProvider() = default;
 
   class iterator : public std::iterator<std::input_iterator_tag, std::vector<std::string>> {
-   private:
+  private:
     BaseDataProvider *provider;
 
-   public:
+  public:
     /**
      * Move provider to the first record when no data has been read.
      * @param provider
@@ -82,14 +81,12 @@ class BaseDataProvider {
       }
     }
 
-    iterator(const iterator &other) {
-      provider = other.provider;
-    }
+    iterator(const iterator &other) { provider = other.provider; }
 
-      iterator &operator=(const iterator &other) {
-          provider = other.provider;
-          return *this;
-      }
+    iterator &operator=(const iterator &other) {
+      provider = other.provider;
+      return *this;
+    }
 
     /**
      * Move to next record
@@ -100,7 +97,7 @@ class BaseDataProvider {
       return *this;
     }
 
-      iterator operator++(int) {
+    iterator operator++(int) {
       iterator result = *this;
       ++(*this);
       return result;
@@ -110,29 +107,19 @@ class BaseDataProvider {
      * Abuse of == for eof checking
      * @return
      */
-    bool operator==(const iterator &) const {
-      return provider->eof();
-    }
+    bool operator==(const iterator &) const { return provider->eof(); }
 
-    bool operator!=(const iterator &other) const {
-      return !(*this == other);
-    }
+    bool operator!=(const iterator &other) const { return !(*this == other); }
 
     /**
      * Get current record from provider
      * @return
      */
-    const std::vector<std::string> &operator*() const {
-      return provider->getRow();
-    }
+    const std::vector<std::string> &operator*() const { return provider->getRow(); }
   };
 
-  iterator begin() {
-    return iterator(this);
-  }
-  iterator end() {
-    return iterator(this);
-  }
+  iterator begin() { return iterator(this); }
+  iterator end() { return iterator(this); }
 
   friend std::ostream &operator<<(std::ostream &os, BaseDataProvider &provider) {
     provider.next();
@@ -142,11 +129,11 @@ class BaseDataProvider {
     return os;
   }
 
- protected:
+protected:
   bool convert;
   std::unique_ptr<CharSetConverter> converter;
 };
 
-}  // namespace DataProviders
+} // namespace DataProviders
 
 #endif //  DATAPROVIDERS_HEADERS_BASEDATAPROVIDER_H_

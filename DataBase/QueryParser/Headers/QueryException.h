@@ -12,35 +12,34 @@
 
 namespace DataBase {
 class QueryException : public std::exception {
- private:
+private:
   const std::string errorMessage;
- public:
-    explicit QueryException(std::string message) : errorMessage(std::move(message)) {}
 
-    [[nodiscard]] char const *what() const noexcept override {
-    return errorMessage.c_str();
-  }
+public:
+  explicit QueryException(std::string message) : errorMessage(std::move(message)) {}
+
+  [[nodiscard]] char const *what() const noexcept override { return errorMessage.c_str(); }
 };
 
 class LexException : public QueryException {
- public:
+public:
   explicit LexException(const std::string &message) : QueryException(message) {}
 };
 
 class SyntaxException : public QueryException {
- public:
+public:
   explicit SyntaxException(const std::string &message) : QueryException(message) {}
 };
 
 class SemanticException : public QueryException {
- public:
+public:
   explicit SemanticException(const std::string &message) : QueryException(message) {}
 };
 
 class DataBaseQueryException : public QueryException {
- public:
+public:
   explicit DataBaseQueryException(const std::string &message) : QueryException(message) {}
 };
-}  // namespace DataBase
+} // namespace DataBase
 
-#endif //PROJECT_QUERYEXCEPTION_H
+#endif // PROJECT_QUERYEXCEPTION_H

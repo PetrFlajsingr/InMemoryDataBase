@@ -2,9 +2,9 @@
 // Created by Petr Flajsingr on 2019-01-29.
 //
 
-#include <catch2/catch.hpp>
-#include <XlsxIOReader.h>
 #include <ArrayWriter.h>
+#include <XlsxIOReader.h>
+#include <catch2/catch.hpp>
 
 #define COLUMN_COUNT 5
 #define ROW_COUNT 3
@@ -12,18 +12,14 @@
 SCENARIO("Reading xlsx file via BaseDataProvider interface", "[XlsReader]") {
 
   GIVEN("A usual xlsx file") {
-    const std::string columnNamesSmall[COLUMN_COUNT]{
-        "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4", "COLUMN5"
-    };
+    const std::string columnNamesSmall[COLUMN_COUNT]{"COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4", "COLUMN5"};
 
     const std::string recordsSmall[ROW_COUNT][COLUMN_COUNT]{
         {"RECORD11", "RECORD12", "RECORD13", "RECORD14", "RECORD15"},
         {"RECORD21", "RECORD22", "RECORD23", "RECORD24", "RECORD25"},
-        {"RECORD31", "RECORD32", "RECOR33", "RECORD34", "RECORD35"}
-    };
+        {"RECORD31", "RECORD32", "RECOR33", "RECORD34", "RECORD35"}};
 
-    DataProviders::XlsxIOReader
-        xlsReader("../DataProviders/tests/Files/simple.xlsx");
+    DataProviders::XlsxIOReader xlsReader("../DataProviders/tests/Files/simple.xlsx");
 
     WHEN("reading the header") {
 
@@ -59,9 +55,7 @@ SCENARIO("Reading xlsx file via BaseDataProvider interface", "[XlsReader]") {
         std::vector<std::vector<std::string>> toCheck;
         while (xlsReader.next()) {
           std::vector<std::string> row;
-          std::copy(xlsReader.getRow().begin(),
-                    xlsReader.getRow().end(),
-                    std::back_inserter(row));
+          std::copy(xlsReader.getRow().begin(), xlsReader.getRow().end(), std::back_inserter(row));
           toCheck.emplace_back(row);
         }
 
@@ -69,7 +63,7 @@ SCENARIO("Reading xlsx file via BaseDataProvider interface", "[XlsReader]") {
 
         int i = 0;
         while (xlsReader.next()) {
-            for (gsl::index j = 0; j < static_cast<gsl::index>(toCheck[i].size()); ++j) {
+          for (gsl::index j = 0; j < static_cast<gsl::index>(toCheck[i].size()); ++j) {
             REQUIRE(xlsReader.getRow()[j] == toCheck[i][j]);
           }
           i++;
@@ -77,7 +71,6 @@ SCENARIO("Reading xlsx file via BaseDataProvider interface", "[XlsReader]") {
       }
     }
   }
-
 }
 
 SCENARIO("Reading xlsx file via iterator", "[XlsReader]") {
@@ -86,11 +79,9 @@ SCENARIO("Reading xlsx file via iterator", "[XlsReader]") {
     const std::string recordsSmall[ROW_COUNT][COLUMN_COUNT]{
         {"RECORD11", "RECORD12", "RECORD13", "RECORD14", "RECORD15"},
         {"RECORD21", "RECORD22", "RECORD23", "RECORD24", "RECORD25"},
-        {"RECORD31", "RECORD32", "RECOR33", "RECORD34", "RECORD35"}
-    };
+        {"RECORD31", "RECORD32", "RECOR33", "RECORD34", "RECORD35"}};
 
-    DataProviders::XlsxIOReader
-        xlsReader("../DataProviders/tests/Files/simple.xlsx");
+    DataProviders::XlsxIOReader xlsReader("../DataProviders/tests/Files/simple.xlsx");
 
     WHEN("reading the file contents") {
 
@@ -111,15 +102,13 @@ SCENARIO("Reading xlsx file via iterator", "[XlsReader]") {
 
       THEN("the read contents are the same") {
         std::vector<std::vector<std::string>> toCheck;
-        std::copy(xlsReader.begin(),
-                  xlsReader.end(),
-                  std::back_inserter(toCheck));
+        std::copy(xlsReader.begin(), xlsReader.end(), std::back_inserter(toCheck));
 
         xlsReader.first();
 
         int i = 0;
         for (const auto &value : xlsReader) {
-            for (gsl::index j = 0; j < static_cast<gsl::index>(toCheck[i].size()); ++j) {
+          for (gsl::index j = 0; j < static_cast<gsl::index>(toCheck[i].size()); ++j) {
             REQUIRE(value[j] == toCheck[i][j]);
           }
           ++i;
@@ -129,23 +118,17 @@ SCENARIO("Reading xlsx file via iterator", "[XlsReader]") {
   }
 }
 
-SCENARIO(
-    "Writing parsed xlsx directly to DataWriter using BaseDataProvider interface",
-    "[XlsReader][integration]") {
+SCENARIO("Writing parsed xlsx directly to DataWriter using BaseDataProvider interface", "[XlsReader][integration]") {
 
   GIVEN("A usual xlsx file") {
-    const std::string columnNamesSmall[COLUMN_COUNT]{
-        "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4", "COLUMN5"
-    };
+    const std::string columnNamesSmall[COLUMN_COUNT]{"COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4", "COLUMN5"};
 
     const std::string recordsSmall[ROW_COUNT][COLUMN_COUNT]{
         {"RECORD11", "RECORD12", "RECORD13", "RECORD14", "RECORD15"},
         {"RECORD21", "RECORD22", "RECORD23", "RECORD24", "RECORD25"},
-        {"RECORD31", "RECORD32", "RECOR33", "RECORD34", "RECORD35"}
-    };
+        {"RECORD31", "RECORD32", "RECOR33", "RECORD34", "RECORD35"}};
 
-    DataProviders::XlsxIOReader
-        xlsReader("../DataProviders/tests/Files/simple.xlsx");
+    DataProviders::XlsxIOReader xlsReader("../DataProviders/tests/Files/simple.xlsx");
 
     DataWriters::ArrayWriter writer;
     WHEN("reading the content") {
@@ -173,22 +156,17 @@ SCENARIO(
   }
 }
 
-SCENARIO("Writing parsed xlsx directly to DataWriter using iterator",
-         "[XlsReader][integration]") {
+SCENARIO("Writing parsed xlsx directly to DataWriter using iterator", "[XlsReader][integration]") {
 
   GIVEN("A usual xlsx file") {
-    const std::string columnNamesSmall[COLUMN_COUNT]{
-        "COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4", "COLUMN5"
-    };
+    const std::string columnNamesSmall[COLUMN_COUNT]{"COLUMN1", "COLUMN2", "COLUMN3", "COLUMN4", "COLUMN5"};
 
     const std::string recordsSmall[ROW_COUNT][COLUMN_COUNT]{
         {"RECORD11", "RECORD12", "RECORD13", "RECORD14", "RECORD15"},
         {"RECORD21", "RECORD22", "RECORD23", "RECORD24", "RECORD25"},
-        {"RECORD31", "RECORD32", "RECOR33", "RECORD34", "RECORD35"}
-    };
+        {"RECORD31", "RECORD32", "RECOR33", "RECORD34", "RECORD35"}};
 
-    DataProviders::XlsxIOReader
-        xlsReader("../DataProviders/tests/Files/simple.xlsx");
+    DataProviders::XlsxIOReader xlsReader("../DataProviders/tests/Files/simple.xlsx");
 
     DataWriters::ArrayWriter writer;
     WHEN("reading the content") {

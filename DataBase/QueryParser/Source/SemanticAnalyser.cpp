@@ -5,7 +5,7 @@
 #include <SemanticAnalyser.h>
 
 void DataBase::SemanticAnalyser::setInput(StructuredQuery &newStructuredQuery) {
-    this->structuredQuery = newStructuredQuery;
+  this->structuredQuery = newStructuredQuery;
 }
 
 DataBase::StructuredQuery DataBase::SemanticAnalyser::analyse() {
@@ -51,8 +51,8 @@ DataBase::StructuredQuery DataBase::SemanticAnalyser::analyse() {
     }
   }
   for (const auto &val : structuredQuery.order.data) {
-    if (std::find(tables.begin(), tables.end(), val.field.table) == tables.end()
-        && std::find(aliases.begin(), aliases.end(), val.field.alias) == aliases.end()) {
+    if (std::find(tables.begin(), tables.end(), val.field.table) == tables.end() &&
+        std::find(aliases.begin(), aliases.end(), val.field.alias) == aliases.end()) {
       throw SemanticException("order");
     }
   }
@@ -60,12 +60,12 @@ DataBase::StructuredQuery DataBase::SemanticAnalyser::analyse() {
   // check group by containing all non aggregated values
   if (!structuredQuery.agr.data.empty()) {
     for (const auto &val : structuredQuery.project.data) {
-      auto found = std::find_if(structuredQuery.agr.data.begin(), structuredQuery.agr.data.end(),
-                                [&val](const AgreItem &item) {
-                                  return item.op == AgrOperator::group
-                                      && ((item.field.table == val.table && item.field.column == val.column)
-                                          || item.field.alias == val.alias);
-                                });
+      auto found =
+          std::find_if(structuredQuery.agr.data.begin(), structuredQuery.agr.data.end(), [&val](const AgreItem &item) {
+            return item.op == AgrOperator::group &&
+                   ((item.field.table == val.table && item.field.column == val.column) ||
+                    item.field.alias == val.alias);
+          });
       if (found == structuredQuery.agr.data.end()) {
         throw SemanticException("group by");
       }
@@ -92,16 +92,27 @@ std::string DataBase::SemanticAnalyser::getErrorMsg(DataBase::SemanticAnalyser::
                                                     const std::string &value) {
   std::string result = "Semantic error: ";
   switch (errType) {
-    case SemErrType::where:result += "Use of undeclared table \'" + value + "\' in WHERE clause";
-      break;
-    case SemErrType::joinMain:result += "Use of undeclared table \'" + value + "\' in JOIN clause";
-      break;
-    case SemErrType::joinSecond:result += "Use of undeclared table \'" + value + "\' in JOIN clause";break;
-    case SemErrType::group:result += "Use of undeclared table \'" + value + "\' in GROUP BY clause";break;
-    case SemErrType::order:result += "Use of undeclared table \'" + value + "\' in ORDER BY clause";break;
-    case SemErrType::project:result += "Use of undeclared table \'" + value + "\' in SELECT clause";
-          break;
-    case SemErrType::having:result += "Use of undeclared table \'" + value + "\' in HAVING clause";break;
+  case SemErrType::where:
+    result += "Use of undeclared table \'" + value + "\' in WHERE clause";
+    break;
+  case SemErrType::joinMain:
+    result += "Use of undeclared table \'" + value + "\' in JOIN clause";
+    break;
+  case SemErrType::joinSecond:
+    result += "Use of undeclared table \'" + value + "\' in JOIN clause";
+    break;
+  case SemErrType::group:
+    result += "Use of undeclared table \'" + value + "\' in GROUP BY clause";
+    break;
+  case SemErrType::order:
+    result += "Use of undeclared table \'" + value + "\' in ORDER BY clause";
+    break;
+  case SemErrType::project:
+    result += "Use of undeclared table \'" + value + "\' in SELECT clause";
+    break;
+  case SemErrType::having:
+    result += "Use of undeclared table \'" + value + "\' in HAVING clause";
+    break;
   }
   return result;
 }

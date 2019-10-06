@@ -5,16 +5,16 @@
 #ifndef CSV_READER_ARRAYWRITER_H
 #define CSV_READER_ARRAYWRITER_H
 
+#include <BaseDataWriter.h>
 #include <string>
 #include <vector>
-#include <BaseDataWriter.h>
 
 namespace DataWriters {
 /**
  * Write values to array. For debug/testing purposes.
  */
 class ArrayWriter : public BaseDataWriter {
- public:
+public:
   void writeHeader(const std::vector<std::string> &header) override;
   void writeRecord(const std::vector<std::string> &record) override;
   /**
@@ -23,10 +23,10 @@ class ArrayWriter : public BaseDataWriter {
   void print() const;
   [[nodiscard]] const std::vector<std::vector<std::string>> &getArray() const;
 
- private:
+private:
   std::vector<std::vector<std::string>> result;
 };
 
-}  // namespace DataWriters
+} // namespace DataWriters
 
-#endif //CSV_READER_ARRAYWRITER_H
+#endif // CSV_READER_ARRAYWRITER_H

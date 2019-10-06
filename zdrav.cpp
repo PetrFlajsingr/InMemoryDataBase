@@ -3,75 +3,54 @@
 //
 
 #include <CsvReader.h>
-#include <MemoryDataSet.h>
+#include <CsvWriter.h>
+#include <Logger.h>
 #include <MemoryDataBase.h>
+#include <MemoryDataSet.h>
+#include <Tree.h>
+#include <XlntReader.h>
+#include <XlntWriter.h>
 #include <XlsxIOReader.h>
 #include <XlsxIOWriter.h>
-#include <CsvWriter.h>
-#include <XlntWriter.h>
 #include <boost/locale.hpp>
-#include <XlntReader.h>
-#include <Logger.h>
-#include <Tree.h>
 
 int main() {
   Logger::GetInstance().log(LogLevel::Debug, "Start", true);
-  auto nnoProvider =
-      DataProviders::XlsxIOReader("/Users/petr/Desktop/NNO_subjekty6ver2.4.xlsx",
-                                  CharSet::CP1250);
+  auto nnoProvider = DataProviders::XlsxIOReader("/Users/petr/Desktop/NNO_subjekty6ver2.4.xlsx", CharSet::CP1250);
   Logger::GetInstance().log(LogLevel::Debug, "created nno provider", true);
   auto nnoDs = std::make_shared<DataSets::MemoryDataSet>("nno");
   nnoDs->open(nnoProvider,
-              {ValueType::Integer, ValueType::Integer, ValueType::Integer,
-               ValueType::Integer, ValueType::String, ValueType::String,
-               ValueType::String, ValueType::String, ValueType::String,
-               ValueType::String, ValueType::String, ValueType::String,
-               ValueType::String, ValueType::String, ValueType::String,
-               ValueType::String, ValueType::String, ValueType::String,
-               ValueType::String, ValueType::String, ValueType::String,
-               ValueType::String, ValueType::String, ValueType::String,
-               ValueType::String, ValueType::String, ValueType::String,
-               ValueType::String, ValueType::String, ValueType::String,
-               ValueType::String, ValueType::String, ValueType::String,
-               ValueType::String, ValueType::String, ValueType::String,
-               ValueType::String, ValueType::String, ValueType::String,
-               ValueType::String, ValueType::String, ValueType::String,
-               ValueType::String, ValueType::String, ValueType::String,
-               ValueType::String, ValueType::String, ValueType::String,
-               ValueType::String, ValueType::String, ValueType::String,
-               ValueType::String, ValueType::String, ValueType::String,
-               ValueType::String, ValueType::String, ValueType::String,
-               ValueType::String, ValueType::String, ValueType::String,
-               ValueType::String, ValueType::String, ValueType::String,
-               ValueType::String, ValueType::String, ValueType::String,
-               ValueType::String, ValueType::String, ValueType::String,
-               ValueType::String, ValueType::String, ValueType::String,
-               ValueType::String, ValueType::String, ValueType::String,
-               ValueType::String, ValueType::String, ValueType::String,
-               ValueType::String, ValueType::String, ValueType::String,
-               ValueType::String});
+              {ValueType::Integer, ValueType::Integer, ValueType::Integer, ValueType::Integer, ValueType::String,
+               ValueType::String,  ValueType::String,  ValueType::String,  ValueType::String,  ValueType::String,
+               ValueType::String,  ValueType::String,  ValueType::String,  ValueType::String,  ValueType::String,
+               ValueType::String,  ValueType::String,  ValueType::String,  ValueType::String,  ValueType::String,
+               ValueType::String,  ValueType::String,  ValueType::String,  ValueType::String,  ValueType::String,
+               ValueType::String,  ValueType::String,  ValueType::String,  ValueType::String,  ValueType::String,
+               ValueType::String,  ValueType::String,  ValueType::String,  ValueType::String,  ValueType::String,
+               ValueType::String,  ValueType::String,  ValueType::String,  ValueType::String,  ValueType::String,
+               ValueType::String,  ValueType::String,  ValueType::String,  ValueType::String,  ValueType::String,
+               ValueType::String,  ValueType::String,  ValueType::String,  ValueType::String,  ValueType::String,
+               ValueType::String,  ValueType::String,  ValueType::String,  ValueType::String,  ValueType::String,
+               ValueType::String,  ValueType::String,  ValueType::String,  ValueType::String,  ValueType::String,
+               ValueType::String,  ValueType::String,  ValueType::String,  ValueType::String,  ValueType::String,
+               ValueType::String,  ValueType::String,  ValueType::String,  ValueType::String,  ValueType::String,
+               ValueType::String,  ValueType::String,  ValueType::String,  ValueType::String,  ValueType::String,
+               ValueType::String,  ValueType::String,  ValueType::String,  ValueType::String,  ValueType::String,
+               ValueType::String,  ValueType::String});
   Logger::GetInstance().log(LogLevel::Debug, "Loaded nno", true);
 
-  auto zdravProvider =
-      DataProviders::CsvReader("/Users/petr/Desktop/csvs/export-2019-02.csv",
-                               CharSet::CP1250,
-                               ";");
+  auto zdravProvider = DataProviders::CsvReader("/Users/petr/Desktop/csvs/export-2019-02.csv", CharSet::CP1250, ";");
   Logger::GetInstance().log(LogLevel::Debug, "Created zdrav provider", true);
   auto zdravDs = std::make_shared<DataSets::MemoryDataSet>("zdrav");
   zdravDs->open(zdravProvider,
-                {ValueType::String, ValueType::String, ValueType::String,
-                 ValueType::String, ValueType::String, ValueType::String,
-                 ValueType::String, ValueType::String, ValueType::String,
-                 ValueType::String, ValueType::String, ValueType::String,
-                 ValueType::String, ValueType::String, ValueType::String,
-                 ValueType::String, ValueType::String, ValueType::String,
-                 ValueType::String, ValueType::String, ValueType::String,
-                 ValueType::Integer, ValueType::String, ValueType::String,
-                 ValueType::String, ValueType::String, ValueType::String,
-                 ValueType::String, ValueType::String, ValueType::String,
-                 ValueType::String, ValueType::String, ValueType::String,
-                 ValueType::String, ValueType::String, ValueType::String,
-                 ValueType::String, ValueType::String});
+                {ValueType::String, ValueType::String,  ValueType::String, ValueType::String, ValueType::String,
+                 ValueType::String, ValueType::String,  ValueType::String, ValueType::String, ValueType::String,
+                 ValueType::String, ValueType::String,  ValueType::String, ValueType::String, ValueType::String,
+                 ValueType::String, ValueType::String,  ValueType::String, ValueType::String, ValueType::String,
+                 ValueType::String, ValueType::Integer, ValueType::String, ValueType::String, ValueType::String,
+                 ValueType::String, ValueType::String,  ValueType::String, ValueType::String, ValueType::String,
+                 ValueType::String, ValueType::String,  ValueType::String, ValueType::String, ValueType::String,
+                 ValueType::String, ValueType::String,  ValueType::String});
   Logger::GetInstance().log(LogLevel::Debug, "Loaded zdrav", true);
   DataBase::MemoryDataBase db("main");
   db.addTable(nnoDs);
@@ -88,37 +67,31 @@ int main() {
   auto nrzps_obecZarField = joinRes->dataSet->fieldByName("Obec");
   auto nrzps_pscZarField = joinRes->dataSet->fieldByName("Psc");
   auto nrzps_uliceZarField = joinRes->dataSet->fieldByName("Ulice");
-  auto nrzps_cisloDomZarField =
-      joinRes->dataSet->fieldByName("CisloDomovniOrientacni");
-  auto
-      nrzps_nazevPoskField = joinRes->dataSet->fieldByName("PoskytovatelNazev");
+  auto nrzps_cisloDomZarField = joinRes->dataSet->fieldByName("CisloDomovniOrientacni");
+  auto nrzps_nazevPoskField = joinRes->dataSet->fieldByName("PoskytovatelNazev");
   auto nrzps_pravFormaField = joinRes->dataSet->fieldByName("PravniFormaKod");
   auto nrzps_krajPoskField = joinRes->dataSet->fieldByName("KrajSidlo");
   auto nrzps_okresPoskField = joinRes->dataSet->fieldByName("OkresSidlo");
   auto nrzps_pscPoskField = joinRes->dataSet->fieldByName("PscSidlo");
   auto nrzps_obecPoskField = joinRes->dataSet->fieldByName("ObecSidlo");
   auto nrzps_ulicePoskyField = joinRes->dataSet->fieldByName("UliceSidlo");
-  auto nrzps_cisloDomPoskField =
-      joinRes->dataSet->fieldByName("CisloDomovniOrientacniSidlo");
+  auto nrzps_cisloDomPoskField = joinRes->dataSet->fieldByName("CisloDomovniOrientacniSidlo");
   auto nrzps_oborPeceField = joinRes->dataSet->fieldByName("OborPece");
   auto nrzps_formaPeceField = joinRes->dataSet->fieldByName("FormaPece");
   auto nrzps_gpsField = joinRes->dataSet->fieldByName("GPS");
-  auto nno_icField =
-      dynamic_cast<DataSets::IntegerField *>(joinRes->dataSet->fieldByName(
-          "ICO_num"));
+  auto nno_icField = dynamic_cast<DataSets::IntegerField *>(joinRes->dataSet->fieldByName("ICO_num"));
   auto nno_yField = joinRes->dataSet->fieldByName("Y");
   auto nno_xField = joinRes->dataSet->fieldByName("X");
   auto nno_obecIdField = joinRes->dataSet->fieldByName("ICOB_text");
 
   auto joinDs = joinRes->dataSet->toDataSet();
   db.addTable(joinDs);
-  //db.removeTable("nno");
-  //db.removeTable("zdrav");
+  // db.removeTable("nno");
+  // db.removeTable("zdrav");
 
-  auto countRes = db.execAggregateQuery(
-      "select joinRes.ICO_num, COUNT(joinRes.PoskytovatelNazev) "
-      "from joinRes group by joinRes.ICO_num;",
-      "count");
+  auto countRes = db.execAggregateQuery("select joinRes.ICO_num, COUNT(joinRes.PoskytovatelNazev) "
+                                        "from joinRes group by joinRes.ICO_num;",
+                                        "count");
   Logger::GetInstance().log(LogLevel::Debug, "Count query done", true);
 
   joinRes->dataSet->resetBegin();
@@ -144,32 +117,14 @@ int main() {
                     "PSC_ZARIZENI",
                     "OBOR_PECE",
                     "FORMA_PECE",
-                    "ORGANIZACE/ZARIZENI"
-                   },
-                   {ValueType::Integer,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
-                    ValueType::String,
+                    "ORGANIZACE/ZARIZENI"},
+                   {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
+                    ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String,
+                    ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String,
+                    ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String,
                     ValueType::String});
 
-  auto res_icField = dynamic_cast<DataSets::IntegerField *>(result.fieldByName(
-      "IC_POSKYTOVATEL"));
+  auto res_icField = dynamic_cast<DataSets::IntegerField *>(result.fieldByName("IC_POSKYTOVATEL"));
   auto res_nazevPoskField = result.fieldByName("NAZEV_POSKYTOVATELE");
   auto res_pravFormField = result.fieldByName("PRAVNI_FORMA");
   auto res_ulicePoskField = result.fieldByName("ULICE");
@@ -185,24 +140,21 @@ int main() {
   auto res_nazevZarField = result.fieldByName("NAZEV_ZARIZENI");
   auto res_obecZarField = result.fieldByName("OBEC_ZARIZENI");
   auto res_uliceZarField = result.fieldByName("ULICE_ZARIZENI");
-  auto res_cisloDomZarField =
-      result.fieldByName("CISLO_DOMOVNI_ORIENTACNI_ZARIZENI");
+  auto res_cisloDomZarField = result.fieldByName("CISLO_DOMOVNI_ORIENTACNI_ZARIZENI");
   auto res_oborPeceField = result.fieldByName("OBOR_PECE");
   auto res_formaPeceField = result.fieldByName("FORMA_PECE");
   auto res_orgZarField = result.fieldByName("ORGANIZACE/ZARIZENI");
   auto res_pscZarField = result.fieldByName("PSC_ZARIZENI");
 
   int lastIco = -1;
-  auto countField =
-      dynamic_cast<DataSets::IntegerField *>(countRes->dataSet->fieldByName(
-          "PoskytovatelNazev"));
+  auto countField = dynamic_cast<DataSets::IntegerField *>(countRes->dataSet->fieldByName("PoskytovatelNazev"));
 
   const std::string nilStr = "Null";
   countRes->dataSet->next();
   bool setPoskytovatel = false;
   Logger::GetInstance().log(LogLevel::Debug, "Starting final alg", true);
   while (joinRes->dataSet->next()) {
-    yay_goto:
+  yay_goto:
     result.append();
     setPoskytovatel = false;
     if (nno_icField->getAsInteger() != lastIco) {
@@ -233,8 +185,7 @@ int main() {
       res_cisloDomPoskyField->setAsString(nilStr);
       res_pscPoskField->setAsString(nilStr);
 
-      auto gps =
-          Utilities::splitStringByDelimiter(nrzps_gpsField->getAsString(), " ");
+      auto gps = Utilities::splitStringByDelimiter(nrzps_gpsField->getAsString(), " ");
       if (gps.size() == 2) {
         res_xField->setAsString(gps[1].substr(0, gps[0].length() - 1));
         res_yField->setAsString(gps[0].substr(1));
@@ -263,20 +214,16 @@ int main() {
   }
 
   auto writer = DataWriters::XlntWriter("/Users/petr/Desktop/nrzps.xlsx");
-  //auto writer = DataWriters::XlsxWriter("/Users/petr/Desktop/nrzps.xlsx");
-  //auto writer = DataWriters::CsvWriter("/Users/petr/Desktop/nrzps.csv");
+  // auto writer = DataWriters::XlsxWriter("/Users/petr/Desktop/nrzps.xlsx");
+  // auto writer = DataWriters::CsvWriter("/Users/petr/Desktop/nrzps.csv");
   writer.writeHeader(result.getFieldNames());
   auto fields = result.getFields();
   result.resetBegin();
 
   while (result.next()) {
     std::vector<std::string> record;
-    std::transform(fields.begin(),
-                   fields.end(),
-                   std::back_inserter(record),
-                   [](const DataSets::BaseField *field) {
-                     return field->getAsString();
-                   });
+    std::transform(fields.begin(), fields.end(), std::back_inserter(record),
+                   [](const DataSets::BaseField *field) { return field->getAsString(); });
     writer.writeRecord(record);
   }
 

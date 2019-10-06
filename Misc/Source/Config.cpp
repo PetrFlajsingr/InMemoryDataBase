@@ -2,8 +2,8 @@
 // Created by Petr Flajsingr on 2019-02-24.
 //
 
-#include <fstream>
 #include <Config.h>
+#include <fstream>
 
 Config::Config(const std::string &path, bool autoCommit) : path(path), autoCommit(autoCommit) {
   std::ifstream file(path);
@@ -14,9 +14,7 @@ Config::Config(const std::string &path, bool autoCommit) : path(path), autoCommi
   load();
 }
 
-Config::~Config() {
-  commit();
-}
+Config::~Config() { commit(); }
 
 void Config::load() {
   std::ifstream file(path);

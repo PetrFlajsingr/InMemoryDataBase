@@ -5,30 +5,27 @@
 #ifndef PROJECT_CONFIG_H
 #define PROJECT_CONFIG_H
 
+#include <Exceptions.h>
+#include <Utilities.h>
+#include <fstream>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <Utilities.h>
-#include <Exceptions.h>
-#include <fstream>
 
 /**
  * Config in files using categories & key value pairs
  */
 class Config {
-  template<typename T>
-  std::string toString(T val) {
+  template <typename T> std::string toString(T val) {
     if constexpr (std::is_integral<T>{} || std::is_floating_point<T>{}) {
       return std::to_string(val);
     }
-    if constexpr (std::is_same<T, std::string>{} || std::is_same<T, char *>{}
-        || std::is_same<T, const char *>{}) {
+    if constexpr (std::is_same<T, std::string>{} || std::is_same<T, char *>{} || std::is_same<T, const char *>{}) {
       return val;
     }
   }
 
-  template<typename T>
-  T fromString(std::string val) {
+  template <typename T> T fromString(std::string val) {
     if constexpr (std::is_integral<T>{}) {
       return Utilities::stringToInt(val);
     }
@@ -39,7 +36,8 @@ class Config {
       return val;
     }
   }
- public:
+
+public:
   /**
    *
    * @param path path to config file
@@ -55,8 +53,7 @@ class Config {
    * @param defaultVal
    * @return required value if found, else defaultVal
    */
-  template<typename T>
-  T getValue(const std::string &category, const std::string &key, T defaultVal) {
+  template <typename T> T getValue(const std::string &category, const std::string &key, T defaultVal) {
     if (categories.find(category) != categories.end()) {
       auto cat = categories[category];
       if (cat.find(key) != cat.end()) {
@@ -77,16 +74,14 @@ class Config {
    * @param key
    * @return required value
    */
-  template<typename T>
-  T getValue(std::string_view category, std::string_view key) {
+  template <typename T> T getValue(std::string_view category, std::string_view key) {
     if (categories.find(std::string(category)) != categories.end()) {
       auto cat = categories[std::string(category)];
       if (cat.find(std::string(key)) != cat.end()) {
         return fromString<T>(cat[std::string(key)]);
       }
     }
-    throw ResourceNotFoundException(
-        "Resource [" + std::string(category) + "[" + std::string(key) + "]] not found");
+    throw ResourceNotFoundException("Resource [" + std::string(category) + "[" + std::string(key) + "]] not found");
   }
   /**
    * Save value on autocommit
@@ -95,8 +90,7 @@ class Config {
    * @param key
    * @param value
    */
-  template<typename T>
-  void setValue(const std::string &category, const std::string &key, T value) {
+  template <typename T> void setValue(const std::string &category, const std::string &key, T value) {
     categories[category][key] = toString(value);
     if (autoCommit) {
       save();
@@ -107,7 +101,7 @@ class Config {
    */
   void commit();
 
- private:
+private:
   std::string path;
   bool autoCommit;
 
@@ -116,4 +110,4 @@ class Config {
   void save();
 };
 
-#endif //PROJECT_CONFIG_H
+#endif // PROJECT_CONFIG_H

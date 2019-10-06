@@ -47,70 +47,69 @@ class xlsx_producer;
 /// <summary>
 /// workbook is the container for all other parts of the document.
 /// </summary>
-class XLNT_API streaming_workbook_writer
-{
+class XLNT_API streaming_workbook_writer {
 public:
-    streaming_workbook_writer();
-    ~streaming_workbook_writer();
+  streaming_workbook_writer();
+  ~streaming_workbook_writer();
 
-    /// <summary>
-    /// Finishes writing of the remaining contents of the workbook and closes
-    /// currently open write stream. This will be called automatically by the
-    /// destructor if it hasn't already been called manually.
-    /// </summary>
-    void close();
+  /// <summary>
+  /// Finishes writing of the remaining contents of the workbook and closes
+  /// currently open write stream. This will be called automatically by the
+  /// destructor if it hasn't already been called manually.
+  /// </summary>
+  void close();
 
-    /// <summary>
-    /// Writes a cell to the currently active worksheet at the position given by
-    /// ref and with the given value. ref should be to the right of or below
-    /// the previously written cell.
-    /// </summary>
-    cell add_cell(const cell_reference &ref);
+  /// <summary>
+  /// Writes a cell to the currently active worksheet at the position given by
+  /// ref and with the given value. ref should be to the right of or below
+  /// the previously written cell.
+  /// </summary>
+  cell add_cell(const cell_reference &ref);
 
-    /// <summary>
-    /// Ends writing of data to the current sheet and begins writing a new sheet
-    /// with the given title.
-    /// </summary>
-    worksheet add_worksheet(const std::string &title);
+  /// <summary>
+  /// Ends writing of data to the current sheet and begins writing a new sheet
+  /// with the given title.
+  /// </summary>
+  worksheet add_worksheet(const std::string &title);
 
-    /// <summary>
-    /// Serializes the workbook into an XLSX file and saves the bytes into
-    /// byte vector data.
-    /// </summary>
-    void open(std::vector<std::uint8_t> &data);
+  /// <summary>
+  /// Serializes the workbook into an XLSX file and saves the bytes into
+  /// byte vector data.
+  /// </summary>
+  void open(std::vector<std::uint8_t> &data);
 
-    /// <summary>
-    /// Serializes the workbook into an XLSX file and saves the data into a file
-    /// named filename.
-    /// </summary>
-    void open(const std::string &filename);
+  /// <summary>
+  /// Serializes the workbook into an XLSX file and saves the data into a file
+  /// named filename.
+  /// </summary>
+  void open(const std::string &filename);
 
 #ifdef _MSC_VER
-    /// <summary>
-    /// Serializes the workbook into an XLSX file and saves the data into a file
-    /// named filename.
-    /// </summary>
-    void open(const std::wstring &filename);
+  /// <summary>
+  /// Serializes the workbook into an XLSX file and saves the data into a file
+  /// named filename.
+  /// </summary>
+  void open(const std::wstring &filename);
 #endif
 
-    /// <summary>
-    /// Serializes the workbook into an XLSX file and saves the data into a file
-    /// named filename.
-    /// </summary>
-    void open(const xlnt::path &filename);
+  /// <summary>
+  /// Serializes the workbook into an XLSX file and saves the data into a file
+  /// named filename.
+  /// </summary>
+  void open(const xlnt::path &filename);
 
-    /// <summary>
-    /// Serializes the workbook into an XLSX file and saves the data into stream.
-    /// </summary>
-    void open(std::ostream &stream);
+  /// <summary>
+  /// Serializes the workbook into an XLSX file and saves the data into stream.
+  /// </summary>
+  void open(std::ostream &stream);
 
-    std::unique_ptr<xlnt::detail::xlsx_producer> producer_;
-    std::unique_ptr<workbook> workbook_;
-    std::unique_ptr<std::ostream> stream_;
-    std::unique_ptr<std::streambuf> stream_buffer_;
-    std::unique_ptr<std::ostream> part_stream_;
-    std::unique_ptr<std::streambuf> part_stream_buffer_;
-    std::unique_ptr<xml::serializer> serializer_;
+  std::unique_ptr<xlnt::detail::xlsx_producer> producer_;
+  std::unique_ptr<workbook> workbook_;
+  std::unique_ptr<std::ostream> stream_;
+  std::unique_ptr<std::streambuf> stream_buffer_;
+  std::unique_ptr<std::ostream> part_stream_;
+  std::unique_ptr<std::streambuf> part_stream_buffer_;
+  std::unique_ptr<xml::serializer> serializer_;
 };
 
 } // namespace xlnt

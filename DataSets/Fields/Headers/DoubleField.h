@@ -13,7 +13,7 @@ namespace DataSets {
  * Field for double values.
  */
 class DoubleField : public BaseField {
- public:
+public:
   /**
    *
    * @param fieldName name of the field (column)
@@ -22,23 +22,23 @@ class DoubleField : public BaseField {
    */
   DoubleField(std::string_view fieldName, gsl::index index, BaseDataSet *dataSet);
 
-    [[nodiscard]] ValueType getFieldType() const override;
+  [[nodiscard]] ValueType getFieldType() const override;
 
-    void setAsString(std::string_view newValue) override;
+  void setAsString(std::string_view newValue) override;
 
-    [[nodiscard]] std::string getAsString() const override;
+  [[nodiscard]] std::string getAsString() const override;
 
-    void setAsDouble(double newValue);
+  void setAsDouble(double newValue);
 
-    [[nodiscard]] double getAsDouble() const;
+  [[nodiscard]] double getAsDouble() const;
 
-    [[nodiscard]] std::function<int8_t(const DataSetRow *, const DataSetRow *)> getCompareFunction() const override;
+  [[nodiscard]] std::function<int8_t(const DataSetRow *, const DataSetRow *)> getCompareFunction() const override;
 
- protected:
-    void setValue(const void *newValue) override;
+protected:
+  void setValue(const void *newValue) override;
 
-    double value;
+  double value;
 };
-}
+} // namespace DataSets
 
 #endif //  DATASETS_FIELDS_HEADERS_DOUBLEFIELD_H_

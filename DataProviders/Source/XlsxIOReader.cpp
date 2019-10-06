@@ -4,9 +4,7 @@
 
 #include <XlsxIOReader.h>
 
-DataProviders::XlsxIOReader::XlsxIOReader(std::string_view fileName) : BaseDataProvider() {
-  init(fileName);
-}
+DataProviders::XlsxIOReader::XlsxIOReader(std::string_view fileName) : BaseDataProvider() { init(fileName); }
 
 DataProviders::XlsxIOReader::XlsxIOReader(std::string_view fileName, CharSet inputCharSet)
     : BaseDataProvider(inputCharSet) {
@@ -30,25 +28,17 @@ void DataProviders::XlsxIOReader::init(std::string_view fileName) {
   readHeader();
 }
 
-const std::vector<std::string> &DataProviders::XlsxIOReader::getRow() const {
-  return currentRecord;
-}
+const std::vector<std::string> &DataProviders::XlsxIOReader::getRow() const { return currentRecord; }
 
 std::string DataProviders::XlsxIOReader::getColumnName(unsigned int columnIndex) const {
   return currentRecord.at(columnIndex);
 }
 
-uint64_t DataProviders::XlsxIOReader::getColumnCount() const {
-  return currentRecord.size();
-}
+uint64_t DataProviders::XlsxIOReader::getColumnCount() const { return currentRecord.size(); }
 
-const std::vector<std::string> &DataProviders::XlsxIOReader::getHeader() const {
-  return header;
-}
+const std::vector<std::string> &DataProviders::XlsxIOReader::getHeader() const { return header; }
 
-int DataProviders::XlsxIOReader::getCurrentRecordNumber() const {
-  return currentRecordNumber;
-}
+int DataProviders::XlsxIOReader::getCurrentRecordNumber() const { return currentRecordNumber; }
 
 bool DataProviders::XlsxIOReader::next() {
   if (xlsxioread_sheet_next_row(xlsxioSheet) != 0) {
@@ -62,9 +52,7 @@ bool DataProviders::XlsxIOReader::next() {
       }
       delete value;
     }
-    if (std::all_of(currentRecord.begin(), currentRecord.end(), [](std::string_view value) {
-      return value.empty();
-    })) {
+    if (std::all_of(currentRecord.begin(), currentRecord.end(), [](std::string_view value) { return value.empty(); })) {
       _eof = true;
       return false;
     }
@@ -82,13 +70,9 @@ void DataProviders::XlsxIOReader::first() {
   readHeader();
 }
 
-bool DataProviders::XlsxIOReader::eof() const {
-  return _eof;
-}
+bool DataProviders::XlsxIOReader::eof() const { return _eof; }
 
-DataProviders::XlsxIOReader::~XlsxIOReader() {
-  close();
-}
+DataProviders::XlsxIOReader::~XlsxIOReader() { close(); }
 
 void DataProviders::XlsxIOReader::close() {
   xlsxioread_sheet_close(xlsxioSheet);

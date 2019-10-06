@@ -31,8 +31,6 @@ namespace xlnt {
 /// <summary>
 /// A reference to an external workbook for use in formulae.
 /// </summary>
-class XLNT_API external_book
-{
-};
+class XLNT_API external_book {};
 
 } // namespace xlnt

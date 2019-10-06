@@ -21,4 +21,3 @@ AppContext::AppContext() {
   messageManager.value->registerMsg<ExecAsyncNotify>(threadPool.value.get());
   messageManager.value->registerMsg<ExecAsync>(threadPool.value.get());
 }
-

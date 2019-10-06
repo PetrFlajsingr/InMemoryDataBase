@@ -5,27 +5,24 @@
 #ifndef PROJECT_RESOURCEMANAGER_H
 #define PROJECT_RESOURCEMANAGER_H
 
-#include <string>
-#include <Exceptions.h>
 #include "Config.h"
 #include "FileManager.h"
+#include <Exceptions.h>
+#include <string>
 
-enum ResourceType {
-  Image, Text, Csv, Archive
-};
+enum ResourceType { Image, Text, Csv, Archive };
 /**
  * Access point for resource handling.
  */
 class ResourceManager {
- public:
+public:
   /**
    * Return a string resource [category[name]]
    * @tparam T type of resource
    * @param resString resource string indetifying the value
    * @return value saved under provided key
    */
-  template<typename T>
-  T getResource(std::string_view resString) {
+  template <typename T> T getResource(std::string_view resString) {
     if (resString[0] == '[' && resString.back() == ']' && resString[resString.size() - 2] == ']') {
       auto sub = resString.substr(1, resString.size() - 3);
       auto pos = sub.find('[');
@@ -41,10 +38,10 @@ class ResourceManager {
 
   File getResourceFile(std::string_view fileName);
 
- private:
+private:
   Config config = Config("./test.conf");
 
-    Folder resourceFolder = FileManager::getFolder("./resources");
+  Folder resourceFolder = FileManager::getFolder("./resources");
 };
 
-#endif //PROJECT_RESOURCEMANAGER_H
+#endif // PROJECT_RESOURCEMANAGER_H

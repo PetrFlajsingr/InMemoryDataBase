@@ -6,11 +6,16 @@
 
 int compareDataContainers(const DataContainer &data1, const DataContainer &data2, ValueType valueType) {
   switch (valueType) {
-    case ValueType::Integer:return Utilities::compareInt(data1._integer, data2._integer);
-    case ValueType::Double:return Utilities::compareDouble(data1._double, data2._double);
-    case ValueType::String:return Utilities::compareString(data1._string, data2._string);
-    case ValueType::Currency:return Utilities::compareCurrency(*data1._currency, *data2._currency);
-    case ValueType::DateTime:return Utilities::compareDateTime(*data1._dateTime, *data2._dateTime);
+  case ValueType::Integer:
+    return Utilities::compareInt(data1._integer, data2._integer);
+  case ValueType::Double:
+    return Utilities::compareDouble(data1._double, data2._double);
+  case ValueType::String:
+    return Utilities::compareString(data1._string, data2._string);
+  case ValueType::Currency:
+    return Utilities::compareCurrency(*data1._currency, *data2._currency);
+  case ValueType::DateTime:
+    return Utilities::compareDateTime(*data1._dateTime, *data2._dateTime);
   }
   throw IllegalStateException("Internal error. compareDataContainers");
 }
@@ -55,66 +60,46 @@ DateTime::DateTime(const DateTime &other) : type(other.type), ptime(other.ptime)
 
 std::string DateTime::toString() const {
   switch (type) {
-    case DateTimeType::Date: return toString(dateDefFmt);
-    case DateTimeType::Time: return toString(timeDefFmt);
-    case DateTimeType::DateTime: return toString(dateTimeDefFmt);
+  case DateTimeType::Date:
+    return toString(dateDefFmt);
+  case DateTimeType::Time:
+    return toString(timeDefFmt);
+  case DateTimeType::DateTime:
+    return toString(dateTimeDefFmt);
   }
-    throw std::runtime_error("DateTime::toString()");
+  throw std::runtime_error("DateTime::toString()");
 }
 
 std::string DateTime::toString(std::string_view fmt) const {
-    auto *facet = new boost::posix_time::time_facet(std::string(fmt).c_str());
+  auto *facet = new boost::posix_time::time_facet(std::string(fmt).c_str());
   std::ostringstream os;
   os.imbue(std::locale(os.getloc(), facet));
   os << ptime;
   return os.str();
 }
 
-DateTimeType DateTime::getType() const {
-  return type;
-}
+DateTimeType DateTime::getType() const { return type; }
 
-DateTime::DateTime(std::string_view str, DateTimeType type) : type(type) {
-  fromString(str);
-}
-DateTime::DateTime(std::string_view str, std::string_view fmt) {
-  fromString(str, fmt);
-}
+DateTime::DateTime(std::string_view str, DateTimeType type) : type(type) { fromString(str); }
+DateTime::DateTime(std::string_view str, std::string_view fmt) { fromString(str, fmt); }
 
-const boost::posix_time::ptime &DateTime::getTime() const {
-  return ptime;
-}
-bool DateTime::operator==(const DateTime &rhs) const {
-  return type == rhs.type &&
-      ptime == rhs.ptime;
-}
-bool DateTime::operator!=(const DateTime &rhs) const {
-  return !(rhs == *this);
-}
-bool DateTime::operator<(const DateTime &rhs) const {
-  return ptime < rhs.ptime;
-}
-bool DateTime::operator>(const DateTime &rhs) const {
-  return rhs < *this;
-}
-bool DateTime::operator<=(const DateTime &rhs) const {
-  return !(rhs < *this);
-}
-bool DateTime::operator>=(const DateTime &rhs) const {
-  return !(*this < rhs);
-}
+const boost::posix_time::ptime &DateTime::getTime() const { return ptime; }
+bool DateTime::operator==(const DateTime &rhs) const { return type == rhs.type && ptime == rhs.ptime; }
+bool DateTime::operator!=(const DateTime &rhs) const { return !(rhs == *this); }
+bool DateTime::operator<(const DateTime &rhs) const { return ptime < rhs.ptime; }
+bool DateTime::operator>(const DateTime &rhs) const { return rhs < *this; }
+bool DateTime::operator<=(const DateTime &rhs) const { return !(rhs < *this); }
+bool DateTime::operator>=(const DateTime &rhs) const { return !(*this < rhs); }
 std::ostream &operator<<(std::ostream &os, const DateTime &timeB) {
   os << timeB.toString();
   return os;
 }
 
-std::istream &operator>>(std::istream &, DateTime &) {
-  throw NotImplementedException();
-}
+std::istream &operator>>(std::istream &, DateTime &) { throw NotImplementedException(); }
 std::pair<DateTimeType, boost::posix_time::ptime> DateTime::innerFromString(std::string_view str,
                                                                             std::string_view fmt) {
-  const std::locale loc = std::locale(std::locale::classic(),
-                                      new boost::posix_time::time_input_facet(std::string(fmt)));
+  const std::locale loc =
+      std::locale(std::locale::classic(), new boost::posix_time::time_input_facet(std::string(fmt)));
   auto is = std::istringstream(std::string(str));
   is.imbue(loc);
   boost::posix_time::ptime t;
@@ -134,29 +119,26 @@ std::pair<DateTimeType, boost::posix_time::ptime> DateTime::innerFromString(std:
 
 void DateTime::fromString(std::string_view str) {
   switch (type) {
-    case DateTimeType::Date: fromString(str, dateDefFmt);
-      break;
-    case DateTimeType::Time: fromString(str, timeDefFmt);
-      break;
-    case DateTimeType::DateTime: fromString(str, dateTimeDefFmt);
-      break;
+  case DateTimeType::Date:
+    fromString(str, dateDefFmt);
+    break;
+  case DateTimeType::Time:
+    fromString(str, timeDefFmt);
+    break;
+  case DateTimeType::DateTime:
+    fromString(str, dateTimeDefFmt);
+    break;
   }
 }
 void DateTime::fromString(std::string_view str, std::string_view fmt) {
-    auto[_, t] = innerFromString(str, fmt);
-    _ = _;
+  auto [_, t] = innerFromString(str, fmt);
+  _ = _;
   this->ptime = t;
 }
 xlnt::date DateTime::toXlntDate() {
   return xlnt::date(ptime.date().year(), ptime.date().month().as_number(), ptime.date().day().as_number());
 }
 xlnt::time DateTime::toXlntTime() {
-  return xlnt::time(ptime.time_of_day().hours(),
-                    ptime.time_of_day().minutes(),
-                    ptime.time_of_day().seconds(),
-                    0);
+  return xlnt::time(ptime.time_of_day().hours(), ptime.time_of_day().minutes(), ptime.time_of_day().seconds(), 0);
 }
-xlnt::datetime DateTime::toXlntDateTime() {
-  return xlnt::datetime(toXlntDate(), toXlntTime());
-}
-
+xlnt::datetime DateTime::toXlntDateTime() { return xlnt::datetime(toXlntDate(), toXlntTime()); }

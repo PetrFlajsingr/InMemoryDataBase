@@ -5,9 +5,9 @@
 #ifndef DATASETS_FIELDS_HEADERS_INTEGERFIELD_H_
 #define DATASETS_FIELDS_HEADERS_INTEGERFIELD_H_
 
-#include <string>
 #include "BaseField.h"
 #include "Utilities.h"
+#include <string>
 
 namespace DataSets {
 
@@ -15,7 +15,7 @@ namespace DataSets {
  * Field for integer values.
  */
 class IntegerField : public BaseField {
- public:
+public:
   /**
    *
    * @param fieldName name of the field (column)
@@ -24,23 +24,23 @@ class IntegerField : public BaseField {
    */
   IntegerField(std::string_view fieldName, gsl::index index, BaseDataSet *dataSet);
 
-    [[nodiscard]] ValueType getFieldType() const override;
+  [[nodiscard]] ValueType getFieldType() const override;
 
-    void setAsString(std::string_view newValue) override;
+  void setAsString(std::string_view newValue) override;
 
-    [[nodiscard]] std::string getAsString() const override;
+  [[nodiscard]] std::string getAsString() const override;
 
-    void setAsInteger(int newValue);
+  void setAsInteger(int newValue);
 
-    [[nodiscard]] int getAsInteger() const;
+  [[nodiscard]] int getAsInteger() const;
 
-    [[nodiscard]] std::function<int8_t(const DataSetRow *, const DataSetRow *)> getCompareFunction() const override;
+  [[nodiscard]] std::function<int8_t(const DataSetRow *, const DataSetRow *)> getCompareFunction() const override;
 
- protected:
-    void setValue(const void *data) override;
+protected:
+  void setValue(const void *data) override;
 
-    int value;
+  int value;
 };
-}
+} // namespace DataSets
 
 #endif //  DATASETS_FIELDS_HEADERS_INTEGERFIELD_H_

@@ -5,9 +5,9 @@
 #ifndef CSV_READER_ZAKLADNIUDAJE_H
 #define CSV_READER_ZAKLADNIUDAJE_H
 
+#include <boost/property_tree/ptree.hpp>
 #include <string>
 #include <vector>
-#include <boost/property_tree/ptree.hpp>
 
 namespace pt = boost::property_tree;
 struct ZakladniUdaje {
@@ -77,4 +77,4 @@ struct ZakladniUdaje {
   std::vector<std::string> toVector();
 };
 
-#endif //CSV_READER_ZAKLADNIUDAJE_H
+#endif // CSV_READER_ZAKLADNIUDAJE_H

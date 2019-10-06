@@ -5,77 +5,72 @@
 #ifndef MISC_HEADERS_EXCEPTIONS_H_
 #define MISC_HEADERS_EXCEPTIONS_H_
 
+#include <gsl/gsl>
 #include <stdexcept>
 #include <string>
-#include <gsl/gsl>
 
 class NotImplementedException : public std::logic_error {
- public:
+public:
   NotImplementedException() : logic_error("Function is not implemented") {}
 };
 
 class IOException : public std::exception {
- private:
+private:
   const gsl::czstring<> errorMessage;
- public:
+
+public:
   explicit IOException(const gsl::czstring<> message) : errorMessage(message) {}
   explicit IOException(const std::string &message) : errorMessage(message.c_str()) {}
 
-    [[nodiscard]] char const *what() const noexcept override {
-    return errorMessage;
-  }
+  [[nodiscard]] char const *what() const noexcept override { return errorMessage; }
 };
 
 class InvalidArgumentException : public std::invalid_argument {
- public:
+public:
   explicit InvalidArgumentException(const gsl::czstring<> message) : invalid_argument(message) {}
 
-    explicit InvalidArgumentException(const std::string &message) : invalid_argument(message.c_str()) {}
+  explicit InvalidArgumentException(const std::string &message) : invalid_argument(message.c_str()) {}
 };
 
 class IllegalStateException : public std::exception {
- private:
+private:
   const gsl::czstring<> errorMessage;
- public:
+
+public:
   explicit IllegalStateException(const gsl::czstring<> message) : errorMessage(message) {}
 
-    [[nodiscard]] char const *what() const noexcept override {
-    return errorMessage;
-  }
+  [[nodiscard]] char const *what() const noexcept override { return errorMessage; }
 };
 
 class UnsupportedOperationException : public std::exception {
- private:
+private:
   const gsl::czstring<> errorMessage;
- public:
+
+public:
   explicit UnsupportedOperationException(const gsl::czstring<> message) : errorMessage(message) {}
 
-    [[nodiscard]] char const *what() const noexcept override {
-    return errorMessage;
-  }
+  [[nodiscard]] char const *what() const noexcept override { return errorMessage; }
 };
 
 class DataBaseException : public std::exception {
- private:
+private:
   const gsl::czstring<> errorMessage;
- public:
+
+public:
   explicit DataBaseException(const std::string &errorMessage) : errorMessage(errorMessage.c_str()) {}
   explicit DataBaseException(const gsl::czstring<> message) : errorMessage(message) {}
 
-    [[nodiscard]] char const *what() const noexcept override {
-    return errorMessage;
-  }
+  [[nodiscard]] char const *what() const noexcept override { return errorMessage; }
 };
 
 class ResourceNotFoundException : public std::exception {
- private:
+private:
   const gsl::czstring<> errorMessage;
- public:
+
+public:
   explicit ResourceNotFoundException(const std::string &errorMessage) : errorMessage(errorMessage.c_str()) {}
   explicit ResourceNotFoundException(const gsl::czstring<> message) : errorMessage(message) {}
 
-    [[nodiscard]] char const *what() const noexcept override {
-    return errorMessage;
-  }
+  [[nodiscard]] char const *what() const noexcept override { return errorMessage; }
 };
-#endif  //  MISC_HEADERS_EXCEPTIONS_H_
+#endif //  MISC_HEADERS_EXCEPTIONS_H_

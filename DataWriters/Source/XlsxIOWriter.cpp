@@ -5,17 +5,14 @@
 #include <Exceptions.h>
 #include <XlsxIOWriter.h>
 
-DataWriters::XlsxIOWriter::XlsxIOWriter(std::string_view fileName, std::string_view sheetName)
-    : BaseDataWriter() {
+DataWriters::XlsxIOWriter::XlsxIOWriter(std::string_view fileName, std::string_view sheetName) : BaseDataWriter() {
   xlsxWriterHandle = xlsxiowrite_open(std::string(fileName).c_str(), std::string(sheetName).c_str());
   if (xlsxWriterHandle == nullptr) {
     throw IOException("Error creating .xlsx file");
   }
 }
 
-DataWriters::XlsxIOWriter::XlsxIOWriter(std::string_view fileName,
-                                        CharSet charSet,
-                                        std::string_view sheetName)
+DataWriters::XlsxIOWriter::XlsxIOWriter(std::string_view fileName, CharSet charSet, std::string_view sheetName)
     : BaseDataWriter(charSet) {
   xlsxWriterHandle = xlsxiowrite_open(std::string(fileName).c_str(), std::string(sheetName).c_str());
   if (xlsxWriterHandle == nullptr) {
@@ -23,9 +20,7 @@ DataWriters::XlsxIOWriter::XlsxIOWriter(std::string_view fileName,
   }
 }
 
-DataWriters::XlsxIOWriter::~XlsxIOWriter() {
-  xlsxiowrite_close(xlsxWriterHandle);
-}
+DataWriters::XlsxIOWriter::~XlsxIOWriter() { xlsxiowrite_close(xlsxWriterHandle); }
 
 void DataWriters::XlsxIOWriter::writeHeader(const std::vector<std::string> &header) {
   for (auto &name : header) {

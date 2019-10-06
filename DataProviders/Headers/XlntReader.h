@@ -6,31 +6,31 @@
 #define PROJECT_XLNTREADER_H
 
 #include "BaseDataProvider.h"
-#include <xlnt/xlnt.hpp>
-#include <vector>
 #include <string>
+#include <vector>
+#include <xlnt/xlnt.hpp>
 
 namespace DataProviders {
 class XlntReader : public BaseDataProvider {
- public:
+public:
   explicit XlntReader(std::string_view fileName, std::string_view sheetName = "");
   XlntReader(std::string_view fileName, CharSet inputCharSet, std::string_view sheetName = "");
 
-    [[nodiscard]] const std::vector<std::string> &getRow() const override;
+  [[nodiscard]] const std::vector<std::string> &getRow() const override;
 
-    [[nodiscard]] std::string getColumnName(unsigned int columnIndex) const override;
+  [[nodiscard]] std::string getColumnName(unsigned int columnIndex) const override;
 
-    [[nodiscard]] uint64_t getColumnCount() const override;
+  [[nodiscard]] uint64_t getColumnCount() const override;
 
-    [[nodiscard]] const std::vector<std::string> &getHeader() const override;
+  [[nodiscard]] const std::vector<std::string> &getHeader() const override;
 
-    [[nodiscard]] int getCurrentRecordNumber() const override;
+  [[nodiscard]] int getCurrentRecordNumber() const override;
   bool next() override;
   void first() override;
 
-    [[nodiscard]] bool eof() const override;
+  [[nodiscard]] bool eof() const override;
 
- private:
+private:
   xlnt::streaming_workbook_reader wb;
 
   std::vector<std::string> header;
@@ -51,6 +51,6 @@ class XlntReader : public BaseDataProvider {
 
   void prepareSheet();
 };
-}
+} // namespace DataProviders
 
-#endif //PROJECT_XLNTREADER_H
+#endif // PROJECT_XLNTREADER_H

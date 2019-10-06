@@ -5,30 +5,28 @@
 #ifndef PROJECT_APPCONTEXT_H
 #define PROJECT_APPCONTEXT_H
 
-#include <unordered_map>
-#include <MemoryDataBase.h>
-#include <Config.h>
-#include <MessageManager.h>
 #include "ConsoleIO.h"
-#include <ThreadPool.h>
+#include <Config.h>
 #include <FileDownloadManager.h>
-#include <ResourceManager.h>
+#include <MemoryDataBase.h>
+#include <MessageManager.h>
 #include <Property.h>
-#include <string>
+#include <ResourceManager.h>
+#include <ThreadPool.h>
 #include <memory>
+#include <string>
+#include <unordered_map>
 
 /**
  * Global data and managers.
  */
 class AppContext {
- public:
+public:
   std::unordered_map<std::string, std::shared_ptr<DataBase::MemoryDataBase>> DBs;
   /**
    * CLI input mode.
    */
-  enum class Mode {
-    query, normal
-  };
+  enum class Mode { query, normal };
   Mode mode = Mode::normal;
 
   Property<std::shared_ptr<MessageManager>, AppContext, PropType::R> messageManager;
@@ -39,8 +37,8 @@ class AppContext {
 
   static AppContext &GetInstance();
 
- private:
+private:
   AppContext();
 };
 
-#endif //PROJECT_APPCONTEXT_H
+#endif // PROJECT_APPCONTEXT_H

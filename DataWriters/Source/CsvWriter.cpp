@@ -2,9 +2,9 @@
 // Created by Petr Flajsingr on 13/10/2018.
 //
 
+#include "CsvWriter.h"
 #include <Exceptions.h>
 #include <vector>
-#include "CsvWriter.h"
 
 DataWriters::CsvWriter::CsvWriter(std::string_view filePath, std::string_view delimiter) : BaseDataWriter() {
   this->delimiter = delimiter;
@@ -34,14 +34,13 @@ void DataWriters::CsvWriter::writeHeader(const std::vector<std::string> &header)
 
 void DataWriters::CsvWriter::writeRecord(const std::vector<std::string> &record) {
   if (record.size() != columnCount) {
-    throw InvalidArgumentException(
-        "Length of record doesn't match length of header.");
+    throw InvalidArgumentException("Length of record doesn't match length of header.");
   }
   writeRow(record);
 }
 
 void DataWriters::CsvWriter::writeRow(const std::vector<std::string> &data) {
-    for (gsl::index i = 0; i < static_cast<gsl::index>(columnCount - 1); ++i) {
+  for (gsl::index i = 0; i < static_cast<gsl::index>(columnCount - 1); ++i) {
     if (convert) {
       *outputStream << converter->convertBack(data[i]) << delimiter;
     } else {
@@ -54,4 +53,3 @@ void DataWriters::CsvWriter::writeRow(const std::vector<std::string> &data) {
     *outputStream << data[columnCount - 1] << "\n";
   }
 }
-

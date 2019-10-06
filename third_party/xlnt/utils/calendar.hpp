@@ -31,10 +31,6 @@ namespace xlnt {
 /// An enumeration of possible base dates.
 /// Dates in Excel are stored as days since this base date.
 /// </summary>
-enum class XLNT_API calendar
-{
-    windows_1900,
-    mac_1904
-};
+enum class XLNT_API calendar { windows_1900, mac_1904 };
 
 } // namespace xlnt

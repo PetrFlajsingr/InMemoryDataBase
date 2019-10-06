@@ -38,56 +38,55 @@ class worksheet;
 /// A 2D range of cells in a worksheet that is referred to by name.
 /// ws->range("A1:B2") could be replaced by ws->range("range1")
 /// </summary>
-class XLNT_API named_range
-{
+class XLNT_API named_range {
 public:
-    /// <summary>
-    /// Type alias for the combination of sheet and range this named_range points to.
-    /// </summary>
-    using target = std::pair<worksheet, range_reference>;
+  /// <summary>
+  /// Type alias for the combination of sheet and range this named_range points to.
+  /// </summary>
+  using target = std::pair<worksheet, range_reference>;
 
-    /// <summary>
-    /// Constructs a named range that has no name and has no targets.
-    /// </summary>
-    named_range();
+  /// <summary>
+  /// Constructs a named range that has no name and has no targets.
+  /// </summary>
+  named_range();
 
-    /// <summary>
-    /// Constructs a named range by copying its name and targets from other.
-    /// </summary>
-    named_range(const named_range &other);
+  /// <summary>
+  /// Constructs a named range by copying its name and targets from other.
+  /// </summary>
+  named_range(const named_range &other);
 
-    /// <summary>
-    /// Constructs a named range with the given name and targets.
-    /// </summary>
-    named_range(const std::string &name, const std::vector<target> &targets);
+  /// <summary>
+  /// Constructs a named range with the given name and targets.
+  /// </summary>
+  named_range(const std::string &name, const std::vector<target> &targets);
 
-    /// <summary>
-    /// Returns the name of this range.
-    /// </summary>
-    std::string name() const;
+  /// <summary>
+  /// Returns the name of this range.
+  /// </summary>
+  std::string name() const;
 
-    /// <summary>
-    /// Returns the set of targets of this named range as a vector.
-    /// </summary>
-    const std::vector<target> &targets() const;
+  /// <summary>
+  /// Returns the set of targets of this named range as a vector.
+  /// </summary>
+  const std::vector<target> &targets() const;
 
-    /// <summary>
-    /// Assigns the name and targets of this named_range to that of other.
-    /// </summary>
-    named_range &operator=(const named_range &other);
+  /// <summary>
+  /// Assigns the name and targets of this named_range to that of other.
+  /// </summary>
+  named_range &operator=(const named_range &other);
 
-    bool operator==(const named_range &rhs) const;
+  bool operator==(const named_range &rhs) const;
 
 private:
-    /// <summary>
-    /// The name of this named range.
-    /// </summary>
-    std::string name_;
+  /// <summary>
+  /// The name of this named range.
+  /// </summary>
+  std::string name_;
 
-    /// <summary>
-    /// The targets of this named range.
-    /// </summary>
-    std::vector<target> targets_;
+  /// <summary>
+  /// The targets of this named range.
+  /// </summary>
+  std::vector<target> targets_;
 };
 
 } // namespace xlnt

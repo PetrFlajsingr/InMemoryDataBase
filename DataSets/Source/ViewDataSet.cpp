@@ -3,5 +3,4 @@
 //
 
 #include "ViewDataSet.h"
-DataSets::ViewDataSet::ViewDataSet(const std::string_view &dataSetName)
-    : BaseDataSet(dataSetName) {}
+DataSets::ViewDataSet::ViewDataSet(const std::string_view &dataSetName) : BaseDataSet(dataSetName) {}

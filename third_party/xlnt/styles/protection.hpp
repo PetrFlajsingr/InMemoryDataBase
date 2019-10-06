@@ -26,82 +26,81 @@
 
 #include <cstddef>
 
-#include <xlnt/xlnt_config.hpp>
 #include <xlnt/utils/optional.hpp>
+#include <xlnt/xlnt_config.hpp>
 
 namespace xlnt {
 
 /// <summary>
 /// Describes the protection style of a particular cell.
 /// </summary>
-class XLNT_API protection
-{
+class XLNT_API protection {
 public:
-    /// <summary>
-    /// Returns an unlocked and unhidden protection object.
-    /// </summary>
-    static protection unlocked_and_visible();
+  /// <summary>
+  /// Returns an unlocked and unhidden protection object.
+  /// </summary>
+  static protection unlocked_and_visible();
 
-    /// <summary>
-    /// Returns a locked and unhidden protection object.
-    /// </summary>
-    static protection locked_and_visible();
+  /// <summary>
+  /// Returns a locked and unhidden protection object.
+  /// </summary>
+  static protection locked_and_visible();
 
-    /// <summary>
-    /// Returns an unlocked and hidden protection object.
-    /// </summary>
-    static protection unlocked_and_hidden();
+  /// <summary>
+  /// Returns an unlocked and hidden protection object.
+  /// </summary>
+  static protection unlocked_and_hidden();
 
-    /// <summary>
-    /// Returns a locked and hidden protection object.
-    /// </summary>
-    static protection locked_and_hidden();
+  /// <summary>
+  /// Returns a locked and hidden protection object.
+  /// </summary>
+  static protection locked_and_hidden();
 
-    /// <summary>
-    /// Constructs a default unlocked unhidden protection object.
-    /// </summary>
-    protection();
+  /// <summary>
+  /// Constructs a default unlocked unhidden protection object.
+  /// </summary>
+  protection();
 
-    /// <summary>
-    /// Returns true if cells using this protection should be locked.
-    /// </summary>
-    bool locked() const;
+  /// <summary>
+  /// Returns true if cells using this protection should be locked.
+  /// </summary>
+  bool locked() const;
 
-    /// <summary>
-    /// Sets the locked state of the protection to locked and returns a reference to the protection.
-    /// </summary>
-    protection &locked(bool locked);
+  /// <summary>
+  /// Sets the locked state of the protection to locked and returns a reference to the protection.
+  /// </summary>
+  protection &locked(bool locked);
 
-    /// <summary>
-    /// Returns true if cells using this protection should be hidden.
-    /// </summary>
-    bool hidden() const;
+  /// <summary>
+  /// Returns true if cells using this protection should be hidden.
+  /// </summary>
+  bool hidden() const;
 
-    /// <summary>
-    /// Sets the hidden state of the protection to hidden and returns a reference to the protection.
-    /// </summary>
-    protection &hidden(bool hidden);
+  /// <summary>
+  /// Sets the hidden state of the protection to hidden and returns a reference to the protection.
+  /// </summary>
+  protection &hidden(bool hidden);
 
-    /// <summary>
-    /// Returns true if this protections is equivalent to right.
-    /// </summary>
-    bool operator==(const protection &other) const;
+  /// <summary>
+  /// Returns true if this protections is equivalent to right.
+  /// </summary>
+  bool operator==(const protection &other) const;
 
-    /// <summary>
-    /// Returns true if this protection is not equivalent to right.
-    /// </summary>
-    bool operator!=(const protection &other) const;
+  /// <summary>
+  /// Returns true if this protection is not equivalent to right.
+  /// </summary>
+  bool operator!=(const protection &other) const;
 
 private:
-    /// <summary>
-    /// Whether the cell using this protection is locked or not
-    /// </summary>
-    bool locked_;
+  /// <summary>
+  /// Whether the cell using this protection is locked or not
+  /// </summary>
+  bool locked_;
 
-    /// <summary>
-    /// Whether the cell using this protection is hidden or not
-    /// </summary>
-    bool hidden_;
+  /// <summary>
+  /// Whether the cell using this protection is hidden or not
+  /// </summary>
+  bool hidden_;
 };
 
 } // namespace xlnt

@@ -5,13 +5,13 @@
 #ifndef DATASETS_HEADERS_FILTERSTRUCTURES_H_
 #define DATASETS_HEADERS_FILTERSTRUCTURES_H_
 
-#include <vector>
+#include "Types.h"
+#include <BaseField.h>
+#include <QueryCommon.h>
+#include <Utilities.h>
 #include <algorithm>
 #include <string>
-#include <BaseField.h>
-#include <Utilities.h>
-#include "Types.h"
-#include <QueryCommon.h>
+#include <vector>
 
 namespace DataSets {
 /**
@@ -41,7 +41,7 @@ struct FilterItem {
   std::vector<DataContainer> searchData;
   FilterOption filterOption;
 
-    FilterItem(const BaseField *field, std::vector<DataContainer> searchData, FilterOption filterOption);
+  FilterItem(const BaseField *field, std::vector<DataContainer> searchData, FilterOption filterOption);
 };
 /**
  * Structure holding options for filtering.
@@ -49,14 +49,12 @@ struct FilterItem {
 struct FilterOptions {
   std::vector<FilterItem> options;
 
-  void addOption(const DataSets::BaseField *field,
-                 const std::vector<DataContainer> &values,
+  void addOption(const DataSets::BaseField *field, const std::vector<DataContainer> &values,
                  const FilterOption &filterOption);
 
-  void addOption(const DataSets::BaseField *field,
-                 const std::vector<std::string> &values,
+  void addOption(const DataSets::BaseField *field, const std::vector<std::string> &values,
                  const FilterOption &filterOption);
 };
-}  // namespace DataSets
+} // namespace DataSets
 
-#endif  // DATASETS_HEADERS_FILTERSTRUCTURES_H_
+#endif // DATASETS_HEADERS_FILTERSTRUCTURES_H_

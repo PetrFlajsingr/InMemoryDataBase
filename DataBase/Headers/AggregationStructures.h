@@ -5,8 +5,8 @@
 #ifndef PROJECT_AGGREGATIONSTRUCTURES_H
 #define PROJECT_AGGREGATIONSTRUCTURES_H
 
-#include <Types.h>
 #include <BaseField.h>
+#include <Types.h>
 #include <gsl/gsl>
 
 namespace DataBase {
@@ -66,6 +66,6 @@ struct Avg : Sum, Count {
 };
 
 #pragma clang diagnostic pop
-}
+} // namespace DataBase
 
-#endif //PROJECT_AGGREGATIONSTRUCTURES_H
+#endif // PROJECT_AGGREGATIONSTRUCTURES_H

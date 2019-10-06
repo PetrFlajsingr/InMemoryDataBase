@@ -34,60 +34,59 @@ namespace xlnt {
 /// minute, second, and microsecond (0-999999).
 /// It can also be initialized as a fraction of a day using time::from_number.
 /// </summary>
-struct XLNT_API time
-{
-    /// <summary>
-    /// Return the current time according to the system time.
-    /// </summary>
-    static time now();
+struct XLNT_API time {
+  /// <summary>
+  /// Return the current time according to the system time.
+  /// </summary>
+  static time now();
 
-    /// <summary>
-    /// Return a time from a number representing a fraction of a day.
-    /// The integer part of number will be ignored.
-    /// 0.5 would return time(12, 0, 0, 0) or noon, halfway through the day.
-    /// </summary>
-    static time from_number(double number);
+  /// <summary>
+  /// Return a time from a number representing a fraction of a day.
+  /// The integer part of number will be ignored.
+  /// 0.5 would return time(12, 0, 0, 0) or noon, halfway through the day.
+  /// </summary>
+  static time from_number(double number);
 
-    /// <summary>
-    /// Constructs a time object from an optional hour, minute, second, and microsecond.
-    /// </summary>
-    explicit time(int hour_ = 0, int minute_ = 0, int second_ = 0, int microsecond_ = 0);
+  /// <summary>
+  /// Constructs a time object from an optional hour, minute, second, and microsecond.
+  /// </summary>
+  explicit time(int hour_ = 0, int minute_ = 0, int second_ = 0, int microsecond_ = 0);
 
-    /// <summary>
-    /// Constructs a time object from a string representing the time.
-    /// </summary>
-    explicit time(const std::string &time_string);
+  /// <summary>
+  /// Constructs a time object from a string representing the time.
+  /// </summary>
+  explicit time(const std::string &time_string);
 
-    /// <summary>
-    /// Returns a numeric representation of the time in the range 0-1 where the value
-    /// is equal to the fraction of the day elapsed.
-    /// </summary>
-    double to_number() const;
+  /// <summary>
+  /// Returns a numeric representation of the time in the range 0-1 where the value
+  /// is equal to the fraction of the day elapsed.
+  /// </summary>
+  double to_number() const;
 
-    /// <summary>
-    /// Returns true if this time is equivalent to comparand.
-    /// </summary>
-    bool operator==(const time &comparand) const;
+  /// <summary>
+  /// Returns true if this time is equivalent to comparand.
+  /// </summary>
+  bool operator==(const time &comparand) const;
 
-    /// <summary>
-    /// The hour
-    /// </summary>
-    int hour;
+  /// <summary>
+  /// The hour
+  /// </summary>
+  int hour;
 
-    /// <summary>
-    /// The minute
-    /// </summary>
-    int minute;
+  /// <summary>
+  /// The minute
+  /// </summary>
+  int minute;
 
-    /// <summary>
-    /// The second
-    /// </summary>
-    int second;
+  /// <summary>
+  /// The second
+  /// </summary>
+  int second;
 
-    /// <summary>
-    /// The microsecond
-    /// </summary>
-    int microsecond;
+  /// <summary>
+  /// The microsecond
+  /// </summary>
+  int microsecond;
 };
 
 } // namespace xlnt

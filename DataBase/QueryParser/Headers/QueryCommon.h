@@ -6,36 +6,24 @@
 #define PROJECT_QUERYCOMMON_H
 
 #include <string>
-#include <vector>
 #include <utility>
+#include <vector>
 
 namespace DataBase {
 /*
  * Types for query parsing and its inner representation.
  */
-enum class CondOperator {
-  greater, greaterEqual, less, lessEqual, equal, notEqual
-};
+enum class CondOperator { greater, greaterEqual, less, lessEqual, equal, notEqual };
 
-enum class LogicOperator {
-  logicOr, logicAnd, none
-};
+enum class LogicOperator { logicOr, logicAnd, none };
 
-enum class ConstType {
-  integer, floatingPoint, string
-};
+enum class ConstType { integer, floatingPoint, string };
 
-enum class AgrOperator {
-  sum, avg, count, min, max, group
-};
+enum class AgrOperator { sum, avg, count, min, max, group };
 
-enum class Order {
-  asc, desc
-};
+enum class Order { asc, desc };
 
-enum class JoinType {
-  innerJoin, leftJoin, rightJoin, outerJoin
-};
+enum class JoinType { innerJoin, leftJoin, rightJoin, outerJoin };
 
 struct FieldId {
   std::string alias;
@@ -82,7 +70,7 @@ struct HavingStructure {
 };
 
 struct OrderItem {
-    Order order = Order::asc;
+  Order order = Order::asc;
   FieldId field;
 };
 struct OrderStructure {
@@ -159,6 +147,6 @@ LogicOperator tokenToLogic(Token token);
 AgrOperator tokenToAgrOperation(Token token);
 
 Order tokenToOrder(Token token);
-}  // namespace DataBase
+} // namespace DataBase
 
-#endif //PROJECT_QUERYCOMMON_H
+#endif // PROJECT_QUERYCOMMON_H

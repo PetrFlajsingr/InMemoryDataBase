@@ -5,8 +5,8 @@
 #ifndef PROJECT_XLNTWRITER_H
 #define PROJECT_XLNTWRITER_H
 
-#include <string>
 #include "BaseDataWriter.h"
+#include <string>
 #include <xlnt/xlnt.hpp>
 
 namespace DataWriters {
@@ -14,7 +14,7 @@ namespace DataWriters {
  * Write xlsx files using xlnt library.
  */
 class XlntWriter : public BaseDataWriter {
- public:
+public:
   /**
    *
    * @param fileName destination
@@ -28,12 +28,12 @@ class XlntWriter : public BaseDataWriter {
    */
   ~XlntWriter() override;
 
- private:
+private:
   xlnt::workbook wb;
   xlnt::worksheet ws;
   std::string destination;
   gsl::index recordNumber = 1;
 };
-}  // namespace DataWriters
+} // namespace DataWriters
 
-#endif //PROJECT_XLNTWRITER_H
+#endif // PROJECT_XLNTWRITER_H

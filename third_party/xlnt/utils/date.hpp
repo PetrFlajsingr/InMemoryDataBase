@@ -25,8 +25,8 @@
 
 #include <string>
 
-#include <xlnt/xlnt_config.hpp>
 #include <xlnt/utils/calendar.hpp>
+#include <xlnt/xlnt_config.hpp>
 
 namespace xlnt {
 
@@ -35,59 +35,58 @@ namespace xlnt {
 /// It can also be initialized as a number of days since a base date
 /// using date::from_number.
 /// </summary>
-struct XLNT_API date
-{
-    /// <summary>
-    /// Return the current date according to the system time.
-    /// </summary>
-    static date today();
+struct XLNT_API date {
+  /// <summary>
+  /// Return the current date according to the system time.
+  /// </summary>
+  static date today();
 
-    /// <summary>
-    /// Return a date by adding days_since_base_year to base_date.
-    /// This includes leap years.
-    /// </summary>
-    static date from_number(int days_since_base_year, calendar base_date);
+  /// <summary>
+  /// Return a date by adding days_since_base_year to base_date.
+  /// This includes leap years.
+  /// </summary>
+  static date from_number(int days_since_base_year, calendar base_date);
 
-    /// <summary>
-    /// Constructs a data from a given year, month, and day.
-    /// </summary>
-    date(int year_, int month_, int day_);
+  /// <summary>
+  /// Constructs a data from a given year, month, and day.
+  /// </summary>
+  date(int year_, int month_, int day_);
 
-    /// <summary>
-    /// Return the number of days between this date and base_date.
-    /// </summary>
-    int to_number(calendar base_date) const;
+  /// <summary>
+  /// Return the number of days between this date and base_date.
+  /// </summary>
+  int to_number(calendar base_date) const;
 
-    /// <summary>
-    /// Calculates and returns the day of the week that this date represents in the range
-    /// 0 to 6 where 0 represents Sunday.
-    /// </summary>
-    int weekday() const;
+  /// <summary>
+  /// Calculates and returns the day of the week that this date represents in the range
+  /// 0 to 6 where 0 represents Sunday.
+  /// </summary>
+  int weekday() const;
 
-    /// <summary>
-    /// Return true if this date is equal to comparand.
-    /// </summary>
-    bool operator==(const date &comparand) const;
+  /// <summary>
+  /// Return true if this date is equal to comparand.
+  /// </summary>
+  bool operator==(const date &comparand) const;
 
-    /// <summary>
-    /// Return true if this date is equal to comparand.
-    /// </summary>
-    bool operator!=(const date &comparand) const;
+  /// <summary>
+  /// Return true if this date is equal to comparand.
+  /// </summary>
+  bool operator!=(const date &comparand) const;
 
-    /// <summary>
-    /// The year
-    /// </summary>
-    int year;
+  /// <summary>
+  /// The year
+  /// </summary>
+  int year;
 
-    /// <summary>
-    /// The month
-    /// </summary>
-    int month;
+  /// <summary>
+  /// The month
+  /// </summary>
+  int month;
 
-    /// <summary>
-    /// The day
-    /// </summary>
-    int day;
+  /// <summary>
+  /// The day
+  /// </summary>
+  int day;
 };
 
 } // namespace xlnt

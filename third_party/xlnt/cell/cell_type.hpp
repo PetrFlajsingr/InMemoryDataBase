@@ -35,24 +35,23 @@ namespace xlnt {
 /// <summary>
 /// Enumerates the possible types a cell can be determined by it's current value.
 /// </summary>
-enum class XLNT_API cell_type
-{
-    /// no value
-    empty,
-    /// value is TRUE or FALSE
-    boolean,
-    /// value is an ISO 8601 formatted date
-    date,
-    /// value is a known error code such as \#VALUE!
-    error,
-    /// value is a string stored in the cell
-    inline_string,
-    /// value is a number
-    number,
-    /// value is a string shared with other cells to save space
-    shared_string,
-    /// value is the string result of a formula
-    formula_string
+enum class XLNT_API cell_type {
+  /// no value
+  empty,
+  /// value is TRUE or FALSE
+  boolean,
+  /// value is an ISO 8601 formatted date
+  date,
+  /// value is a known error code such as \#VALUE!
+  error,
+  /// value is a string stored in the cell
+  inline_string,
+  /// value is a number
+  number,
+  /// value is a string shared with other cells to save space
+  shared_string,
+  /// value is the string result of a formula
+  formula_string
 };
 
 } // namespace xlnt

@@ -1,23 +1,22 @@
 //
 // Created by Petr Flajsingr on 2019-04-09.
 //
-#include <string>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
-#include <boost/foreach.hpp>
-#include <iostream>
+#include "ARES/ZakladniUdaje.h"
+#include <CsvReader.h>
 #include <CsvWriter.h>
 #include <FileManager.h>
 #include <Logger.h>
-#include <CsvReader.h>
-#include "ARES/ZakladniUdaje.h"
+#include <boost/foreach.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
+#include <iostream>
+#include <string>
 
 namespace pt = boost::property_tree;
 using namespace std::string_literals;
 using namespace std::chrono_literals;
 
 using MyLogger = Logger<true>;
-
 
 std::string indent(int level) {
   const auto indentThingy = "  ";
@@ -64,7 +63,7 @@ std::vector<std::string> readData(const pt::ptree &pt, int level = 0) {
     result.emplace_back(pt.data());
   } else {
 
-    for (auto &val: pt) {
+    for (auto &val : pt) {
       auto innerResult = readData(val.second, level + 1);
       result.insert(result.end(), innerResult.begin(), innerResult.end());
     }
@@ -86,7 +85,7 @@ int main() {
 
   ZakladniUdaje udaje(tree);
 
-  for(auto &ffs : udaje.toVector()) {
+  for (auto &ffs : udaje.toVector()) {
     std::cout << ffs << std::endl;
   }
 
