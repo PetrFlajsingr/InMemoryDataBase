@@ -102,7 +102,7 @@ public:
    *
    * @return count of columns/fields in data set
    */
-  [[nodiscard]] gsl::index getColumnCount() const;
+  [[nodiscard]] virtual gsl::index getColumnCount() const;
   /**
    * Get index of current record in data set
    * @return index of current record

@@ -370,3 +370,6 @@ std::shared_ptr<DataSets::MemoryDataSet> DataSets::MemoryViewDataSet::toDataSet(
   result->resetBegin();
   return result;
 }
+gsl::index DataSets::MemoryViewDataSet::getColumnCount() const {
+  return allowedFields.size();
+}

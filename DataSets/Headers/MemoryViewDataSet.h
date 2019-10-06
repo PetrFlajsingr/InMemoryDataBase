@@ -58,6 +58,8 @@ public:
 
   [[nodiscard]] std::vector<std::string> getFieldNames() const override;
 
+  gsl::index getColumnCount() const override;
+
   [[nodiscard]] gsl::index getCurrentRecord() const override;
   void append() override;
   void append(DataProviders::BaseDataProvider &dataProvider) override;
