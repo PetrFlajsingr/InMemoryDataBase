@@ -101,7 +101,6 @@ include_directories(${LibArchive_INCLUDE_DIR})
 FIND_PACKAGE(Boost COMPONENTS locale date_time filesystem REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 
-add_executable(cedr cedr.cpp ${SOURCE_FILES})
 add_executable(cedr_new cedr_new.cpp ${SOURCE_FILES})
 add_executable(test test.cpp ${SOURCE_FILES})
 add_executable(zdrav zdrav.cpp ${SOURCE_FILES})
@@ -113,10 +112,6 @@ add_executable(csv_to_xlsx csv_to_xlsx.cpp ${SOURCE_FILES})
 FILE(GLOB ARESSources ARES/*.cpp)
 
 add_executable(xml_test xml_test.cpp ${SOURCE_FILES} ${ARESSources})
-
-target_link_libraries(cedr xlsxio_read)
-target_link_libraries(cedr xlsxio_write)
-target_link_libraries(cedr -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 
 target_link_libraries(cedr_new xlsxio_read)
 target_link_libraries(cedr_new xlsxio_write)

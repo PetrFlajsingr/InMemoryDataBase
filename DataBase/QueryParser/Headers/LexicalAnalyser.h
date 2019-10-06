@@ -45,7 +45,7 @@ class LexicalAnalyser {
   std::string getErrorPrint();
 
   enum class LexState {
-    start, negNum, num1, numFloat, id, string, exclam, less, greater
+      start, negNum, num1, numFloat, id, string, exclam, less, greater, quotedId
   };
 };
 }  // namespace DataBase
