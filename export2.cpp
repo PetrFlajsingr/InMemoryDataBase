@@ -11,6 +11,7 @@
 #include <XlntReader.h>
 #include <XlntWriter.h>
 #include <XlsxIOReader.h>
+#include <XlsReader.h>
 #include <memory>
 
 using namespace std::string_literals;
