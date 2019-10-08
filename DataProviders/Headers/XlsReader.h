@@ -6,6 +6,7 @@
 #define CSV_READER_XLSREADER_H
 
 #include "BaseDataProvider.h"
+#include <xls.h>
 
 namespace DataProviders {
 class XlsReader : public BaseDataProvider {
@@ -25,6 +26,9 @@ public:
   void first() override;
 
   [[nodiscard]] bool eof() const override;
+
+private:
+
 };
 }
 
