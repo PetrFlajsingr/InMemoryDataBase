@@ -23,7 +23,8 @@ Combiner::prepareColumnInfo(const std::map<std::string, std::string> &tableAndCo
 
 std::shared_ptr<DataBase::View> Combiner::viewByName(const std::string &name) {
   auto iter = std::find_if(views.begin(), views.end(), [&name](auto &view) {
-    bool res = Utilities::compareString(view->getName(), name) == 0;
+    auto viewName = view->getName();
+    bool res = Utilities::compareString(viewName, name) == 0;
     return res;
   });
   if (iter != views.end()) {

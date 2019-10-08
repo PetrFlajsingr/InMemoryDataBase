@@ -7,15 +7,17 @@
 #include <map>
 #include <utility>
 
+using namespace std::string_literals;
+
 DataBase::Table::Table(std::shared_ptr<DataSets::MemoryDataSet> dataSet) : dataSet(std::move(dataSet)) {}
-std::string_view DataBase::Table::getName() { return dataSet->getName(); }
+std::string DataBase::Table::getName() { return dataSet->getName(); }
 
 DataBase::View::View(std::shared_ptr<DataSets::MemoryViewDataSet> dataSet) : dataSet(std::move(dataSet)) {}
-std::string_view DataBase::View::getName() { return dataSet->getName(); }
+std::string DataBase::View::getName() { return dataSet->getName(); }
 
 DataBase::MemoryDataBase::MemoryDataBase(std::string name) : name(std::move(name)) {}
 
-std::string_view DataBase::MemoryDataBase::getName() const { return name; }
+std::string DataBase::MemoryDataBase::getName() const { return name; }
 
 void DataBase::MemoryDataBase::addTable(const std::shared_ptr<DataSets::MemoryDataSet> &dataSet) {
   tables.emplace_back(std::make_shared<Table>(dataSet));
@@ -320,6 +322,6 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::viewByName(std::string
       viewIter != views.end()) {
     return *viewIter;
   }
-  std::string errMsg = "View named \"" + std::string(name) + "\" not found. DataBase::MemoryDataBase::viewByName";
+  std::string errMsg = "View named \""s + viewName.data() + "\" not found. DataBase::MemoryDataBase::viewByName";
   throw InvalidArgumentException(errMsg.c_str());
 }

@@ -22,7 +22,7 @@ namespace DataBase {
 
 struct Table {
   std::shared_ptr<DataSets::MemoryDataSet> dataSet;
-  std::string_view getName();
+  std::string getName();
   std::mutex mutex;
 
   explicit Table(std::shared_ptr<DataSets::MemoryDataSet> dataSet);
@@ -30,7 +30,7 @@ struct Table {
 
 struct View {
   std::shared_ptr<DataSets::MemoryViewDataSet> dataSet;
-  std::string_view getName();
+  std::string getName();
   std::mutex mutex;
 
   explicit View(std::shared_ptr<DataSets::MemoryViewDataSet> dataSet);
@@ -64,7 +64,7 @@ public:
    */
   std::shared_ptr<View> execAggregateQuery(std::string_view query, std::string_view viewName);
 
-  [[nodiscard]] std::string_view getName() const;
+  [[nodiscard]] std::string getName() const;
 
   [[nodiscard]] const std::vector<std::shared_ptr<Table>> &getTables() const;
 

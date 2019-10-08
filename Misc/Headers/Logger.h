@@ -59,7 +59,9 @@ private:
   std::chrono::milliseconds endTimeMs;
 
 public:
-  static Logger GetInstance() {
+  Logger(const Logger&) = delete;
+  Logger& operator=(const Logger&) = delete;
+  static Logger &GetInstance() {
     static Logger instance;
     return instance;
   }

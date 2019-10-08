@@ -8,15 +8,14 @@
 #include <Logger.h>
 #include <MemoryDataBase.h>
 #include <MemoryDataSet.h>
-#include <XlntReader.h>
 #include <XlntWriter.h>
 #include <XlsxIOReader.h>
-#include <XlsReader.h>
+#include <XlsxReader.h>
 #include <memory>
 
 using namespace std::string_literals;
 
-auto logger = Logger<true>::GetInstance();
+auto &logger = Logger<true>::GetInstance();
 
 struct FileSettings {
   enum Type { csv, xlsx, xls };
@@ -65,7 +64,7 @@ std::shared_ptr<DataSets::MemoryDataSet> createDataSetFromFile(const std::string
     }
     break;
   case FileSettings::xls:
-    provider = std::make_unique<DataProviders::XlntReader>(fileSettings.pathToFile);
+    provider = std::make_unique<DataProviders::XlsxReader>(fileSettings.pathToFile);
     break;
   }
   auto result = std::make_shared<DataSets::MemoryDataSet>(name);
@@ -116,14 +115,6 @@ int main() {
        ValueType::String, ValueType::Integer, ValueType::String, ValueType::String, ValueType::String,
        ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String});
 
-  auto NNO = createDataSetFromFile("subjekty", FileSettings::Xlsx(folder + "NNO.xlsx"),
-                                   {ValueType::Integer, ValueType::Integer, ValueType::String, ValueType::String,
-                                    ValueType::String, ValueType::String, ValueType::String, ValueType::String,
-                                    ValueType::String, ValueType::String, ValueType::String, ValueType::String,
-                                    ValueType::String, ValueType::String, ValueType::String, ValueType::String,
-                                    ValueType::String});
-  db.addTable(NNO);
-
   db.addTable(VZds);
   db.addTable(castiVZds);
   db.addTable(dodavatelVZ);
@@ -133,8 +124,10 @@ int main() {
                             "join dodVZ on VZ.ID_Zakazky = dodVZ.ID_Zakazky "
                             "join subjekty on dodVZ.DodavatelICO = subjekty.ICOnum;";
 
-  db.execSimpleQuery(query, true, "vz");
+  db.addTable(db.execSimpleQuery(query, false, "vz")->dataSet->toDataSet());
   logger.log<LogLevel::Info>("Query vz done");
+  db.tableByName("vz")->dataSet->resetEnd();
+  logger.log<LogLevel::Debug>(db.tableByName("vz")->dataSet->getCurrentRecord());
 
   auto cedr = createDataSetFromFile(
       "cedr", FileSettings::Xlsx(folder + "cedr.xlsx"),
@@ -150,7 +143,7 @@ int main() {
   logger.log<LogLevel::Info>("Query cedr done");
 
   auto dotaceDS = createDataSetFromFile(
-      "dotace", FileSettings::Xls(folder + "dotaceeu.xls"),
+      "dotace", FileSettings::Xlsx(folder + "dotaceeu.xlsx"),
       {ValueType::String, ValueType::String,  ValueType::String, ValueType::String, ValueType::String,
        ValueType::String, ValueType::Integer, ValueType::String, ValueType::String, ValueType::String,
        ValueType::String, ValueType::String,  ValueType::String, ValueType::String, ValueType::String,
@@ -158,7 +151,7 @@ int main() {
        ValueType::String, ValueType::String,  ValueType::String, ValueType::String, ValueType::String,
        ValueType::String, ValueType::String,  ValueType::String, ValueType::String});
   db.addTable(dotaceDS);
-  db.execSimpleQuery("select dotace.* from dotace join subjekty on dotace.IČ = subjekty.ICOnum;", true, "dotace2");
+  db.execSimpleQuery("select dotace.* from dotace join subjekty on dotace.IC = subjekty.ICOnum;", true, "dotace2");
   logger.log<LogLevel::Info>("Query dotace2done");
 
   db.execSimpleQuery("select vz.* from vz join subjekty on vz.DodavatelICO = subjekty.ICOnum;", true, "vz2");
@@ -171,7 +164,16 @@ int main() {
   combiner.addDataSource(db.viewByName("cedr2"));
   combiner.addDataSource(db.viewByName("dotace2"));
 
-  auto result = combiner.combineOn({{"sub", "ICOnum"}, {"vz2", "DodavatelICO"}, {"cedr2", "ico"}, {"dotace2", "IČ"}});
+  db.viewByName("sub")->dataSet->resetEnd();
+  logger.log<LogLevel::Debug>(db.viewByName("sub")->dataSet->getCurrentRecord());
+  db.viewByName("vz2")->dataSet->resetEnd();
+  logger.log<LogLevel::Debug>(db.viewByName("vz2")->dataSet->getCurrentRecord());
+  db.viewByName("cedr2")->dataSet->resetEnd();
+  logger.log<LogLevel::Debug>(db.viewByName("cedr2")->dataSet->getCurrentRecord());
+  db.viewByName("dotace2")->dataSet->resetEnd();
+  logger.log<LogLevel::Debug>(db.viewByName("dotace2")->dataSet->getCurrentRecord());
+
+  /*auto result = combiner.combineOn({{"sub", "ICOnum"}, {"vz2", "DodavatelICO"}, {"cedr2", "ICOnum"}, {"dotace2", "IC"}});
 
   DataWriters::XlntWriter writer(folder + "export2.xlsx");
 
@@ -186,5 +188,5 @@ int main() {
                    [](const DataSets::BaseField *field) { return field->getAsString(); });
     writer.writeRecord(record);
     record.clear();
-  }
+  }*/
 }

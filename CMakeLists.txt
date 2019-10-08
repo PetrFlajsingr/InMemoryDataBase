@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.13)
 project(csv_reader)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra -Werror -Wno-unknown-pragmas")
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -Wno-unknown-pragmas")
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
 
@@ -11,8 +11,6 @@ if (APPLE)
     add_definitions(-DGTEST_USE_OWN_TR1_TUPLE)
     add_definitions(-D__GLIBCXX__)
 endif (APPLE)
-
-link_directories(/usr/local/lib/)
 
 include_directories(third_party)
 include_directories(third_party/xlsxio/include)
@@ -29,6 +27,8 @@ include_directories(DataBase/Headers)
 include_directories(DataBase/QueryParser/Headers)
 include_directories(Messages/Headers)
 include_directories(Templates/Headers)
+
+link_directories(/home/petr/OpenXLSX/build/install/lib)
 
 FILE(GLOB DataProviderSources DataProviders/Source/*.cpp)
 FILE(GLOB DataProviderHeaders DataProviders/Headers/*.h)
@@ -145,5 +145,5 @@ target_link_libraries(export1 -pthread Boost::boost Boost::locale Boost::date_ti
 
 target_link_libraries(export2 xlsxio_read)
 target_link_libraries(export2 xlsxio_write)
-target_link_libraries(export2 -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
+target_link_libraries(export2 OpenXLSX xlsreader -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 

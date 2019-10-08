@@ -14,7 +14,7 @@
 #include <string>
 #include <vector>
 
-typedef dec::decimal<2> Currency;
+using Currency = dec::decimal<2>;
 class DateTime;
 
 namespace Utilities {
@@ -123,6 +123,8 @@ std::string getRandomString(size_t length);
 std::string toLower(const std::string &str);
 
 template <int maxDigit = 64> std::string doubleToString(double value);
+
+std::string boolToString(bool value);
 
 int getCoreCount();
 } // namespace Utilities

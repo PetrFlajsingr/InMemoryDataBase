@@ -180,3 +180,6 @@ int Utilities::getCoreCount() {
   }
   return result;
 }
+std::string Utilities::boolToString(bool value) {
+  return value ? "true" : "false";
+}
