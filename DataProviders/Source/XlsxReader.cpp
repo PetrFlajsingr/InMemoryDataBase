@@ -5,6 +5,8 @@
 #include "XlsxReader.h"
 #include <vector>
 
+DataProviders::XlsxReader::XlsxReader(std::string_view path) : BaseDataProvider(), workBook(path.data()) {}
+
 const std::vector<std::string> &DataProviders::XlsxReader::getRow() const { throw NotImplementedException(); }
 
 std::string DataProviders::XlsxReader::getColumnName(unsigned int columnIndex) const { throw NotImplementedException(); }
@@ -20,3 +22,4 @@ bool DataProviders::XlsxReader::next() { throw NotImplementedException(); }
 void DataProviders::XlsxReader::first() {throw NotImplementedException();}
 
 bool DataProviders::XlsxReader::eof() const { throw NotImplementedException(); }
+

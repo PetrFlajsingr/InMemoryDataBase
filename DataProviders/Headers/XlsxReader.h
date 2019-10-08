@@ -6,11 +6,12 @@
 #define CSV_READER_XLSREADER_H
 
 #include "BaseDataProvider.h"
-#include <xls.h>
+#include <XlsReader.h>
 
 namespace DataProviders {
 class XlsxReader : public BaseDataProvider {
 public:
+  explicit XlsxReader(std::string_view path);
   [[nodiscard]] const std::vector<std::string> &getRow() const override;
 
   [[nodiscard]] std::string getColumnName(unsigned int columnIndex) const override;
@@ -28,7 +29,7 @@ public:
   [[nodiscard]] bool eof() const override;
 
 private:
-
+  xls::WorkBook workBook;
 };
 }
 
