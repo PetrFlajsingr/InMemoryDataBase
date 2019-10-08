@@ -9,7 +9,7 @@
 #include <xls.h>
 
 namespace DataProviders {
-class XlsReader : public BaseDataProvider {
+class XlsxReader : public BaseDataProvider {
 public:
   [[nodiscard]] const std::vector<std::string> &getRow() const override;
 
