@@ -47,6 +47,7 @@ public:
   void removeView(std::string_view viewName);
 
   [[nodiscard]] std::shared_ptr<Table> tableByName(std::string_view tableName) const;
+  [[nodiscard]] std::shared_ptr<View> viewByName(std::string_view viewName) const;
   /**
    * Execute a query not containing aggregation.
    * @param query query to execute

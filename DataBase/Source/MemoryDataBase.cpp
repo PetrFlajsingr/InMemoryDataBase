@@ -218,10 +218,10 @@ DataBase::StructuredQuery DataBase::MemoryDataBase::parseQuery(std::string_view 
 }
 
 std::shared_ptr<DataBase::Table> DataBase::MemoryDataBase::tableByName(std::string_view tableName) const {
-  for (auto &table : tables) {
-    if (table->dataSet->getName() == tableName) {
-      return table;
-    }
+  if (auto tableIter = std::find_if(tables.begin(), tables.end(),
+                                    [tableName](const auto &table) { return table->dataSet->getName() == tableName; });
+      tableIter != tables.end()) {
+    return *tableIter;
   }
   std::string errMsg = "Table named \"" + std::string(name) + "\" not found. DataBase::MemoryDataBase::tableByName";
   throw InvalidArgumentException(errMsg.c_str());
@@ -313,3 +313,13 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doHaving(const DataBas
   return result;
 }
 const std::vector<std::shared_ptr<DataBase::Table>> &DataBase::MemoryDataBase::getTables() const { return tables; }
+
+std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::viewByName(std::string_view viewName) const {
+  if (auto viewIter = std::find_if(views.begin(), views.end(),
+                                   [viewName](const auto &view) { return view->dataSet->getName() == viewName; });
+      viewIter != views.end()) {
+    return *viewIter;
+  }
+  std::string errMsg = "View named \"" + std::string(name) + "\" not found. DataBase::MemoryDataBase::viewByName";
+  throw InvalidArgumentException(errMsg.c_str());
+}

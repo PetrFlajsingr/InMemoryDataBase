@@ -160,19 +160,18 @@ bool ScriptParser::runCommand(ScriptParser::Command command) {
       AppContext::GetInstance().ui->writeLnErr("DataBase doesn't exist.");
       return false;
     }
-    DataProviders::BaseDataProvider *provider;
+    std::unique_ptr<DataProviders::BaseDataProvider> provider;
     switch (fileType) {
     case ScriptParser::FileTypes::csv:
-      provider = new DataProviders::CsvReader(filePath, delimiter);
+      provider = std::make_unique<DataProviders::CsvReader>(filePath, delimiter);
       break;
     case ScriptParser::FileTypes::xlsx:
-      provider = new DataProviders::XlsxIOReader(filePath);
+      provider = std::make_unique<DataProviders::XlsxIOReader>(filePath);
       break;
     }
     auto ds = std::make_shared<DataSets::MemoryDataSet>(dataSetName);
     ds->open(*provider, valueTypes);
     AppContext::GetInstance().DBs[dbName]->addTable(ds);
-    delete provider;
   } break;
   case ScriptParser::Command::append:
     if (AppContext::GetInstance().DBs.find(dbName) == AppContext::GetInstance().DBs.end()) {
@@ -180,13 +179,13 @@ bool ScriptParser::runCommand(ScriptParser::Command command) {
       return false;
     }
     {
-      DataProviders::BaseDataProvider *provider;
+      std::unique_ptr<DataProviders::BaseDataProvider> provider;
       switch (fileType) {
       case ScriptParser::FileTypes::csv:
-        provider = new DataProviders::CsvReader(filePath);
+        provider = std::make_unique<DataProviders::CsvReader>(filePath);
         break;
       case ScriptParser::FileTypes::xlsx:
-        provider = new DataProviders::XlsxIOReader(filePath);
+        provider = std::make_unique<DataProviders::XlsxIOReader>(filePath);
         break;
       }
       auto ds = AppContext::GetInstance().DBs[dbName]->tableByName(dataSetName);
@@ -214,13 +213,13 @@ bool ScriptParser::runCommand(ScriptParser::Command command) {
       } else {
         result = AppContext::GetInstance().DBs[dbName]->execSimpleQuery(query, false, dataSetName);
       }
-      DataWriters::BaseDataWriter *writer;
+      std::unique_ptr<DataWriters::BaseDataWriter> writer;
       switch (fileType) {
       case ScriptParser::FileTypes::csv:
-        writer = new DataWriters::CsvWriter(filePath);
+        writer = std::make_unique<DataWriters::CsvWriter>(filePath);
         break;
       case ScriptParser::FileTypes::xlsx:
-        writer = new DataWriters::XlsxIOWriter(filePath);
+        writer = std::make_unique<DataWriters::XlsxIOWriter>(filePath);
         break;
       }
       writer->writeHeader(result->dataSet->getFieldNames());
@@ -231,7 +230,6 @@ bool ScriptParser::runCommand(ScriptParser::Command command) {
                        [](const DataSets::BaseField *field) { return std::string(field->getAsString()); });
         writer->writeRecord(record);
       }
-      delete writer;
       auto endMs =
           std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch());
       std::cout << "Exec time: " << (endMs - startMs).count() << "ms" << std::endl;

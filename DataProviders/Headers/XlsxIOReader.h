@@ -21,6 +21,8 @@ public:
 
   ~XlsxIOReader() override;
 
+  void openSheet(std::string_view sheet);
+
   [[nodiscard]] const std::vector<std::string> &getRow() const override;
 
   [[nodiscard]] std::string getColumnName(unsigned int columnIndex) const override;

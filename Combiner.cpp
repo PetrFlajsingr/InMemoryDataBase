@@ -86,7 +86,6 @@ std::shared_ptr<DataBase::Table> Combiner::combineOn(const std::map<std::string,
 
     int fieldCnt = 1;
     for (auto iter = views.begin() + 1; iter != views.end(); ++iter) {
-      std::cout << joinFields[0]->getAsString() << std::endl;
       switch (Utilities::compareString(joinFields[fieldCnt]->getAsString(), joinFields[0]->getAsString())) {
       case -1:
         if ((*iter)->dataSet->next()) {

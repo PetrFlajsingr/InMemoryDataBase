@@ -7,6 +7,7 @@
 #include <Logger.h>
 #include <MemoryDataBase.h>
 #include <MemoryDataSet.h>
+#include <XlntWriter.h>
 #include <XlsxIOReader.h>
 #include <XlsxIOWriter.h>
 #include <string>
@@ -49,7 +50,7 @@ const std::string QUERY = "SELECT dotace.idDotace, dotace.projektIdnetifikator, 
                           "LEFT JOIN dotaceTitul ON obdobi.iriDotacniTitul = dotaceTitul.idDotaceTitul "
                           "LEFT JOIN poskytovatelDotace ON rozhodnuti.iriPoskytovatelDotace = poskytovatelDotace.id";
 
-const std::string QUERY_2018 = QUERY + " WHERE obdobi.rozpoctoveObdobi = 2017;";
+const std::string QUERY_2018 = QUERY + " WHERE obdobi.rozpoctoveObdobi = 2018;";
 
 const std::string QUERY_AGR = "SELECT dotace.idPrijemce, SUM(dotace.castkaCerpana), "
                               "SUM(dotace.castkaUvolnena), "
@@ -218,7 +219,7 @@ int main() {
   logger.log<LogLevel::Debug>("Count:", poskytovatelDotaceDataSet->getCurrentRecord());
 
   auto result = dataBase.execSimpleQuery(QUERY_2018, false, "cedr");
-  DataWriters::CsvWriter writer(outPath + outputCSVName);
+  DataWriters::XlntWriter writer(outPath + outputCSVName);
 
   writer.writeHeader(result->dataSet->getFieldNames());
   auto fields = result->dataSet->getFields();

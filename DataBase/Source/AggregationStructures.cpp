@@ -24,6 +24,8 @@ bool DataBase::Unique::check(const DataContainer &newVal) {
   case ValueType::DateTime:
     cmpResult = lastVal.compare<DateTime>(newVal);
     break;
+  default:
+    throw std::runtime_error("DataBase::Unique::check()");
   }
   return cmpResult != 0;
 }

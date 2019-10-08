@@ -4,6 +4,8 @@
 
 #include <XlsxIOReader.h>
 
+using namespace std::string_literals;
+
 DataProviders::XlsxIOReader::XlsxIOReader(std::string_view fileName) : BaseDataProvider() { init(fileName); }
 
 DataProviders::XlsxIOReader::XlsxIOReader(std::string_view fileName, CharSet inputCharSet)
@@ -22,6 +24,17 @@ void DataProviders::XlsxIOReader::init(std::string_view fileName) {
 
   if (xlsxioSheet == nullptr) {
     auto errMsg = "Error while opening xls file: " + strFileName;
+    throw IOException(errMsg.c_str());
+  }
+
+  readHeader();
+}
+
+void DataProviders::XlsxIOReader::openSheet(std::string_view sheet) {
+  xlsxioSheet = xlsxioread_sheet_open(xlsxioReader, sheet.data(), XLSXIOREAD_SKIP_EMPTY_ROWS);
+
+  if (xlsxioSheet == nullptr) {
+    auto errMsg = "Error while opening xls sheet: "s + std::string(sheet);
     throw IOException(errMsg.c_str());
   }
 
@@ -80,6 +93,7 @@ void DataProviders::XlsxIOReader::close() {
 }
 
 void DataProviders::XlsxIOReader::readHeader() {
+  header.clear();
   if (xlsxioread_sheet_next_row(xlsxioSheet) != 0) {
     gsl::zstring<> value;
     while ((value = xlsxioread_sheet_next_cell(xlsxioSheet)) != nullptr) {
@@ -92,3 +106,4 @@ void DataProviders::XlsxIOReader::readHeader() {
     }
   }
 }
+

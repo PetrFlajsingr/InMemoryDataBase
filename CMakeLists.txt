@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.13)
 project(csv_reader)
 
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -Wno-unknown-pragmas")
+set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra -Werror -Wno-unknown-pragmas")
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
 
@@ -106,6 +106,7 @@ add_executable(test test.cpp ${SOURCE_FILES})
 add_executable(zdrav zdrav.cpp ${SOURCE_FILES})
 add_executable(catch_tests ${TEST_SOURCE_FILES})
 add_executable(export1 export1.cpp ${SOURCE_FILES})
+add_executable(export2 export2.cpp ${SOURCE_FILES})
 
 add_executable(csv_to_xlsx csv_to_xlsx.cpp ${SOURCE_FILES})
 
@@ -141,4 +142,8 @@ target_link_libraries(csv_to_xlsx -pthread Boost::boost Boost::locale Boost::dat
 target_link_libraries(export1 xlsxio_read)
 target_link_libraries(export1 xlsxio_write)
 target_link_libraries(export1 -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
+
+target_link_libraries(export2 xlsxio_read)
+target_link_libraries(export2 xlsxio_write)
+target_link_libraries(export2 -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 

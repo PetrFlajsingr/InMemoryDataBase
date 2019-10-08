@@ -52,6 +52,7 @@ private:
     case LogLevel::Error:
       return "[ERROR]";
     }
+    throw std::exception();
   }
 
   std::chrono::milliseconds startTimeMs;
