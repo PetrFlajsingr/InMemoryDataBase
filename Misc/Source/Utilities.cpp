@@ -183,3 +183,7 @@ int Utilities::getCoreCount() {
 std::string Utilities::boolToString(bool value) {
   return value ? "true" : "false";
 }
+
+bool Utilities::isUtf8Accent(char c) {
+  return std::find(utf8Accents.begin(), utf8Accents.end(), c) != utf8Accents.end();
+}

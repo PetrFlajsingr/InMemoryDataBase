@@ -127,6 +127,36 @@ template <int maxDigit = 64> std::string doubleToString(double value);
 std::string boolToString(bool value);
 
 int getCoreCount();
+
+namespace {
+const std::array<char, 64> utf8Accents = {
+    gsl::narrow_cast<char>(0x80), gsl::narrow_cast<char>(0x81), gsl::narrow_cast<char>(0x82),
+    gsl::narrow_cast<char>(0x83), gsl::narrow_cast<char>(0x84), gsl::narrow_cast<char>(0x85),
+    gsl::narrow_cast<char>(0x86), gsl::narrow_cast<char>(0x87), gsl::narrow_cast<char>(0x88),
+    gsl::narrow_cast<char>(0x89), gsl::narrow_cast<char>(0x8a), gsl::narrow_cast<char>(0x8b),
+    gsl::narrow_cast<char>(0x8c), gsl::narrow_cast<char>(0x8d), gsl::narrow_cast<char>(0x8e),
+    gsl::narrow_cast<char>(0x8f), gsl::narrow_cast<char>(0x90), gsl::narrow_cast<char>(0x91),
+    gsl::narrow_cast<char>(0x92), gsl::narrow_cast<char>(0x93), gsl::narrow_cast<char>(0x94),
+    gsl::narrow_cast<char>(0x95), gsl::narrow_cast<char>(0x96), gsl::narrow_cast<char>(0x98),
+    gsl::narrow_cast<char>(0x99), gsl::narrow_cast<char>(0x9a), gsl::narrow_cast<char>(0x9b),
+    gsl::narrow_cast<char>(0x9c), gsl::narrow_cast<char>(0x9d), gsl::narrow_cast<char>(0x9e),
+    gsl::narrow_cast<char>(0x9f), gsl::narrow_cast<char>(0xa0), gsl::narrow_cast<char>(0xa1),
+    gsl::narrow_cast<char>(0xa2), gsl::narrow_cast<char>(0xa3), gsl::narrow_cast<char>(0xa4),
+    gsl::narrow_cast<char>(0xa5), gsl::narrow_cast<char>(0xa6), gsl::narrow_cast<char>(0xa7),
+    gsl::narrow_cast<char>(0xa8), gsl::narrow_cast<char>(0xa9), gsl::narrow_cast<char>(0xaa),
+    gsl::narrow_cast<char>(0xab), gsl::narrow_cast<char>(0xac), gsl::narrow_cast<char>(0xad),
+    gsl::narrow_cast<char>(0xae), gsl::narrow_cast<char>(0xaf), gsl::narrow_cast<char>(0xb0),
+    gsl::narrow_cast<char>(0xb1), gsl::narrow_cast<char>(0xb2), gsl::narrow_cast<char>(0xb3),
+    gsl::narrow_cast<char>(0xb4), gsl::narrow_cast<char>(0xb5), gsl::narrow_cast<char>(0xb6),
+    gsl::narrow_cast<char>(0xb8), gsl::narrow_cast<char>(0xb9), gsl::narrow_cast<char>(0xba),
+    gsl::narrow_cast<char>(0xbb), gsl::narrow_cast<char>(0xbc), gsl::narrow_cast<char>(0xbd),
+    gsl::narrow_cast<char>(0xbe), gsl::narrow_cast<char>(0xbf), gsl::narrow_cast<char>(0xc3),
+    gsl::narrow_cast<char>(0xc5)
+};
+}
+
+bool isUtf8Accent(char c);
+
 } // namespace Utilities
 
 template <int maxDigit> std::string Utilities::doubleToString(double value) {
