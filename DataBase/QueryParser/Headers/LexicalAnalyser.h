@@ -14,6 +14,7 @@
 #include <vector>
 
 namespace DataBase {
+
 /**
  * Analyse and tokenize query inputs.
  */

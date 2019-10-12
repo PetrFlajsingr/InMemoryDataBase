@@ -44,7 +44,7 @@ std::tuple<DataBase::Token, std::string, bool> DataBase::LexicalAnalyser::getNex
         state = LexState::num1;
       } else if (*it == '-') {
         state = LexState::negNum;
-      } else if (isalpha(*it)) {
+      } else if (isalpha(*it) || Utilities::isUtf8Accent(*it)) {
         state = LexState::id;
       } else if (*it == '\"') {
         state = LexState::string;
@@ -119,7 +119,7 @@ std::tuple<DataBase::Token, std::string, bool> DataBase::LexicalAnalyser::getNex
       }
       break;
     case LexState::id:
-      if (isalnum(*it) || *it == '_' || *it == '-') {
+      if (isalnum(*it) || *it == '_' || *it == '-' || Utilities::isUtf8Accent(*it)) {
         state = LexState::id;
       } else {
         token = keyWordCheck(Utilities::toLower(value));
