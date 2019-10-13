@@ -108,8 +108,6 @@ add_executable(catch_tests ${TEST_SOURCE_FILES})
 add_executable(export1 export1.cpp ${SOURCE_FILES})
 add_executable(export2 export2.cpp ${SOURCE_FILES})
 
-add_executable(csv_to_xlsx csv_to_xlsx.cpp ${SOURCE_FILES})
-
 FILE(GLOB ARESSources ARES/*.cpp)
 
 add_executable(xml_test xml_test.cpp ${SOURCE_FILES} ${ARESSources})
@@ -134,10 +132,6 @@ target_link_libraries(test -pthread Boost::boost Boost::locale Boost::date_time 
 target_link_libraries(xml_test libxlsxio_read.dylib)
 target_link_libraries(xml_test libxlsxio_write.dylib)
 target_link_libraries(xml_test -pthread Boost::boost Boost::locale Boost::date_time libxlnt.dylib Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
-
-target_link_libraries(csv_to_xlsx xlsxio_read)
-target_link_libraries(csv_to_xlsx xlsxio_write)
-target_link_libraries(csv_to_xlsx -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 
 target_link_libraries(export1 xlsxio_read)
 target_link_libraries(export1 xlsxio_write)

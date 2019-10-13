@@ -68,6 +68,7 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::execSimpleQuery(std::s
     result = doOrder(structQuery, result);
   }
   result = doProject(structQuery, result);
+  result = setFieldAliases(structQuery, result);
 
   result->dataSet->setName(std::string(viewName));
   if (keepView) {
@@ -106,6 +107,7 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::execAggregateQuery(std
     result = doOrder(structQuery, result);
   }
   result = doProject(structQuery, result);
+  result = setFieldAliases(structQuery, result);
 
   result->dataSet->setName(std::string(viewName));
 
@@ -324,4 +326,14 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::viewByName(std::string
   }
   std::string errMsg = "View named \""s + viewName.data() + "\" not found. DataBase::MemoryDataBase::viewByName";
   throw InvalidArgumentException(errMsg.c_str());
+}
+std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::setFieldAliases(const DataBase::StructuredQuery &query,
+                                                                std::shared_ptr<View> &view) {
+  for (const auto & i : query.project.data) {
+    if (i.alias.empty()) {
+      continue;
+    }
+    view->dataSet->fieldByName(i.column)->setName(i.alias);
+  }
+  return view;
 }

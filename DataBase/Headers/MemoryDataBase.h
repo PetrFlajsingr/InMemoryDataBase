@@ -89,6 +89,8 @@ private:
   std::shared_ptr<View> doOrder(const StructuredQuery &query, std::shared_ptr<View> &view);
   std::shared_ptr<View> doProject(const StructuredQuery &query, std::shared_ptr<View> &view);
   std::shared_ptr<View> doHaving(const StructuredQuery &query, std::shared_ptr<View> &view);
+
+  std::shared_ptr<View> setFieldAliases(const StructuredQuery &query, std::shared_ptr<View> &view);
 };
 
 } // namespace DataBase

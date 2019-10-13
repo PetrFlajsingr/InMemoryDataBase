@@ -20,19 +20,19 @@ class Combiner {
 public:
   void addDataSource(const std::shared_ptr<DataBase::View> &view);
 
-  std::shared_ptr<DataBase::Table> combineOn(const std::map<std::string, std::string> &tableAndColumn);
+  std::shared_ptr<DataBase::Table> combineOn(const std::vector<std::pair<std::string, std::string>> &tableAndColumn);
 
 private:
   std::vector<std::shared_ptr<DataBase::View>> views;
 
-  void sortDataSets(const std::map<std::string, std::string> &tableAndColumn);
+  void sortDataSets(const std::vector<std::pair<std::string, std::string>> &tableAndColumn);
 
   std::pair<std::vector<std::shared_ptr<DataBase::View>>, std::vector<DataSets::BaseField *>>
-  prepareJoinFields(const std::map<std::string, std::string> &tableAndColumn);
+  prepareJoinFields(const std::vector<std::pair<std::string, std::string>> &tableAndColumn);
 
   std::shared_ptr<DataBase::View> viewByName(const std::string &name);
   std::pair<std::vector<std::string>, std::vector<ValueType>>
-  prepareColumnInfo(const std::map<std::string, std::string> &tableAndColumn);
+  prepareColumnInfo(const std::vector<std::pair<std::string, std::string>> &tableAndColumn);
 };
 
 #endif // CSV_READER_COMBINER_H

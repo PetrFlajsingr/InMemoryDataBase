@@ -5,7 +5,7 @@
 #include "Combiner.h"
 
 std::pair<std::vector<std::string>, std::vector<ValueType>>
-Combiner::prepareColumnInfo(const std::map<std::string, std::string> &tableAndColumn) {
+Combiner::prepareColumnInfo(const std::vector<std::pair<std::string, std::string>> &tableAndColumn) {
   std::pair<std::vector<std::string>, std::vector<ValueType>> result;
   for (auto [name, _] : tableAndColumn) {
     _ = _;
@@ -35,7 +35,7 @@ std::shared_ptr<DataBase::View> Combiner::viewByName(const std::string &name) {
 
 void Combiner::addDataSource(const std::shared_ptr<DataBase::View> &view) { views.emplace_back(view); }
 
-void Combiner::sortDataSets(const std::map<std::string, std::string> &tableAndColumn) {
+void Combiner::sortDataSets(const std::vector<std::pair<std::string, std::string>> &tableAndColumn) {
   for (auto [name, column] : tableAndColumn) {
     auto view = viewByName(name);
     DataSets::SortOptions options;
@@ -45,7 +45,7 @@ void Combiner::sortDataSets(const std::map<std::string, std::string> &tableAndCo
 }
 
 std::pair<std::vector<std::shared_ptr<DataBase::View>>, std::vector<DataSets::BaseField *>>
-Combiner::prepareJoinFields(const std::map<std::string, std::string> &tableAndColumn) {
+Combiner::prepareJoinFields(const std::vector<std::pair<std::string, std::string>> &tableAndColumn) {
   std::vector<DataSets::BaseField *> joinFields;
   std::vector<std::shared_ptr<DataBase::View>> views;
   for (auto [view, field] : tableAndColumn) {
@@ -55,7 +55,8 @@ Combiner::prepareJoinFields(const std::map<std::string, std::string> &tableAndCo
   return std::make_pair(views, joinFields);
 }
 
-std::shared_ptr<DataBase::Table> Combiner::combineOn(const std::map<std::string, std::string> &tableAndColumn) {
+std::shared_ptr<DataBase::Table>
+Combiner::combineOn(const std::vector<std::pair<std::string, std::string>> &tableAndColumn) {
   sortDataSets(tableAndColumn);
 
   auto dataSet = std::make_shared<DataSets::MemoryDataSet>("result");
@@ -67,6 +68,9 @@ std::shared_ptr<DataBase::Table> Combiner::combineOn(const std::map<std::string,
   auto [views, joinFields] = prepareJoinFields(tableAndColumn);
 
   for (const auto &view : views) {
+    view->dataSet->resetEnd();
+    std::cout << view->dataSet->getCurrentRecord() << std::endl;
+    view->dataSet->resetBegin();
     view->dataSet->next();
   }
 

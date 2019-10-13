@@ -45,6 +45,7 @@ public:
    */
   template <PropType Type = SetGet, typename = typename std::enable_if<Type == PropType::RW, void>::type>
   Property(const Getter &get, const Setter &set) : get(get), set(set) {}
+
   /**
    * Create ready only property
    * @param get getter
@@ -127,6 +128,12 @@ private:
   Property(const Getter &get, T val) : get(get), value(val) {}
   template <PropType Type = SetGet, typename = typename std::enable_if<Type == PropType::W, void>::type>
   Property(const Setter &set, T val) : set(set), value(val) {}
+};
+
+template<typename Class>
+struct UseProperty {
+  template <typename T, PropType type>
+  using Property = Property<T, Class, type>;
 };
 
 template <typename T, typename Owner, typename... Args, typename Getter = std::function<const T &()>>
