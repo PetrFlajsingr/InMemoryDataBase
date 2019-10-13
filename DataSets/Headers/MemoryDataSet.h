@@ -64,6 +64,8 @@ public:
   [[nodiscard]] gsl::index getCurrentRecord() const override;
   void resetBegin() override;
   void resetEnd() override;
+
+  void setCurrentRecord(gsl::index pos) override;
   //\ BaseDataSet
   /**
    * Create a view to all records.

@@ -68,6 +68,7 @@ public:
   void resetBegin() override;
   void resetEnd() override;
   void setData(void *data, gsl::index index, ValueType type) override;
+  void setCurrentRecord(gsl::index pos) override;
   //\ BaseDataSet
   /**
    * Get inner data representation

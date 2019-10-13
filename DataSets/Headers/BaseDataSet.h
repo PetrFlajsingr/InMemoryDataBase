@@ -108,6 +108,8 @@ public:
    * @return index of current record
    */
   [[nodiscard]] virtual gsl::index getCurrentRecord() const = 0;
+
+  virtual void setCurrentRecord(gsl::index pos) = 0;
   /**
    * Create an empty row at the end of the data set.
    */

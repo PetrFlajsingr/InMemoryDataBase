@@ -373,3 +373,6 @@ std::shared_ptr<DataSets::MemoryDataSet> DataSets::MemoryViewDataSet::toDataSet(
 gsl::index DataSets::MemoryViewDataSet::getColumnCount() const {
   return allowedFields.size();
 }
+void DataSets::MemoryViewDataSet::setCurrentRecord(gsl::index pos) {
+  currentRecord = pos;
+}

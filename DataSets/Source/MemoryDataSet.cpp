@@ -417,5 +417,8 @@ std::shared_ptr<DataSets::MemoryViewDataSet> DataSets::MemoryDataSet::fullView()
   result->resetBegin();
   return result;
 }
+void DataSets::MemoryDataSet::setCurrentRecord(gsl::index pos) {
+  currentRecord = pos;
+}
 
 #pragma clang diagnostic pop
