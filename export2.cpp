@@ -21,13 +21,14 @@ const auto notAvailable = "není k dispozici"s;
 auto &logger = Logger<true>::GetInstance();
 
 struct FileSettings {
-  enum Type { csv, xlsx, xls, csvOld, xlnt };
+  enum Type { csv, xlsx, xls, csvOld };
   Type type;
   std::string pathToFile;
   char delimiter;
   std::string sheet = "";
   bool useCharset = false;
   CharSet charset;
+  bool useQuotes = true;
 
   static FileSettings Xlsx(const std::string &path, const std::string &sheet = "") {
     FileSettings result;
@@ -45,14 +46,6 @@ struct FileSettings {
     return result;
   }
 
-  static FileSettings Xlnt(const std::string &path, const std::string &sheet = "") {
-    FileSettings result;
-    result.type = xlnt;
-    result.pathToFile = path;
-    result.sheet = sheet;
-    return result;
-  }
-
   static FileSettings Csv(const std::string &path, char delimiter = ',', bool useCharset = false,
                           CharSet charset = CharSet::CP1250) {
     FileSettings result;
@@ -64,13 +57,14 @@ struct FileSettings {
     return result;
   }
 
-  static FileSettings CsvOld(const std::string &path, char delimiter = ',', bool useCharset = false,
-                             CharSet charset = CharSet::CP1250) {
+  static FileSettings CsvOld(const std::string &path, char delimiter = ',', bool useQuotes = true,
+                             bool useCharset = false, CharSet charset = CharSet::CP1250) {
     FileSettings result;
     result.type = csvOld;
     result.pathToFile = path;
     result.delimiter = delimiter;
     result.useCharset = useCharset;
+    result.useQuotes = useQuotes;
     result.charset = charset;
     return result;
   }
@@ -91,11 +85,12 @@ std::shared_ptr<DataSets::MemoryDataSet> createDataSetFromFile(const std::string
     break;
   case FileSettings::csvOld:
     if (fileSettings.useCharset) {
-      provider = std::make_unique<DataProviders::CsvReader>(fileSettings.pathToFile, fileSettings.charset,
-                                                            std::string(1, fileSettings.delimiter), false);
+      provider =
+          std::make_unique<DataProviders::CsvReader>(fileSettings.pathToFile, fileSettings.charset,
+                                                     std::string(1, fileSettings.delimiter), fileSettings.useQuotes);
     } else {
-      provider = std::make_unique<DataProviders::CsvReader>(fileSettings.pathToFile,
-                                                            std::string(1, fileSettings.delimiter), false);
+      provider = std::make_unique<DataProviders::CsvReader>(
+          fileSettings.pathToFile, std::string(1, fileSettings.delimiter), fileSettings.useQuotes);
     }
     break;
   case FileSettings::xlsx:
@@ -106,9 +101,6 @@ std::shared_ptr<DataSets::MemoryDataSet> createDataSetFromFile(const std::string
     break;
   case FileSettings::xls:
     provider = std::make_unique<DataProviders::XlsxReader>(fileSettings.pathToFile);
-    break;
-  case FileSettings::xlnt:
-    provider = std::make_unique<DataProviders::XlntReader>(fileSettings.pathToFile);
     break;
   }
   auto result = std::make_shared<DataSets::MemoryDataSet>(name);
@@ -121,6 +113,7 @@ std::shared_ptr<DataSets::MemoryDataSet> createDataSetFromFile(const std::string
 }
 
 const auto folder = "/home/petr/Desktop/export2/"s;
+const std::string velkatCSV = "/home/petr/Desktop/velikostni_kategorie.csv";
 
 struct TableColumn {
   std::string table;
@@ -180,9 +173,15 @@ void combine(std::vector<std::shared_ptr<DataSets::BaseDataSet>> dataSets, std::
   writer.setAddQuotes(true);
 
   auto cnt = 0;
+
+  auto likvField = mainDS.ds->fieldByName("DATUM_LIKVIDACE");
   while (mainDS.ds->next()) {
+
+    if (likvField->getAsString().empty()) {
+      likvField->setAsString("Aktivní");
+    }
+
     ++cnt;
-    if (cnt % 1000 == 0) std::cout << cnt << std::endl;
     for (auto &ds : dss) {
       ds.ds->setCurrentRecord(ds.pos);
       while (ds.ds->next()) {
@@ -195,7 +194,7 @@ void combine(std::vector<std::shared_ptr<DataSets::BaseDataSet>> dataSets, std::
           } else if (ds.ds->getName() == "vz2") {
             row.emplace_back("VerejneZakazky");
           } else if (ds.ds->getName() == "cedrDotace") {
-            if (ds.ds->fieldByIndex(10)->getAsString() == notAvailable) {
+            if (ds.ds->fieldByIndex(4)->getAsString() == notAvailable) {
               row.emplace_back("CEDR");
             } else {
               row.emplace_back("DotaceEU");
@@ -226,20 +225,32 @@ void combine(std::vector<std::shared_ptr<DataSets::BaseDataSet>> dataSets, std::
 std::shared_ptr<DataSets::MemoryDataSet> transformDotace(const std::shared_ptr<DataSets::BaseDataSet> &dotaceSub) {
   auto dotaceRequired = std::make_shared<DataSets::MemoryDataSet>("dotace2");
   dotaceRequired->openEmpty(
-      {"DOTACE_POSKYTOVATEL", "DOTACE_CASTKA_UVOLNENA", "DOTACE_CASTKA_CERPANA", "DOTACE_ROK",
-       "DOTACE_OPERACNI_PROGRAM_NAZEV_PROGRAMU", "DOTACE_OPERACNI_PROGRAM_PRIORITNI_OSA",
-       "DOTACE_REGISTRACNI_CISLO_PROJEKTU", "DOTACE_OPERACNI_PROGRAM_NAZEV_PROJEKTU",
-       "DOTACE_OPERACNI_PROGRAM_ANOTACE_PROJEKTU", "DOTACE_OPERACNI_PROGRAM_PRIJEMCE",
+      {"DOTACE_POSKYTOVATEL",
+       "DOTACE_CASTKA_UVOLNENA",
+       "DOTACE_CASTKA_CERPANA",
+       "DOTACE_ROK",
+       "ROK_UDELENI_DOTACE",
+       "DOTACE_OPERACNI_PROGRAM_NAZEV_PROGRAMU",
+       "DOTACE_OPERACNI_PROGRAM_PRIORITNI_OSA",
+       "DOTACE_REGISTRACNI_CISLO_PROJEKTU",
+       "DOTACE_OPERACNI_PROGRAM_NAZEV_PROJEKTU",
+       "DOTACE_OPERACNI_PROGRAM_ANOTACE_PROJEKTU",
+       "DOTACE_OPERACNI_PROGRAM_PRIJEMCE",
        "DOTACE_OPERACNI_PROGRAM_DATUM_SKUTECNE_DATUM_ZAHAJENI_FYZICKE_REALIZACE_PROJEKTU",
        "DOTACE_OPERACNI_PROGRAM_DATUM_REALIZACE_SKUTECNE_DATUM_UKONCENI_FYZICKE_REALIZACE_PROJEKTU",
-       "DOTACE_OPERACNI_PROGRAM_OBLAST_INTERVENCE_KOD", "DOTACE_OPERACNI_PROGRAM_OBLAST_INTERVENCE_NAZEV",
-       "DOTACE_OPERACNI_PROGRAM_MISTO_REALIZACE_NUTS3_NAZEV", "DOTACE_OPERACNI_PROGRAM_SPOLUFINANCOVANI_CASTKA",
+       "DOTACE_OPERACNI_PROGRAM_OBLAST_INTERVENCE_KOD",
+       "DOTACE_OPERACNI_PROGRAM_OBLAST_INTERVENCE_NAZEV",
+       "DOTACE_OPERACNI_PROGRAM_MISTO_REALIZACE_NUTS3_NAZEV",
+       "DOTACE_OPERACNI_PROGRAM_SPOLUFINANCOVANI_CASTKA",
        "DOTACE_OPERACNI_PROGRAM_SPOLUFINANCOVANI_PRISPEVEK_EU",
-       "DOTACE_OPERACNI_PROGRAM_SPOLUFINANCOVANI_PRISPEVEK_CR"},
-      {ValueType::String, ValueType::Currency, ValueType::Currency, ValueType::String, ValueType::String,
-       ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::Integer,
-       ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
-       ValueType::Currency, ValueType::Currency, ValueType::Currency});
+       "DOTACE_OPERACNI_PROGRAM_SPOLUFINANCOVANI_PRISPEVEK_CR",
+       "DOTACE_FINANCNI_ZDROJ_KOD",
+       "DOTACE_FINANCNI_ZDROJ_NAZEV"},
+      {ValueType::String,  ValueType::Currency, ValueType::Currency, ValueType::String,   ValueType::String,
+       ValueType::String,  ValueType::String,   ValueType::String,   ValueType::String,   ValueType::String,
+       ValueType::Integer, ValueType::String,   ValueType::String,   ValueType::String,   ValueType::String,
+       ValueType::String,  ValueType::Currency, ValueType::Currency, ValueType::Currency, ValueType::String,
+       ValueType::String});
 
   dotaceSub->resetBegin();
   auto DOTACE_POSKYTOVATEL = dotaceSub->fieldByName("Poskytovatel");
@@ -253,7 +264,8 @@ std::shared_ptr<DataSets::MemoryDataSet> transformDotace(const std::shared_ptr<D
   auto DOTACE_CASTKA_CERPANA2 = dynamic_cast<DataSets::CurrencyField *>(
       dotaceSub->fieldByName("Finanční prostředky vyúčtované v žádostech o platbu (národní veřejné zdroje, CZK)"));
 
-  auto DOTACE_ROK = dotaceSub->fieldByName("Datum zahájení fyzické operace");
+  // auto DOTACE_ROK = dotaceSub->fieldByName("Datum zahájení fyzické operace");
+  auto DOTACE_ROK_UDELENI = dotaceSub->fieldByName("Datum zahájení fyzické operace");
 
   auto DOTACE_OPERACNI_PROGRAM_NAZEV_PROGRAMU = dotaceSub->fieldByName("Program");
   auto DOTACE_OPERACNI_PROGRAM_PRIORITNI_OSA = dotaceSub->fieldByName("Název prioritní osy / priority Unie");
@@ -282,30 +294,33 @@ std::shared_ptr<DataSets::MemoryDataSet> transformDotace(const std::shared_ptr<D
     reinterpret_cast<DataSets::CurrencyField *>(dotaceRequired->fieldByIndex(2))
         ->setAsCurrency(DOTACE_CASTKA_CERPANA1->getAsCurrency() + DOTACE_CASTKA_CERPANA2->getAsCurrency());
 
-    auto rok = DOTACE_ROK->getAsString();
+    auto rok = DOTACE_ROK_UDELENI->getAsString();
     if (rok.size() > 4) {
       rok = std::string(rok.end() - 4, rok.end());
     }
-    dotaceRequired->fieldByIndex(3)->setAsString(rok);
-    dotaceRequired->fieldByIndex(4)->setAsString(DOTACE_OPERACNI_PROGRAM_NAZEV_PROGRAMU->getAsString());
-    dotaceRequired->fieldByIndex(5)->setAsString(DOTACE_OPERACNI_PROGRAM_PRIORITNI_OSA->getAsString());
-    dotaceRequired->fieldByIndex(6)->setAsString(DOTACE_REGISTRACNI_CISLO_PROJEKTU->getAsString());
-    dotaceRequired->fieldByIndex(7)->setAsString(DOTACE_OPERACNI_PROGRAM_NAZEV_PROJEKTU->getAsString());
-    dotaceRequired->fieldByIndex(8)->setAsString(DOTACE_OPERACNI_PROGRAM_ANOTACE_PROJEKTU->getAsString());
-    dotaceRequired->fieldByIndex(9)->setAsString(DOTACE_OPERACNI_PROGRAM_PRIJEMCE->getAsString());
-    dotaceRequired->fieldByIndex(10)->setAsString(
-        DOTACE_OPERACNI_PROGRAM_DATUM__SKUTECNE_DATUM_ZAHAJENI_FYZICKE_REALIZACE_PROJEKTU->getAsString());
+    dotaceRequired->fieldByIndex(3)->setAsString("2014-2020");
+    dotaceRequired->fieldByIndex(4)->setAsString(rok);
+    dotaceRequired->fieldByIndex(5)->setAsString(DOTACE_OPERACNI_PROGRAM_NAZEV_PROGRAMU->getAsString());
+    dotaceRequired->fieldByIndex(6)->setAsString(DOTACE_OPERACNI_PROGRAM_PRIORITNI_OSA->getAsString());
+    dotaceRequired->fieldByIndex(7)->setAsString(DOTACE_REGISTRACNI_CISLO_PROJEKTU->getAsString());
+    dotaceRequired->fieldByIndex(8)->setAsString(DOTACE_OPERACNI_PROGRAM_NAZEV_PROJEKTU->getAsString());
+    dotaceRequired->fieldByIndex(9)->setAsString(DOTACE_OPERACNI_PROGRAM_ANOTACE_PROJEKTU->getAsString());
+    dotaceRequired->fieldByIndex(10)->setAsString(DOTACE_OPERACNI_PROGRAM_PRIJEMCE->getAsString());
     dotaceRequired->fieldByIndex(11)->setAsString(
+        DOTACE_OPERACNI_PROGRAM_DATUM__SKUTECNE_DATUM_ZAHAJENI_FYZICKE_REALIZACE_PROJEKTU->getAsString());
+    dotaceRequired->fieldByIndex(12)->setAsString(
         DOTACE_OPERACNI_PROGRAM_DATUM_REALIZACE_SKUTECNE_DATUM_UKONCENI_FYZICKE_REALIZACE_PROJEKTU->getAsString());
-    dotaceRequired->fieldByIndex(12)->setAsString(DOTACE_OPERACNI_PROGRAM_OBLAST_INTERVENCE_KOD->getAsString());
-    dotaceRequired->fieldByIndex(13)->setAsString(DOTACE_OPERACNI_PROGRAM_OBLAST_INTERVENCE_NAZEV->getAsString());
-    dotaceRequired->fieldByIndex(14)->setAsString(DOTACE_OPERACNI_PROGRAM_MISTO_REALIZACE_NUTS3_NAZEV->getAsString());
-    reinterpret_cast<DataSets::CurrencyField *>(dotaceRequired->fieldByIndex(15))
-        ->setAsCurrency(DOTACE_OPERACNI_PROGRAM_SPOLUFINANCOVANI_CASTKA->getAsCurrency());
+    dotaceRequired->fieldByIndex(13)->setAsString(DOTACE_OPERACNI_PROGRAM_OBLAST_INTERVENCE_KOD->getAsString());
+    dotaceRequired->fieldByIndex(14)->setAsString(DOTACE_OPERACNI_PROGRAM_OBLAST_INTERVENCE_NAZEV->getAsString());
+    dotaceRequired->fieldByIndex(15)->setAsString(DOTACE_OPERACNI_PROGRAM_MISTO_REALIZACE_NUTS3_NAZEV->getAsString());
     reinterpret_cast<DataSets::CurrencyField *>(dotaceRequired->fieldByIndex(16))
-        ->setAsCurrency(DOTACE_OPERACNI_PROGRAM_SPOLUFINANCOVANI_PRISPEVEK_EU->getAsCurrency());
+        ->setAsCurrency(DOTACE_OPERACNI_PROGRAM_SPOLUFINANCOVANI_CASTKA->getAsCurrency());
     reinterpret_cast<DataSets::CurrencyField *>(dotaceRequired->fieldByIndex(17))
+        ->setAsCurrency(DOTACE_OPERACNI_PROGRAM_SPOLUFINANCOVANI_PRISPEVEK_EU->getAsCurrency());
+    reinterpret_cast<DataSets::CurrencyField *>(dotaceRequired->fieldByIndex(18))
         ->setAsCurrency(DOTACE_OPERACNI_PROGRAM_SPOLUFINANCOVANI_PRISPEVEK_CR->getAsCurrency());
+    dotaceRequired->fieldByIndex(19)->setAsString("není k dispozici");
+    dotaceRequired->fieldByIndex(20)->setAsString("není k dispozici");
   }
   return dotaceRequired;
 }
@@ -318,12 +333,14 @@ std::string removeQuotes(std::string_view str) {
 
 std::shared_ptr<DataSets::MemoryDataSet> transformCedr(std::shared_ptr<DataSets::BaseDataSet> cedr) {
   auto fieldNames = cedr->getFieldNames();
+  fieldNames.insert(fieldNames.begin() + 4, "DOTACE_ROK_UDELENI");
   std::vector<ValueType> fieldTypes;
   for (auto field : cedr->getFields()) {
     fieldTypes.emplace_back(field->getFieldType());
   }
-  fieldNames.emplace_back("DOTACE_OPERACNI_PROGRAM_SPOLUFINANCOVANI_PRISPEVEK_CR");
-  fieldTypes.emplace_back(ValueType::String);
+  fieldTypes.insert(fieldTypes.begin() + 4, ValueType::String);
+  fieldNames.insert(fieldNames.begin() + 9, "DOTACE_OPERACNI_PROGRAM_SPOLUFINANCOVANI_PRISPEVEK_CR");
+  fieldTypes.insert(fieldTypes.begin() + 9, ValueType::String);
   auto result = std::make_shared<DataSets::MemoryDataSet>("cedrReady");
   result->openEmpty(fieldNames, fieldTypes);
 
@@ -335,10 +352,17 @@ std::shared_ptr<DataSets::MemoryDataSet> transformCedr(std::shared_ptr<DataSets:
     result->append();
     int cnt = 0;
     for (auto field : cedrFields) {
+      if (cnt == 4) {
+        resultFields[cnt]->setAsString("není k dispozici");
+        logger.log<LogLevel::Debug>(resultFields[cnt]->getName());
+        ++cnt;
+      } else if (cnt == 9) {
+        resultFields[cnt]->setAsString(duplField->getAsString());
+        ++cnt;
+      }
       resultFields[cnt]->setAsString(removeQuotes(field->getAsString()));
       ++cnt;
     }
-    resultFields.back()->setAsString(duplField->getAsString());
   }
   result->fieldByName("ICOnum")->setName("DOTACE_OPERACNI_PROGRAM_PRIJEMCE");
   return result;
@@ -346,6 +370,8 @@ std::shared_ptr<DataSets::MemoryDataSet> transformCedr(std::shared_ptr<DataSets:
 
 std::shared_ptr<DataSets::MemoryDataSet> appendCedrDotace(std::shared_ptr<DataSets::BaseDataSet> cedr,
                                                           std::shared_ptr<DataSets::BaseDataSet> dotace) {
+  cedr->resetBegin();
+  dotace->resetBegin();
   auto fieldNames = dotace->getFieldNames();
   std::vector<ValueType> fieldTypes;
   for (auto field : dotace->getFields()) {
@@ -372,16 +398,20 @@ std::shared_ptr<DataSets::MemoryDataSet> appendCedrDotace(std::shared_ptr<DataSe
 
   auto prijemceField = result->fieldByName("DOTACE_OPERACNI_PROGRAM_PRIJEMCE");
   auto prispevekField = result->fieldByName("DOTACE_OPERACNI_PROGRAM_SPOLUFINANCOVANI_PRISPEVEK_CR");
+  auto finKod = result->fieldByName("DOTACE_FINANCNI_ZDROJ_KOD");
+  auto finNazev = result->fieldByName("DOTACE_FINANCNI_ZDROJ_NAZEV");
   while (cedr->next()) {
     result->append();
-    for (int i = 0; i < static_cast<int>(cedrFields.size()) - 2; ++i) {
+    for (int i = 0; i < static_cast<int>(cedrFields.size()) - 4; ++i) {
       resultFields[i]->setAsString(cedrFields[i]->getAsString());
     }
-    for (int i = cedrFields.size() - 2; i < static_cast<int>(resultFields.size()); ++i) {
+    for (int i = cedrFields.size() - 4; i < static_cast<int>(resultFields.size() - 2); ++i) {
       resultFields[i]->setAsString(notAvailable);
     }
-    prijemceField->setAsString(cedrFields[cedrFields.size() - 2]->getAsString());
-    prispevekField->setAsString(cedrFields[cedrFields.size() - 1]->getAsString());
+    prijemceField->setAsString(cedrFields[10]->getAsString());
+    prispevekField->setAsString(cedrFields[9]->getAsString());
+    finKod->setAsString(cedr->fieldByIndex(11)->getAsString());
+    finNazev->setAsString(cedr->fieldByIndex(12)->getAsString());
   }
 
   return result;
@@ -392,7 +422,7 @@ int main() {
   DataBase::MemoryDataBase db("db");
 
   auto verejneSbirkyDS = createDataSetFromFile(
-      "verejneSbirky", FileSettings::CsvOld(folder + "VerejneSbirky.csv", '|'), //, true, CharSet::CP1250),
+      "verejneSbirky", FileSettings::CsvOld(folder + "VerejneSbirky.csv", '|', false), //, true, CharSet::CP1250),
       {
           ValueType::String,
           ValueType::String,
@@ -406,13 +436,22 @@ int main() {
       });
   db.addTable(verejneSbirkyDS);
 
-  auto subjekty = createDataSetFromFile("subjekty", FileSettings::Xlsx(folder + "NNO.xlsx"),
+  auto subjekty = createDataSetFromFile("subjekty", FileSettings::Csv(folder + "NNO.csv"),
                                         {ValueType::Integer, ValueType::Integer, ValueType::String, ValueType::String,
                                          ValueType::String, ValueType::String, ValueType::String, ValueType::String,
                                          ValueType::String, ValueType::String, ValueType::String, ValueType::String,
                                          ValueType::String, ValueType::String, ValueType::String, ValueType::String,
                                          ValueType::String});
   db.addTable(subjekty);
+  db.addTable(createDataSetFromFile("velkat", {FileSettings::Type::csv, velkatCSV, ','},
+                                    {ValueType::String, ValueType::String}));
+
+  const std::string katQuery = "select subjekty.*, velkat.velikostni_kategorie_index from subjekty join velkat on "
+                               "subjekty.Velikostní_kategorie = velkat.TEXT;";
+  auto vel = db.execSimpleQuery(katQuery, false, "subjekty");
+  auto newNno = vel->dataSet->toDataSet();
+  db.removeTable("subjekty");
+  db.addTable(newNno);
 
   db.execSimpleQuery("select verejneSbirky.NAZEV_PO, verejneSbirky.OZNACENI_SBIRKY AS VEREJNA_SBIRKA_OZNACENI, "
                      "verejneSbirky.UZEMNI_ROZSAH AS "
@@ -484,7 +523,8 @@ int main() {
        ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
        ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
        ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
-       ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String});
+       ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
+       ValueType::String, ValueType::String});
   db.addTable(cedr);
 
   auto cedrView = db.execSimpleQuery("select "
@@ -498,7 +538,8 @@ int main() {
                                      "cedr.projektNazev AS DOTACE_OPERACNI_PROGRAM_NAZEV_PROJEKTU, "
                                      //"cedr.castkaUvolnena AS DOTACE_OPERACNI_PROGRAM_SPOLUFINANCOVANI_PRISPEVEK_CR, "
                                      //"cedr.dotaceTitulNazev, " "cedr.projektIdnetifikator, "
-                                     "cedr.ICOnum from cedr;",
+                                     "cedr.ICOnum, cedr.financniZdrojKod AS DOTACE_FINANCNI_ZDROJ_KOD, "
+                                     "cedr.financniZdrojNazev AS DOTACE_FINANCNI_ZDROJ_NAZEV from cedr;",
                                      false, "cedrView");
   auto cedrReady = transformCedr(cedrView->dataSet);
   // db.addTable(cedrReady);
@@ -525,7 +566,10 @@ int main() {
                                       "join subjekty on dotace.IC = subjekty.ICOnum "
                                       "left join dotace_dopl on dotace.Program = dotace_dopl.Program;",
                                       false, "dotaceSub");
-  logger.log<LogLevel::Info>("Query dotace2done");
+
+  dotaceSub->dataSet->resetEnd();
+  logger.log<LogLevel::Info>("Query dotace2done: ", dotaceSub->dataSet->getCurrentRecord());
+  dotaceSub->dataSet->resetBegin();
 
   auto dotace2 = transformDotace(dotaceSub->dataSet);
   // db.addTable(dotace2);
@@ -535,9 +579,18 @@ int main() {
 
   auto wtf = appendCedrDotace(cedrReady, dotace2);
   db.addTable(wtf);
-  db.execSimpleQuery("select cedrDotace.* from cedrDotace;", true, "cedrDotace");
+  auto cdtc = db.execSimpleQuery("select cedrDotace.* from cedrDotace;", true, "cedrDotace");
+  cdtc->dataSet->resetEnd();
+  logger.log<LogLevel::Info>("Query cedrEU: ", cdtc->dataSet->getCurrentRecord());
+  cdtc->dataSet->resetBegin();
 
-  combine({db.viewByName("sub")->dataSet, db.viewByName("vz2")->dataSet, db.viewByName("cedrDotace")->dataSet,
+  {
+    DataWriters::CsvWriter w("/home/petr/Desktop/t.csv");
+    w.setAddQuotes(true);
+    w.writeDataSet(*cdtc->dataSet);
+  }
+
+  combine({db.viewByName("sub")->dataSet->toDataSet(), db.viewByName("vz2")->dataSet, cdtc->dataSet,
            db.viewByName("verSb")->dataSet}
           /*{db.viewByName("sub")->dataSet, db.viewByName("vz2")->dataSet, db.viewByName("cedr2")->dataSet,
                db.viewByName("dotace2")->dataSet, db.viewByName("verSb")->dataSet}*/
@@ -548,7 +601,7 @@ int main() {
            //{"cedr2", "ICOnum"},
            //{"dotace2", "DOTACE_OPERACNI_PROGRAM_PRIJEMCE"},
            {"verSb", "ICOnum"}},
-          folder + "export2.xlsx");
+          folder + "export2.csv");
 
   logger.endTime();
   logger.printElapsedTime();

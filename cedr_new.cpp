@@ -28,6 +28,7 @@ const std::string operacniProgramCSVName = "ciselnikCedrOperacniProgramv01.csv";
 const std::string grantoveSchemaCSVName = "ciselnikCedrGrantoveSchemav01.csv";
 const std::string dotacniTitulCSVName = "ciselnikDotaceTitulv01.csv";
 const std::string poskytovatelDotaceCSVName = "ciselnikDotacePoskytovatelv01.csv";
+const std::string financniZdrojCSVName = "ciselnikFinancniZdrojv01.csv";
 
 const std::string QUERY = "SELECT dotace.idDotace, dotace.projektIdnetifikator, dotace.idPrijemce, "
                           "dotace.projektNazev, dotace.iriOperacniProgram, "
@@ -39,7 +40,8 @@ const std::string QUERY = "SELECT dotace.idDotace, dotace.projektIdnetifikator, 
                           "operacniProgram.operacniProgramNazev, "
                           "grantoveSchema.grantoveSchemaNazev, "
                           "dotaceTitul.dotaceTitulNazev, "
-                          "poskytovatelDotace.dotacePoskytovatelNazev "
+                          "poskytovatelDotace.dotacePoskytovatelNazev, "
+                          "financniZdroj.financniZdrojKod, financniZdroj.financniZdrojNazev "
                           "FROM dotace "
                           "JOIN prijemce ON dotace.idPrijemce = prijemce.idPrijemce "
                           "JOIN subjekty ON prijemce.ico = subjekty.ICOnum "
@@ -48,7 +50,8 @@ const std::string QUERY = "SELECT dotace.idDotace, dotace.projektIdnetifikator, 
                           "LEFT JOIN operacniProgram ON dotace.iriOperacniProgram = operacniProgram.idOperacniProgram "
                           "LEFT JOIN grantoveSchema ON dotace.iriGrantoveSchema = grantoveSchema.idGrantoveSchema "
                           "LEFT JOIN dotaceTitul ON obdobi.iriDotacniTitul = dotaceTitul.idDotaceTitul "
-                          "LEFT JOIN poskytovatelDotace ON rozhodnuti.iriPoskytovatelDotace = poskytovatelDotace.id";
+                          "LEFT JOIN poskytovatelDotace ON rozhodnuti.iriPoskytovatelDotace = poskytovatelDotace.id "
+                          "LEFT JOIN financniZdroj ON rozhodnuti.iriFinancniZdroj = financniZdroj.id";
 
 const std::string QUERY_2018 = QUERY + " WHERE obdobi.rozpoctoveObdobi = 2018;";
 
@@ -79,6 +82,18 @@ int main() {
   DataProviders::CsvStreamReader obdobiProvider(csvPath + obdobiCSVName, ',');
   DataProviders::CsvStreamReader prijemceProvider(csvPath + prijemceCSVName, ',');
   DataProviders::XlsxIOReader subjektyProvider(csvPath + subjektyCSVName);
+
+  DataProviders::CsvReader financniZdrojProvider(csvPath + financniZdrojCSVName, ",");
+  auto financniZdrojDataSet = make_dataset("financniZdroj");
+  financniZdrojDataSet->open(financniZdrojProvider, {
+      ValueType::String,
+      ValueType::String,
+      ValueType::String,
+      ValueType::String,
+      ValueType::String,
+      ValueType::String,
+  });
+  dataBase.addTable(financniZdrojDataSet);
 
   auto dotaceDataSet = make_dataset("dotace");
   dotaceDataSet->open(dotaceProvider,
@@ -218,6 +233,7 @@ int main() {
   logger.log<LogLevel::Status>("Loaded: "s + poskytovatelDotaceDataSet->getName());
   poskytovatelDotaceDataSet->resetEnd();
   logger.log<LogLevel::Debug>("Count:", poskytovatelDotaceDataSet->getCurrentRecord());
+
 
   auto result = dataBase.execSimpleQuery(QUERY_2018, false, "cedr");
   DataWriters::XlntWriter writer(outPath + outputCSVName);
