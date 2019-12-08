@@ -88,4 +88,5 @@ private:
   CharSet charsetIn;
 };
 
+xlnt::date doubleToDate(double value);
 #endif // PROJECT_CONVERTERS_H

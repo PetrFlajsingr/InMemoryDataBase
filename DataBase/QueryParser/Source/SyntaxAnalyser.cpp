@@ -241,7 +241,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
       if (token == Token::equal) {
         state = SynState::joinCond2nd;
       } else {
-        throw SyntaxException(getErrorMsg(SynErrType::wrong, {Token::id}, it));
+        throw SyntaxException(getErrorMsg(SynErrType::wrong, {Token::equal}, it));
       }
       break;
     case SynState::joinCond2nd:

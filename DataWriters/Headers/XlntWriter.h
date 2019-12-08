@@ -23,6 +23,8 @@ public:
   XlntWriter(std::string_view fileName, CharSet outCharSet);
   void writeHeader(const std::vector<std::string> &header) override;
   void writeRecord(const std::vector<std::string> &record) override;
+
+  void setCellTypes(const std::vector<xlnt::cell_type> &types);
   /**
    * Save file
    */
@@ -33,6 +35,8 @@ private:
   xlnt::worksheet ws;
   std::string destination;
   gsl::index recordNumber = 1;
+
+  std::vector<xlnt::cell_type> cellTypes;
 };
 } // namespace DataWriters
 

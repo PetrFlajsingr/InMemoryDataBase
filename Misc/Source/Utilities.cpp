@@ -5,6 +5,7 @@
 #include <Types.h>
 #include <Utilities.h>
 #include <thread>
+#include <utf8cpp/utf8.h>
 
 std::vector<std::string> Utilities::splitStringByDelimiter(std::string_view str, std::string_view delimiter) {
   std::vector<std::string> result;
@@ -132,6 +133,44 @@ int8_t Utilities::compareString(std::string_view a, std::string_view b) {
   return 0;
 }
 
+int8_t Utilities::compareString(std::experimental::u8string_view a, std::experimental::u8string_view b) {
+  auto cmpResult = a == b;
+  if (cmpResult) {
+    return 0;
+  }
+  if (a < b) {
+    return -1;
+  } else if (a > b) {
+    return 1;
+  }
+  return 0;
+}
+int8_t Utilities::compareU8String(std::experimental::u8string_view a, std::experimental::u8string_view b) {
+  auto begin1 = a.begin();
+  const auto end1 = a.end();
+  auto begin2 = b.begin();
+  const auto end2 = b.end();
+  const auto aLength = utf8::distance(begin1, end1);
+  const auto bLength = utf8::distance(begin2, end2);
+  while (begin1 < end1 && begin2 < end2) {
+    const auto val1 = utf8::next(begin1, end1);
+    const auto val2 = utf8::next(begin2, end2);
+    if ((val1 == 160 && val2 == 32) || (val1 == 32 && val2 == 160)) {
+      continue;
+    } else if (val1 < val2) {
+      return -1;
+    } else if (val1 > val2) {
+      return 1;
+    }
+  }
+  if (aLength < bLength) {
+    return -1;
+  } else if (aLength > bLength) {
+    return 1;
+  }
+  return 0;
+}
+
 int8_t Utilities::compareDateTime(const DateTime &a, const DateTime &b) {
   if (a == b) {
     return 0;
@@ -186,4 +225,15 @@ std::string Utilities::boolToString(bool value) {
 
 bool Utilities::isUtf8Accent(char c) {
   return std::find(utf8Accents.begin(), utf8Accents.end(), c) != utf8Accents.end();
+}
+std::string Utilities::rtrim(std::string str, const std::string &chars) {
+  str.erase(str.find_last_not_of(chars) + 1);
+  return str;
+}
+std::string Utilities::ltrim(std::string str, const std::string &chars) {
+  str.erase(0, str.find_first_not_of(chars));
+  return str;
+}
+std::string Utilities::trim(std::string str, const std::string &chars) {
+  return ltrim(rtrim(str, chars), chars);
 }

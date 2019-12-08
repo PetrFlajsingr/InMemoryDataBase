@@ -50,6 +50,10 @@ private:
   std::string filePath;
   char delimiter;
   bool _eof = false;
+
+  std::vector<std::string> removeQuotes(const std::vector<std::string> &data);
+
+  void shrinkRecordToFit();
 };
 } // namespace DataProviders
 

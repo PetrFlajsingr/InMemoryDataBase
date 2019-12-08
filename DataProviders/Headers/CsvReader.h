@@ -40,9 +40,9 @@ public:
    * @param filePath path to file
    * @param delimiter csv delimiter
    */
-  explicit CsvReader(std::string_view filePath, std::string_view delimiter = ",");
+  explicit CsvReader(std::string_view filePath, std::string_view delimiter = ",", bool useQuotes = true);
 
-  explicit CsvReader(std::string_view filePath, CharSet inputCharSet, std::string_view delimiter = ",");
+  explicit CsvReader(std::string_view filePath, CharSet inputCharSet, std::string_view delimiter = ",", bool useQuotes = true);
 
   /**
    * Close file on deletion.
@@ -87,6 +87,7 @@ private:
   int currentRecordNumber = -1;
 
   bool _eof = false;
+  bool useQuotes;
 
   /**
    * Read first row of the file into header member
@@ -105,6 +106,8 @@ private:
    * @return tokenized vector from line
    */
   std::vector<std::string> tokenize(std::string_view line, unsigned int vectorReserve) const;
+
+  void shrinkRecordToFit();
 };
 } // namespace DataProviders
 

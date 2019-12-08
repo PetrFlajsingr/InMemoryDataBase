@@ -132,6 +132,7 @@ public:
 protected:
   bool convert;
   std::unique_ptr<CharSetConverter> converter;
+
 };
 
 } // namespace DataProviders

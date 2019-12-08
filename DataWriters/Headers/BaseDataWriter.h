@@ -11,6 +11,8 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <BaseDataSet.h>
+
 
 namespace DataWriters {
 
@@ -38,6 +40,9 @@ public:
    * @param record row to write
    */
   virtual void writeRecord(const std::vector<std::string> &record) = 0;
+
+  void writeDataSet(DataSets::BaseDataSet &dataSet);
+
   virtual ~BaseDataWriter() = default;
 
   class iterator : public std::iterator<std::output_iterator_tag, std::vector<std::string>> {
@@ -72,6 +77,7 @@ protected:
   bool convert;
   std::unique_ptr<CharSetConverter> converter;
 };
+
 
 } // namespace DataWriters
 

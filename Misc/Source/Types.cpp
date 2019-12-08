@@ -11,7 +11,7 @@ int compareDataContainers(const DataContainer &data1, const DataContainer &data2
   case ValueType::Double:
     return Utilities::compareDouble(data1._double, data2._double);
   case ValueType::String:
-    return Utilities::compareString(data1._string, data2._string);
+    return Utilities::compareU8String(reinterpret_cast<const char8_t*>(data1._string), reinterpret_cast<const char8_t*>(data2._string));
   case ValueType::Currency:
     return Utilities::compareCurrency(*data1._currency, *data2._currency);
   case ValueType::DateTime:

@@ -18,7 +18,7 @@ struct SortItem {
 struct SortOptions {
   std::vector<SortItem> options;
 
-  void addOption(BaseField *field, SortOrder order) { options.emplace_back(SortItem{field, order}); }
+  SortOptions & addOption(BaseField *field, SortOrder order) { options.emplace_back(SortItem{field, order}); return *this;}
 };
 
 } // namespace DataSets

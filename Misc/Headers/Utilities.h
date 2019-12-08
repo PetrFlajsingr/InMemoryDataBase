@@ -12,7 +12,10 @@
 #include <regex>
 #include <sstream>
 #include <string>
+#include <experimental/string_view>
 #include <vector>
+#include <iostream>
+#include <meta.h>
 
 using Currency = dec::decimal<2>;
 class DateTime;
@@ -106,6 +109,14 @@ int8_t compareCurrency(const Currency &a, const Currency &b);
  */
 int8_t compareString(std::string_view a, std::string_view b);
 /**
+ * Srovnani string hodnot
+ * @param a
+ * @param b
+ * @return -1 pokud a < b, 0 pokud a == b, 1 pokud a > b
+ */
+int8_t compareString(std::experimental::u8string_view a, std::experimental::u8string_view b);
+int8_t compareU8String(std::experimental::u8string_view a, std::experimental::u8string_view b);
+/**
  * Srovnani DateTime hodnot
  * @param a
  * @param b
@@ -157,6 +168,50 @@ const std::array<char, 64> utf8Accents = {
 
 bool isUtf8Accent(char c);
 
+namespace {
+template <int indentLevel>
+void printIndent() {
+  std::cout << std::string(indentLevel * 2, ' ');
+}
+}
+template <typename T, int indentLevel = 0>
+void print(const T &value) {
+  if constexpr (is_container<T>::value) {
+    printIndent<indentLevel>();
+    std::cout << '{' << std::endl;
+    for (const auto &val: value) {
+      print<std::decay_t<decltype(val)>, indentLevel + 1>(val);
+    }
+    printIndent<indentLevel>();
+    std::cout << '}' << std::endl;
+  } else {
+    printIndent<indentLevel>();
+    std::cout << value << std::endl;
+  }
+}
+
+template <template <class> typename Container, typename T>
+std::vector<T> getDuplicates(const Container<T> &container) {
+  std::vector<T> result;
+  for (const auto &value : container) {
+    int count = -1;
+    for (const auto &val : container) {
+      if (value == val) {
+        ++count;
+      }
+    }
+    for (int i = 0; i < count; ++i) {
+      result.emplace_back(value);
+    }
+  }
+  return result;
+}
+
+std::string ltrim(std::string str, const std::string& chars = "\t\n\v\f\r ");
+
+std::string rtrim(std::string str, const std::string& chars = "\t\n\v\f\r ");
+
+std::string trim(std::string str, const std::string& chars = "\t\n\v\f\r ");
 } // namespace Utilities
 
 template <int maxDigit> std::string Utilities::doubleToString(double value) {

@@ -88,3 +88,11 @@ double ExcelDateTime2DateTimeConverter::convertBack(const DateTime &value) const
   auto fractPart = value.getTime().time_of_day().total_seconds() / daySecondCount;
   return wholePart + fractPart;
 }
+xlnt::date doubleToDate(double value) {
+  const boost::gregorian::date excelStartDate = boost::gregorian::date(1900, 1, 1);
+  using namespace boost::gregorian;
+  using namespace boost::posix_time;
+  auto finDate = excelStartDate + date_duration(gsl::narrow_cast<int>(value) - 2);
+  auto d = ptime(finDate);
+  return xlnt::date(d.date().year(), d.date().month().as_number(), d.date().day().as_number());
+}

@@ -294,7 +294,8 @@ DataSets::MemoryViewDataSet::iterator DataSets::MemoryViewDataSet::begin() { ret
 DataSets::MemoryViewDataSet::iterator DataSets::MemoryViewDataSet::end() { return iterator(this, data.size() - 1); }
 void DataSets::MemoryViewDataSet::createNullRows(const std::vector<std::pair<int, int>> &fieldIndices,
                                                  const std::vector<ValueType> &fieldTypes) {
-  static gsl::czstring<> nullStr = "null";
+  //static gsl::czstring<> nullStr = "null";
+  static gsl::czstring<> nullStr = "není k dispozici";
   int last = fieldIndices[0].first;
   std::vector<DataContainer> nullData;
   for (gsl::index i = 0; i < static_cast<gsl::index>(fieldIndices.size()); ++i) {

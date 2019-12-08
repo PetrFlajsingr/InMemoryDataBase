@@ -66,9 +66,10 @@ const std::string QUERY_AGR_2018 = QUERY_AGR + " WHERE dotace.rozpoctoveObdobi =
 
 std::shared_ptr<DataSets::MemoryDataSet> make_dataset(const std::string &name) {
   return std::make_shared<DataSets::MemoryDataSet>(name);
+  return std::make_shared<DataSets::MemoryDataSet>(name);
 }
 
-auto logger = Logger<true>::GetInstance();
+auto &logger = Logger<true>::GetInstance();
 
 int main() {
   DataBase::MemoryDataBase dataBase("db");

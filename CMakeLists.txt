@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.13)
 
 project(csv_reader)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -Wno-unknown-pragmas")
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unknown-pragmas -fchar8_t")
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
 
@@ -91,7 +91,7 @@ set(TEST_SOURCE_FILES
         ${DataSetTests}
         ${DataWriterTests}
         ${MiscTests}
-        ${RelationLayerTests})
+        ${RelationLayerTests} DataWriters/Source/BaseDataWriter.cpp)
 
 
 FIND_PACKAGE(CURL REQUIRED)
@@ -114,7 +114,7 @@ add_executable(xml_test xml_test.cpp ${SOURCE_FILES} ${ARESSources})
 
 target_link_libraries(cedr_new xlsxio_read)
 target_link_libraries(cedr_new xlsxio_write)
-target_link_libraries(cedr_new -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
+target_link_libraries(cedr_new OpenXLSX xlsreader -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 
 
 target_link_libraries(zdrav xlsxio_read)
@@ -135,7 +135,7 @@ target_link_libraries(xml_test -pthread Boost::boost Boost::locale Boost::date_t
 
 target_link_libraries(export1 xlsxio_read)
 target_link_libraries(export1 xlsxio_write)
-target_link_libraries(export1 -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
+target_link_libraries(export1 /usr/local/lib/libxlsreader.so -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 
 target_link_libraries(export2 xlsxio_read)
 target_link_libraries(export2 xlsxio_write)

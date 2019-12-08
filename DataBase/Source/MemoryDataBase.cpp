@@ -328,7 +328,7 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::viewByName(std::string
   throw InvalidArgumentException(errMsg.c_str());
 }
 std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::setFieldAliases(const DataBase::StructuredQuery &query,
-                                                                std::shared_ptr<View> &view) {
+                                                                          std::shared_ptr<View> &view) {
   for (const auto & i : query.project.data) {
     if (i.alias.empty()) {
       continue;

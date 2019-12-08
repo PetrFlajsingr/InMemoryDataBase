@@ -50,6 +50,12 @@ void DataSets::MemoryDataSet::createFields(std::vector<std::string> columns, std
 }
 
 void DataSets::MemoryDataSet::addRecord(DataProviders::BaseDataProvider &dataProvider) {
+  auto trimQuotes = [] (const std::string &value) {
+    if (value.front() == '"') {
+      return value.substr(1, value.length() - 2);
+    }
+    return value;
+  };
   auto record = dataProvider.getRow();
   data.emplace_back(new DataSetRow());
 
@@ -57,7 +63,7 @@ void DataSets::MemoryDataSet::addRecord(DataProviders::BaseDataProvider &dataPro
   for (gsl::index i = 0; i < static_cast<gsl::index>(record.size()); ++i) {
     switch (fields[i]->getFieldType()) {
     case ValueType::Integer:
-      data.back()->emplace_back(DataContainer{._integer = Utilities::stringToInt(record[i])});
+      data.back()->emplace_back(DataContainer{._integer = Utilities::stringToInt(trimQuotes(record[i]))});
       break;
     case ValueType::Double:
       data.back()->emplace_back(DataContainer{._double = Utilities::stringToDouble(record[i])});

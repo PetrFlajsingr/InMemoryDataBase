@@ -35,10 +35,14 @@ public:
   void writeHeader(const std::vector<std::string> &header) override;
   void writeRecord(const std::vector<std::string> &record) override;
 
+  void setAddQuotes(bool value);
+
 private:
   std::ofstream *outputStream;
   uint64_t columnCount = 0;
   std::string delimiter;
+
+  bool addQuotes = false;
   /**
    * Write row of delimited data to outputStream
    * @param data data to write
