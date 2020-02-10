@@ -63,22 +63,21 @@ void DataProviders::XlsxReader::readRow(gsl::index rowNumber)  {
     } else if (cell->id == 0x0203) {
       currentRow.emplace_back(Utilities::doubleToString(cell->d));
     } else if (cell->id == 0x0006) {
-      if (strcmp(cell->str, "bool") == 0) {
+      if (strcmp(reinterpret_cast<const char *>(cell->str), "bool") == 0) {
         currentRow.emplace_back(Utilities::boolToString(cell->d > 0.0));
-      } else if (strcmp(cell->str, "error") == 0) {
+      } else if (strcmp(reinterpret_cast<const char *>(cell->str), "error") == 0) {
         currentRow.emplace_back();
       } else {
-        currentRow.emplace_back(cell->str);
+        currentRow.emplace_back(reinterpret_cast<const char *>(cell->str));
       }
     } else if (cell->str != nullptr) {
-      currentRow.emplace_back(cell->str);
+      currentRow.emplace_back(reinterpret_cast<const char *>(cell->str));
     }
   }
 }
 
 void DataProviders::XlsxReader::open() {
-  xls::xls_error_t error = xls::LIBXLS_OK;
-  workBook = xls::xls_open_file(filePath.data(), "UTF-8", &error);
+  workBook = xls::xls_open(filePath.data(), "UTF-8");
   if (workBook == nullptr) {
     throw IOException("File: "s + filePath + " could not be open.");
   }

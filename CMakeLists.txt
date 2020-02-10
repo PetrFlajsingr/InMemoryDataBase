@@ -29,6 +29,8 @@ include_directories(Messages/Headers)
 include_directories(Templates/Headers)
 
 link_directories(/home/petr/OpenXLSX/build/install/lib)
+link_directories(/usr/local/libxls/lib)
+include_directories(/usr/local/libxls/include)
 
 FILE(GLOB DataProviderSources DataProviders/Source/*.cpp)
 FILE(GLOB DataProviderHeaders DataProviders/Headers/*.h)
@@ -98,6 +100,7 @@ FIND_PACKAGE(CURL REQUIRED)
 include_directories(${CURL_INCLUDE_DIR})
 FIND_PACKAGE(LibArchive REQUIRED)
 include_directories(${LibArchive_INCLUDE_DIR})
+
 FIND_PACKAGE(Boost COMPONENTS locale date_time filesystem REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 
@@ -123,7 +126,7 @@ target_link_libraries(zdrav -pthread Boost::boost Boost::locale Boost::date_time
 
 target_link_libraries(catch_tests xlsxio_read)
 target_link_libraries(catch_tests xlsxio_write)
-target_link_libraries(catch_tests -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
+target_link_libraries(catch_tests libxlsreader -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 
 target_link_libraries(test xlsxio_read)
 target_link_libraries(test xlsxio_write)
@@ -135,7 +138,7 @@ target_link_libraries(xml_test -pthread Boost::boost Boost::locale Boost::date_t
 
 target_link_libraries(export1 xlsxio_read)
 target_link_libraries(export1 xlsxio_write)
-target_link_libraries(export1 /usr/local/lib/libxlsreader.so -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
+target_link_libraries(export1 libxlsreader -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 
 target_link_libraries(export2 xlsxio_read)
 target_link_libraries(export2 xlsxio_write)
