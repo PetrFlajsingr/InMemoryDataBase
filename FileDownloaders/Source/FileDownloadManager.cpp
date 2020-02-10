@@ -16,7 +16,7 @@ FileDownloadManager::FileDownloadManager(const std::shared_ptr<MessageManager> &
 
 void FileDownloadManager::enqueueDownload(const std::string &localFolder, const std::string &url,
                                           FileDownloadObserver &observer, bool blocking) {
-  auto download = [=, &observer] {
+  auto download = [=, this, &observer] {
     FileDownloader downloader(localFolder);
     auto cntObs = CountObserver(this);
     downloader.addObserver(&cntObs);
@@ -39,7 +39,7 @@ FileDownloadManager::~FileDownloadManager() {
 
 void FileDownloadManager::receive(std::shared_ptr<Message> message) {
   if (auto msg = std::dynamic_pointer_cast<DownloadNoBlock>(message)) {
-    auto dlLambda = [=] { downloadTask(msg); };
+    auto dlLambda = [=, this] { downloadTask(msg); };
     dispatch(new TaggedExecAsync(dlLambda, 0));
   } else if (auto msg = std::dynamic_pointer_cast<Download>(message)) {
     downloadTask(msg);

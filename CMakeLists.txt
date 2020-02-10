@@ -126,7 +126,7 @@ target_link_libraries(zdrav -pthread Boost::boost Boost::locale Boost::date_time
 
 target_link_libraries(catch_tests xlsxio_read)
 target_link_libraries(catch_tests xlsxio_write)
-target_link_libraries(catch_tests libxlsreader -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
+target_link_libraries(catch_tests xlsreader -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 
 target_link_libraries(test xlsxio_read)
 target_link_libraries(test xlsxio_write)
@@ -138,7 +138,7 @@ target_link_libraries(xml_test -pthread Boost::boost Boost::locale Boost::date_t
 
 target_link_libraries(export1 xlsxio_read)
 target_link_libraries(export1 xlsxio_write)
-target_link_libraries(export1 libxlsreader -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
+target_link_libraries(export1 xlsreader -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 
 target_link_libraries(export2 xlsxio_read)
 target_link_libraries(export2 xlsxio_write)

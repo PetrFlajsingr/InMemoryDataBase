@@ -12,13 +12,13 @@ ThreadPool::ThreadPool(std::size_t numThreads) { start(numThreads); }
 ThreadPool::~ThreadPool() { stop(); }
 void ThreadPool::start(std::size_t numThreads) {
   for (auto i = 0u; i < numThreads; ++i) {
-    threads.emplace_back([=] {
+    threads.emplace_back([=, this] {
       while (true) {
         Task task;
 
         {
           std::unique_lock<std::mutex> lock{mutex};
-          event.wait(lock, [=] { return stopping || !tasks.empty(); });
+          event.wait(lock, [=, this] { return stopping || !tasks.empty(); });
 
           if (stopping && tasks.empty())
             break;

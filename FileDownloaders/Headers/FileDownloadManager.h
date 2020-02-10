@@ -37,7 +37,7 @@ private:
   void unfinished();
   void finished();
 
-  std::function<void(const std::shared_ptr<Download>)> downloadTask = [=](const std::shared_ptr<Download> &msg) {
+  std::function<void(const std::shared_ptr<Download>)> downloadTask = [=, this](const std::shared_ptr<Download> &msg) {
     FileDownloader downloader(msg->getData().second);
     auto cntObs = CountObserver(this);
     downloader.addObserver(&cntObs);
