@@ -106,13 +106,13 @@ std::shared_ptr<DataSets::MemoryDataSet> createDataSetFromFile(const std::string
   return result;
 }
 
-const std::string csvPath = "/home/petr/Desktop/cedr/";
+const std::string csvPath = "/home/petr/Desktop/muni/";
 const std::string outPath = csvPath + "out/";
-const std::string subjektyCSVName = "NNO.csv";
-const std::string justiceCSV = "/home/petr/Desktop/or.justice/justice.csv";
-const std::string rzpCSV = "/home/petr/Desktop/rzp.csv";
-const std::string naceCSV = "/home/petr/Desktop/nace.csv";
-const std::string velkatCSV = "/home/petr/Desktop/velikostni_kategorie.csv";
+const std::string subjektyCSVName = "NNO.xlsx";
+const std::string justiceCSV = "/home/petr/Desktop/muni/or.justice/justice.csv";
+const std::string rzpCSV = "/home/petr/Desktop/muni/rzp/rzp.csv";
+const std::string nnoDopl = "/home/petr/Desktop/muni/NNO_doplneni.xlsx";
+const std::string velkatCSV = "/home/petr/Desktop/muni/velikostni_kategorie.csv";
 
 std::shared_ptr<DataSets::MemoryDataSet> shrinkRzp(const std::shared_ptr<DataSets::BaseDataSet> &rzp) {
   DataSets::SortOptions sortOptions;
@@ -152,7 +152,8 @@ std::shared_ptr<DataSets::MemoryDataSet> shrinkRzp(const std::shared_ptr<DataSet
 
 int main() {
   DataBase::MemoryDataBase db("db");
-  db.addTable(createDataSetFromFile("nno", {FileSettings::Type::csv, csvPath + subjektyCSVName, ','},
+  db.addTable(createDataSetFromFile("nno",
+                                    FileSettings::Xlsx(csvPath + subjektyCSVName),
                                     {ValueType::Integer, ValueType::Integer, ValueType::String, ValueType::String,
                                      ValueType::String, ValueType::String, ValueType::String, ValueType::String,
                                      ValueType::String, ValueType::String, ValueType::String, ValueType::String,
@@ -170,8 +171,10 @@ int main() {
   db.addTable(createDataSetFromFile(
       "rzp", {FileSettings::Type::csv, rzpCSV, ','},
       {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String, ValueType::String}));
-  db.addTable(
-      createDataSetFromFile("nace", {FileSettings::Type::csv, naceCSV, ','}, {ValueType::String, ValueType::Integer}));
+
+  db.addTable(createDataSetFromFile("nace", FileSettings::Xlsx(nnoDopl, "NACE_kódy"), {ValueType::String, ValueType::Integer}));
+  //db.addTable(
+  //    createDataSetFromFile("nace", {FileSettings::Type::csv, naceCSV, ','}, {ValueType::String, ValueType::Integer}));
 
   const std::string katQuery =
       "select nno.*, velkat.velikostni_kategorie_index from nno join velkat on nno.Velikostní_kategorie = velkat.TEXT;";

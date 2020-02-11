@@ -15,7 +15,7 @@
 #include <cereal/archives/json.hpp>
 #include <cereal/cereal.hpp>
 #include <cereal/types/memory.hpp>
-
+#include "fmt/format.h"
 enum class ErrorPolicy { Throw, NoThrow };
 
 template <ErrorPolicy errorPolicy = ErrorPolicy::NoThrow> class Demo {
@@ -36,6 +36,9 @@ template <ErrorPolicy errorPolicy = ErrorPolicy::NoThrow> class Demo {
 void terminate_handler();
 
 int main(int argc, char **argv) {
+
+  fmt::print("{:04d}", 5);
+  return 0;
   // CLIController cl;
   // cl.runApp();
 

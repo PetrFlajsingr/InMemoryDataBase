@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.13)
 project(csv_reader)
 
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unknown-pragmas -fchar8_t")
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unknown-pragmas -fchar8_t -o3")
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
 
@@ -27,9 +27,12 @@ include_directories(DataBase/Headers)
 include_directories(DataBase/QueryParser/Headers)
 include_directories(Messages/Headers)
 include_directories(Templates/Headers)
+include_directories(utilities)
+include_directories(utilities/include)
 
 link_directories(/home/petr/OpenXLSX/build/install/lib)
 link_directories(/usr/local/libxls/lib)
+link_directories(/usr/local/lib)
 include_directories(/usr/local/libxls/include)
 
 FILE(GLOB DataProviderSources DataProviders/Source/*.cpp)
@@ -72,6 +75,7 @@ FILE(GLOB CommandSources Messages/Source/*.cpp)
 FILE(GLOB CommandHeaders Messages/Headers/*.h)
 
 FILE(GLOB moorSources third_party/moor/*.cpp)
+FILE(GLOB fmtSources utilities/include/fmt/*.cc)
 
 set(SOURCE_FILES
         ${DataProviderSources}
@@ -104,12 +108,12 @@ include_directories(${LibArchive_INCLUDE_DIR})
 FIND_PACKAGE(Boost COMPONENTS locale date_time filesystem REQUIRED)
 include_directories(${Boost_INCLUDE_DIRS})
 
-add_executable(cedr_new cedr_new.cpp ${SOURCE_FILES})
-add_executable(test test.cpp ${SOURCE_FILES})
-add_executable(zdrav zdrav.cpp ${SOURCE_FILES})
-add_executable(catch_tests ${TEST_SOURCE_FILES})
-add_executable(export1 export1.cpp ${SOURCE_FILES})
-add_executable(export2 export2.cpp ${SOURCE_FILES})
+add_executable(cedr_new cedr_new.cpp ${SOURCE_FILES} ${fmtSources})
+add_executable(test test.cpp ${SOURCE_FILES} ${fmtSources})
+add_executable(zdrav zdrav.cpp ${SOURCE_FILES} ${fmtSources})
+add_executable(catch_tests ${TEST_SOURCE_FILES} ${fmtSources})
+add_executable(export1 export1.cpp ${SOURCE_FILES} ${fmtSources})
+add_executable(export2 export2.cpp ${SOURCE_FILES} ${fmtSources})
 
 FILE(GLOB ARESSources ARES/*.cpp)
 
@@ -130,7 +134,7 @@ target_link_libraries(catch_tests xlsreader -pthread Boost::boost Boost::locale 
 
 target_link_libraries(test xlsxio_read)
 target_link_libraries(test xlsxio_write)
-target_link_libraries(test -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
+target_link_libraries(test -pthread xlsreader Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 
 target_link_libraries(xml_test libxlsxio_read.dylib)
 target_link_libraries(xml_test libxlsxio_write.dylib)

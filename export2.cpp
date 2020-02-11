@@ -14,7 +14,8 @@
 #include <XlsxIOReader.h>
 #include <XlsxReader.h>
 #include <memory>
-
+#include "time/now.h"
+#include "fmt/format.h"
 using namespace std::string_literals;
 
 const auto notAvailable = "není k dispozici"s;
@@ -112,8 +113,12 @@ std::shared_ptr<DataSets::MemoryDataSet> createDataSetFromFile(const std::string
   return result;
 }
 
-const auto folder = "/home/petr/Desktop/export2/"s;
-const std::string velkatCSV = "/home/petr/Desktop/velikostni_kategorie.csv";
+const auto verejneSbirkyPath = "/home/petr/Desktop/muni/verejnesbirky/"s;
+const auto muniPath = "/home/petr/Desktop/muni/"s;
+const auto dotacePath = "/home/petr/Desktop/muni/dotaceeu/"s;
+const auto verejneZakazkyPath = "/home/petr/Desktop/muni/verejnezakazky/"s;
+const auto cedrPath = "/home/petr/Desktop/muni/cedr/out/"s;
+const std::string velkatCSV = muniPath + "/velikostni_kategorie.csv";
 
 struct TableColumn {
   std::string table;
@@ -127,8 +132,8 @@ struct DSFieldCnt {
   gsl::index fieldOffset;
   std::vector<DataSets::BaseField *> fields;
 };
-void combine(std::vector<std::shared_ptr<DataSets::BaseDataSet>> dataSets, std::vector<TableColumn> joins,
-             std::string dest) {
+void combine(std::vector<std::shared_ptr<DataSets::BaseDataSet>> dataSets, const std::vector<TableColumn>& joins,
+             const std::string& dest) {
   std::vector<DSFieldCnt> dss;
   const auto recordTypeInfoColumnCount = 1;
   gsl::index fieldOffset = 0;
@@ -168,12 +173,19 @@ void combine(std::vector<std::shared_ptr<DataSets::BaseDataSet>> dataSets, std::
     std::transform(ds.fields.begin(), ds.fields.end(), std::back_inserter(row),
                    [](auto &field) { return field->getName().data(); });
   }
+  row.emplace_back("download_period");
 
   writer.writeHeader(row);
   writer.setAddQuotes(true);
 
   auto cnt = 0;
 
+  const auto currentTime = std::chrono::system_clock::now();
+  auto now_t = std::chrono::system_clock::to_time_t(currentTime);
+  struct tm *parts = std::localtime(&now_t);
+  const auto year = 1900 + parts->tm_year;
+  const auto month = 1 + parts->tm_mon;
+  const auto downloadPeriodData = fmt::format("{:04d}-{:02d}", year, month);
   auto likvField = mainDS.ds->fieldByName("DATUM_LIKVIDACE");
   while (mainDS.ds->next()) {
 
@@ -211,7 +223,7 @@ void combine(std::vector<std::shared_ptr<DataSets::BaseDataSet>> dataSets, std::
           for (int i = 0; i < fill; ++i) {
             row.emplace_back(notAvailable);
           }
-
+          row.emplace_back(downloadPeriodData);
           writer.writeRecord(row);
         } else if (mainField->getAsInteger() < ds.field->getAsInteger()) {
           ds.pos = ds.ds->getCurrentRecord() - 1;
@@ -331,7 +343,7 @@ std::string removeQuotes(std::string_view str) {
   return std::string(str.begin() + beginOffset, str.end() - endOffset);
 }
 
-std::shared_ptr<DataSets::MemoryDataSet> transformCedr(std::shared_ptr<DataSets::BaseDataSet> cedr) {
+std::shared_ptr<DataSets::MemoryDataSet> transformCedr(const std::shared_ptr<DataSets::BaseDataSet>& cedr) {
   auto fieldNames = cedr->getFieldNames();
   fieldNames.insert(fieldNames.begin() + 4, "DOTACE_ROK_UDELENI");
   std::vector<ValueType> fieldTypes;
@@ -354,7 +366,7 @@ std::shared_ptr<DataSets::MemoryDataSet> transformCedr(std::shared_ptr<DataSets:
     for (auto field : cedrFields) {
       if (cnt == 4) {
         resultFields[cnt]->setAsString("není k dispozici");
-        logger.log<LogLevel::Debug>(resultFields[cnt]->getName());
+        //logger.log<LogLevel::Debug>(resultFields[cnt]->getName());
         ++cnt;
       } else if (cnt == 9) {
         resultFields[cnt]->setAsString(duplField->getAsString());
@@ -368,8 +380,8 @@ std::shared_ptr<DataSets::MemoryDataSet> transformCedr(std::shared_ptr<DataSets:
   return result;
 }
 
-std::shared_ptr<DataSets::MemoryDataSet> appendCedrDotace(std::shared_ptr<DataSets::BaseDataSet> cedr,
-                                                          std::shared_ptr<DataSets::BaseDataSet> dotace) {
+std::shared_ptr<DataSets::MemoryDataSet> appendCedrDotace(const std::shared_ptr<DataSets::BaseDataSet>& cedr,
+                                                          const std::shared_ptr<DataSets::BaseDataSet>& dotace) {
   cedr->resetBegin();
   dotace->resetBegin();
   auto fieldNames = dotace->getFieldNames();
@@ -422,7 +434,7 @@ int main() {
   DataBase::MemoryDataBase db("db");
 
   auto verejneSbirkyDS = createDataSetFromFile(
-      "verejneSbirky", FileSettings::CsvOld(folder + "VerejneSbirky.csv", '|', false), //, true, CharSet::CP1250),
+      "verejneSbirky", FileSettings::CsvOld(verejneSbirkyPath + "VerejneSbirky.csv", '|', false, true, CharSet::CP1250),
       {
           ValueType::String,
           ValueType::String,
@@ -436,7 +448,7 @@ int main() {
       });
   db.addTable(verejneSbirkyDS);
 
-  auto subjekty = createDataSetFromFile("subjekty", FileSettings::Csv(folder + "NNO.csv"),
+  auto subjekty = createDataSetFromFile("subjekty", FileSettings::Xlsx(muniPath + "NNO.xlsx"),
                                         {ValueType::Integer, ValueType::Integer, ValueType::String, ValueType::String,
                                          ValueType::String, ValueType::String, ValueType::String, ValueType::String,
                                          ValueType::String, ValueType::String, ValueType::String, ValueType::String,
@@ -466,7 +478,7 @@ int main() {
   db.execSimpleQuery("select subjekty.* from subjekty;", true, "sub");
 
   auto VZds = createDataSetFromFile(
-      "VZ", FileSettings::Xlsx(folder + "vz.xlsx", "VZ"),
+      "VZ", FileSettings::Xlsx(verejneZakazkyPath + "vz.xlsx", "VZ"),
       {ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
        ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
        ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
@@ -480,12 +492,12 @@ int main() {
        ValueType::String, ValueType::String, ValueType::String, ValueType::String});
 
   auto castiVZds = createDataSetFromFile(
-      "castiVZ", FileSettings::Xlsx(folder + "vz.xlsx", "Části VZ"),
+      "castiVZ", FileSettings::Xlsx(verejneZakazkyPath + "vz.xlsx", "Části VZ"),
       {ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
        ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
        ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String});
   auto dodavatelVZ = createDataSetFromFile(
-      "dodVZ", FileSettings::Xlsx(folder + "vz.xlsx", "Dodavatelé"),
+      "dodVZ", FileSettings::Xlsx(verejneZakazkyPath + "vz.xlsx", "Dodavatelé"),
       {ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
        ValueType::String, ValueType::Integer, ValueType::String, ValueType::String, ValueType::String,
        ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String});
@@ -516,7 +528,7 @@ int main() {
   logger.log<LogLevel::Debug, true>(db.tableByName("vz")->dataSet->getCurrentRecord());
 
   auto cedr = createDataSetFromFile(
-      "cedr", FileSettings::Xlsx(folder + "cedr.xlsx"),
+      "cedr", FileSettings::Xlsx(cedrPath + "cedr_output.xlsx"),
       {ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
        ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
        ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::Integer,
@@ -548,17 +560,17 @@ int main() {
   logger.log<LogLevel::Info>("Query cedr done");
 
   auto dotaceDS = createDataSetFromFile(
-      "dotace", FileSettings::Xlsx(folder + "dotaceeu.xlsx"),
+      "dotace", FileSettings::Csv(dotacePath + "dotaceeu.csv"),
       {ValueType::String,   ValueType::String,   ValueType::String,   ValueType::String,   ValueType::String,
        ValueType::String,   ValueType::Integer,  ValueType::String,   ValueType::String,   ValueType::String,
        ValueType::String,   ValueType::String,   ValueType::String,   ValueType::String,   ValueType::String,
        ValueType::String,   ValueType::String,   ValueType::String,   ValueType::String,   ValueType::String,
        ValueType::Currency, ValueType::Currency, ValueType::Currency, ValueType::Currency, ValueType::Currency,
-       ValueType::Currency, ValueType::Currency, ValueType::Currency, ValueType::String});
+       ValueType::Currency, ValueType::Currency, ValueType::Currency});
   db.addTable(dotaceDS);
 
   auto dotaceDoplneniDS =
-      createDataSetFromFile("dotace_dopl", FileSettings::Xlsx(folder + "NNO_doplneni.xlsx", "dotaceeu_poskytovatel"),
+      createDataSetFromFile("dotace_dopl", FileSettings::Xlsx(muniPath+ "NNO_doplneni.xlsx", "dotaceeu_poskytovatel"),
                             {ValueType::String, ValueType::String});
   db.addTable(dotaceDoplneniDS);
   auto dotaceSub = db.execSimpleQuery("select dotace.*, "
@@ -584,11 +596,11 @@ int main() {
   logger.log<LogLevel::Info>("Query cedrEU: ", cdtc->dataSet->getCurrentRecord());
   cdtc->dataSet->resetBegin();
 
-  {
+  /*{
     DataWriters::CsvWriter w("/home/petr/Desktop/t.csv");
     w.setAddQuotes(true);
     w.writeDataSet(*cdtc->dataSet);
-  }
+  }*/
 
   combine({db.viewByName("sub")->dataSet->toDataSet(), db.viewByName("vz2")->dataSet, cdtc->dataSet,
            db.viewByName("verSb")->dataSet}
@@ -601,7 +613,7 @@ int main() {
            //{"cedr2", "ICOnum"},
            //{"dotace2", "DOTACE_OPERACNI_PROGRAM_PRIJEMCE"},
            {"verSb", "ICOnum"}},
-          folder + "export2.csv");
+          muniPath + "export2.csv");
 
   logger.endTime();
   logger.printElapsedTime();

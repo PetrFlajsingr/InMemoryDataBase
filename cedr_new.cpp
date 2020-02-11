@@ -14,13 +14,14 @@
 
 using namespace std::string_literals;
 
-const std::string csvPath = "/home/petr/Desktop/cedr/";
+const std::string csvPath = "/home/petr/Desktop/muni/cedr/";
+const std::string nnoPath = "/home/petr/Desktop/muni/";
 const std::string outPath = csvPath + "out/";
 const std::string dotaceCSVName = "Dotace.csv";
 const std::string rozhodnutiCSVName = "Rozhodnuti.csv";
 const std::string obdobiCSVName = "RozpoctoveObdobi.csv";
 const std::string prijemceCSVName = "PrijemcePomoci.csv";
-const std::string outputCSVName = "cedr_output.csv";
+const std::string outputCSVName = "cedr_output.xlsx";
 const std::string outputCSVAgrName = "cedr_output_agr.csv";
 const std::string subjektyCSVName = "NNO.xlsx";
 
@@ -69,7 +70,6 @@ const std::string QUERY_AGR_2018 = QUERY_AGR + " WHERE dotace.rozpoctoveObdobi =
 
 std::shared_ptr<DataSets::MemoryDataSet> make_dataset(const std::string &name) {
   return std::make_shared<DataSets::MemoryDataSet>(name);
-  return std::make_shared<DataSets::MemoryDataSet>(name);
 }
 
 auto &logger = Logger<true>::GetInstance();
@@ -81,7 +81,7 @@ int main() {
   DataProviders::CsvStreamReader rozhodnutiProvider(csvPath + rozhodnutiCSVName, ',');
   DataProviders::CsvStreamReader obdobiProvider(csvPath + obdobiCSVName, ',');
   DataProviders::CsvStreamReader prijemceProvider(csvPath + prijemceCSVName, ',');
-  DataProviders::XlsxIOReader subjektyProvider(csvPath + subjektyCSVName);
+  DataProviders::XlsxIOReader subjektyProvider(nnoPath + subjektyCSVName);
 
   DataProviders::CsvReader financniZdrojProvider(csvPath + financniZdrojCSVName, ",");
   auto financniZdrojDataSet = make_dataset("financniZdroj");
