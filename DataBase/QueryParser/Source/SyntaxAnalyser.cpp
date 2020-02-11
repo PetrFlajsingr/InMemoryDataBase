@@ -100,7 +100,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
       }
       break;
     case SynState::selectItemEnd:
-      if (token == Token::id || token == Token::asterisk) {
+      if (token == Token::id || token == Token::asterisk || token == Token::string) {
         state = SynState::selectItemDivide;
         projectItem.column = std::get<1>(it);
         result.project.data.emplace_back(projectItem);
@@ -230,7 +230,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
       }
       break;
     case SynState::joinCond1stId:
-      if (token == Token::id) {
+      if (token == Token::id || token == Token::string) {
         state = SynState::joinCondEq;
         joinItem.firstField.column = std::get<1>(it);
       } else {

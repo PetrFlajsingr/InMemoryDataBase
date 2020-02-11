@@ -180,6 +180,9 @@ emit_token:
   if (it == input.end() || *it == '\0') {
     notLast = false;
   }
+  if (token == Token::string) {
+    value = Utilities::trim(value, "\"");
+  }
 
   currentIndex = std::distance(input.begin(), it);
   return std::make_tuple(token, value, notLast);

@@ -114,6 +114,7 @@ add_executable(zdrav zdrav.cpp ${SOURCE_FILES} ${fmtSources})
 add_executable(catch_tests ${TEST_SOURCE_FILES} ${fmtSources})
 add_executable(export1 export1.cpp ${SOURCE_FILES} ${fmtSources})
 add_executable(export2 export2.cpp ${SOURCE_FILES} ${fmtSources})
+add_executable(nno nno.cpp ${SOURCE_FILES} ${fmtSources})
 
 FILE(GLOB ARESSources ARES/*.cpp)
 
@@ -147,4 +148,8 @@ target_link_libraries(export1 xlsreader -pthread Boost::boost Boost::locale Boos
 target_link_libraries(export2 xlsxio_read)
 target_link_libraries(export2 xlsxio_write)
 target_link_libraries(export2 OpenXLSX xlsreader -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
+
+target_link_libraries(nno xlsxio_read)
+target_link_libraries(nno xlsxio_write)
+target_link_libraries(nno OpenXLSX xlsreader -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 
