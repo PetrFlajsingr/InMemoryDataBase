@@ -496,7 +496,8 @@ int main() {
                      "JOIN subjekty on verejneSbirky.NAZEV_PO = subjekty.NAZEV;",
                      true, "verSb");
 
-  db.execSimpleQuery("select subjekty.* from subjekty;", true, "sub");
+  db.execSimpleQuery("select subjekty.* from subjekty "
+                     "where subjekty.INSTITUCE_V_LIKVIDACI = \"aktivní\";", true, "sub");
 
   auto VZds = createDataSetFromFile(
       "VZ", FileSettings::Xlsx(verejneZakazkyPath + "vz.xlsx", "VZ"),

@@ -13,7 +13,6 @@
 #include <XlsxReader.h>
 #include <include/fmt/format.h>
 #include <memory>
-
 using namespace std::string_literals;
 
 auto &logger = Logger<true>::GetInstance();
@@ -215,7 +214,8 @@ int main() {
       "rzp_shrinked.ZIVNOSTENSKE_OPRAVNENI_OBOR, rzp_shrinked.PREDMET_CINNOSTI, "
       "rzp_shrinked.ZIVNOSTENSKE_OPRAVNENI, rzp_shrinked.Kód_NACE "
       "FROM nno join justice on nno.ICOnum = justice.ICO "
-      "left join rzp_shrinked on nno.ICOnum = rzp_shrinked.ICO;";
+      "left join rzp_shrinked on nno.ICOnum = rzp_shrinked.ICO "
+      "where nno.INSTITUCE_V_LIKVIDACI = \"aktivní\";";
   auto res = db.execSimpleQuery(queryFin, false, "res");
 
   res->dataSet->resetBegin();
@@ -252,12 +252,13 @@ int main() {
   const auto year = 1900 + parts->tm_year;
   const auto month = 1 + parts->tm_mon;
   const auto downloadPeriodData = fmt::format("{:04d}-{:02d}", year, month);
-  while(resDS->next()) {
 
-    std::transform(fields.begin(), fields.end(), std::back_inserter(row), [] (auto &field) {return field->getAsString();});
-    row.emplace_back(downloadPeriodData);
-    writer.writeRecord(row);
-    row.clear();
+  while(resDS->next()) {
+      std::transform(fields.begin(), fields.end(), std::back_inserter(row),
+                     [](auto &field) { return field->getAsString(); });
+      row.emplace_back(downloadPeriodData);
+      writer.writeRecord(row);
+      row.clear();
   }
 
   //writer.writeDataSet(*resDS);
