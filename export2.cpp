@@ -458,12 +458,33 @@ int main() {
   db.addTable(createDataSetFromFile("velkat", {FileSettings::Type::csv, velkatCSV, ','},
                                     {ValueType::String, ValueType::String}));
 
-  const std::string katQuery = "select subjekty.*, velkat.velikostni_kategorie_index from subjekty join velkat on "
-                               "subjekty.Velikostní_kategorie = velkat.TEXT;";
-  auto vel = db.execSimpleQuery(katQuery, false, "subjekty");
-  auto newNno = vel->dataSet->toDataSet();
-  db.removeTable("subjekty");
-  db.addTable(newNno);
+  //const std::string katQuery = "select subjekty.*, velkat.velikostni_kategorie_index from subjekty join velkat on "
+  //                             "subjekty.Velikostní_kategorie = velkat.TEXT;";
+  //auto vel = db.execSimpleQuery(katQuery, false, "subjekty");
+  //auto newNno = vel->dataSet->toDataSet();
+  //db.removeTable("subjekty");
+  //db.addTable(newNno);
+  std::unordered_map<std::string, std::string> kategorie;
+  auto velkat = db.tableByName("velkat");
+  velkat->dataSet->resetBegin();
+  while (velkat->dataSet->next()) {
+    kategorie[velkat->dataSet->fieldByName("TEXT")->getAsString()]
+    = fmt::format("{}) ",
+        velkat->dataSet->fieldByName("velikostni_kategorie_index")->getAsString());
+  }
+
+  {
+    subjekty->resetBegin();
+    auto katField = subjekty->fieldByName("Velikostní_kategorie");
+    while (subjekty->next()) {
+      auto newKat = kategorie[katField->getAsString()];
+      katField->setAsString(newKat + katField->getAsString());
+    }
+    subjekty->resetBegin();
+  }
+
+
+  //------
 
   db.execSimpleQuery("select verejneSbirky.NAZEV_PO, verejneSbirky.OZNACENI_SBIRKY AS VEREJNA_SBIRKA_OZNACENI, "
                      "verejneSbirky.UZEMNI_ROZSAH AS "

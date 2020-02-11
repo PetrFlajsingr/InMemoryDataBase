@@ -174,15 +174,34 @@ int main() {
       {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String}));
 
   db.addTable(createDataSetFromFile("nace", FileSettings::Xlsx(nnoDopl, "NACE_kódy"), {ValueType::String, ValueType::Integer}));
-  //db.addTable(
-  //    createDataSetFromFile("nace", {FileSettings::Type::csv, naceCSV, ','}, {ValueType::String, ValueType::Integer}));
 
-  const std::string katQuery =
-      "select nno.*, velkat.velikostni_kategorie_index from nno join velkat on nno.Velikostní_kategorie = velkat.TEXT;";
-  auto vel = db.execSimpleQuery(katQuery, false, "nno");
-  auto newNno = vel->dataSet->toDataSet();
-  db.removeTable("nno");
-  db.addTable(newNno);
+  //const std::string katQuery =
+  //    "select nno.*, velkat.velikostni_kategorie_index from nno join velkat on nno.Velikostní_kategorie = velkat.TEXT;";
+  //auto vel = db.execSimpleQuery(katQuery, false, "nno");
+  //auto newNno = vel->dataSet->toDataSet();
+  //db.removeTable("nno");
+  //db.addTable(newNno);
+
+  std::unordered_map<std::string, std::string> kategorie;
+  auto velkat = db.tableByName("velkat");
+  velkat->dataSet->resetBegin();
+  while (velkat->dataSet->next()) {
+    kategorie[velkat->dataSet->fieldByName("TEXT")->getAsString()]
+        = fmt::format("{}) ",
+                      velkat->dataSet->fieldByName("velikostni_kategorie_index")->getAsString());
+  }
+
+  {
+    auto subjekty = db.tableByName("nno")->dataSet;
+    subjekty->resetBegin();
+    auto katField = subjekty->fieldByName("Velikostní_kategorie");
+    while (subjekty->next()) {
+      auto newKat = kategorie[katField->getAsString()];
+      katField->setAsString(newKat + katField->getAsString());
+    }
+    subjekty->resetBegin();
+  }
+
 
   const std::string query =
       "SELECT rzp.*, nace.Kód_NACE from rzp join nace on rzp.ZIVNOSTENSKE_OPRAVNENI_OBOR = nace.cinnost_NACE;";
