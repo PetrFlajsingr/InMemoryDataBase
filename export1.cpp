@@ -11,6 +11,7 @@
 #include <XlsxIOReader.h>
 #include <XlsxIOWriter.h>
 #include <XlsxReader.h>
+#include <include/fmt/format.h>
 #include <memory>
 
 using namespace std::string_literals;
@@ -120,7 +121,7 @@ std::shared_ptr<DataSets::MemoryDataSet> shrinkRzp(const std::shared_ptr<DataSet
   rzp->sort(sortOptions);
 
   auto result = std::make_shared<DataSets::MemoryDataSet>("rzp_shrinked");
-  result->openEmpty(rzp->getFieldNames(), {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String,
+  result->openEmpty(rzp->getFieldNames(), {ValueType::Integer, ValueType::String, ValueType::String,
                                            ValueType::String, ValueType::String});
 
   rzp->resetBegin();
@@ -170,7 +171,7 @@ int main() {
 
   db.addTable(createDataSetFromFile(
       "rzp", {FileSettings::Type::csv, rzpCSV, ','},
-      {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String, ValueType::String}));
+      {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String}));
 
   db.addTable(createDataSetFromFile("nace", FileSettings::Xlsx(nnoDopl, "NACE_kódy"), {ValueType::String, ValueType::Integer}));
   //db.addTable(
@@ -192,7 +193,7 @@ int main() {
       "SELECT nno.*, justice.DATUM_ZAPISU, justice.NADACNI_KAPITAL, justice.ZAKLADATEL, "
       "justice.STATUTARNI_ORGAN, justice.POBOCNE_SPOLKY, justice.UCETNI_UZAVERKA, justice.STANOVY_A_DALSI_DOKUMENTY, "
       "justice.POBOCNE_SPOLKY_ODKAZ, "
-      "rzp_shrinked.ZRIZOVATEL, rzp_shrinked.ZIVNOSTENSKE_OPRAVNENI_OBOR, rzp_shrinked.PREDMET_CINNOSTI, "
+      "rzp_shrinked.ZIVNOSTENSKE_OPRAVNENI_OBOR, rzp_shrinked.PREDMET_CINNOSTI, "
       "rzp_shrinked.ZIVNOSTENSKE_OPRAVNENI, rzp_shrinked.Kód_NACE "
       "FROM nno join justice on nno.ICOnum = justice.ICO "
       "left join rzp_shrinked on nno.ICOnum = rzp_shrinked.ICO;";
@@ -202,7 +203,6 @@ int main() {
   auto resDS = res->dataSet->toDataSet();
   auto zanikField = resDS->fieldByName("DATUM_LIKVIDACE");
   auto kapitalField = resDS->fieldByName("NADACNI_KAPITAL");
-  auto zrizovatelField = resDS->fieldByName("ZRIZOVATEL");
   auto zakladatelField = resDS->fieldByName("ZAKLADATEL");
   resDS->resetBegin();
   while (resDS->next()) {
@@ -212,18 +212,36 @@ int main() {
     if (kapitalField->getAsString().empty()) {
       kapitalField->setAsString("není k dispozici");
     }
-    if (zrizovatelField->getAsString().empty()) {
-      zrizovatelField->setAsString("není k dispozici");
-    }
     if (zakladatelField->getAsString().empty()) {
       zakladatelField->setAsString("není k dispozici");
     }
   }
 
-  DataWriters::CsvWriter writer{"/home/petr/Desktop/out.csv"};
+  DataWriters::CsvWriter writer{"/home/petr/Desktop/muni/export1.csv"};
   writer.setAddQuotes(true);
+  auto header = resDS->getFieldNames();
+  header.emplace_back("download_period");
+  writer.writeHeader(header);
+  resDS->resetBegin();
+  auto fields = resDS->getFields();
+  std::vector<std::string> row;
+  row.reserve(header.size() + 1);
 
-  writer.writeDataSet(*resDS);
+  const auto currentTime = std::chrono::system_clock::now();
+  auto now_t = std::chrono::system_clock::to_time_t(currentTime);
+  struct tm *parts = std::localtime(&now_t);
+  const auto year = 1900 + parts->tm_year;
+  const auto month = 1 + parts->tm_mon;
+  const auto downloadPeriodData = fmt::format("{:04d}-{:02d}", year, month);
+  while(resDS->next()) {
+
+    std::transform(fields.begin(), fields.end(), std::back_inserter(row), [] (auto &field) {return field->getAsString();});
+    row.emplace_back(downloadPeriodData);
+    writer.writeRecord(row);
+    row.clear();
+  }
+
+  //writer.writeDataSet(*resDS);
 
   logger.log<LogLevel::Debug, true>("Result rows: ", resDS->getCurrentRecord());
 }
