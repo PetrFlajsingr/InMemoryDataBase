@@ -54,7 +54,7 @@ const std::string QUERY = "SELECT dotace.idDotace, dotace.projektIdnetifikator, 
                           "LEFT JOIN poskytovatelDotace ON rozhodnuti.iriPoskytovatelDotace = poskytovatelDotace.id "
                           "LEFT JOIN financniZdroj ON rozhodnuti.iriFinancniZdroj = financniZdroj.id";
 
-const std::string QUERY_2018 = QUERY + " WHERE obdobi.rozpoctoveObdobi = 2018;";
+const std::string QUERY_2018 = QUERY + ";";// + " WHERE obdobi.rozpoctoveObdobi = 2019;";
 
 const std::string QUERY_AGR = "SELECT dotace.idPrijemce, SUM(dotace.castkaCerpana), "
                               "SUM(dotace.castkaUvolnena), "

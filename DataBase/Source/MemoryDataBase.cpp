@@ -262,11 +262,7 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doWhere(const DataBase
     std::vector<std::string> values;
     std::transform(whereItem.first.constValues.begin(), whereItem.first.constValues.end(), std::back_inserter(values),
                    [](const std::pair<ConstType, std::string> &value) {
-                     if (value.first == ConstType::string) {
-                       return value.second.substr(1, value.second.size() - 2);
-                     } else {
                        return value.second;
-                     }
                    });
     filterOptions.addOption(field, values, DataSets::condOpToFilterOp(whereItem.first.condOperator));
   }

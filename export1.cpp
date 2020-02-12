@@ -8,6 +8,7 @@
 #include <Logger.h>
 #include <MemoryDataBase.h>
 #include <MemoryDataSet.h>
+#include <XlntWriter.h>
 #include <XlsxIOReader.h>
 #include <XlsxIOWriter.h>
 #include <XlsxReader.h>
@@ -120,8 +121,8 @@ std::shared_ptr<DataSets::MemoryDataSet> shrinkRzp(const std::shared_ptr<DataSet
   rzp->sort(sortOptions);
 
   auto result = std::make_shared<DataSets::MemoryDataSet>("rzp_shrinked");
-  result->openEmpty(rzp->getFieldNames(), {ValueType::Integer, ValueType::String, ValueType::String,
-                                           ValueType::String, ValueType::String});
+  result->openEmpty(rzp->getFieldNames(),
+                    {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String, ValueType::String});
 
   rzp->resetBegin();
   int lastICO = 0;
@@ -152,8 +153,7 @@ std::shared_ptr<DataSets::MemoryDataSet> shrinkRzp(const std::shared_ptr<DataSet
 
 int main() {
   DataBase::MemoryDataBase db("db");
-  db.addTable(createDataSetFromFile("nno",
-                                    FileSettings::Xlsx(csvPath + subjektyCSVName),
+  db.addTable(createDataSetFromFile("nno", FileSettings::Xlsx(csvPath + subjektyCSVName),
                                     {ValueType::Integer, ValueType::Integer, ValueType::String, ValueType::String,
                                      ValueType::String, ValueType::String, ValueType::String, ValueType::String,
                                      ValueType::String, ValueType::String, ValueType::String, ValueType::String,
@@ -168,26 +168,47 @@ int main() {
                                      ValueType::String, ValueType::String, ValueType::String, ValueType::String,
                                      ValueType::String, ValueType::String}));
 
+  db.addTable(createDataSetFromFile("rzp", {FileSettings::Type::csv, rzpCSV, ','},
+                                    {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String}));
+
+  db.addTable(
+      createDataSetFromFile("nace", FileSettings::Xlsx(nnoDopl, "NACE_kódy"), {ValueType::String, ValueType::Integer}));
+
   db.addTable(createDataSetFromFile(
-      "rzp", {FileSettings::Type::csv, rzpCSV, ','},
-      {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String}));
+      "copni1", FileSettings::Xlsx(csvPath + "CSU2019_copni.xlsx", "CSU_copni"),
+      {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
+       ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String,
+       ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String,
+       ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String,
+       ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::Integer}));
+  db.addTable(createDataSetFromFile(
+      "copni2", FileSettings::Xlsx(csvPath + "CSU2019_copni.xlsx", "COPNImetod"),
+      {ValueType::String,
+       ValueType::Integer,
+       ValueType::String,
+       ValueType::String,
+       ValueType::String}));
 
-  db.addTable(createDataSetFromFile("nace", FileSettings::Xlsx(nnoDopl, "NACE_kódy"), {ValueType::String, ValueType::Integer}));
+  const auto copniQuery = "select copni1.ICO, copni2.\"Popis cinnosti\" from copni1 join copni2 on copni1.COPNI = copni2.COPNI_codes;";
+  auto copniDesc = db.execSimpleQuery(copniQuery, false, "copni");
+  db.addTable(copniDesc->dataSet->toDataSet());
+  db.removeTable("copni1");
+  db.removeTable("copni2");
 
-  //const std::string katQuery =
-  //    "select nno.*, velkat.velikostni_kategorie_index from nno join velkat on nno.Velikostní_kategorie = velkat.TEXT;";
-  //auto vel = db.execSimpleQuery(katQuery, false, "nno");
-  //auto newNno = vel->dataSet->toDataSet();
-  //db.removeTable("nno");
-  //db.addTable(newNno);
+  // const std::string katQuery =
+  //    "select nno.*, velkat.velikostni_kategorie_index from nno join velkat on nno.Velikostní_kategorie =
+  //    velkat.TEXT;";
+  // auto vel = db.execSimpleQuery(katQuery, false, "nno");
+  // auto newNno = vel->dataSet->toDataSet();
+  // db.removeTable("nno");
+  // db.addTable(newNno);
 
   std::unordered_map<std::string, std::string> kategorie;
   auto velkat = db.tableByName("velkat");
   velkat->dataSet->resetBegin();
   while (velkat->dataSet->next()) {
-    kategorie[velkat->dataSet->fieldByName("TEXT")->getAsString()]
-        = fmt::format("{}) ",
-                      velkat->dataSet->fieldByName("velikostni_kategorie_index")->getAsString());
+    kategorie[velkat->dataSet->fieldByName("TEXT")->getAsString()] =
+        fmt::format("{}) ", velkat->dataSet->fieldByName("velikostni_kategorie_index")->getAsString());
   }
 
   {
@@ -201,20 +222,36 @@ int main() {
     subjekty->resetBegin();
   }
 
-
   const std::string query =
       "SELECT rzp.*, nace.Kód_NACE from rzp join nace on rzp.ZIVNOSTENSKE_OPRAVNENI_OBOR = nace.cinnost_NACE;";
   auto tmp = db.execSimpleQuery(query, false, "rzp2");
   db.addTable(shrinkRzp(tmp->dataSet));
 
   const std::string queryFin =
-      "SELECT nno.*, justice.DATUM_ZAPISU, justice.NADACNI_KAPITAL, justice.ZAKLADATEL, "
+      "SELECT nno.ICOnum, "
+      "nno.IC_ORGANIZACE, "
+      "nno.NAZEV, "
+      "nno.PRAVNI_FORMA, "
+      "nno.Velikostní_kategorie, "
+      "nno.Adresa, "
+      "nno.KRAJ, "
+      "nno.OKRES, "
+      "nno.OBEC, "
+      "nno.OBEC_ICOB, "
+      "nno.DATUM_VZNIKU, "
+      "nno.DATUM_LIKVIDACE, "
+      "nno.INSTITUCE_V_LIKVIDACI, "
+      "copni.\"Popis cinnosti\" as UCEL_PREDMET_CINNOSTI, "
+      "nno.KATEGORIZACE_CINNOSTI, "
+      "nno.X, "
+      "nno.Y, justice.DATUM_ZAPISU, justice.NADACNI_KAPITAL, justice.ZAKLADATEL, "
       "justice.STATUTARNI_ORGAN, justice.POBOCNE_SPOLKY, justice.UCETNI_UZAVERKA, justice.STANOVY_A_DALSI_DOKUMENTY, "
       "justice.POBOCNE_SPOLKY_ODKAZ, "
       "rzp_shrinked.ZIVNOSTENSKE_OPRAVNENI_OBOR, rzp_shrinked.PREDMET_CINNOSTI, "
       "rzp_shrinked.ZIVNOSTENSKE_OPRAVNENI, rzp_shrinked.Kód_NACE "
       "FROM nno join justice on nno.ICOnum = justice.ICO "
       "left join rzp_shrinked on nno.ICOnum = rzp_shrinked.ICO "
+      "left join copni on nno.ICOnum = copni.ICO "
       "where nno.INSTITUCE_V_LIKVIDACI = \"aktivní\";";
   auto res = db.execSimpleQuery(queryFin, false, "res");
 
@@ -236,9 +273,12 @@ int main() {
     }
   }
 
-  DataWriters::CsvWriter writer{"/home/petr/Desktop/muni/export1.csv"};
-  writer.setAddQuotes(true);
+  DataWriters::XlntWriter writer{"/home/petr/Desktop/muni/export1.xlsx"};
+  //writer.setAddQuotes(true);
   auto header = resDS->getFieldNames();
+  header.insert(header.begin() + 24, "POBOCNE_SPOLKY_POCET");
+  header.insert(header.begin() + 26, "UCEL_POPIS");
+
   header.emplace_back("download_period");
   writer.writeHeader(header);
   resDS->resetBegin();
@@ -253,15 +293,17 @@ int main() {
   const auto month = 1 + parts->tm_mon;
   const auto downloadPeriodData = fmt::format("{:04d}-{:02d}", year, month);
 
-  while(resDS->next()) {
-      std::transform(fields.begin(), fields.end(), std::back_inserter(row),
-                     [](auto &field) { return field->getAsString(); });
-      row.emplace_back(downloadPeriodData);
-      writer.writeRecord(row);
-      row.clear();
+  while (resDS->next()) {
+    std::transform(fields.begin(), fields.end(), std::back_inserter(row),
+                   [](auto &field) { return field->getAsString(); });
+    row.emplace_back(downloadPeriodData);
+    row.insert(row.begin() + 24, "0");
+    row.insert(row.begin() + 26, "<placeholder>");
+    writer.writeRecord(row);
+    row.clear();
   }
 
-  //writer.writeDataSet(*resDS);
+  // writer.writeDataSet(*resDS);
 
   logger.log<LogLevel::Debug, true>("Result rows: ", resDS->getCurrentRecord());
 }

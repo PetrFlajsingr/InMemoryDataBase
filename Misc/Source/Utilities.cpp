@@ -49,7 +49,7 @@ std::vector<std::string> Utilities::splitStringByDelimiterReserve(std::string_vi
 
 int Utilities::stringToInt(std::string_view str) {
   gsl::zstring<> p;
-  auto result = strtol(std::string(str).c_str(), &p, 10);
+  const auto result = strtod(std::string(str).c_str(), &p);
   if (*p) {
     return 0;
   } else {
@@ -59,7 +59,7 @@ int Utilities::stringToInt(std::string_view str) {
 
 double Utilities::stringToDouble(std::string_view str) {
   gsl::zstring<> p;
-  auto result = strtod(std::string(str).c_str(), &p);
+  const auto result = strtod(std::string(str).c_str(), &p);
   if (*p) {
     return 0;
   } else {
