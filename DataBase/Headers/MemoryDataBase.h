@@ -42,7 +42,7 @@ class MemoryDataBase {
 public:
   explicit MemoryDataBase(std::string name);
 
-  void addTable(const std::shared_ptr<DataSets::MemoryDataSet> &dataSet);
+  std::shared_ptr<DataBase::Table> addTable(const std::shared_ptr<DataSets::MemoryDataSet> &dataSet);
   void removeTable(std::string_view tableName);
   void removeView(std::string_view viewName);
 

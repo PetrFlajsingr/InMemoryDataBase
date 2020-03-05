@@ -208,6 +208,8 @@ public:
    */
   void setAllowedFields(const std::vector<std::string> &fieldNames);
 
+  void setAllowedFieldsWithAliases(const std::vector<std::string> &fieldNames, DataBase::ProjectStructure projectData);
+
 private:
   std::vector<BaseField *> allowedFields;
 

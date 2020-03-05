@@ -294,7 +294,7 @@ DataSets::MemoryViewDataSet::iterator DataSets::MemoryViewDataSet::begin() { ret
 DataSets::MemoryViewDataSet::iterator DataSets::MemoryViewDataSet::end() { return iterator(this, data.size() - 1); }
 void DataSets::MemoryViewDataSet::createNullRows(const std::vector<std::pair<int, int>> &fieldIndices,
                                                  const std::vector<ValueType> &fieldTypes) {
-  //static gsl::czstring<> nullStr = "null";
+  // static gsl::czstring<> nullStr = "null";
   static gsl::czstring<> nullStr = "není k dispozici";
   int last = fieldIndices[0].first;
   std::vector<DataContainer> nullData;
@@ -336,6 +336,27 @@ void DataSets::MemoryViewDataSet::setAllowedFields(const std::vector<std::string
   std::transform(fieldNames.begin(), fieldNames.end(), std::back_inserter(allowedFields),
                  [this](std::string_view fieldName) { return fieldByName(fieldName); });
 }
+
+void DataSets::MemoryViewDataSet::setAllowedFieldsWithAliases(const std::vector<std::string> &fieldNames,
+                                                              DataBase::ProjectStructure projectData) {
+
+  allowedFields.clear();
+  std::transform(fieldNames.begin(), fieldNames.end(), std::back_inserter(allowedFields),
+                 [this, &projectData](std::string_view fieldName) {
+                   auto field = fieldByName(fieldName);
+
+                   if (auto it = std::find_if(projectData.data.begin(), projectData.data.end(), [&field] (auto &projData) {
+                     return projData.column == field->getName();
+                   }); it != projectData.data.end()) {
+                     if (!it->alias.empty()) {
+                       field->setName(it->alias);
+                       projectData.data.erase(it);
+                     }
+                   }
+                   return field;
+                 });
+}
+
 void DataSets::MemoryViewDataSet::addParent(std::shared_ptr<MemoryDataSet> &parent) { parents.emplace_back(parent); }
 void DataSets::MemoryViewDataSet::addParents(const std::vector<std::shared_ptr<DataSets::MemoryDataSet>> &parents) {
   std::copy(parents.begin(), parents.end(), std::back_inserter(this->parents));
@@ -371,9 +392,5 @@ std::shared_ptr<DataSets::MemoryDataSet> DataSets::MemoryViewDataSet::toDataSet(
   result->resetBegin();
   return result;
 }
-gsl::index DataSets::MemoryViewDataSet::getColumnCount() const {
-  return allowedFields.size();
-}
-void DataSets::MemoryViewDataSet::setCurrentRecord(gsl::index pos) {
-  currentRecord = pos;
-}
+gsl::index DataSets::MemoryViewDataSet::getColumnCount() const { return allowedFields.size(); }
+void DataSets::MemoryViewDataSet::setCurrentRecord(gsl::index pos) { currentRecord = pos; }

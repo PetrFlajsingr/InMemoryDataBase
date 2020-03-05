@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.13)
 project(csv_reader)
 
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unknown-pragmas -fchar8_t -o3")
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unknown-pragmas -fchar8_t")
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
 

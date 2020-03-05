@@ -19,8 +19,9 @@ DataBase::MemoryDataBase::MemoryDataBase(std::string name) : name(std::move(name
 
 std::string DataBase::MemoryDataBase::getName() const { return name; }
 
-void DataBase::MemoryDataBase::addTable(const std::shared_ptr<DataSets::MemoryDataSet> &dataSet) {
+std::shared_ptr<DataBase::Table> DataBase::MemoryDataBase::addTable(const std::shared_ptr<DataSets::MemoryDataSet> &dataSet) {
   tables.emplace_back(std::make_shared<Table>(dataSet));
+  return tables.back();
 }
 
 void DataBase::MemoryDataBase::removeTable(std::string_view tableName) {
@@ -68,7 +69,7 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::execSimpleQuery(std::s
     result = doOrder(structQuery, result);
   }
   result = doProject(structQuery, result);
-  result = setFieldAliases(structQuery, result);
+  //result = setFieldAliases(structQuery, result);
 
   result->dataSet->setName(std::string(viewName));
   if (keepView) {
@@ -286,7 +287,7 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::doProject(const DataBa
   std::vector<std::string> allowedFields;
   std::transform(query.project.data.begin(), query.project.data.end(), std::back_inserter(allowedFields),
                  [](const ProjectItem &item) { return item.column; });
-  view->dataSet->setAllowedFields(allowedFields);
+  view->dataSet->setAllowedFieldsWithAliases(allowedFields, query.project);
 
   return view;
 }

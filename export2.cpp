@@ -167,6 +167,8 @@ void combine(std::vector<std::shared_ptr<DataSets::BaseDataSet>> dataSets, const
 
   std::transform(mainDS.fields.begin(), mainDS.fields.end(), std::back_inserter(row),
                  [](auto &field) { return field->getName().data(); });
+  row.emplace_back("ROK_VZNIKU");
+  row.emplace_back("ROK_LIKVIDACE");
   row.emplace_back("Zdroj dat");
   dss = std::vector<DSFieldCnt>{dss.begin() + 1, dss.end()};
   for (auto &ds : dss) {
@@ -187,10 +189,15 @@ void combine(std::vector<std::shared_ptr<DataSets::BaseDataSet>> dataSets, const
   const auto month = 1 + parts->tm_mon;
   const auto downloadPeriodData = fmt::format("{:04d}-{:02d}", year, month);
   auto likvField = mainDS.ds->fieldByName("DATUM_LIKVIDACE");
+  auto vznikField = mainDS.ds->fieldByName("DATUM_VZNIKU");
+  auto dotaceRokField = dataSets[2]->fieldByName("DOTACE_ROK");
   while (mainDS.ds->next()) {
 
     if (likvField->getAsString().empty()) {
       likvField->setAsString("Aktivní");
+    }
+    if (dotaceRokField->getAsString() == notAvailable) {
+      dotaceRokField->setAsString("9999");
     }
 
     ++cnt;
@@ -201,6 +208,12 @@ void combine(std::vector<std::shared_ptr<DataSets::BaseDataSet>> dataSets, const
           row.clear();
           std::transform(mainDS.fields.begin(), mainDS.fields.end(), std::back_inserter(row),
                          [](auto &field) { return field->getAsString(); });
+
+          const auto vznik = vznikField->getAsString();
+          row.emplace_back(vznik.empty() ? notAvailable : vznik.substr(6));
+          const auto zanik = vznikField->getAsString();
+          row.emplace_back(zanik != notAvailable ? notAvailable : zanik.substr(6));
+
           if (ds.ds->getName() == "verSb") {
             row.emplace_back("VerejnaSbirka");
           } else if (ds.ds->getName() == "vz2") {
@@ -496,7 +509,8 @@ int main() {
                      "JOIN subjekty on verejneSbirky.NAZEV_PO = subjekty.NAZEV;",
                      true, "verSb");
 
-  db.execSimpleQuery("select subjekty.* from subjekty where subjekty.INSTITUCE_V_LIKVIDACI = \"aktivní\";", true, "sub");
+  //db.execSimpleQuery("select subjekty.* from subjekty where subjekty.INSTITUCE_V_LIKVIDACI = \"aktivní\";", true, "sub");
+  db.execSimpleQuery("select subjekty.* from subjekty;", true, "sub");
 
   auto VZds = createDataSetFromFile(
       "VZ", FileSettings::Xlsx(verejneZakazkyPath + "vz.xlsx", "VZ"),

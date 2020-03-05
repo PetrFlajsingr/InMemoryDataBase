@@ -5,7 +5,7 @@
 #include <CsvReader.h>
 #include <utility>
 
-void myGetLine(std::istream &stream, gsl::span<char> &buffer, bool allowNewLineInQuotes = true, char lineDelimiter = '\n') {
+bool myGetLine(std::istream &stream, gsl::span<char> &buffer, bool allowNewLineInQuotes = true, char lineDelimiter = '\n') {
   using stream_traits = std::istream::traits_type;
   int c;
   auto streamBuffer = stream.rdbuf();
@@ -36,11 +36,15 @@ void myGetLine(std::istream &stream, gsl::span<char> &buffer, bool allowNewLineI
       streamBuffer->snextc();
     }
   }
+  if (stream_traits::eq_int_type(c, stream_traits::eof())) {
+    return true;
+  }
   if (c == lineDelimiter) {
     streamBuffer->snextc();
   }
 
   buffer[bufferPos] = '\0';
+  return false;
 }
 
 DataProviders::CsvReader::CsvReader(std::string_view filePath, std::string_view delimiter, bool useQuotes) : BaseDataProvider(), useQuotes(useQuotes) {
@@ -113,7 +117,10 @@ void DataProviders::CsvReader::parseRecord() {
   gsl::span<char> spanBuffer{buffer, BUFFER_SIZE};
 
   // file.getline(buffer, BUFFER_SIZE, '\n');
-  myGetLine(file, spanBuffer, false);
+  bool isEof = myGetLine(file, spanBuffer, false);
+  if (isEof) {
+    file.setstate(std::ios::eofbit);
+  }
   auto line = std::string_view(spanBuffer.data());
   if (!line.empty() && line[line.length() - 1] == '\r') {
     line = line.substr(0, line.length() - 1);

@@ -36,7 +36,7 @@ std::tuple<DataBase::Token, std::string, bool> DataBase::LexicalAnalyser::getNex
     //\ comment skip
     switch (state) {
     case LexState::start:
-      if (*it == ' ') {
+      if (std::isspace(*it)) {
         token = Token::space;
         value = *it;
         goto emit_token_move_iter;

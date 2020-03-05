@@ -21,6 +21,15 @@ using Currency = dec::decimal<2>;
 class DateTime;
 
 namespace Utilities {
+
+std::string defaultForEmpty(const std::string &value, const std::string &def = "");
+
+std::string replaceAll(
+    const std::string & str ,   // where to work
+    const std::string & find ,  // substitute 'find'
+    const std::string & replace //      by 'replace'
+);
+
 /**
  * Rozdeleni stringu pomoci urceneho delimiteru.
  * Delimiter neni v rozdelenych retezcich obsazen.

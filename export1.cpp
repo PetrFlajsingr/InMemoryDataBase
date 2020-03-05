@@ -168,8 +168,9 @@ int main() {
                                      ValueType::String, ValueType::String, ValueType::String, ValueType::String,
                                      ValueType::String, ValueType::String}));
 
-  db.addTable(createDataSetFromFile("rzp", {FileSettings::Type::csv, rzpCSV, ','},
-                                    {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String}));
+  db.addTable(createDataSetFromFile(
+      "rzp", {FileSettings::Type::csv, rzpCSV, ','},
+      {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String, ValueType::String}));
 
   db.addTable(
       createDataSetFromFile("nace", FileSettings::Xlsx(nnoDopl, "NACE_kódy"), {ValueType::String, ValueType::Integer}));
@@ -183,13 +184,10 @@ int main() {
        ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::Integer}));
   db.addTable(createDataSetFromFile(
       "copni2", FileSettings::Xlsx(csvPath + "CSU2019_copni.xlsx", "COPNImetod"),
-      {ValueType::String,
-       ValueType::Integer,
-       ValueType::String,
-       ValueType::String,
-       ValueType::String}));
+      {ValueType::String, ValueType::Integer, ValueType::String, ValueType::String, ValueType::String}));
 
-  const auto copniQuery = "select copni1.ICO, copni2.\"Popis cinnosti\" from copni1 join copni2 on copni1.COPNI = copni2.COPNI_codes;";
+  const auto copniQuery =
+      "select copni1.ICO, copni2.\"Popis cinnosti\" from copni1 join copni2 on copni1.COPNI = copni2.COPNI_codes;";
   auto copniDesc = db.execSimpleQuery(copniQuery, false, "copni");
   db.addTable(copniDesc->dataSet->toDataSet());
   db.removeTable("copni1");
@@ -274,7 +272,7 @@ int main() {
   }
 
   DataWriters::XlntWriter writer{"/home/petr/Desktop/muni/export1.xlsx"};
-  //writer.setAddQuotes(true);
+  // writer.setAddQuotes(true);
   auto header = resDS->getFieldNames();
   header.insert(header.begin() + 24, "POBOCNE_SPOLKY_POCET");
   header.insert(header.begin() + 26, "UCEL_POPIS");
