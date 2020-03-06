@@ -5,6 +5,8 @@
 #ifndef UTILITIES_ISIN_H
 #define UTILITIES_ISIN_H
 
+#include <algorithm>
+
 template <typename T, typename Container> bool isIn(T value, Container &&container) {
   return std::find_if(container.begin(), container.end(), [value](const T &val) { return val == value; }) != container.end();
 }

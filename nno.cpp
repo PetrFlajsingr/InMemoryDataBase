@@ -2,112 +2,26 @@
 // Created by petr on 2/11/20.
 //
 
-#include "Misc/Headers/Logger.h"
+#include "various/isin.h"
 #include <CsvReader.h>
-#include <CsvStreamReader.h>
 #include <CsvWriter.h>
 #include <MemoryDataBase.h>
 #include <XlsxIOReader.h>
-#include <XlsxReader.h>
 #include <include/fmt/format.h>
-#include "various/isin.h"
+#include "types/Range.h"
+#include "io/print.h"
+#include "LoadingUtils.h"
+
 using namespace std::string_literals;
+using namespace LoggerStreamModifiers;
+Logger logger{std::cout};
 
-auto &logger = Logger<true>::GetInstance();
 
-struct FileSettings {
-  enum Type { csv, xlsx, xls, csvOld };
-  Type type;
-  std::string pathToFile;
-  char delimiter;
-  std::string sheet = "";
-  bool useCharset = false;
-  CharSet charset;
-
-  static FileSettings Xlsx(const std::string &path, const std::string &sheet = "") {
-    FileSettings result;
-    result.type = xlsx;
-    result.pathToFile = path;
-    result.sheet = sheet;
-    return result;
-  }
-
-  static FileSettings Xls(const std::string &path, const std::string &sheet = "") {
-    FileSettings result;
-    result.type = xls;
-    result.pathToFile = path;
-    result.sheet = sheet;
-    return result;
-  }
-
-  static FileSettings Csv(const std::string &path, char delimiter = ',', bool useCharset = false,
-                          CharSet charset = CharSet::CP1250) {
-    FileSettings result;
-    result.type = csv;
-    result.pathToFile = path;
-    result.delimiter = delimiter;
-    result.useCharset = useCharset;
-    result.charset = charset;
-    return result;
-  }
-
-  static FileSettings CsvOld(const std::string &path, char delimiter = ',', bool useCharset = false,
-                             CharSet charset = CharSet::CP1250) {
-    FileSettings result;
-    result.type = csvOld;
-    result.pathToFile = path;
-    result.delimiter = delimiter;
-    result.useCharset = useCharset;
-    result.charset = charset;
-    return result;
-  }
-};
-
-std::shared_ptr<DataSets::MemoryDataSet> createDataSetFromFile(const std::string &name,
-                                                               const FileSettings &fileSettings,
-                                                               const std::vector<ValueType> &valueTypes) {
-  std::unique_ptr<DataProviders::BaseDataProvider> provider;
-  switch (fileSettings.type) {
-  case FileSettings::csv:
-    if (fileSettings.useCharset) {
-      provider = std::make_unique<DataProviders::CsvStreamReader>(fileSettings.pathToFile, fileSettings.charset,
-                                                                  fileSettings.delimiter);
-    } else {
-      provider = std::make_unique<DataProviders::CsvStreamReader>(fileSettings.pathToFile, fileSettings.delimiter);
-    }
-    break;
-  case FileSettings::csvOld:
-    if (fileSettings.useCharset) {
-      provider = std::make_unique<DataProviders::CsvReader>(fileSettings.pathToFile, fileSettings.charset,
-                                                            std::string(1, fileSettings.delimiter), true);
-    } else {
-      provider = std::make_unique<DataProviders::CsvReader>(fileSettings.pathToFile,
-                                                            std::string(1, fileSettings.delimiter), true);
-    }
-    break;
-  case FileSettings::xlsx:
-    provider = std::make_unique<DataProviders::XlsxIOReader>(fileSettings.pathToFile);
-    if (!fileSettings.sheet.empty()) {
-      dynamic_cast<DataProviders::XlsxIOReader *>(provider.get())->openSheet(fileSettings.sheet);
-    }
-    break;
-  case FileSettings::xls:
-    provider = std::make_unique<DataProviders::XlsxReader>(fileSettings.pathToFile);
-    break;
-  }
-  auto result = std::make_shared<DataSets::MemoryDataSet>(name);
-  result->open(*provider, valueTypes);
-  logger.log<LogLevel::Status>("Loaded: "s + result->getName());
-  result->resetEnd();
-  logger.log<LogLevel::Debug, true>("Count:", result->getCurrentRecord());
-  result->resetBegin();
-  return result;
-}
 const auto notAvailable = "není k dispozici"s;
-std::shared_ptr<DataSets::MemoryDataSet> prepareNACE() {
+std::shared_ptr<DataSets::MemoryDataSet> prepareNACE(const std::shared_ptr<DataSets::MemoryDataSet> &res) {
   DataBase::MemoryDataBase db("db");
-  db.addTable(
-      createDataSetFromFile("icos", FileSettings::Csv("/home/petr/Desktop/muni/icos.csv"), {ValueType::Integer}));
+  db.addTable(res);
+
   db.addTable(createDataSetFromFile(
       "res_nace", FileSettings::Csv("/home/petr/Desktop/muni/res/all/RES3B2020M02.csv", ';', true, CharSet::CP1250),
       {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
@@ -120,7 +34,7 @@ std::shared_ptr<DataSets::MemoryDataSet> prepareNACE() {
        ValueType::String, ValueType::String}));
   auto ordered = db.execSimpleQuery(R"(SELECT res_nace.ICO, res_nace.HODN, nace.TEXTZ
 FROM res_nace
-JOIN icos ON res_nace.ICO = icos.ICO
+JOIN resFiltered ON res_nace.ICO = resFiltered.ICO
 LEFT JOIN nace ON res_nace.HODN = nace.KODZAZ
 ORDER BY res_nace.ICO ASC;)",
                                     false, "nace_ordered");
@@ -165,7 +79,7 @@ ORDER BY res_nace.ICO ASC;)",
 
   return result;
 }
-// OBEC_TEXT, PSC, COBCE_TEXT, ULICE_TEXT CDOM/COR pokud prazdne
+
 std::string buildAdresa(const std::string &obec, const std::string &psc, const std::string &castObce,
                         const std::string &ulice, const std::string &cisloDomu, const std::string &cisloOrientacni) {
   std::string result = fmt::format("{}, {}", obec, psc);
@@ -190,13 +104,10 @@ std::string buildAdresa(const std::string &obec, const std::string &psc, const s
 };
 
 int main() {
-  logger.startTime();
+  logger.setDefaultPrintTime(true);
+  logger << status{} << "Starting\n";
+
   DataBase::MemoryDataBase db("db");
-
-  db.addTable(prepareNACE());
-
-  db.addTable(
-      createDataSetFromFile("icos", FileSettings::Csv("/home/petr/Desktop/muni/icos.csv"), {ValueType::Integer}));
 
   db.addTable(createDataSetFromFile(
       "forma",
@@ -219,20 +130,44 @@ int main() {
   db.addTable(createDataSetFromFile("rso", FileSettings::Csv("/home/petr/Desktop/muni/res/rso.csv", ','),
                                     {ValueType::String, ValueType::String, ValueType::String, ValueType::String}));
 
-  db.addTable(createDataSetFromFile(
-      "res", FileSettings::Csv("/home/petr/Desktop/muni/res/all/RES3A2020M02.csv", ';', true, CharSet::CP1250),
-      {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
-       ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String,
-       ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String,
-       ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String,
-       ValueType::String,  ValueType::String, ValueType::String, ValueType::String}));
-  const auto queryFilterIcos = R"(SELECT res.* from res join icos on res.ICO = icos.ICO;)";
-  db.addTable(db.execSimpleQuery(queryFilterIcos, false, "resFiltered")->dataSet->toDataSet());
+  auto resTable = db.addTable(std::make_shared<DataSets::MemoryDataSet>("resFiltered"));
+  {
+    logger << debug{} << "Starting NNO selection\n";
+    const std::vector resColumnTypes{ValueType::Integer, ValueType::String, ValueType::String, ValueType::String,
+                                     ValueType::String,  ValueType::String, ValueType::String, ValueType::String,
+                                     ValueType::String,  ValueType::String, ValueType::String, ValueType::String,
+                                     ValueType::String,  ValueType::String, ValueType::String, ValueType::String,
+                                     ValueType::String,  ValueType::String, ValueType::String, ValueType::String,
+                                     ValueType::String,  ValueType::String, ValueType::String, ValueType::String};
+    auto resDs = createDataSetFromFile(
+        "r", FileSettings::Csv("/home/petr/Desktop/muni/res/all/RES3A2020M02.csv", ';', true, CharSet::CP1250),
+        resColumnTypes);
+    const auto resColumnNames = resDs->getFieldNames();
+    resTable->dataSet->openEmpty(resColumnNames, resColumnTypes);
 
-  db.removeTable("icos");
-  db.removeTable("res");
+    DataProviders::CsvReader nnoKodyReader{"/home/petr/Desktop/muni/pravni_formy_nno.csv"};
+    std::vector<std::string> nnoKody;
+    std::transform(nnoKodyReader.begin(), nnoKodyReader.end(), std::back_inserter(nnoKody), [] (const auto &row) {
+      return row[0];
+    });
 
-  // 19015291
+    auto srcFields = resDs->getFields();
+    auto srcPravniFormaKodField = resDs->fieldByName("FORMA");
+    auto dstFields = resTable->dataSet->getFields();
+    while (resDs->next()) {
+      if (isIn(srcPravniFormaKodField->getAsString(), nnoKody)) {
+        resTable->dataSet->append();
+        for (auto i : MakeRange::range(srcFields.size())) {
+          dstFields[i]->setAsString(srcFields[i]->getAsString());
+        }
+      }
+    }
+    logger << debug{} << fmt::format("NNO selection done, row count: {}", resTable->dataSet->getCurrentRecord());
+    resTable->dataSet->resetBegin();
+  }
+
+  db.addTable(prepareNACE(resTable->dataSet));
+  logger << status{} << "Prepared NACE\n";
 
   const auto queryCisleniky = R"sql(SELECT
 resFiltered.ICO,
@@ -261,21 +196,16 @@ LEFT JOIN rso on resFiltered.ICZUJ = rso.KOD_ZUJ
 ORDER BY resFiltered.ICO ASC
 ;)sql";
 
-  // resFiltered.DDATVZN AS ROK_VZNIKU,
-  // resFiltered.DDATZAN AS ROK_ZANIKU,
-  // resFiltered.DDATZAN AS INSTITUCE_V_LIKVIDACI
-
   {
     std::vector<std::string> okresniMesta{};
     {
       DataProviders::CsvReader csvReader("/home/petr/Desktop/muni/res/okresni_mesta.csv");
-      std::transform(csvReader.begin(), csvReader.end(), std::back_inserter(okresniMesta), [] (const auto &row) {
-        std::cout << row[0] << std::endl;
+      std::transform(csvReader.begin(), csvReader.end(), std::back_inserter(okresniMesta), [](const auto &row) {
         return row[0];
       });
     }
     auto result = db.execSimpleQuery(queryCisleniky, false, "result")->dataSet;
-    auto ICO_field = dynamic_cast<DataSets::IntegerField*>(result->fieldByName("ICO")); // ICOnum
+    auto ICO_field = dynamic_cast<DataSets::IntegerField *>(result->fieldByName("ICO")); // ICOnum
     // ICO 8mistne
     auto NAZEV_field = result->fieldByName("NAZEV");
     auto PRAVNI_FORMA_field = result->fieldByName("PRAVNI_FORMA");
@@ -366,49 +296,5 @@ ORDER BY resFiltered.ICO ASC
       writer.writeRecord(record);
     }
   }
-
-  logger.endTime();
-  logger.printElapsedTime();
-
-  // join na seznam pozadovanych ico jako prvni, pak zjistit pravni formu z ciselniku FORMA, velikostni kategorii z
-  // ciselniku KATPO slozit adresu z polozek, dohledat kraj z ciselniku OKRESLAU, zmensit datum na orpavdu pouze datum,
-  // pridat k datum sloupce pouze pro rok zjisit OBEC_ICOB podle ICZUJ a prejmenovat sloupce
-
-  // DataWriters::CsvWriter writer{"/home/petr/Desktop/test.csv"};
-  // writer.setAddQuotes(true);
-  // writer.writeDataSet(*db.execSimpleQuery(queryCisleniky, false, "result")->dataSet);
-  /*
-
-  const auto query = "SELECT res.ICO, "
-                     "res.Stav, "
-                     "res.Nazev, "
-                     "res.Statisticka_pravni_forma, "
-                     "res.Datum_vzniku, "
-                     "res.Datum_zaniku, "
-                     "res.Adresa, "
-                     "res.\"Kod_stat._pravni_formy\", "
-                     "res.\"Institucionalni_sektor\", "
-                     "res.\"Cinnosti_dle_CZ-NACE\", "
-                     "vel_kod.nazev FROM res JOIN vel_kod on res.\"Velikostni_kategorie\" = vel_kod.kod;";
-
-  auto result = db.execSimpleQuery(query, false, "resKat");
-
-  db.addTable(result->dataSet->toDataSet());
-  db.removeTable("res");
-  db.removeTable("vel_kod");
-
-  DataWriters::CsvWriter writer{"/home/petr/Desktop/out.csv"};
-  auto r = db.tableByName("resKat")->dataSet;
-  writer.writeHeader(r->getFieldNames());
-  std::vector<std::string> row;
-  auto fields = r->getFields();
-  writer.setAddQuotes(true);
-  while (r->next()) {
-    std::transform(fields.begin(), fields.end(), std::back_inserter(row),
-                   [](auto &field) { return field->getAsString(); });
-    writer.writeRecord(row);
-    row.clear();
-  }*/
-
   return 0;
 }

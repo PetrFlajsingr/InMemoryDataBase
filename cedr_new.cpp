@@ -72,7 +72,7 @@ std::shared_ptr<DataSets::MemoryDataSet> make_dataset(const std::string &name) {
   return std::make_shared<DataSets::MemoryDataSet>(name);
 }
 
-auto &logger = Logger<true>::GetInstance();
+auto &lgr = Logger<true>::GetInstance();
 
 int main() {
   DataBase::MemoryDataBase dataBase("db");
@@ -103,9 +103,9 @@ int main() {
                        ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
                        ValueType::String, ValueType::String, ValueType::String});
   dataBase.addTable(dotaceDataSet);
-  logger.log<LogLevel::Status>("Loaded: "s + dotaceDataSet->getName());
+  lgr.log<LogLevel::Status>("Loaded: "s + dotaceDataSet->getName());
   dotaceDataSet->resetEnd();
-  logger.log<LogLevel::Debug>("Count:", dotaceDataSet->getCurrentRecord());
+  lgr.log<LogLevel::Debug>("Count:", dotaceDataSet->getCurrentRecord());
 
   auto rozhodnutiDataSet = make_dataset("rozhodnuti");
   rozhodnutiDataSet->open(rozhodnutiProvider,
@@ -114,18 +114,18 @@ int main() {
                            ValueType::String, ValueType::String, ValueType::String, ValueType::String,
                            ValueType::String});
   dataBase.addTable(rozhodnutiDataSet);
-  logger.log<LogLevel::Status>("Loaded: "s + rozhodnutiDataSet->getName());
+  lgr.log<LogLevel::Status>("Loaded: "s + rozhodnutiDataSet->getName());
   rozhodnutiDataSet->resetEnd();
-  logger.log<LogLevel::Debug>("Count:", rozhodnutiDataSet->getCurrentRecord());
+  lgr.log<LogLevel::Debug>("Count:", rozhodnutiDataSet->getCurrentRecord());
 
   auto obdobiDataSet = make_dataset("obdobi");
   obdobiDataSet->open(obdobiProvider, {ValueType::String, ValueType::String, ValueType::Currency, ValueType::Currency,
                                        ValueType::String, ValueType::String, ValueType::String, ValueType::String,
                                        ValueType::String, ValueType::String, ValueType::String, ValueType::String});
   dataBase.addTable(obdobiDataSet);
-  logger.log<LogLevel::Status>("Loaded: "s + obdobiDataSet->getName());
+  lgr.log<LogLevel::Status>("Loaded: "s + obdobiDataSet->getName());
   obdobiDataSet->resetEnd();
-  logger.log<LogLevel::Debug>("Count:", obdobiDataSet->getCurrentRecord());
+  lgr.log<LogLevel::Debug>("Count:", obdobiDataSet->getCurrentRecord());
 
   auto prijemceDataSet = make_dataset("prijemce");
   prijemceDataSet->open(prijemceProvider, {
@@ -143,9 +143,9 @@ int main() {
                                               ValueType::String,
                                           });
   dataBase.addTable(prijemceDataSet);
-  logger.log<LogLevel::Status>("Loaded: "s + prijemceDataSet->getName());
+  lgr.log<LogLevel::Status>("Loaded: "s + prijemceDataSet->getName());
   prijemceDataSet->resetEnd();
-  logger.log<LogLevel::Debug>("Count:", prijemceDataSet->getCurrentRecord());
+  lgr.log<LogLevel::Debug>("Count:", prijemceDataSet->getCurrentRecord());
 
   auto subjektyDataSet = make_dataset("subjekty");
   subjektyDataSet->open(subjektyProvider, {
@@ -168,9 +168,9 @@ int main() {
                                               ValueType::String,
                                           });
   dataBase.addTable(subjektyDataSet);
-  logger.log<LogLevel::Status>("Loaded: "s + subjektyDataSet->getName());
+  lgr.log<LogLevel::Status>("Loaded: "s + subjektyDataSet->getName());
   subjektyDataSet->resetEnd();
-  logger.log<LogLevel::Debug>("Count:", subjektyDataSet->getCurrentRecord());
+  lgr.log<LogLevel::Debug>("Count:", subjektyDataSet->getCurrentRecord());
 
   DataProviders::CsvReader operacniProgramProvider(csvPath + operacniProgramCSVName, ",");
   auto operacniProgramDataSet = make_dataset("operacniProgram");
@@ -183,9 +183,9 @@ int main() {
                                                             ValueType::String,
                                                         });
   dataBase.addTable(operacniProgramDataSet);
-  logger.log<LogLevel::Status>("Loaded: "s + operacniProgramDataSet->getName());
+  lgr.log<LogLevel::Status>("Loaded: "s + operacniProgramDataSet->getName());
   operacniProgramDataSet->resetEnd();
-  logger.log<LogLevel::Debug>("Count:", operacniProgramDataSet->getCurrentRecord());
+  lgr.log<LogLevel::Debug>("Count:", operacniProgramDataSet->getCurrentRecord());
 
   DataProviders::CsvReader grantoveSchemaProvider(csvPath + grantoveSchemaCSVName, ",");
   auto grantoveSchemaDataSet = make_dataset("grantoveSchema");
@@ -198,9 +198,9 @@ int main() {
                                                           ValueType::String,
                                                       });
   dataBase.addTable(grantoveSchemaDataSet);
-  logger.log<LogLevel::Status>("Loaded: "s + grantoveSchemaDataSet->getName());
+  lgr.log<LogLevel::Status>("Loaded: "s + grantoveSchemaDataSet->getName());
   grantoveSchemaDataSet->resetEnd();
-  logger.log<LogLevel::Debug>("Count:", grantoveSchemaDataSet->getCurrentRecord());
+  lgr.log<LogLevel::Debug>("Count:", grantoveSchemaDataSet->getCurrentRecord());
 
   DataProviders::CsvReader dotaceTitulProvider(csvPath + dotacniTitulCSVName, ",");
   auto dotaceTitulDataSet = make_dataset("dotaceTitul");
@@ -215,9 +215,9 @@ int main() {
                                                     ValueType::String,
                                                 });
   dataBase.addTable(dotaceTitulDataSet);
-  logger.log<LogLevel::Status>("Loaded: "s + dotaceTitulDataSet->getName());
+  lgr.log<LogLevel::Status>("Loaded: "s + dotaceTitulDataSet->getName());
   dotaceTitulDataSet->resetEnd();
-  logger.log<LogLevel::Debug>("Count:", dotaceTitulDataSet->getCurrentRecord());
+  lgr.log<LogLevel::Debug>("Count:", dotaceTitulDataSet->getCurrentRecord());
 
   DataProviders::CsvReader poskytovatelDotaceProvider(csvPath + poskytovatelDotaceCSVName, ",");
   auto poskytovatelDotaceDataSet = make_dataset("poskytovatelDotace");
@@ -230,9 +230,9 @@ int main() {
                                                                   ValueType::String,
                                                               });
   dataBase.addTable(poskytovatelDotaceDataSet);
-  logger.log<LogLevel::Status>("Loaded: "s + poskytovatelDotaceDataSet->getName());
+  lgr.log<LogLevel::Status>("Loaded: "s + poskytovatelDotaceDataSet->getName());
   poskytovatelDotaceDataSet->resetEnd();
-  logger.log<LogLevel::Debug>("Count:", poskytovatelDotaceDataSet->getCurrentRecord());
+  lgr.log<LogLevel::Debug>("Count:", poskytovatelDotaceDataSet->getCurrentRecord());
 
 
   auto result = dataBase.execSimpleQuery(QUERY_2018, false, "cedr");

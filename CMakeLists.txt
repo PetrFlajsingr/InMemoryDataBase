@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.13)
 project(csv_reader)
 
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unknown-pragmas -fchar8_t")
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unknown-pragmas -fchar8_t -o3")
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
 
@@ -89,7 +89,8 @@ set(SOURCE_FILES
         ${CLISources}
         ${moorSources}
         ${CommandSources}
-        Combiner.cpp)
+        Combiner.cpp
+        LoadingUtils.cpp)
 
 set(TEST_SOURCE_FILES
         ${SOURCE_FILES}
@@ -150,6 +151,7 @@ target_link_libraries(export2 xlsxio_write)
 target_link_libraries(export2 OpenXLSX xlsreader -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 
 target_link_libraries(nno xlsxio_read)
+#target_link_libraries(nno asan)
 target_link_libraries(nno xlsxio_write)
 target_link_libraries(nno OpenXLSX xlsreader -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 

@@ -16,102 +16,12 @@
 #include <memory>
 #include "time/now.h"
 #include "fmt/format.h"
+#include "LoadingUtils.h"
+
 using namespace std::string_literals;
 
 const auto notAvailable = "není k dispozici"s;
 auto &logger = Logger<true>::GetInstance();
-
-struct FileSettings {
-  enum Type { csv, xlsx, xls, csvOld };
-  Type type;
-  std::string pathToFile;
-  char delimiter;
-  std::string sheet = "";
-  bool useCharset = false;
-  CharSet charset;
-  bool useQuotes = true;
-
-  static FileSettings Xlsx(const std::string &path, const std::string &sheet = "") {
-    FileSettings result;
-    result.type = xlsx;
-    result.pathToFile = path;
-    result.sheet = sheet;
-    return result;
-  }
-
-  static FileSettings Xls(const std::string &path, const std::string &sheet = "") {
-    FileSettings result;
-    result.type = xls;
-    result.pathToFile = path;
-    result.sheet = sheet;
-    return result;
-  }
-
-  static FileSettings Csv(const std::string &path, char delimiter = ',', bool useCharset = false,
-                          CharSet charset = CharSet::CP1250) {
-    FileSettings result;
-    result.type = csv;
-    result.pathToFile = path;
-    result.delimiter = delimiter;
-    result.useCharset = useCharset;
-    result.charset = charset;
-    return result;
-  }
-
-  static FileSettings CsvOld(const std::string &path, char delimiter = ',', bool useQuotes = true,
-                             bool useCharset = false, CharSet charset = CharSet::CP1250) {
-    FileSettings result;
-    result.type = csvOld;
-    result.pathToFile = path;
-    result.delimiter = delimiter;
-    result.useCharset = useCharset;
-    result.useQuotes = useQuotes;
-    result.charset = charset;
-    return result;
-  }
-};
-
-std::shared_ptr<DataSets::MemoryDataSet> createDataSetFromFile(const std::string &name,
-                                                               const FileSettings &fileSettings,
-                                                               const std::vector<ValueType> &valueTypes) {
-  std::unique_ptr<DataProviders::BaseDataProvider> provider;
-  switch (fileSettings.type) {
-  case FileSettings::csv:
-    if (fileSettings.useCharset) {
-      provider = std::make_unique<DataProviders::CsvStreamReader>(fileSettings.pathToFile, fileSettings.charset,
-                                                                  fileSettings.delimiter);
-    } else {
-      provider = std::make_unique<DataProviders::CsvStreamReader>(fileSettings.pathToFile, fileSettings.delimiter);
-    }
-    break;
-  case FileSettings::csvOld:
-    if (fileSettings.useCharset) {
-      provider =
-          std::make_unique<DataProviders::CsvReader>(fileSettings.pathToFile, fileSettings.charset,
-                                                     std::string(1, fileSettings.delimiter), fileSettings.useQuotes);
-    } else {
-      provider = std::make_unique<DataProviders::CsvReader>(
-          fileSettings.pathToFile, std::string(1, fileSettings.delimiter), fileSettings.useQuotes);
-    }
-    break;
-  case FileSettings::xlsx:
-    provider = std::make_unique<DataProviders::XlsxIOReader>(fileSettings.pathToFile);
-    if (!fileSettings.sheet.empty()) {
-      dynamic_cast<DataProviders::XlsxIOReader *>(provider.get())->openSheet(fileSettings.sheet);
-    }
-    break;
-  case FileSettings::xls:
-    provider = std::make_unique<DataProviders::XlsxReader>(fileSettings.pathToFile);
-    break;
-  }
-  auto result = std::make_shared<DataSets::MemoryDataSet>(name);
-  result->open(*provider, valueTypes);
-  logger.log<LogLevel::Status>("Loaded: "s + result->getName());
-  result->resetEnd();
-  logger.log<LogLevel::Debug, true>("Count:", result->getCurrentRecord());
-  result->resetBegin();
-  return result;
-}
 
 const auto verejneSbirkyPath = "/home/petr/Desktop/muni/verejnesbirky/"s;
 const auto muniPath = "/home/petr/Desktop/muni/"s;
@@ -447,7 +357,7 @@ int main() {
   DataBase::MemoryDataBase db("db");
 
   auto verejneSbirkyDS = createDataSetFromFile(
-      "verejneSbirky", FileSettings::CsvOld(verejneSbirkyPath + "VerejneSbirky.csv", '|', false, true, CharSet::CP1250),
+      "verejneSbirky", FileSettings::CsvOld(verejneSbirkyPath + "VerejneSbirky.csv", '|', true, CharSet::CP1250),
       {
           ValueType::String,
           ValueType::String,
@@ -654,3 +564,4 @@ int main() {
   logger.printElapsedTime();
   return 0;
 }
+

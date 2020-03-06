@@ -2,110 +2,19 @@
 // Created by petr on 10/3/19.
 //
 
-#include <CsvReader.h>
-#include <CsvStreamReader.h>
-#include <CsvWriter.h>
 #include <Logger.h>
 #include <MemoryDataBase.h>
 #include <MemoryDataSet.h>
 #include <XlntWriter.h>
 #include <XlsxIOReader.h>
 #include <XlsxIOWriter.h>
-#include <XlsxReader.h>
 #include <include/fmt/format.h>
 #include <memory>
+#include "LoadingUtils.h"
+
 using namespace std::string_literals;
 
 auto &logger = Logger<true>::GetInstance();
-
-struct FileSettings {
-  enum Type { csv, xlsx, xls, csvOld };
-  Type type;
-  std::string pathToFile;
-  char delimiter;
-  std::string sheet = "";
-  bool useCharset = false;
-  CharSet charset;
-
-  static FileSettings Xlsx(const std::string &path, const std::string &sheet = "") {
-    FileSettings result;
-    result.type = xlsx;
-    result.pathToFile = path;
-    result.sheet = sheet;
-    return result;
-  }
-
-  static FileSettings Xls(const std::string &path, const std::string &sheet = "") {
-    FileSettings result;
-    result.type = xls;
-    result.pathToFile = path;
-    result.sheet = sheet;
-    return result;
-  }
-
-  static FileSettings Csv(const std::string &path, char delimiter = ',', bool useCharset = false,
-                          CharSet charset = CharSet::CP1250) {
-    FileSettings result;
-    result.type = csv;
-    result.pathToFile = path;
-    result.delimiter = delimiter;
-    result.useCharset = useCharset;
-    result.charset = charset;
-    return result;
-  }
-
-  static FileSettings CsvOld(const std::string &path, char delimiter = ',', bool useCharset = false,
-                             CharSet charset = CharSet::CP1250) {
-    FileSettings result;
-    result.type = csvOld;
-    result.pathToFile = path;
-    result.delimiter = delimiter;
-    result.useCharset = useCharset;
-    result.charset = charset;
-    return result;
-  }
-};
-
-std::shared_ptr<DataSets::MemoryDataSet> createDataSetFromFile(const std::string &name,
-                                                               const FileSettings &fileSettings,
-                                                               const std::vector<ValueType> &valueTypes) {
-  std::unique_ptr<DataProviders::BaseDataProvider> provider;
-  switch (fileSettings.type) {
-  case FileSettings::csv:
-    if (fileSettings.useCharset) {
-      provider = std::make_unique<DataProviders::CsvStreamReader>(fileSettings.pathToFile, fileSettings.charset,
-                                                                  fileSettings.delimiter);
-    } else {
-      provider = std::make_unique<DataProviders::CsvStreamReader>(fileSettings.pathToFile, fileSettings.delimiter);
-    }
-    break;
-  case FileSettings::csvOld:
-    if (fileSettings.useCharset) {
-      provider = std::make_unique<DataProviders::CsvReader>(fileSettings.pathToFile, fileSettings.charset,
-                                                            std::string(1, fileSettings.delimiter), true);
-    } else {
-      provider = std::make_unique<DataProviders::CsvReader>(fileSettings.pathToFile,
-                                                            std::string(1, fileSettings.delimiter), true);
-    }
-    break;
-  case FileSettings::xlsx:
-    provider = std::make_unique<DataProviders::XlsxIOReader>(fileSettings.pathToFile);
-    if (!fileSettings.sheet.empty()) {
-      dynamic_cast<DataProviders::XlsxIOReader *>(provider.get())->openSheet(fileSettings.sheet);
-    }
-    break;
-  case FileSettings::xls:
-    provider = std::make_unique<DataProviders::XlsxReader>(fileSettings.pathToFile);
-    break;
-  }
-  auto result = std::make_shared<DataSets::MemoryDataSet>(name);
-  result->open(*provider, valueTypes);
-  logger.log<LogLevel::Status>("Loaded: "s + result->getName());
-  result->resetEnd();
-  logger.log<LogLevel::Debug, true>("Count:", result->getCurrentRecord());
-  result->resetBegin();
-  return result;
-}
 
 const std::string csvPath = "/home/petr/Desktop/muni/";
 const std::string outPath = csvPath + "out/";
@@ -192,14 +101,6 @@ int main() {
   db.addTable(copniDesc->dataSet->toDataSet());
   db.removeTable("copni1");
   db.removeTable("copni2");
-
-  // const std::string katQuery =
-  //    "select nno.*, velkat.velikostni_kategorie_index from nno join velkat on nno.Velikostní_kategorie =
-  //    velkat.TEXT;";
-  // auto vel = db.execSimpleQuery(katQuery, false, "nno");
-  // auto newNno = vel->dataSet->toDataSet();
-  // db.removeTable("nno");
-  // db.addTable(newNno);
 
   std::unordered_map<std::string, std::string> kategorie;
   auto velkat = db.tableByName("velkat");

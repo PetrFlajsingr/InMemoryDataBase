@@ -59,7 +59,7 @@ int Utilities::stringToInt(std::string_view str) {
 }
 
 double Utilities::stringToDouble(std::string_view str) {
-  gsl::zstring<> p;
+  char *p;
   const auto result = strtod(std::string(str).c_str(), &p);
   if (*p) {
     return 0;
