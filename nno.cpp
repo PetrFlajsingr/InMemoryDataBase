@@ -2,15 +2,15 @@
 // Created by petr on 2/11/20.
 //
 
+#include "LoadingUtils.h"
+#include "io/print.h"
+#include "types/Range.h"
 #include "various/isin.h"
 #include <CsvReader.h>
 #include <CsvWriter.h>
 #include <MemoryDataBase.h>
 #include <XlsxIOReader.h>
 #include <include/fmt/format.h>
-#include "types/Range.h"
-#include "io/print.h"
-#include "LoadingUtils.h"
 
 using namespace std::string_literals;
 using namespace LoggerStreamModifiers;

@@ -2,6 +2,7 @@
 // Created by petr on 10/3/19.
 //
 
+#include "LoadingUtils.h"
 #include <Logger.h>
 #include <MemoryDataBase.h>
 #include <MemoryDataSet.h>
@@ -10,7 +11,6 @@
 #include <XlsxIOWriter.h>
 #include <include/fmt/format.h>
 #include <memory>
-#include "LoadingUtils.h"
 
 using namespace std::string_literals;
 

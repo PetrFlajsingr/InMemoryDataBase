@@ -3,6 +3,9 @@
 //
 
 #include "Combiner.h"
+#include "LoadingUtils.h"
+#include "fmt/format.h"
+#include "time/now.h"
 #include <CsvReader.h>
 #include <CsvStreamReader.h>
 #include <CsvWriter.h>
@@ -14,9 +17,6 @@
 #include <XlsxIOReader.h>
 #include <XlsxReader.h>
 #include <memory>
-#include "time/now.h"
-#include "fmt/format.h"
-#include "LoadingUtils.h"
 
 using namespace std::string_literals;
 
@@ -42,8 +42,8 @@ struct DSFieldCnt {
   gsl::index fieldOffset;
   std::vector<DataSets::BaseField *> fields;
 };
-void combine(std::vector<std::shared_ptr<DataSets::BaseDataSet>> dataSets, const std::vector<TableColumn>& joins,
-             const std::string& dest) {
+void combine(std::vector<std::shared_ptr<DataSets::BaseDataSet>> dataSets, const std::vector<TableColumn> &joins,
+             const std::string &dest) {
   std::vector<DSFieldCnt> dss;
   const auto recordTypeInfoColumnCount = 1;
   gsl::index fieldOffset = 0;
@@ -88,7 +88,7 @@ void combine(std::vector<std::shared_ptr<DataSets::BaseDataSet>> dataSets, const
   row.emplace_back("download_period");
 
   writer.writeHeader(row);
-  //writer.setAddQuotes(true);
+  // writer.setAddQuotes(true);
 
   auto cnt = 0;
 
@@ -266,7 +266,7 @@ std::string removeQuotes(std::string_view str) {
   return std::string(str.begin() + beginOffset, str.end() - endOffset);
 }
 
-std::shared_ptr<DataSets::MemoryDataSet> transformCedr(const std::shared_ptr<DataSets::BaseDataSet>& cedr) {
+std::shared_ptr<DataSets::MemoryDataSet> transformCedr(const std::shared_ptr<DataSets::BaseDataSet> &cedr) {
   auto fieldNames = cedr->getFieldNames();
   fieldNames.insert(fieldNames.begin() + 4, "DOTACE_ROK_UDELENI");
   std::vector<ValueType> fieldTypes;
@@ -289,7 +289,7 @@ std::shared_ptr<DataSets::MemoryDataSet> transformCedr(const std::shared_ptr<Dat
     for (auto field : cedrFields) {
       if (cnt == 4) {
         resultFields[cnt]->setAsString("není k dispozici");
-        //logger.log<LogLevel::Debug>(resultFields[cnt]->getName());
+        // logger.log<LogLevel::Debug>(resultFields[cnt]->getName());
         ++cnt;
       } else if (cnt == 9) {
         resultFields[cnt]->setAsString(duplField->getAsString());
@@ -303,8 +303,8 @@ std::shared_ptr<DataSets::MemoryDataSet> transformCedr(const std::shared_ptr<Dat
   return result;
 }
 
-std::shared_ptr<DataSets::MemoryDataSet> appendCedrDotace(const std::shared_ptr<DataSets::BaseDataSet>& cedr,
-                                                          const std::shared_ptr<DataSets::BaseDataSet>& dotace) {
+std::shared_ptr<DataSets::MemoryDataSet> appendCedrDotace(const std::shared_ptr<DataSets::BaseDataSet> &cedr,
+                                                          const std::shared_ptr<DataSets::BaseDataSet> &dotace) {
   cedr->resetBegin();
   dotace->resetBegin();
   auto fieldNames = dotace->getFieldNames();
@@ -381,19 +381,18 @@ int main() {
   db.addTable(createDataSetFromFile("velkat", {FileSettings::Type::csv, velkatCSV, ','},
                                     {ValueType::String, ValueType::String}));
 
-  //const std::string katQuery = "select subjekty.*, velkat.velikostni_kategorie_index from subjekty join velkat on "
+  // const std::string katQuery = "select subjekty.*, velkat.velikostni_kategorie_index from subjekty join velkat on "
   //                             "subjekty.Velikostní_kategorie = velkat.TEXT;";
-  //auto vel = db.execSimpleQuery(katQuery, false, "subjekty");
-  //auto newNno = vel->dataSet->toDataSet();
-  //db.removeTable("subjekty");
-  //db.addTable(newNno);
+  // auto vel = db.execSimpleQuery(katQuery, false, "subjekty");
+  // auto newNno = vel->dataSet->toDataSet();
+  // db.removeTable("subjekty");
+  // db.addTable(newNno);
   std::unordered_map<std::string, std::string> kategorie;
   auto velkat = db.tableByName("velkat");
   velkat->dataSet->resetBegin();
   while (velkat->dataSet->next()) {
-    kategorie[velkat->dataSet->fieldByName("TEXT")->getAsString()]
-    = fmt::format("{}) ",
-        velkat->dataSet->fieldByName("velikostni_kategorie_index")->getAsString());
+    kategorie[velkat->dataSet->fieldByName("TEXT")->getAsString()] =
+        fmt::format("{}) ", velkat->dataSet->fieldByName("velikostni_kategorie_index")->getAsString());
   }
 
   {
@@ -405,7 +404,6 @@ int main() {
     }
     subjekty->resetBegin();
   }
-
 
   //------
 
@@ -419,7 +417,8 @@ int main() {
                      "JOIN subjekty on verejneSbirky.NAZEV_PO = subjekty.NAZEV;",
                      true, "verSb");
 
-  //db.execSimpleQuery("select subjekty.* from subjekty where subjekty.INSTITUCE_V_LIKVIDACI = \"aktivní\";", true, "sub");
+  // db.execSimpleQuery("select subjekty.* from subjekty where subjekty.INSTITUCE_V_LIKVIDACI = \"aktivní\";", true,
+  // "sub");
   db.execSimpleQuery("select subjekty.* from subjekty;", true, "sub");
 
   auto VZds = createDataSetFromFile(
@@ -515,7 +514,7 @@ int main() {
   db.addTable(dotaceDS);
 
   auto dotaceDoplneniDS =
-      createDataSetFromFile("dotace_dopl", FileSettings::Xlsx(muniPath+ "NNO_doplneni.xlsx", "dotaceeu_poskytovatel"),
+      createDataSetFromFile("dotace_dopl", FileSettings::Xlsx(muniPath + "NNO_doplneni.xlsx", "dotaceeu_poskytovatel"),
                             {ValueType::String, ValueType::String});
   db.addTable(dotaceDoplneniDS);
   auto dotaceSub = db.execSimpleQuery("select dotace.*, "
@@ -564,4 +563,3 @@ int main() {
   logger.printElapsedTime();
   return 0;
 }
-

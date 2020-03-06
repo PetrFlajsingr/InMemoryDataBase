@@ -54,7 +54,7 @@ const std::string QUERY = "SELECT dotace.idDotace, dotace.projektIdnetifikator, 
                           "LEFT JOIN poskytovatelDotace ON rozhodnuti.iriPoskytovatelDotace = poskytovatelDotace.id "
                           "LEFT JOIN financniZdroj ON rozhodnuti.iriFinancniZdroj = financniZdroj.id";
 
-const std::string QUERY_2018 = QUERY + ";";// + " WHERE obdobi.rozpoctoveObdobi = 2019;";
+const std::string QUERY_2018 = QUERY + ";"; // + " WHERE obdobi.rozpoctoveObdobi = 2019;";
 
 const std::string QUERY_AGR = "SELECT dotace.idPrijemce, SUM(dotace.castkaCerpana), "
                               "SUM(dotace.castkaUvolnena), "
@@ -86,13 +86,13 @@ int main() {
   DataProviders::CsvReader financniZdrojProvider(csvPath + financniZdrojCSVName, ",");
   auto financniZdrojDataSet = make_dataset("financniZdroj");
   financniZdrojDataSet->open(financniZdrojProvider, {
-      ValueType::String,
-      ValueType::String,
-      ValueType::String,
-      ValueType::String,
-      ValueType::String,
-      ValueType::String,
-  });
+                                                        ValueType::String,
+                                                        ValueType::String,
+                                                        ValueType::String,
+                                                        ValueType::String,
+                                                        ValueType::String,
+                                                        ValueType::String,
+                                                    });
   dataBase.addTable(financniZdrojDataSet);
 
   auto dotaceDataSet = make_dataset("dotace");
@@ -233,7 +233,6 @@ int main() {
   lgr.log<LogLevel::Status>("Loaded: "s + poskytovatelDotaceDataSet->getName());
   poskytovatelDotaceDataSet->resetEnd();
   lgr.log<LogLevel::Debug>("Count:", poskytovatelDotaceDataSet->getCurrentRecord());
-
 
   auto result = dataBase.execSimpleQuery(QUERY_2018, false, "cedr");
   DataWriters::XlntWriter writer(outPath + outputCSVName);
