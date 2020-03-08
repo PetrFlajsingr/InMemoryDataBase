@@ -188,7 +188,11 @@ auto Logger<OutStream>::OutOperator<logLevel>::operator<<(const T &rhs) {
     logger.log<logLevel, false, false>(rhs);
     return *this;
   } else {
-    logger.log<logLevel, false, false>(rhs);
+    if (logger.defaultPrintTime) {
+      logger.log<logLevel, true, false>(rhs);
+    } else {
+      logger.log<logLevel, false, false>(rhs);
+    }
     return OutOperator<LogLevel::Verbose>(logger);
   }
 }

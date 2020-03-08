@@ -16,7 +16,6 @@ using namespace std::string_literals;
 using namespace LoggerStreamModifiers;
 Logger logger{std::cout};
 
-
 const auto notAvailable = "není k dispozici"s;
 std::shared_ptr<DataSets::MemoryDataSet> prepareNACE(const std::shared_ptr<DataSets::MemoryDataSet> &res) {
   DataBase::MemoryDataBase db("db");
@@ -147,9 +146,8 @@ int main() {
 
     DataProviders::CsvReader nnoKodyReader{"/home/petr/Desktop/muni/pravni_formy_nno.csv"};
     std::vector<std::string> nnoKody;
-    std::transform(nnoKodyReader.begin(), nnoKodyReader.end(), std::back_inserter(nnoKody), [] (const auto &row) {
-      return row[0];
-    });
+    std::transform(nnoKodyReader.begin(), nnoKodyReader.end(), std::back_inserter(nnoKody),
+                   [](const auto &row) { return row[0]; });
 
     auto srcFields = resDs->getFields();
     auto srcPravniFormaKodField = resDs->fieldByName("FORMA");
@@ -180,13 +178,14 @@ okreslau.TEXTZ as OKRES,
 resFiltered.OBEC_TEXT as OBEC,
 rso.KOD_OBEC as OBEC_ICOB,
 resFiltered.DDATVZN AS DATUM_VZNIKU,
-resFiltered.DDATZAN AS DATUM_ZANIKU,
+resFiltered.DDATZAN AS DATUM_LIKVIDACE,
 resFiltered.PSC,
 resFiltered.COBCE_TEXT,
 resFiltered.ULICE_TEXT,
 resFiltered.CDOM,
 resFiltered.COR,
-nace.CINNOSTI_DLE_NACE
+nace.CINNOSTI_DLE_NACE,
+nace.KOD_NACE
 FROM resFiltered
 LEFT JOIN nace on resFiltered.ICO = nace.ICO
 LEFT JOIN forma ON resFiltered.FORMA = forma.KODZAZ
@@ -200,9 +199,8 @@ ORDER BY resFiltered.ICO ASC
     std::vector<std::string> okresniMesta{};
     {
       DataProviders::CsvReader csvReader("/home/petr/Desktop/muni/res/okresni_mesta.csv");
-      std::transform(csvReader.begin(), csvReader.end(), std::back_inserter(okresniMesta), [](const auto &row) {
-        return row[0];
-      });
+      std::transform(csvReader.begin(), csvReader.end(), std::back_inserter(okresniMesta),
+                     [](const auto &row) { return row[0]; });
     }
     auto result = db.execSimpleQuery(queryCisleniky, false, "result")->dataSet;
     auto ICO_field = dynamic_cast<DataSets::IntegerField *>(result->fieldByName("ICO")); // ICOnum
@@ -219,9 +217,9 @@ ORDER BY resFiltered.ICO ASC
     auto DATUM_VZNIKU_field =
         result->fieldByName("DATUM_VZNIKU"); // potreba predelat na normalni datum, zkratit a nahradit - /
     // ROK_VZNIKU
-    auto DATUM_ZANIKU_field =
-        result->fieldByName("DATUM_ZANIKU"); // potreba predelat na normalni datum, zkratit a nahradit - /
-    // ROK_ZANIKU
+    auto DATUM_LIKVIDACE_field =
+        result->fieldByName("DATUM_LIKVIDACE"); // potreba predelat na normalni datum, zkratit a nahradit - /
+    // ROK_LIKVIDACE
     // INSTITUCE_V_LIKVIDACI - pokud je datum zaniku prazdne tak aktivní, jinak rok zaniku
     auto PSC_field = result->fieldByName("PSC");
     auto COBCE_TEXT_field = result->fieldByName("COBCE_TEXT");
@@ -229,20 +227,22 @@ ORDER BY resFiltered.ICO ASC
     auto CDOM_field = result->fieldByName("CDOM");
     auto COR_field = result->fieldByName("COR");
     auto CINNOSTI_DLE_NACE_field = result->fieldByName("CINNOSTI_DLE_NACE");
+    auto KOD_NACE_field = result->fieldByName("KOD_NACE");
 
-    DataWriters::CsvWriter writer{"/home/petr/Desktop/test.csv"};
+    DataWriters::CsvWriter writer{"/home/petr/Desktop/muni/res/res.csv"};
     writer.setAddQuotes(true);
 
     result->resetBegin();
-    writer.writeHeader({"ICOnum", "ICO", "NAZEV", "PRAVNI_FORMA", "VELIKOSTNI_KATEGORIE", "ADRESA", "KRAJ", "OKRES",
-                        "OBEC", "OBEC_ICOB", "DATUM_VZNIKU", "ROK_VZNIKU", "DATUM_ZANIKU", "ROK_ZANIKU",
-                        "INSTITUCE_V_LIKVIDACI", "CINNOSTI_DLE_NACE"});
+    writer.writeHeader({"ICO_number", "ICO", "NAZEV", "PRAVNI_FORMA", "VELIKOSTNI_KATEGORIE", "ADRESA", "KRAJ", "OKRES",
+                        "OBEC", "OBEC_ICOB", "DATUM_VZNIKU", "ROK_VZNIKU", "DATUM_LIKVIDACE", "ROK_LIKVIDACE",
+                        "INSTITUCE_V_LIKVIDACI", "CINNOSTI_DLE_NACE", "KOD_NACE"});
     std::vector<std::string> record;
     while (result->next()) {
       record.clear();
       record.emplace_back(ICO_field->getAsString());
       record.emplace_back(fmt::format("{:08d}", ICO_field->getAsInteger()));
-      record.emplace_back(Utilities::defaultForEmpty(NAZEV_field->getAsString(), notAvailable));
+      record.emplace_back(
+          Utilities::defaultForEmpty(Utilities::replaceAll(NAZEV_field->getAsString(), "&#34^", "\""), notAvailable));
       record.emplace_back(Utilities::defaultForEmpty(PRAVNI_FORMA_field->getAsString(), notAvailable));
       record.emplace_back(Utilities::defaultForEmpty(VELIKOSTNI_KATEGORIE_field->getAsString(), notAvailable));
       auto adresa = ADRESA_field->getAsString();
@@ -274,7 +274,7 @@ ORDER BY resFiltered.ICO ASC
         record.emplace_back(notAvailable);
         record.emplace_back(notAvailable);
       }
-      auto datumZaniku = DATUM_ZANIKU_field->getAsString();
+      auto datumZaniku = DATUM_LIKVIDACE_field->getAsString();
       auto rokZaniku = ""s;
       if (!datumZaniku.empty()) {
         datumZaniku = datumZaniku.substr(0, 10);
@@ -293,6 +293,7 @@ ORDER BY resFiltered.ICO ASC
         record.emplace_back(rokZaniku);
       }
       record.emplace_back(Utilities::defaultForEmpty(CINNOSTI_DLE_NACE_field->getAsString(), notAvailable));
+      record.emplace_back(Utilities::defaultForEmpty(KOD_NACE_field->getAsString(), notAvailable));
       writer.writeRecord(record);
     }
   }

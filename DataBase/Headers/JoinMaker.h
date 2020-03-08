@@ -71,6 +71,7 @@ private:
   template <typename CompFnc>
   void iterAndCompare(DataSetType1 first, DataSetType2 second, std::pair<gsl::index, gsl::index> firstIndex,
                       std::pair<gsl::index, gsl::index> secondIndex, CompFnc cmpFunc, ValueType valueType) {
+    static auto t = 0;
     auto begin1 = first->begin();
     auto end1 = first->end();
     auto begin2 = second->begin();

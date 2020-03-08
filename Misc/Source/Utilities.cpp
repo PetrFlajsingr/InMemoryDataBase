@@ -5,8 +5,8 @@
 #include <Types.h>
 #include <Utilities.h>
 #include <thread>
-#include <utility>
 #include <utf8cpp/utf8.h>
+#include <utility>
 
 std::vector<std::string> Utilities::splitStringByDelimiter(std::string_view str, std::string_view delimiter) {
   std::vector<std::string> result;
@@ -220,9 +220,7 @@ int Utilities::getCoreCount() {
   }
   return result;
 }
-std::string Utilities::boolToString(bool value) {
-  return value ? "true" : "false";
-}
+std::string Utilities::boolToString(bool value) { return value ? "true" : "false"; }
 
 bool Utilities::isUtf8Accent(char c) {
   return std::find(utf8Accents.begin(), utf8Accents.end(), c) != utf8Accents.end();
@@ -239,16 +237,15 @@ std::string Utilities::trim(std::string str, const std::string &chars) {
   return ltrim(rtrim(std::move(str), chars), chars);
 }
 std::string Utilities::replaceAll(const std::string &str, const std::string &find, const std::string &replace) {
-  using namespace std;
-  string result;
-  size_t find_len = find.size();
-  size_t pos,from=0;
-  while ( string::npos != ( pos=str.find(find,from) ) ) {
-    result.append( str, from, pos-from );
-    result.append( replace );
+  std::string result;
+  std::size_t find_len = find.size();
+  std::size_t pos, from = 0;
+  while (std::string::npos != (pos = str.find(find, from))) {
+    result.append(str, from, pos - from);
+    result.append(replace);
     from = pos + find_len;
   }
-  result.append( str, from , string::npos );
+  result.append(str, from, std::string::npos);
   return result;
 }
 

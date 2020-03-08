@@ -36,7 +36,7 @@ private:
   std::vector<std::string> header;
   std::vector<std::string> currentRecord;
 
-  gsl::index currentRecordIndex = 0;
+  gsl::index currentRecordIndex = -1;
 
   std::string fileName;
   std::string sheetName;
