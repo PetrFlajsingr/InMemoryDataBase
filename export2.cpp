@@ -9,26 +9,25 @@
 #include <CsvReader.h>
 #include <CsvStreamReader.h>
 #include <CsvWriter.h>
-#include <Logger.h>
 #include <MemoryDataBase.h>
 #include <MemoryDataSet.h>
 #include <XlntReader.h>
 #include <XlntWriter.h>
 #include <XlsxIOReader.h>
 #include <XlsxReader.h>
+#include <io/logger.h>
 #include <memory>
 
 using namespace std::string_literals;
 
 const auto notAvailable = "není k dispozici"s;
-auto &logger = Logger<true>::GetInstance();
+Logger logger{std::cout};
 
 const auto verejneSbirkyPath = "/home/petr/Desktop/muni/verejnesbirky/"s;
 const auto muniPath = "/home/petr/Desktop/muni/"s;
 const auto dotacePath = "/home/petr/Desktop/muni/dotaceeu/"s;
 const auto verejneZakazkyPath = "/home/petr/Desktop/muni/verejnezakazky/"s;
 const auto cedrPath = "/home/petr/Desktop/muni/cedr/out/"s;
-const std::string velkatCSV = muniPath + "/velikostni_kategorie.csv";
 
 struct TableColumn {
   std::string table;
@@ -73,12 +72,10 @@ void combine(std::vector<std::shared_ptr<DataSets::BaseDataSet>> dataSets, const
 
   std::vector<std::string> row;
 
-  DataWriters::XlntWriter writer(dest);
+  DataWriters::CsvWriter writer(dest);
 
   std::transform(mainDS.fields.begin(), mainDS.fields.end(), std::back_inserter(row),
                  [](auto &field) { return field->getName().data(); });
-  row.emplace_back("ROK_VZNIKU");
-  row.emplace_back("ROK_LIKVIDACE");
   row.emplace_back("Zdroj dat");
   dss = std::vector<DSFieldCnt>{dss.begin() + 1, dss.end()};
   for (auto &ds : dss) {
@@ -88,7 +85,7 @@ void combine(std::vector<std::shared_ptr<DataSets::BaseDataSet>> dataSets, const
   row.emplace_back("download_period");
 
   writer.writeHeader(row);
-  // writer.setAddQuotes(true);
+  writer.setAddQuotes(true);
 
   auto cnt = 0;
 
@@ -98,14 +95,9 @@ void combine(std::vector<std::shared_ptr<DataSets::BaseDataSet>> dataSets, const
   const auto year = 1900 + parts->tm_year;
   const auto month = 1 + parts->tm_mon;
   const auto downloadPeriodData = fmt::format("{:04d}-{:02d}", year, month);
-  auto likvField = mainDS.ds->fieldByName("DATUM_LIKVIDACE");
-  auto vznikField = mainDS.ds->fieldByName("DATUM_VZNIKU");
   auto dotaceRokField = dataSets[2]->fieldByName("DOTACE_ROK");
   while (mainDS.ds->next()) {
 
-    if (likvField->getAsString().empty()) {
-      likvField->setAsString("Aktivní");
-    }
     if (dotaceRokField->getAsString() == notAvailable) {
       dotaceRokField->setAsString("9999");
     }
@@ -117,12 +109,8 @@ void combine(std::vector<std::shared_ptr<DataSets::BaseDataSet>> dataSets, const
         if (mainField->getAsInteger() == ds.field->getAsInteger()) {
           row.clear();
           std::transform(mainDS.fields.begin(), mainDS.fields.end(), std::back_inserter(row),
-                         [](auto &field) { return field->getAsString(); });
+                         [](auto &field) { return Utilities::defaultForEmpty(field->getAsString(), notAvailable); });
 
-          const auto vznik = vznikField->getAsString();
-          row.emplace_back(vznik.empty() ? notAvailable : vznik.substr(6));
-          const auto zanik = vznikField->getAsString();
-          row.emplace_back(zanik != notAvailable ? notAvailable : zanik.substr(6));
 
           if (ds.ds->getName() == "verSb") {
             row.emplace_back("VerejnaSbirka");
@@ -140,7 +128,7 @@ void combine(std::vector<std::shared_ptr<DataSets::BaseDataSet>> dataSets, const
             row.emplace_back(notAvailable);
           }
           std::transform(ds.fields.begin(), ds.fields.end(), std::back_inserter(row),
-                         [](auto &field) { return field->getAsString(); });
+                         [](auto &field) { return Utilities::defaultForEmpty(field->getAsString(), notAvailable); });
 
           fill = rowLength - row.size();
           for (int i = 0; i < fill; ++i) {
@@ -289,7 +277,6 @@ std::shared_ptr<DataSets::MemoryDataSet> transformCedr(const std::shared_ptr<Dat
     for (auto field : cedrFields) {
       if (cnt == 4) {
         resultFields[cnt]->setAsString("není k dispozici");
-        // logger.log<LogLevel::Debug>(resultFields[cnt]->getName());
         ++cnt;
       } else if (cnt == 9) {
         resultFields[cnt]->setAsString(duplField->getAsString());
@@ -356,70 +343,47 @@ int main() {
   logger.startTime();
   DataBase::MemoryDataBase db("db");
 
-  auto verejneSbirkyDS = createDataSetFromFile(
-      "verejneSbirky", FileSettings::CsvOld(verejneSbirkyPath + "VerejneSbirky.csv", '|', true, CharSet::CP1250),
-      {
-          ValueType::String,
-          ValueType::String,
-          ValueType::String,
-          ValueType::String,
-          ValueType::String,
-          ValueType::String,
-          ValueType::String,
-          ValueType::String,
-          ValueType::String,
-      });
-  db.addTable(verejneSbirkyDS);
+  //auto verejneSbirkyDS = createDataSetFromFile(
+  //    "verejneSbirky", FileSettings::CsvOld(verejneSbirkyPath + "VerejneSbirky.csv", '|', true, CharSet::CP1250),
+  //    {
+  //        ValueType::String,
+  //        ValueType::String,
+  //        ValueType::String,
+  //        ValueType::String,
+  //        ValueType::String,
+  //        ValueType::String,
+  //        ValueType::String,
+  //        ValueType::String,
+  //        ValueType::String,
+  //    });
+  //db.addTable(verejneSbirkyDS);
 
-  auto subjekty = createDataSetFromFile("subjekty", FileSettings::Xlsx(muniPath + "NNO.xlsx"),
-                                        {ValueType::Integer, ValueType::Integer, ValueType::String, ValueType::String,
+  auto resDS =
+      db.addTable(createDataSetFromFile("res", FileSettings::Csv(muniPath + "res/res.csv", ','),
+                                        {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String,
                                          ValueType::String, ValueType::String, ValueType::String, ValueType::String,
                                          ValueType::String, ValueType::String, ValueType::String, ValueType::String,
                                          ValueType::String, ValueType::String, ValueType::String, ValueType::String,
-                                         ValueType::String});
-  db.addTable(subjekty);
-  db.addTable(createDataSetFromFile("velkat", {FileSettings::Type::csv, velkatCSV, ','},
-                                    {ValueType::String, ValueType::String}));
+                                         ValueType::String}))
+          ->dataSet;
 
-  // const std::string katQuery = "select subjekty.*, velkat.velikostni_kategorie_index from subjekty join velkat on "
-  //                             "subjekty.Velikostní_kategorie = velkat.TEXT;";
-  // auto vel = db.execSimpleQuery(katQuery, false, "subjekty");
-  // auto newNno = vel->dataSet->toDataSet();
-  // db.removeTable("subjekty");
-  // db.addTable(newNno);
-  std::unordered_map<std::string, std::string> kategorie;
-  auto velkat = db.tableByName("velkat");
-  velkat->dataSet->resetBegin();
-  while (velkat->dataSet->next()) {
-    kategorie[velkat->dataSet->fieldByName("TEXT")->getAsString()] =
-        fmt::format("{}) ", velkat->dataSet->fieldByName("velikostni_kategorie_index")->getAsString());
-  }
-
-  {
-    subjekty->resetBegin();
-    auto katField = subjekty->fieldByName("Velikostní_kategorie");
-    while (subjekty->next()) {
-      auto newKat = kategorie[katField->getAsString()];
-      katField->setAsString(newKat + katField->getAsString());
-    }
-    subjekty->resetBegin();
-  }
-
-  //------
+  db.addTable(createDataSetFromFile(
+      "verejneSbirky", FileSettings::Xlsx(verejneSbirkyPath + "CESSeznamIM08_cor2020-03-09.xlsx", "uprava_dat"),
+      {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
+       ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String,
+       ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String,
+       ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String,
+       ValueType::String,  ValueType::String, ValueType::String, ValueType::String}));
 
   db.execSimpleQuery("select verejneSbirky.NAZEV_PO, verejneSbirky.OZNACENI_SBIRKY AS VEREJNA_SBIRKA_OZNACENI, "
                      "verejneSbirky.UZEMNI_ROZSAH AS "
                      "VEREJNA_SBIRKA_UZEMNI_ROZSAH, verejneSbirky.DATUM_ZAHAJENI AS VEREJNA_SBIRKA_ZACATEK, "
                      "verejneSbirky.DATUM_UKONCENI AS VEREJNA_SBIRKA_KONEC, verejneSbirky.ZPUSOB_PROVADENI AS "
                      "VEREJNA_SBIRKA_ZPUSOB, verejneSbirky.UCEL_SBIRKY AS VEREJNA_SBIRKA_UCEL, "
-                     "verejneSbirky.UCEL_TEXTEM AS VEREJNA_SBIRKA_UCEL_TEXTEM, subjekty.ICOnum "
+                     "verejneSbirky.UCEL_TEXTEM AS VEREJNA_SBIRKA_UCEL_TEXTEM, res.ICO_number "
                      "from verejneSbirky "
-                     "JOIN subjekty on verejneSbirky.NAZEV_PO = subjekty.NAZEV;",
+                     "JOIN res on verejneSbirky.NAZEV_PO = res.NAZEV;",
                      true, "verSb");
-
-  // db.execSimpleQuery("select subjekty.* from subjekty where subjekty.INSTITUCE_V_LIKVIDACI = \"aktivní\";", true,
-  // "sub");
-  db.execSimpleQuery("select subjekty.* from subjekty;", true, "sub");
 
   auto VZds = createDataSetFromFile(
       "VZ", FileSettings::Xlsx(verejneZakazkyPath + "vz.xlsx", "VZ"),
@@ -461,10 +425,10 @@ int main() {
                             "VZ.StrucnyPopisVZ AS VEREJNA_ZAKAZKA_STRUCNY_POPIS_VZ, "
                             "VZ.ZadavatelUredniNazev AS VEREJNA_ZAKAZKA_ZADAVATEL_UREDNI_NAZEV, "
                             "castiVZ.ID_CastiVZ AS VEREJNA_ZAKAZKA_CISLO_CASTI_ZADANI_VZ, "
-                            "castiVZ.NazevCastiVZ AS VEREJNA_ZAKAZKA_NAZEV_CASTI_VZ, dodVZ.DodavatelICO from VZ "
+                            "castiVZ.NazevCastiVZ AS VEREJNA_ZAKAZKA_NAZEV_CASTI_VZ, dodVZ.DodavatelICO as DODAVATEL_ICO from VZ "
                             "join castiVZ on VZ.ID_Zakazky = castiVZ.ID_Zakazky "
                             "join dodVZ on VZ.ID_Zakazky = dodVZ.ID_Zakazky "
-                            "join subjekty on dodVZ.DodavatelICO = subjekty.ICOnum;";
+                            "join res on dodVZ.DodavatelICO = res.ICO_number;";
 
   db.addTable(db.execSimpleQuery(query, false, "vz")->dataSet->toDataSet());
   logger.log<LogLevel::Info>("Query vz done");
@@ -498,8 +462,6 @@ int main() {
                                      "cedr.financniZdrojNazev AS DOTACE_FINANCNI_ZDROJ_NAZEV from cedr;",
                                      false, "cedrView");
   auto cedrReady = transformCedr(cedrView->dataSet);
-  // db.addTable(cedrReady);
-  // db.execSimpleQuery("select cedrReady.* from cedrReady;", true, "cedr2");
 
   logger.log<LogLevel::Info>("Query cedr done");
 
@@ -518,8 +480,8 @@ int main() {
                             {ValueType::String, ValueType::String});
   db.addTable(dotaceDoplneniDS);
   auto dotaceSub = db.execSimpleQuery("select dotace.*, "
-                                      "subjekty.ICOnum, dotace_dopl.Poskytovatel from dotace "
-                                      "join subjekty on dotace.IC = subjekty.ICOnum "
+                                      "res.ICO_number, dotace_dopl.Poskytovatel from dotace "
+                                      "join res on dotace.IC = res.ICO_number "
                                       "left join dotace_dopl on dotace.Program = dotace_dopl.Program;",
                                       false, "dotaceSub");
 
@@ -528,9 +490,8 @@ int main() {
   dotaceSub->dataSet->resetBegin();
 
   auto dotace2 = transformDotace(dotaceSub->dataSet);
-  // db.addTable(dotace2);
-  // db.execSimpleQuery("select dotace2.* from dotace2;", true, "dotace2");
-  db.execSimpleQuery("select vz.* from vz join subjekty on vz.DodavatelICO = subjekty.ICOnum;", true, "vz2");
+
+  db.execSimpleQuery("select vz.* from vz join res on vz.DODAVATEL_ICO = res.ICO_number;", true, "vz2");
   logger.log<LogLevel::Info>("Query vz2 done");
 
   auto wtf = appendCedrDotace(cedrReady, dotace2);
@@ -540,24 +501,13 @@ int main() {
   logger.log<LogLevel::Info>("Query cedrEU: ", cdtc->dataSet->getCurrentRecord());
   cdtc->dataSet->resetBegin();
 
-  /*{
-    DataWriters::CsvWriter w("/home/petr/Desktop/t.csv");
-    w.setAddQuotes(true);
-    w.writeDataSet(*cdtc->dataSet);
-  }*/
-
-  combine({db.viewByName("sub")->dataSet->toDataSet(), db.viewByName("vz2")->dataSet, cdtc->dataSet,
-           db.viewByName("verSb")->dataSet}
-          /*{db.viewByName("sub")->dataSet, db.viewByName("vz2")->dataSet, db.viewByName("cedr2")->dataSet,
-               db.viewByName("dotace2")->dataSet, db.viewByName("verSb")->dataSet}*/
-          ,
-          {{"sub", "ICOnum"},
-           {"vz2", "DodavatelICO"},
+  combine({db.tableByName("res")->dataSet, db.viewByName("vz2")->dataSet, cdtc->dataSet,
+           db.viewByName("verSb")->dataSet},
+          {{"res", "ICO_number"},
+           {"vz2", "DODAVATEL_ICO"},
            {"cedrDotace", "DOTACE_OPERACNI_PROGRAM_PRIJEMCE"},
-           //{"cedr2", "ICOnum"},
-           //{"dotace2", "DOTACE_OPERACNI_PROGRAM_PRIJEMCE"},
-           {"verSb", "ICOnum"}},
-          muniPath + "export2.xlsx");
+           {"verSb", "O_ICO"}},
+          muniPath + "export2.csv");
 
   logger.endTime();
   logger.printElapsedTime();

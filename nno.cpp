@@ -234,8 +234,8 @@ ORDER BY resFiltered.ICO ASC
 
     result->resetBegin();
     writer.writeHeader({"ICO_number", "ICO", "NAZEV", "PRAVNI_FORMA", "VELIKOSTNI_KATEGORIE", "ADRESA", "KRAJ", "OKRES",
-                        "OBEC", "OBEC_ICOB", "DATUM_VZNIKU", "ROK_VZNIKU", "DATUM_LIKVIDACE", "ROK_LIKVIDACE",
-                        "INSTITUCE_V_LIKVIDACI", "CINNOSTI_DLE_NACE", "KOD_NACE"});
+                        "OBEC", "OBEC_OKRES", "OBEC_ICOB", "DATUM_VZNIKU", "ROK_VZNIKU", "DATUM_LIKVIDACE", "ROK_LIKVIDACE",
+                        "INSTITUCE_V_LIKVIDACI", "NACE_cinnost", "NACE_kod"});
     std::vector<std::string> record;
     while (result->next()) {
       record.clear();
@@ -254,6 +254,7 @@ ORDER BY resFiltered.ICO ASC
       record.emplace_back(Utilities::defaultForEmpty(KRAJ_field->getAsString(), notAvailable));
       record.emplace_back(Utilities::defaultForEmpty(OKRES_field->getAsString(), notAvailable));
       auto obec = OBEC_field->getAsString();
+      record.emplace_back(Utilities::defaultForEmpty(obec, notAvailable));
       if (obec.empty()) {
         record.emplace_back(notAvailable);
       } else if (isIn(obec, okresniMesta)) {
