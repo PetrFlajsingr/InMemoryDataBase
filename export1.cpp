@@ -5,6 +5,7 @@
 #include "LoadingUtils.h"
 #include "io/logger.h"
 #include <CsvWriter.h>
+#include <EmptyWriter.h>
 #include <MemoryDataBase.h>
 #include <MemoryDataSet.h>
 #include <XlntReader.h>
@@ -35,13 +36,14 @@ std::shared_ptr<DataSets::MemoryDataSet> shrinkRzp(const std::shared_ptr<DataSet
   rzp->sort(sortOptions);
 
   auto result = std::make_shared<DataSets::MemoryDataSet>("rzp_shrinked");
-  result->openEmpty(rzp->getFieldNames(),
-                    {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String, ValueType::String});
+  result->openEmpty(rzp->getFieldNames(), {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String,
+                                           ValueType::String, ValueType::String});
 
   rzp->resetBegin();
   int lastICO = 0;
 
   auto icoField = dynamic_cast<DataSets::IntegerField *>(rzp->fieldByName("ICO"));
+  auto linkField = rzp->fieldByName("ZIVNOSTENSKE_OPRAVNENI_ODKAZ");
   auto fields = rzp->getFields();
 
   auto resultIcoField = dynamic_cast<DataSets::IntegerField *>(result->fieldByName("ICO"));
@@ -56,8 +58,11 @@ std::shared_ptr<DataSets::MemoryDataSet> shrinkRzp(const std::shared_ptr<DataSet
         (*iter2)->setAsString((*iter1)->getAsString());
       }
     } else {
-      for (auto iter1 = fields.begin() + 1, iter2 = resultFields.begin() + 1; iter1 != fields.end() - 1; ++iter1, ++iter2) {
-        (*iter2)->setAsString((*iter2)->getAsString() + "|" + (*iter1)->getAsString());
+      for (auto iter1 = fields.begin() + 1, iter2 = resultFields.begin() + 1; iter1 != fields.end() - 1;
+           ++iter1, ++iter2) {
+        if (*iter1 != linkField) {
+          (*iter2)->setAsString((*iter2)->getAsString() + "|" + (*iter1)->getAsString());
+        }
       }
     }
   }
@@ -65,10 +70,10 @@ std::shared_ptr<DataSets::MemoryDataSet> shrinkRzp(const std::shared_ptr<DataSet
   return result;
 }
 
-
 std::shared_ptr<DataSets::MemoryDataSet> distinctCopniCodes(DataSets::BaseDataSet &ds) {
   auto result = std::make_shared<DataSets::MemoryDataSet>("copni2");
-  result->openEmpty(ds.getFieldNames(), {ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String});
+  result->openEmpty(ds.getFieldNames(),
+                    {ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String});
   DataSets::SortOptions sortOptions;
   sortOptions.addOption(ds.fieldByName("COPNI_codes"), SortOrder::Ascending);
   ds.sort(sortOptions);
@@ -110,9 +115,9 @@ int main() {
   logger.setDefaultPrintTime(true);
   DataBase::MemoryDataBase db("db");
 
-  db.addTable(createDataSetFromFile(
-      "rzp", FileSettings::Csv(rzpPath),
-      {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String, ValueType::String}));
+  db.addTable(createDataSetFromFile("rzp", FileSettings::Csv(rzpPath),
+                                    {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String,
+                                     ValueType::String, ValueType::String}));
 
   db.addTable(shrinkRzp(db.tableByName("rzp")->dataSet));
 
@@ -121,6 +126,7 @@ int main() {
                                      ValueType::String, ValueType::String, ValueType::String, ValueType::String,
                                      ValueType::String, ValueType::String, ValueType::String, ValueType::String,
                                      ValueType::String, ValueType::String, ValueType::String, ValueType::String,
+                                     ValueType::String,
                                      ValueType::String}));
 
   db.addTable(createDataSetFromFile("justice", FileSettings::Csv(justicePath),
@@ -130,17 +136,16 @@ int main() {
   db.addTable(createDataSetFromFile("geo", FileSettings::Csv(geoPath),
                                     {ValueType::Integer, ValueType::String, ValueType::String}));
 
-
- db.addTable(distinctCopniCodes(*createDataSetFromFile(
-     "copni2", FileSettings::Xlsx(copniPath, "COPNImetod"),
-     {ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String})));
- db.addTable(createDataSetFromFile(
-     "copni1", FileSettings::Xlsx(copniPath, "CSU_copni"),
-     {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
-      ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String,
-      ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String,
-      ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String,
-      ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String}));
+  db.addTable(distinctCopniCodes(*createDataSetFromFile(
+      "copni2", FileSettings::Xlsx(copniPath, "COPNImetod"),
+      {ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String})));
+  db.addTable(createDataSetFromFile(
+      "copni1", FileSettings::Xlsx(copniPath, "CSU_copni"),
+      {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
+       ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String,
+       ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String,
+       ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String,
+       ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String}));
 
   const auto copniQuery =
       R"(select copni1.ICO, copni2."Popis cinnosti", copni2."Oblast cinnosti"
@@ -149,8 +154,6 @@ join copni2 on copni1.COPNI = copni2.COPNI_codes;)";
   db.addTable(db.execSimpleQuery(copniQuery, false, "copni")->dataSet->toDataSet());
   db.removeTable("copni1");
   db.removeTable("copni2");
-
-
 
   const std::string queryFin =
       R"(SELECT res.ICO_number,
@@ -162,14 +165,15 @@ res.ADRESA,
 res.KRAJ,
 res.OKRES,
 res.OBEC,
+res.OBEC_OKRES,
 res.OBEC_ICOB,
 res.DATUM_VZNIKU,
 res.ROK_VZNIKU,
 res.DATUM_LIKVIDACE,
 res.ROK_LIKVIDACE,
 res.INSTITUCE_V_LIKVIDACI,
-copni."Popis cinnosti" as UCEL_PREDMET_CINNOSTI,
-copni."Oblast cinnosti" AS KATEGORIZACE_CINNOSTI,
+copni."Popis cinnosti" as COPNI_cinnost,
+copni."Oblast cinnosti" AS COPNI_obor,
 justice.POBOCNE_SPOLKY AS AKTUALNI_INFORMACE_VE_VEREJNEM_REJSTRIKU,
 justice.DATUM_ZAPISU,
 justice.KAPITAL as NADACNI_KAPITAL,
@@ -177,14 +181,15 @@ justice.STATUTARNI_ORGAN,
 justice.ZAKLADATEL,
 justice.POBOCNE_SPOLKY_POCET,
 justice.UCEL as UCEL_POPIS,
-res.CINNOSTI_DLE_NACE,
-res.KOD_NACE,
+res.NACE_cinnost,
+res.NACE_kod,
 rzp_shrinked.PREDMET_CINNOSTI,
 rzp_shrinked.ZIVNOSTENSKE_OPRAVNENI_OBOR,
 rzp_shrinked.ZIVNOSTENSKE_OPRAVNENI,
+rzp_shrinked.ZIVNOSTENSKE_OPRAVNENI_ODKAZ,
 rzp_shrinked.MA_ZIVNOSTENSKE_OPRAVNENI,
-geo.X as Y,
-geo.Y as X
+geo.x as Y,
+geo.y as X
 FROM res
 left join justice on res.ICO_number = justice.ICO
 left join rzp_shrinked on res.ICO_number = rzp_shrinked.ICO
@@ -211,10 +216,10 @@ left join geo on res.ICO_number = geo.ICO;)";
   }
 
   DataWriters::CsvWriter writerCsv{"/home/petr/Desktop/muni/neziskovky.csv"};
-  DataWriters::XlntWriter writerXlsx{"/home/petr/Desktop/muni/neziskovky.xlsx"};
+  DataWriters::EmptyWriter writerXlsx{"/home/petr/Desktop/muni/neziskovky.xlsx"};
 
   DataWriters::CsvWriter writerCsv_aktivni{"/home/petr/Desktop/muni/neziskovky_aktivni.csv"};
-  DataWriters::XlntWriter writerXlsx_aktivni{"/home/petr/Desktop/muni/neziskovky_aktivni.xlsx"};
+  DataWriters::EmptyWriter writerXlsx_aktivni{"/home/petr/Desktop/muni/neziskovky_aktivni.xlsx"};
   writerCsv.setAddQuotes(true);
   writerCsv_aktivni.setAddQuotes(true);
 
