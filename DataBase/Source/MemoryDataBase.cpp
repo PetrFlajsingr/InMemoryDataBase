@@ -108,7 +108,7 @@ std::shared_ptr<DataBase::View> DataBase::MemoryDataBase::execAggregateQuery(std
     result = doOrder(structQuery, result);
   }
   result = doProject(structQuery, result);
-  result = setFieldAliases(structQuery, result);
+  //result = setFieldAliases(structQuery, result);
 
   result->dataSet->setName(std::string(viewName));
 

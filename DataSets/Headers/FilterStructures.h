@@ -49,6 +49,8 @@ struct FilterItem {
 struct FilterOptions {
   std::vector<FilterItem> options;
 
+  void clear();
+
   void addOption(const DataSets::BaseField *field, const std::vector<DataContainer> &values,
                  const FilterOption &filterOption);
 

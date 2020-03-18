@@ -412,7 +412,7 @@ join copni2 on copni1.COPNI = copni2.COPNI_codes;)";
                                      ValueType::String, ValueType::String, ValueType::String, ValueType::String,
                                      ValueType::String, ValueType::String, ValueType::String, ValueType::String,
                                      ValueType::String, ValueType::String, ValueType::String, ValueType::String,
-                                     ValueType::String, ValueType::String}));
+                                     ValueType::String, ValueType::String, ValueType::String}));
 
   const auto resQuery = R"(
 SELECT res.ICO_number, res.ICO, res.NAZEV, res.PRAVNI_FORMA, res.VELIKOSTNI_KATEGORIE, res.ADRESA, res.KRAJ,

@@ -128,43 +128,16 @@ int main() {
 
   db.addTable(createDataSetFromFile("rso", FileSettings::Csv("/home/petr/Desktop/muni/res/rso.csv", ','),
                                     {ValueType::String, ValueType::String, ValueType::String, ValueType::String}));
+  auto resDs = db.addTable(createDataSetFromFile(
+      "resFiltered", FileSettings::Csv("/home/petr/Desktop/muni/res/all/RES3A2020M02.csv", ';', true, CharSet::CP1250),
+      {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
+       ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String,
+       ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String,
+       ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String,
+       ValueType::String,  ValueType::String, ValueType::String, ValueType::String}))->dataSet;
 
-  auto resTable = db.addTable(std::make_shared<DataSets::MemoryDataSet>("resFiltered"));
-  {
-    logger << debug{} << "Starting NNO selection\n";
-    const std::vector resColumnTypes{ValueType::Integer, ValueType::String, ValueType::String, ValueType::String,
-                                     ValueType::String,  ValueType::String, ValueType::String, ValueType::String,
-                                     ValueType::String,  ValueType::String, ValueType::String, ValueType::String,
-                                     ValueType::String,  ValueType::String, ValueType::String, ValueType::String,
-                                     ValueType::String,  ValueType::String, ValueType::String, ValueType::String,
-                                     ValueType::String,  ValueType::String, ValueType::String, ValueType::String};
-    auto resDs = createDataSetFromFile(
-        "r", FileSettings::Csv("/home/petr/Desktop/muni/res/all/RES3A2020M02.csv", ';', true, CharSet::CP1250),
-        resColumnTypes);
-    const auto resColumnNames = resDs->getFieldNames();
-    resTable->dataSet->openEmpty(resColumnNames, resColumnTypes);
 
-    DataProviders::CsvReader nnoKodyReader{"/home/petr/Desktop/muni/pravni_formy_nno.csv"};
-    std::vector<std::string> nnoKody;
-    std::transform(nnoKodyReader.begin(), nnoKodyReader.end(), std::back_inserter(nnoKody),
-                   [](const auto &row) { return row[0]; });
-
-    auto srcFields = resDs->getFields();
-    auto srcPravniFormaKodField = resDs->fieldByName("FORMA");
-    auto dstFields = resTable->dataSet->getFields();
-    while (resDs->next()) {
-      if (isIn(srcPravniFormaKodField->getAsString(), nnoKody)) {
-        resTable->dataSet->append();
-        for (auto i : MakeRange::range(srcFields.size())) {
-          dstFields[i]->setAsString(srcFields[i]->getAsString());
-        }
-      }
-    }
-    logger << debug{} << fmt::format("NNO selection done, row count: {}", resTable->dataSet->getCurrentRecord());
-    resTable->dataSet->resetBegin();
-  }
-
-  db.addTable(prepareNACE(resTable->dataSet));
+  db.addTable(prepareNACE(resDs));
   logger << status{} << "Prepared NACE\n";
 
   const auto queryCisleniky = R"sql(SELECT
@@ -184,6 +157,7 @@ resFiltered.COBCE_TEXT,
 resFiltered.ULICE_TEXT,
 resFiltered.CDOM,
 resFiltered.COR,
+resFiltered.FORMA,
 nace.CINNOSTI_DLE_NACE,
 nace.KOD_NACE
 FROM resFiltered
@@ -196,6 +170,20 @@ ORDER BY resFiltered.ICO ASC
 ;)sql";
 
   {
+    std::vector<std::string> nnoKody;
+    {
+      logger << debug{} << "Starting NNO selection\n";
+      const std::vector resColumnTypes{ValueType::Integer, ValueType::String, ValueType::String, ValueType::String,
+                                       ValueType::String,  ValueType::String, ValueType::String, ValueType::String,
+                                       ValueType::String,  ValueType::String, ValueType::String, ValueType::String,
+                                       ValueType::String,  ValueType::String, ValueType::String, ValueType::String,
+                                       ValueType::String,  ValueType::String, ValueType::String, ValueType::String,
+                                       ValueType::String,  ValueType::String, ValueType::String, ValueType::String};
+      DataProviders::CsvReader nnoKodyReader{"/home/petr/Desktop/muni/pravni_formy_nno.csv"};
+      std::transform(nnoKodyReader.begin(), nnoKodyReader.end(), std::back_inserter(nnoKody),
+                     [](const auto &row) { return row[0]; });
+    }
+
     std::vector<std::string> okresniMesta{};
     {
       DataProviders::CsvReader csvReader("/home/petr/Desktop/muni/res/okresni_mesta.csv");
@@ -229,13 +217,21 @@ ORDER BY resFiltered.ICO ASC
     auto CINNOSTI_DLE_NACE_field = result->fieldByName("CINNOSTI_DLE_NACE");
     auto KOD_NACE_field = result->fieldByName("KOD_NACE");
 
+    auto FORMA_field = result->fieldByName("FORMA");
+
     DataWriters::CsvWriter writer{"/home/petr/Desktop/muni/res/res.csv"};
     writer.setAddQuotes(true);
 
+    DataWriters::CsvWriter writerFull{"/home/petr/Desktop/muni/res/res_full.csv"};
+    writerFull.setAddQuotes(true);
+
     result->resetBegin();
     writer.writeHeader({"ICO_number", "ICO", "NAZEV", "PRAVNI_FORMA", "VELIKOSTNI_KATEGORIE", "ADRESA", "KRAJ", "OKRES",
-                        "OBEC", "OBEC_OKRES", "OBEC_ICOB", "DATUM_VZNIKU", "ROK_VZNIKU", "DATUM_LIKVIDACE", "ROK_LIKVIDACE",
-                        "INSTITUCE_V_LIKVIDACI", "NACE_cinnost", "NACE_kod"});
+                        "OBEC", "OBEC_OKRES", "OBEC_ICOB", "DATUM_VZNIKU", "ROK_VZNIKU", "DATUM_LIKVIDACE",
+                        "ROK_LIKVIDACE", "INSTITUCE_V_LIKVIDACI", "NACE_cinnost", "NACE_kod", "FORMA"});
+    writerFull.writeHeader({"ICO_number", "ICO", "NAZEV", "PRAVNI_FORMA", "VELIKOSTNI_KATEGORIE", "ADRESA", "KRAJ",
+                            "OKRES", "OBEC", "OBEC_OKRES", "OBEC_ICOB", "DATUM_VZNIKU", "ROK_VZNIKU", "DATUM_LIKVIDACE",
+                            "ROK_LIKVIDACE", "INSTITUCE_V_LIKVIDACI", "NACE_cinnost", "NACE_kod", "FORMA"});
     std::vector<std::string> record;
     while (result->next()) {
       record.clear();
@@ -295,8 +291,13 @@ ORDER BY resFiltered.ICO ASC
       }
       record.emplace_back(Utilities::defaultForEmpty(CINNOSTI_DLE_NACE_field->getAsString(), notAvailable));
       record.emplace_back(Utilities::defaultForEmpty(KOD_NACE_field->getAsString(), notAvailable));
-      writer.writeRecord(record);
+      record.emplace_back(FORMA_field->getAsString());
+      if (isIn(FORMA_field->getAsString(), nnoKody)) {
+        writer.writeRecord(record);
+      }
+      writerFull.writeRecord(record);
     }
   }
+  logger << debug{} << "Done";
   return 0;
 }

@@ -45,7 +45,7 @@ public:
    */
   std::shared_ptr<View> join(JoinType joinType) {
     auto result = prepareResultView();
-    iterAndCompare(t1->dataSet, t2->dataSet, getFirstIndices(), getSecondIndices(), getJoinFunction(result, joinType),
+    iterAndCompare(joinType, t1->dataSet, t2->dataSet, getFirstIndices(), getSecondIndices(), getJoinFunction(result, joinType),
                    getValueType());
 
     result->rawData()->emplace_back();
@@ -69,9 +69,8 @@ private:
    * @param valueType type of value to compare
    */
   template <typename CompFnc>
-  void iterAndCompare(DataSetType1 first, DataSetType2 second, std::pair<gsl::index, gsl::index> firstIndex,
+  void iterAndCompare(JoinType joinType, DataSetType1 first, DataSetType2 second, std::pair<gsl::index, gsl::index> firstIndex,
                       std::pair<gsl::index, gsl::index> secondIndex, CompFnc cmpFunc, ValueType valueType) {
-    static auto t = 0;
     auto begin1 = first->begin();
     auto end1 = first->end();
     auto begin2 = second->begin();
@@ -81,7 +80,7 @@ private:
     bool found = false;
     int diff = 0;
     while (begin1 != end1) {
-      while (begin2 != end2) {
+      while (begin2 != end2) { // zastavi se to moc brzo man
         if constexpr (std::is_same<DataSetType1, std::shared_ptr<DataSets::MemoryViewDataSet>>{}) {
           container1 = (*(*begin1)[firstIndex.first])[firstIndex.second];
         }
@@ -106,6 +105,9 @@ private:
         }
 
         ++begin2;
+      }
+      if (joinType != JoinType::innerJoin && !found && begin2 == end2) {
+        cmpFunc(-1, found, begin1, begin2);
       }
     outer_loop:
       ++begin1;

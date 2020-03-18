@@ -126,8 +126,7 @@ int main() {
                                      ValueType::String, ValueType::String, ValueType::String, ValueType::String,
                                      ValueType::String, ValueType::String, ValueType::String, ValueType::String,
                                      ValueType::String, ValueType::String, ValueType::String, ValueType::String,
-                                     ValueType::String,
-                                     ValueType::String}));
+                                     ValueType::String, ValueType::String, ValueType::String}));
 
   db.addTable(createDataSetFromFile("justice", FileSettings::Csv(justicePath),
                                     {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String,

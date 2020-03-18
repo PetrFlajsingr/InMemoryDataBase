@@ -57,3 +57,6 @@ void DataSets::FilterOptions::addOption(const DataSets::BaseField *field, const 
 
   options.emplace_back(field, searchVals, filterOption);
 }
+void DataSets::FilterOptions::clear() {
+  options.clear();
+}

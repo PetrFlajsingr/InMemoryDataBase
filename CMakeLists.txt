@@ -116,6 +116,9 @@ add_executable(catch_tests ${TEST_SOURCE_FILES} ${fmtSources})
 add_executable(export1 export1.cpp ${SOURCE_FILES} ${fmtSources})
 add_executable(export2 export2.cpp ${SOURCE_FILES} ${fmtSources})
 add_executable(nno nno.cpp ${SOURCE_FILES} ${fmtSources})
+add_executable(nrzps_subjekty nrzps_subjekty.cpp ${SOURCE_FILES} ${fmtSources})
+add_executable(rpss_subjekty rpss_subjekty.cpp ${SOURCE_FILES} ${fmtSources})
+add_executable(ttt ttt.cpp ${SOURCE_FILES} ${fmtSources})
 
 FILE(GLOB ARESSources ARES/*.cpp)
 
@@ -151,7 +154,18 @@ target_link_libraries(export2 xlsxio_write)
 target_link_libraries(export2 OpenXLSX xlsreader -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 
 target_link_libraries(nno xlsxio_read)
-#target_link_libraries(nno asan)
 target_link_libraries(nno xlsxio_write)
 target_link_libraries(nno OpenXLSX xlsreader -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
+
+target_link_libraries(nrzps_subjekty xlsxio_read)
+target_link_libraries(nrzps_subjekty xlsxio_write)
+target_link_libraries(nrzps_subjekty OpenXLSX xlsreader -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
+
+target_link_libraries(rpss_subjekty xlsxio_read)
+target_link_libraries(rpss_subjekty xlsxio_write)
+target_link_libraries(rpss_subjekty OpenXLSX xlsreader -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
+
+target_link_libraries(ttt xlsxio_read)
+target_link_libraries(ttt xlsxio_write)
+target_link_libraries(ttt OpenXLSX xlsreader -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 
