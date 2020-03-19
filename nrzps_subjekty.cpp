@@ -193,9 +193,12 @@ res.OKRES as OKRES_POSKYTOVATELE,
 res.OBEC as OBEC_POSKYTOVATELE,
 res.OBEC_OKRES as OBEC_OKRES_POSKYTOVATELE,
 res.PRAVNI_FORMA as PRAVNI_FORMA_POSKYTOVATELE,
+prav_formy_SEKTOR.sub_sektor,
+prav_formy_SEKTOR.sektor,
 res.INSTITUCE_V_LIKVIDACI as AKTIVNI
 FROM nrzps
 JOIN res ON nrzps.Ico = res.ICO_number
+LEFT JOIN prav_formy_SEKTOR ON res.FORMA = prav_formy_SEKTOR.NNO
 ORDER BY res.ICO_number ASC;
 )";
 
@@ -217,9 +220,12 @@ res.OBEC_OKRES,
 res.PRAVNI_FORMA,
 res.DATUM_VZNIKU,
 res.ROK_VZNIKU,
+prav_formy_SEKTOR.sub_sektor,
+prav_formy_SEKTOR.sektor,
 res.INSTITUCE_V_LIKVIDACI as AKTIVNI
 FROM nrzps
 JOIN res on nrzps.Ico = res.ICO_number
+LEFT JOIN prav_formy_SEKTOR ON res.FORMA = prav_formy_SEKTOR.NNO
 ORDER BY res.ICO_number ASC;
 )";
 
@@ -518,7 +524,9 @@ ORDER BY res.ICO_number ASC;
                                           "OKRES_POSKYTOVATELE",
                                           "OBEC_POSKYTOVATELE",
                                           "OBEC_OKRES_POSKYTOVATELE",
-                                          "PRAVNI_FORMA_POSKYTOVATELE"};
+                                          "PRAVNI_FORMA_POSKYTOVATELE",
+                                          "sub_sektor",
+                                          "sektor"};
 
     auto resultDS = db.execSimpleQuery(queryZarizeni, false, "first_join")->dataSet;
     auto field_NAZEV_ZARIZENI = resultDS->fieldByName("NAZEV_ZARIZENI");
@@ -542,6 +550,8 @@ ORDER BY res.ICO_number ASC;
     auto field_OBEC_POSKYTOVATELE = resultDS->fieldByName("OBEC_POSKYTOVATELE");
     auto field_OBEC_OKRES_POSKYTOVATELE = resultDS->fieldByName("OBEC_OKRES_POSKYTOVATELE");
     auto field_PRAVNI_FORMA_POSKYTOVATELE = resultDS->fieldByName("PRAVNI_FORMA_POSKYTOVATELE");
+    auto field_sub_sektor = resultDS->fieldByName("sub_sektor");
+    auto field_sektor = resultDS->fieldByName("sektor");
 
     auto aktivniField = resultDS->fieldByName("AKTIVNI");
     writerZarizeni.writeHeader(header);
@@ -574,6 +584,8 @@ ORDER BY res.ICO_number ASC;
       row.emplace_back(Utilities::defaultForEmpty(field_OBEC_POSKYTOVATELE->getAsString(), notAvailable));
       row.emplace_back(Utilities::defaultForEmpty(field_OBEC_OKRES_POSKYTOVATELE->getAsString(), notAvailable));
       row.emplace_back(Utilities::defaultForEmpty(field_PRAVNI_FORMA_POSKYTOVATELE->getAsString(), notAvailable));
+      row.emplace_back(Utilities::defaultForEmpty(field_sub_sektor->getAsString(), notAvailable));
+      row.emplace_back(Utilities::defaultForEmpty(field_sektor->getAsString(), notAvailable));
       writerZarizeni.writeRecord(row);
       if (aktivniField->getAsString() == "aktivní") {
         writerZarizeniAktivni.writeRecord(row);

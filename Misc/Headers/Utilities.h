@@ -141,6 +141,7 @@ int8_t compareDateTime(const DateTime &a, const DateTime &b);
 std::string getRandomString(size_t length);
 
 std::string toLower(const std::string &str);
+std::string toUpper(const std::string &str);
 
 template <int maxDigit = 64> std::string doubleToString(double value);
 

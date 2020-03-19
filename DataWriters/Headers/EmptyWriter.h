@@ -11,8 +11,8 @@ class EmptyWriter : public BaseDataWriter {
 public:
   template <typename ...Args>
   explicit EmptyWriter([[maybe_unused]] const Args ...args) : BaseDataWriter() {}
-  void writeHeader(const std::vector<std::string> &header) override;
-  void writeRecord(const std::vector<std::string> &record) override;
+  void writeHeader([[maybe_unused]] const std::vector<std::string> &header) override;
+  void writeRecord([[maybe_unused]] const std::vector<std::string> &record) override;
 };
 }
 

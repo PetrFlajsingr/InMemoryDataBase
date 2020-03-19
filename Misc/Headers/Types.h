@@ -81,13 +81,13 @@ public:
   friend std::ostream &operator<<(std::ostream &os, const DateTime &timeB);
   friend std::istream &operator>>(std::istream &is, DateTime &timeB);
 
-private:
-  DateTimeType type;
-  boost::posix_time::ptime ptime;
-
   static const std::string dateTimeDefFmt;
   static const std::string dateDefFmt;
   static const std::string timeDefFmt;
+private:
+  DateTimeType type;
+
+  boost::posix_time::ptime ptime;
 
   static std::pair<DateTimeType, boost::posix_time::ptime> innerFromString(std::string_view str, std::string_view fmt);
 };

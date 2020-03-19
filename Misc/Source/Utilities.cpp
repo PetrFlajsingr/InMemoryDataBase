@@ -204,6 +204,12 @@ std::string Utilities::toLower(const std::string &str) {
   return result;
 }
 
+std::string Utilities::toUpper(const std::string &str) {
+  std::string result;
+  std::transform(str.begin(), str.end(), std::back_inserter(result), ::toupper);
+  return result;
+}
+
 template <class T> int8_t Utilities::compare(const T &a, const T &b) {
   if (a == b) {
     return 0;
@@ -252,3 +258,4 @@ std::string Utilities::replaceAll(const std::string &str, const std::string &fin
 std::string Utilities::defaultForEmpty(const std::string &value, const std::string &def) {
   return value.empty() ? def : value;
 }
+
