@@ -157,12 +157,12 @@ join copni2 on copni1.COPNI = copni2.COPNI_codes;)";
       ValueType::String, ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String,
       ValueType::String, ValueType::String,  ValueType::String,
   };
+  db.addTable(createDataSetFromFile("rpss", FileSettings::Xlsx(rpssPath, "List1"), rpssTypes));
   db.addTable(createDataSetFromFile("justice", FileSettings::Csv(justicePath),
                                     {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String,
                                      ValueType::String, ValueType::String, ValueType::String, ValueType::String,
                                      ValueType::String, ValueType::String, ValueType::String}));
 
-  db.addTable(createDataSetFromFile("rpss", FileSettings::Xlsx(rpssPath, "List1"), rpssTypes));
   db.addTable(createDataSetFromFile("res", FileSettings::Csv(resPath, ','),
                                     {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String,
                                      ValueType::String, ValueType::String, ValueType::String, ValueType::String,

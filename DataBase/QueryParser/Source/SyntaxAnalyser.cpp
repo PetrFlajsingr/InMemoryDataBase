@@ -260,7 +260,7 @@ DataBase::StructuredQuery DataBase::SyntaxAnalyser::analyse() {
       }
       break;
     case SynState::joinCond2ndId:
-      if (token == Token::id) {
+      if (token == Token::id || token == Token::string) {
         state = SynState::joinList;
         joinItem.secondField.column = std::get<1>(it);
         result.joins.data.emplace_back(joinItem);
