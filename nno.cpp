@@ -17,6 +17,9 @@ using namespace LoggerStreamModifiers;
 Logger logger{std::cout};
 
 const auto notAvailable = "není k dispozici"s;
+const auto csvPath = "/home/petr/Desktop/muni/"s;
+const auto nrzpsPath = csvPath + "nrzps/narodni-registr-poskytovatelu-zdravotnich-sluzeb.csv";
+
 std::shared_ptr<DataSets::MemoryDataSet> prepareNACE(const std::shared_ptr<DataSets::MemoryDataSet> &res) {
   DataBase::MemoryDataBase db("db");
   db.addTable(res);
@@ -107,6 +110,15 @@ int main() {
   logger << status{} << "Starting\n";
 
   DataBase::MemoryDataBase db("db");
+  db.addTable(createDataSetFromFile(
+      "nrzps", FileSettings::Csv(nrzpsPath),
+      {ValueType::String, ValueType::String, ValueType::String, ValueType::String,  ValueType::String,
+       ValueType::String, ValueType::String, ValueType::String, ValueType::String,  ValueType::String,
+       ValueType::String, ValueType::String, ValueType::String, ValueType::String,  ValueType::String,
+       ValueType::String, ValueType::String, ValueType::String, ValueType::Integer, ValueType::String,
+       ValueType::String, ValueType::String, ValueType::String, ValueType::String,  ValueType::String,
+       ValueType::String, ValueType::String, ValueType::String, ValueType::String,  ValueType::String,
+       ValueType::String, ValueType::String, ValueType::String}));
 
   db.addTable(createDataSetFromFile(
       "forma",

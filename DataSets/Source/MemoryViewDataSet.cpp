@@ -105,6 +105,19 @@ std::vector<std::string> DataSets::MemoryViewDataSet::getFieldNames() const {
   return result;
 }
 
+std::vector<ValueType> DataSets::MemoryViewDataSet::getFieldTypes() const {
+  std::vector<ValueType> result;
+  if (allowedFields.empty()) {
+    std::transform(fields.begin(), fields.end(), std::back_inserter(result),
+                   [](const std::shared_ptr<BaseField> &field) { return field->getFieldType(); });
+  } else {
+    std::transform(allowedFields.begin(), allowedFields.end(), std::back_inserter(result),
+                   [](const BaseField *field) { return field->getFieldType(); });
+  }
+  return result;
+}
+
+
 gsl::index DataSets::MemoryViewDataSet::getCurrentRecord() const { return currentRecord; }
 
 void DataSets::MemoryViewDataSet::append() { throw UnsupportedOperationException("View can't be appended to."); }

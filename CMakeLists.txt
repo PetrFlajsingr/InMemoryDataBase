@@ -90,7 +90,8 @@ set(SOURCE_FILES
         ${moorSources}
         ${CommandSources}
         Combiner.cpp
-        LoadingUtils.cpp)
+        LoadingUtils.cpp
+        DotaceForIcos.cpp)
 
 set(TEST_SOURCE_FILES
         ${SOURCE_FILES}
@@ -118,6 +119,8 @@ add_executable(export2 export2.cpp ${SOURCE_FILES} ${fmtSources})
 add_executable(nno nno.cpp ${SOURCE_FILES} ${fmtSources})
 add_executable(nrzps_subjekty nrzps_subjekty.cpp ${SOURCE_FILES} ${fmtSources})
 add_executable(rpss_subjekty rpss_subjekty.cpp ${SOURCE_FILES} ${fmtSources})
+add_executable(nrzps_dotace nrzps_dotace.cpp ${SOURCE_FILES} ${fmtSources})
+add_executable(rpss_dotace rpss_dotace.cpp ${SOURCE_FILES} ${fmtSources})
 add_executable(ttt ttt.cpp ${SOURCE_FILES} ${fmtSources})
 
 FILE(GLOB ARESSources ARES/*.cpp)
@@ -168,4 +171,12 @@ target_link_libraries(rpss_subjekty OpenXLSX xlsreader -pthread Boost::boost Boo
 target_link_libraries(ttt xlsxio_read)
 target_link_libraries(ttt xlsxio_write)
 target_link_libraries(ttt OpenXLSX xlsreader -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
+
+target_link_libraries(nrzps_dotace xlsxio_read)
+target_link_libraries(nrzps_dotace xlsxio_write)
+target_link_libraries(nrzps_dotace OpenXLSX xlsreader -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
+
+target_link_libraries(rpss_dotace xlsxio_read)
+target_link_libraries(rpss_dotace xlsxio_write)
+target_link_libraries(rpss_dotace OpenXLSX xlsreader -pthread Boost::boost Boost::locale Boost::date_time xlnt Boost::filesystem ${CURL_LIBRARIES} ${LibArchive_LIBRARIES})
 

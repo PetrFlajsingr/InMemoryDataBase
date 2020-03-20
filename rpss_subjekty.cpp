@@ -3,6 +3,7 @@
 //
 #include "LoadingUtils.h"
 #include "fmt/format.h"
+#include <CsvReader.h>
 #include <CsvWriter.h>
 #include <MemoryDataBase.h>
 #include <io/print.h>
@@ -98,6 +99,13 @@ int main() {
 
   DataBase::MemoryDataBase db{"db"};
 
+  std::vector<std::string> okresniMesta;
+  {
+    DataProviders::CsvReader csvReader("/home/petr/Desktop/muni/res/okresni_mesta.csv");
+    std::transform(csvReader.begin(), csvReader.end(), std::back_inserter(okresniMesta),
+                   [](const auto &row) { return row[0]; });
+  }
+
   db.addTable(createDataSetFromFile("rzp", FileSettings::Csv(rzpPath),
                                     {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String,
                                      ValueType::String, ValueType::String}));
@@ -178,6 +186,7 @@ rpss."Pobyt. forma" AS POBYTOVA_FORMA,
 rpss."Teren. forma" AS TERENNI_FORMA,
 rpss."Adresa textově - Z" AS ADRESA,
 rpss."Kontakty služba - Telefon" AS TELEFON,
+rpss."Kontakty služba - Email" AS EMAIL,
 rpss."Kontakty služba - Web" AS WEB,
 rpss."Kraj - Z" AS KRAJ,
 rpss."Okres - Z" AS OKRES,
@@ -186,6 +195,10 @@ rpss."Název" AS NAZEV_POSKYTOVATELE,
 res.ICO,
 res.ICO_number,
 rpss."Adresa textově - P" AS ADRESA_POSKYTOVATELE,
+res.KRAJ AS KRAJ_POSKYTOVATELE,
+res.OKRES AS OKRES_POSKYTOVATELE,
+res.OBEC AS OBEC_POSKYTOVATELE,
+res.OBEC_OKRES AS OBEC_OKRES_POSKYTOVATELE,
 prav_formy_SEKTOR.sub_sektor,
 prav_formy_SEKTOR.sektor,
 res.INSTITUCE_V_LIKVIDACI AS AKTIVNI
@@ -209,10 +222,13 @@ res.OBEC,
 res.OBEC_OKRES,
 res.PRAVNI_FORMA,
 res.DATUM_VZNIKU,
-res.ROK_VZNIKU
+res.ROK_VZNIKU,
+prav_formy_SEKTOR.sub_sektor,
+prav_formy_SEKTOR.sektor
 FROM rpss
 LEFT JOIN res on rpss."IČ" = res.ICO_number
 LEFT JOIN justice on rpss."IČ" = justice.ICO
+LEFT JOIN prav_formy_SEKTOR ON res.FORMA = prav_formy_SEKTOR.NNO
 ORDER BY res.ICO ASC;
 )";
 
@@ -276,7 +292,9 @@ ORDER BY res.ICO_number ASC;
     auto field_POBYTOVA_FORMA = zarizeniDS->fieldByName("POBYTOVA_FORMA");
     auto field_TERENNI_FORMA = zarizeniDS->fieldByName("TERENNI_FORMA");
     auto field_ADRESA = zarizeniDS->fieldByName("ADRESA");
+    auto field_OBEC_OKRES_POSKYTOVATELE = zarizeniDS->fieldByName("OBEC_OKRES_POSKYTOVATELE");
     auto field_TELEFON = zarizeniDS->fieldByName("TELEFON");
+    auto field_EMAIL = zarizeniDS->fieldByName("EMAIL");
     auto field_WEB = zarizeniDS->fieldByName("WEB");
     auto field_KRAJ = zarizeniDS->fieldByName("KRAJ");
     auto field_OKRES = zarizeniDS->fieldByName("OKRES");
@@ -285,6 +303,9 @@ ORDER BY res.ICO_number ASC;
     auto field_ICO = zarizeniDS->fieldByName("ICO");
     auto field_ICO_number = dynamic_cast<DataSets::IntegerField *>(zarizeniDS->fieldByName("ICO_number"));
     auto field_ADRESA_POSKYTOVATELE = zarizeniDS->fieldByName("ADRESA_POSKYTOVATELE");
+    auto field_KRAJ_POSKYTOVATELE = zarizeniDS->fieldByName("KRAJ_POSKYTOVATELE");
+    auto field_OKRES_POSKYTOVATELE = zarizeniDS->fieldByName("OKRES_POSKYTOVATELE");
+    auto field_OBEC_POSKYTOVATELE = zarizeniDS->fieldByName("OBEC_POSKYTOVATELE");
     auto field_sub_sektor = zarizeniDS->fieldByName("sub_sektor");
     auto field_sektor = zarizeniDS->fieldByName("sektor");
     auto field_AKTIVNI = zarizeniDS->fieldByName("AKTIVNI");
@@ -306,14 +327,20 @@ ORDER BY res.ICO_number ASC;
         "TERENNI_FORMA"s,
         "ADRESA"s,
         "TELEFON"s,
+        "EMAIL"s,
         "WEB"s,
         "KRAJ"s,
         "OKRES"s,
         "OBEC"s,
+        "OBEC_OKRES"s,
         "NAZEV_POSKYTOVATELE"s,
         "ICO"s,
         "ICO_number"s,
         "ADRESA_POSKYTOVATELE"s,
+        "KRAJ_POSKYTOVATELE"s,
+        "OKRES_POSKYTOVATELE"s,
+        "OBEC_POSKYTOVATELE"s,
+        "OBEC_OKRES_POSKYTOVATELE"s,
         "sub_sektor"s,
         "sektor"s,
     };
@@ -346,14 +373,28 @@ ORDER BY res.ICO_number ASC;
       row.emplace_back(Utilities::defaultForEmpty(Utilities::toUpper(field_TERENNI_FORMA->getAsString()), "NE"));
       row.emplace_back(Utilities::defaultForEmpty(field_ADRESA->getAsString(), notAvailable));
       row.emplace_back(Utilities::defaultForEmpty(field_TELEFON->getAsString(), notAvailable));
+      row.emplace_back(Utilities::defaultForEmpty(field_EMAIL->getAsString(), notAvailable));
       row.emplace_back(Utilities::defaultForEmpty(field_WEB->getAsString(), notAvailable));
       row.emplace_back(Utilities::defaultForEmpty(field_KRAJ->getAsString(), notAvailable));
       row.emplace_back(Utilities::defaultForEmpty(field_OKRES->getAsString(), notAvailable));
-      row.emplace_back(Utilities::defaultForEmpty(field_OBEC->getAsString(), notAvailable));
+      const auto obec = field_OBEC->getAsString();
+      row.emplace_back(Utilities::defaultForEmpty(obec, notAvailable));
+      if (obec.empty()) {
+        row.emplace_back(notAvailable);
+      } else if (isIn(obec, okresniMesta)) {
+        row.emplace_back(obec);
+      } else {
+        row.emplace_back(fmt::format("{} ({})", obec, field_OKRES->getAsString()));
+      }
+
       row.emplace_back(Utilities::defaultForEmpty(field_NAZEV_POSKYTOVATELE->getAsString(), notAvailable));
       row.emplace_back(Utilities::defaultForEmpty(field_ICO->getAsString(), notAvailable));
       row.emplace_back(Utilities::defaultForEmpty(field_ICO_number->getAsString(), notAvailable));
       row.emplace_back(Utilities::defaultForEmpty(field_ADRESA_POSKYTOVATELE->getAsString(), notAvailable));
+      row.emplace_back(Utilities::defaultForEmpty(field_KRAJ_POSKYTOVATELE->getAsString(), notAvailable));
+      row.emplace_back(Utilities::defaultForEmpty(field_OKRES_POSKYTOVATELE->getAsString(), notAvailable));
+      row.emplace_back(Utilities::defaultForEmpty(field_OBEC_POSKYTOVATELE->getAsString(), notAvailable));
+      row.emplace_back(Utilities::defaultForEmpty(field_OBEC_OKRES_POSKYTOVATELE->getAsString(), notAvailable));
       row.emplace_back(Utilities::defaultForEmpty(field_sub_sektor->getAsString(), notAvailable));
       row.emplace_back(Utilities::defaultForEmpty(field_sektor->getAsString(), notAvailable));
       if (field_AKTIVNI->getAsString() == "aktivní") {
@@ -382,6 +423,8 @@ ORDER BY res.ICO_number ASC;
     auto field_PRAVNI_FORMA = poskytovateleDS->fieldByName("PRAVNI_FORMA");
     auto field_DATUM_VZNIKU = poskytovateleDS->fieldByName("DATUM_VZNIKU");
     auto field_ROK_VZNIKU = poskytovateleDS->fieldByName("ROK_VZNIKU");
+    auto field_sub_sektor = poskytovateleDS->fieldByName("sub_sektor");
+    auto field_sektor = poskytovateleDS->fieldByName("sektor");
 
     const auto header = {"NAZEV_POSKYTOVATELE"s,
                          "ICO"s,
@@ -396,6 +439,8 @@ ORDER BY res.ICO_number ASC;
                          "PRAVNI_FORMA"s,
                          "DATUM_VZNIKU"s,
                          "ROK_VZNIKU"s,
+                         "sub_sektor"s,
+                         "sektor"s,
                          "POCET_ZARIZENI"s};
     rpssPoskytovatelWriter.writeHeader(header);
     poskytovateleDS->resetBegin();
@@ -419,6 +464,8 @@ ORDER BY res.ICO_number ASC;
         row.emplace_back(Utilities::defaultForEmpty(field_DATUM_VZNIKU->getAsString(), notAvailable));
         row.emplace_back(Utilities::defaultForEmpty(field_ROK_VZNIKU->getAsString(), notAvailable));
         const auto pocetZarizeni = std::to_string(zarizeniCountForICO[field_ICO_number->getAsInteger()]);
+        row.emplace_back(Utilities::defaultForEmpty(field_sub_sektor->getAsString(), notAvailable));
+        row.emplace_back(Utilities::defaultForEmpty(field_sektor->getAsString(), notAvailable));
         row.emplace_back(pocetZarizeni);
         rpssPoskytovatelWriter.writeRecord(row);
         lastICO = ico;

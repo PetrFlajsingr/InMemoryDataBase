@@ -58,6 +58,8 @@ public:
 
   [[nodiscard]] std::vector<std::string> getFieldNames() const override;
 
+  [[nodiscard]] std::vector<ValueType> getFieldTypes() const override;
+
   [[nodiscard]] gsl::index getColumnCount() const override;
 
   [[nodiscard]] gsl::index getCurrentRecord() const override;

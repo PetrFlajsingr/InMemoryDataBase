@@ -98,6 +98,8 @@ public:
    * @return names of all fields in data set
    */
   [[nodiscard]] virtual std::vector<std::string> getFieldNames() const = 0;
+
+  [[nodiscard]] virtual std::vector<ValueType> getFieldTypes() const = 0;
   /**
    *
    * @return count of columns/fields in data set

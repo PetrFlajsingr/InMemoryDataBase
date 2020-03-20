@@ -54,6 +54,7 @@ public:
   [[nodiscard]] bool isLast() const override;
 
   [[nodiscard]] std::vector<std::string> getFieldNames() const override;
+  [[nodiscard]] std::vector<ValueType> getFieldTypes() const override;
   void append() override;
   void append(DataProviders::BaseDataProvider &dataProvider) override;
 

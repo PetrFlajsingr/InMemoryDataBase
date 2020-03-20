@@ -3,6 +3,7 @@
 //
 #include "LoadingUtils.h"
 #include "fmt/format.h"
+#include <CsvReader.h>
 #include <CsvWriter.h>
 #include <MemoryDataBase.h>
 #include <io/print.h>
@@ -513,6 +514,7 @@ ORDER BY res.ICO_number ASC;
                                           "ULICE",
                                           "CISLO_DOMU",
                                           "OBEC",
+                                          "OBEC_OKRES",
                                           "PSC",
                                           "KRAJ",
                                           "OKRES",
@@ -558,6 +560,14 @@ ORDER BY res.ICO_number ASC;
     writerZarizeniAktivni.writeHeader(header);
     resultDS->resetBegin();
     std::vector<std::string> row{};
+
+    std::vector<std::string> okresniMesta;
+    {
+      DataProviders::CsvReader csvReader("/home/petr/Desktop/muni/res/okresni_mesta.csv");
+      std::transform(csvReader.begin(), csvReader.end(), std::back_inserter(okresniMesta),
+                     [](const auto &row) { return row[0]; });
+    }
+
     while (resultDS->next()) {
       row.clear();
       row.emplace_back(Utilities::defaultForEmpty(field_NAZEV_ZARIZENI->getAsString(), notAvailable));
@@ -571,7 +581,15 @@ ORDER BY res.ICO_number ASC;
                                      notAvailable));
       row.emplace_back(Utilities::defaultForEmpty(field_ULICE->getAsString(), notAvailable));
       row.emplace_back(Utilities::defaultForEmpty(field_CISLO_DOMU->getAsString(), notAvailable));
-      row.emplace_back(Utilities::defaultForEmpty(field_OBEC->getAsString(), notAvailable));
+      const auto obec = field_OBEC->getAsString();
+      row.emplace_back(Utilities::defaultForEmpty(obec, notAvailable));
+      if (obec.empty()) {
+        row.emplace_back(notAvailable);
+      } else if (isIn(obec, okresniMesta)) {
+        row.emplace_back(obec);
+      } else {
+        row.emplace_back(fmt::format("{} ({})", obec, field_OKRES->getAsString()));
+      }
       row.emplace_back(Utilities::defaultForEmpty(field_PSC->getAsString(), notAvailable));
       row.emplace_back(Utilities::defaultForEmpty(field_KRAJ->getAsString(), notAvailable));
       row.emplace_back(Utilities::defaultForEmpty(field_OKRES->getAsString(), notAvailable));

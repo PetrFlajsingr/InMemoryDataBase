@@ -383,6 +383,14 @@ std::vector<std::string> DataSets::MemoryDataSet::getFieldNames() const {
   return result;
 }
 
+std::vector<ValueType> DataSets::MemoryDataSet::getFieldTypes() const {
+  std::vector<ValueType> result;
+  std::transform(fields.begin(), fields.end(), std::back_inserter(result),
+                 [](const std::shared_ptr<BaseField> &field) { return field->getFieldType(); });
+  return result;
+}
+
+
 bool DataSets::MemoryDataSet::isFirst() const { return currentRecord == 0; }
 
 gsl::index DataSets::MemoryDataSet::getFirst() const { return 1; }
