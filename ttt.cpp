@@ -4,21 +4,10 @@
 #include "LoadingUtils.h"
 #include "MemoryDataBase.h"
 #include "StdoutWriter.h"
+#include <io/print.h>
 int main() {
-  DataBase::MemoryDataBase db("db");
-  db.addTable(createDataSetFromFile("t1", FileSettings::Csv("/home/petr/Desktop/test_join/t1.csv"),
-                                    {ValueType::String, ValueType::String}));
-  db.addTable(createDataSetFromFile("t2", FileSettings::Csv("/home/petr/Desktop/test_join/t2.csv"),
-                                    {ValueType::String, ValueType::String}));
-  db.addTable(createDataSetFromFile("t3", FileSettings::Csv("/home/petr/Desktop/test_join/t3.csv"),
-                                    {ValueType::String, ValueType::String}));
-
-  const auto query = R"(SELECT t1.*, t2.*, t3.* FROM t1
-LEFT JOIN t2 ON t1.A = t2.A2
-LEFT JOIN t3 ON t1.A = t3.A3;)";
-  auto result = db.execSimpleQuery(query, false, "t")->dataSet;
-  DataWriters::StdoutWriter writer;
-  writer.writeDataSet(*result);
-
-
+  ExcelDateTime2DateTimeConverter cvt;
+  print(cvt.convert(30829));
+  MacExcelDateTime2DateTimeConverter cvt2;
+  print(cvt2.convert(29367));
 }

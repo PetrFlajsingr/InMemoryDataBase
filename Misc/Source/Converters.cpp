@@ -70,24 +70,47 @@ std::string StringSplitConverter::convertBack(const std::vector<std::string> &va
   return result;
 }
 
+ExcelDateTime2DateTimeConverter::ExcelDateTime2DateTimeConverter(const boost::gregorian::date &customOrigin)
+    : excelStartDate(customOrigin) {}
+
 DateTime ExcelDateTime2DateTimeConverter::convert(const double &value) const {
   using namespace boost::gregorian;
   using namespace boost::posix_time;
-  auto finDate = excelStartDate + date_duration(gsl::narrow_cast<int>(value) - 2);
-  auto hourF = (value - gsl::narrow_cast<int>(value)) * 24;
-  auto h = gsl::narrow_cast<uint8_t>(hourF);
-  auto minF = (hourF - h) * 60;
-  auto m = gsl::narrow_cast<uint8_t>(minF);
-  auto secF = (minF - m) * 60;
-  auto s = gsl::narrow_cast<uint8_t>(round(secF));
+  const auto finDate = excelStartDate + date_duration(gsl::narrow_cast<int>(value) - windowsExcelDateError);
+  const auto hourF = (value - gsl::narrow_cast<int>(value)) * hoursInDay;
+  const auto h = gsl::narrow_cast<uint8_t>(hourF);
+  const auto minF = (hourF - h) * minutesInHour;
+  const auto m = gsl::narrow_cast<uint8_t>(minF);
+  const auto secF = (minF - m) * secondsInMinute;
+  const auto s = gsl::narrow_cast<uint8_t>(round(secF));
   return DateTime(ptime(finDate, hours(h) + minutes(m) + seconds(s)), type);
 }
 double ExcelDateTime2DateTimeConverter::convertBack(const DateTime &value) const {
-  constexpr double daySecondCount = 24 * 60 * 60;
-  auto wholePart = (value.getTime().date() - excelStartDate).days() + 2;
-  auto fractPart = value.getTime().time_of_day().total_seconds() / daySecondCount;
+  const auto wholePart = (value.getTime().date() - excelStartDate).days() + windowsExcelDateError;
+  const auto fractPart = value.getTime().time_of_day().total_seconds() / static_cast<double>(daySecondCount);
   return wholePart + fractPart;
 }
+
+MacExcelDateTime2DateTimeConverter::MacExcelDateTime2DateTimeConverter(const boost::gregorian::date &customOrigin)
+    : ExcelDateTime2DateTimeConverter(customOrigin) {}
+DateTime MacExcelDateTime2DateTimeConverter::convert(const double &value) const {
+  using namespace boost::gregorian;
+  using namespace boost::posix_time;
+  const auto finDate = excelStartDate + date_duration(gsl::narrow_cast<int>(value));
+  const auto hourF = (value - gsl::narrow_cast<int>(value)) * hoursInDay;
+  const auto h = gsl::narrow_cast<uint8_t>(hourF);
+  const auto minF = (hourF - h) * minutesInHour;
+  const auto m = gsl::narrow_cast<uint8_t>(minF);
+  const auto secF = (minF - m) * secondsInMinute;
+  const auto s = gsl::narrow_cast<uint8_t>(round(secF));
+  return DateTime(ptime(finDate, hours(h) + minutes(m) + seconds(s)), type);
+}
+double MacExcelDateTime2DateTimeConverter::convertBack(const DateTime &value) const {
+  const auto wholePart = (value.getTime().date() - excelStartDate).days();
+  const auto fractPart = value.getTime().time_of_day().total_seconds() / static_cast<double>(daySecondCount);
+  return wholePart + fractPart;
+}
+
 xlnt::date doubleToDate(double value) {
   const boost::gregorian::date excelStartDate = boost::gregorian::date(1900, 1, 1);
   using namespace boost::gregorian;

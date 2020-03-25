@@ -63,7 +63,7 @@ std::shared_ptr<DataSets::MemoryDataSet> shrinkRzp(const std::shared_ptr<DataSet
   return result;
 }
 
-std::shared_ptr<DataSets::MemoryDataSet> distinctCopniCodes(DataSets::BaseDataSet &ds) {
+std::shared_ptr<DataSets::MemoryDataSet> distinctCopni(DataSets::BaseDataSet &ds) {
   auto result = std::make_shared<DataSets::MemoryDataSet>("copni2");
   result->openEmpty(ds.getFieldNames(),
                     {ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String});
@@ -115,7 +115,7 @@ int main() {
   db.addTable(createDataSetFromFile("geo", FileSettings::Csv(geoPath),
                                     {ValueType::Integer, ValueType::String, ValueType::String}));
 
-  db.addTable(distinctCopniCodes(*createDataSetFromFile(
+  db.addTable(distinctCopni(*createDataSetFromFile(
       "copni2", FileSettings::Xlsx(copniPath, "COPNImetod"),
       {ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String})));
   db.addTable(createDataSetFromFile(
@@ -199,6 +199,7 @@ res.KRAJ AS KRAJ_POSKYTOVATELE,
 res.OKRES AS OKRES_POSKYTOVATELE,
 res.OBEC AS OBEC_POSKYTOVATELE,
 res.OBEC_OKRES AS OBEC_OKRES_POSKYTOVATELE,
+res.PRAVNI_FORMA AS PRAVNI_FORMA_POSKYTOVATELE,
 prav_formy_SEKTOR.sub_sektor,
 prav_formy_SEKTOR.sektor,
 res.INSTITUCE_V_LIKVIDACI AS AKTIVNI
@@ -306,6 +307,7 @@ ORDER BY res.ICO_number ASC;
     auto field_KRAJ_POSKYTOVATELE = zarizeniDS->fieldByName("KRAJ_POSKYTOVATELE");
     auto field_OKRES_POSKYTOVATELE = zarizeniDS->fieldByName("OKRES_POSKYTOVATELE");
     auto field_OBEC_POSKYTOVATELE = zarizeniDS->fieldByName("OBEC_POSKYTOVATELE");
+    auto field_PRAVNI_FORMA_POSKYTOVATELE = zarizeniDS->fieldByName("PRAVNI_FORMA_POSKYTOVATELE");
     auto field_sub_sektor = zarizeniDS->fieldByName("sub_sektor");
     auto field_sektor = zarizeniDS->fieldByName("sektor");
     auto field_AKTIVNI = zarizeniDS->fieldByName("AKTIVNI");
@@ -341,6 +343,7 @@ ORDER BY res.ICO_number ASC;
         "OKRES_POSKYTOVATELE"s,
         "OBEC_POSKYTOVATELE"s,
         "OBEC_OKRES_POSKYTOVATELE"s,
+        "PRAVNI_FORMA_POSKYTOVATELE"s,
         "sub_sektor"s,
         "sektor"s,
     };
@@ -395,6 +398,7 @@ ORDER BY res.ICO_number ASC;
       row.emplace_back(Utilities::defaultForEmpty(field_OKRES_POSKYTOVATELE->getAsString(), notAvailable));
       row.emplace_back(Utilities::defaultForEmpty(field_OBEC_POSKYTOVATELE->getAsString(), notAvailable));
       row.emplace_back(Utilities::defaultForEmpty(field_OBEC_OKRES_POSKYTOVATELE->getAsString(), notAvailable));
+      row.emplace_back(Utilities::defaultForEmpty(field_PRAVNI_FORMA_POSKYTOVATELE->getAsString(), notAvailable));
       row.emplace_back(Utilities::defaultForEmpty(field_sub_sektor->getAsString(), notAvailable));
       row.emplace_back(Utilities::defaultForEmpty(field_sektor->getAsString(), notAvailable));
       if (field_AKTIVNI->getAsString() == "aktivní") {

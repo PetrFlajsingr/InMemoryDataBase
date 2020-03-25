@@ -64,7 +64,7 @@ std::shared_ptr<DataSets::MemoryDataSet> shrinkRzp(const std::shared_ptr<DataSet
   return result;
 }
 
-std::shared_ptr<DataSets::MemoryDataSet> distinctCopniCodes(DataSets::BaseDataSet &ds) {
+std::shared_ptr<DataSets::MemoryDataSet> distinctCopni(DataSets::BaseDataSet &ds) {
   auto result = std::make_shared<DataSets::MemoryDataSet>("copni2");
   result->openEmpty(ds.getFieldNames(),
                     {ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String});
@@ -153,7 +153,7 @@ int main() {
   db.addTable(createDataSetFromFile("geo", FileSettings::Csv(geoPath),
                                     {ValueType::Integer, ValueType::String, ValueType::String}));
 
-  db.addTable(distinctCopniCodes(*createDataSetFromFile(
+  db.addTable(distinctCopni(*createDataSetFromFile(
       "copni2", FileSettings::Xlsx(copniPath, "COPNImetod"),
       {ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String})));
   db.addTable(createDataSetFromFile(

@@ -212,7 +212,7 @@ std::shared_ptr<DataSets::MemoryDataSet> transformDotace(const std::shared_ptr<D
   auto DOTACE_OPERACNI_PROGRAM_ANOTACE_PROJEKTU = dotaceSub->fieldByName("Shrnutí operace");
   auto DOTACE_OPERACNI_PROGRAM_PRIJEMCE = dotaceSub->fieldByName("IC");
   auto DOTACE_OPERACNI_PROGRAM_DATUM__SKUTECNE_DATUM_ZAHAJENI_FYZICKE_REALIZACE_PROJEKTU =
-      dotaceSub->fieldByName("Skutečné datum ukončení fyzické realizace operace");
+      dotaceSub->fieldByName("Datum zahájení fyzické operace");
   auto DOTACE_OPERACNI_PROGRAM_DATUM_REALIZACE_SKUTECNE_DATUM_UKONCENI_FYZICKE_REALIZACE_PROJEKTU =
       dotaceSub->fieldByName("Skutečné datum ukončení fyzické realizace operace");
   auto DOTACE_OPERACNI_PROGRAM_OBLAST_INTERVENCE_KOD = dotaceSub->fieldByName("Oblast intervence - kód");
@@ -446,7 +446,7 @@ left join geo on res.ICO_number = geo.ICO;
                      true, "verSb");
 
   auto VZds = createDataSetFromFile(
-      "VZ", FileSettings::Xlsx(verejneZakazkyPath + "vz.xlsx", "VZ"),
+      "VZ", FileSettings::Xlsx(verejneZakazkyPath + "verejneZakazky.xlsx", "VZ"),
       {ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
        ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
        ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
@@ -460,12 +460,12 @@ left join geo on res.ICO_number = geo.ICO;
        ValueType::String, ValueType::String, ValueType::String, ValueType::String});
 
   auto castiVZds = createDataSetFromFile(
-      "castiVZ", FileSettings::Xlsx(verejneZakazkyPath + "vz.xlsx", "Části VZ"),
+      "castiVZ", FileSettings::Xlsx(verejneZakazkyPath + "verejneZakazky.xlsx", "Části VZ"),
       {ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
        ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
        ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String});
   auto dodavatelVZ = createDataSetFromFile(
-      "dodVZ", FileSettings::Xlsx(verejneZakazkyPath + "vz.xlsx", "Dodavatelé"),
+      "dodVZ", FileSettings::Xlsx(verejneZakazkyPath + "verejneZakazky.xlsx", "Dodavatelé"),
       {ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
        ValueType::String, ValueType::Integer, ValueType::String, ValueType::String, ValueType::String,
        ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String});
@@ -492,10 +492,50 @@ left join geo on res.ICO_number = geo.ICO;
       "join dodVZ on VZ.ID_Zakazky = dodVZ.ID_Zakazky "
       "join res on dodVZ.DodavatelICO = res.ICO_number;";
 
-  db.addTable(db.execSimpleQuery(query, false, "vz")->dataSet->toDataSet());
+  auto vzDS = db.addTable(db.execSimpleQuery(query, false, "vz")->dataSet->toDataSet())->dataSet;
   logger.log<LogLevel::Info>("Query vz done");
   db.tableByName("vz")->dataSet->resetEnd();
   logger.log<LogLevel::Debug, true>(db.tableByName("vz")->dataSet->getCurrentRecord());
+  {
+    std::unordered_map<std::string, std::string> priceParts;
+    auto field_VEREJNA_ZAKAZKA_ID_ZAKAZKY = vzDS->fieldByName("VEREJNA_ZAKAZKA_ID_ZAKAZKY");
+    auto field_VEREJNA_ZAKAZKA_CELKOVA_KONECNA_HODNOTA = vzDS->fieldByName("VEREJNA_ZAKAZKA_CELKOVA_KONECNA_HODNOTA");
+    auto field_VEREJNA_ZAKAZKA_PREPOKLADANA_CELKOVA_HODNOTA_CASTI_VZ = vzDS->fieldByName("VEREJNA_ZAKAZKA_PREPOKLADANA_CELKOVA_HODNOTA_CASTI_VZ");
+    {
+      DataSets::SortOptions sortOptions;
+      sortOptions.addOption(field_VEREJNA_ZAKAZKA_ID_ZAKAZKY, SortOrder::Ascending);
+      vzDS->sort(sortOptions);
+    }
+
+    vzDS->resetBegin();
+    int cnt = 1;
+    std::string lastID;
+    Currency total;
+    while(vzDS->next()) {
+      const auto idZakazky = field_VEREJNA_ZAKAZKA_ID_ZAKAZKY->getAsString();
+      if (idZakazky == lastID) {
+        ++cnt;
+        continue;
+      }
+      if (cnt == 0) {
+        continue;
+      }
+
+      const auto divValueStr = dec::toString(total / cnt);
+      priceParts[lastID] = divValueStr;
+      cnt = 1;
+      lastID = idZakazky;
+      const auto valueStr = field_VEREJNA_ZAKAZKA_CELKOVA_KONECNA_HODNOTA->getAsString();
+      Currency value{valueStr};
+      total = value;
+    }
+
+    vzDS->resetBegin();
+    while(vzDS->next()) {
+      const auto idZakazky = field_VEREJNA_ZAKAZKA_ID_ZAKAZKY->getAsString();
+      field_VEREJNA_ZAKAZKA_PREPOKLADANA_CELKOVA_HODNOTA_CASTI_VZ->setAsString(priceParts[idZakazky]);
+    }
+  }
 
   auto cedr = createDataSetFromFile(
       "cedr", FileSettings::Xlsx(cedrPath + "cedr_output.xlsx"),
@@ -802,8 +842,9 @@ FROM combined;)";
   resultDS->openEmpty(columnNames, columnTypes);
   auto resultICO_numField = dynamic_cast<DataSets::IntegerField *>(resultDS->fieldByName("ICO_number"));
   auto resultFields = resultDS->getFields();
-  // TODO: vratit dataset, ICO_number jako int jinak je to jedno
+
   ExcelDateTime2DateTimeConverter excelDateTime2DateTimeConverter;
+  MacExcelDateTime2DateTimeConverter macExcelDateTime2DateTimeConverter;
   while (finDs->next()) {
     resultDS->append();
     resultICO_numField->setAsInteger(field_ICO_number->getAsInteger());
@@ -827,27 +868,6 @@ FROM combined;)";
     resultFields[17]->setAsString(Utilities::defaultForEmpty(field_COPNI_obor->getAsString(), notAvailable));
     resultFields[18]->setAsString(Utilities::defaultForEmpty(field_Zdroj->getAsString(), notAvailable));
 
-
-    //row.clear();
-    //row.emplace_back(Utilities::defaultForEmpty(field_ICO_number->getAsString(), notAvailable));
-    //row.emplace_back(Utilities::defaultForEmpty(field_ICO->getAsString(), notAvailable));
-    //row.emplace_back(Utilities::defaultForEmpty(field_NAZEV->getAsString(), notAvailable));
-    //row.emplace_back(Utilities::defaultForEmpty(field_PRAVNI_FORMA->getAsString(), notAvailable));
-    //row.emplace_back(Utilities::defaultForEmpty(field_VELIKOSTNI_KATEGORIE->getAsString(), notAvailable));
-    //row.emplace_back(Utilities::defaultForEmpty(field_ADRESA->getAsString(), notAvailable));
-    //row.emplace_back(Utilities::defaultForEmpty(field_KRAJ->getAsString(), notAvailable));
-    //row.emplace_back(Utilities::defaultForEmpty(field_OKRES->getAsString(), notAvailable));
-    //row.emplace_back(Utilities::defaultForEmpty(field_OBEC->getAsString(), notAvailable));
-    //row.emplace_back(Utilities::defaultForEmpty(field_OBEC_OKRES->getAsString(), notAvailable));
-    //row.emplace_back(Utilities::defaultForEmpty(field_OBEC_ICOB->getAsString(), notAvailable));
-    //row.emplace_back(Utilities::defaultForEmpty(field_DATUM_VZNIKU->getAsString(), notAvailable));
-    //row.emplace_back(Utilities::defaultForEmpty(field_ROK_VZNIKU->getAsString(), notAvailable));
-    //row.emplace_back(Utilities::defaultForEmpty(field_DATUM_LIKVIDACE->getAsString(), notAvailable));
-    //row.emplace_back(Utilities::defaultForEmpty(field_ROK_LIKVIDACE->getAsString(), notAvailable));
-    //row.emplace_back(Utilities::defaultForEmpty(field_INSTITUCE_V_LIKVIDACI->getAsString(), notAvailable));
-    //row.emplace_back(Utilities::defaultForEmpty(field_COPNI_cinnost->getAsString(), notAvailable));
-    //row.emplace_back(Utilities::defaultForEmpty(field_COPNI_obor->getAsString(), notAvailable));
-    //row.emplace_back(Utilities::defaultForEmpty(field_Zdroj->getAsString(), notAvailable));
     zdrojDat = field_Zdroj->getAsString();
 
     if (zdrojDat == "VerejneZakazky") {
@@ -858,7 +878,7 @@ FROM combined;)";
       resultFields[22]->setAsString(Utilities::defaultForEmpty(field_VEREJNA_ZAKAZKA_ZADAVATEL_IC->getAsString(), notAvailable));
       auto datumZadani = field_VEREJNA_ZAKAZKA_DATUM_ZADANI->getAsString();
       if (datumZadani != notAvailable) {
-        datumZadani = excelDateTime2DateTimeConverter.convert(Utilities::stringToInt(datumZadani)).toString("%d/%m/%Y");
+        datumZadani = macExcelDateTime2DateTimeConverter.convert(Utilities::stringToInt(datumZadani)).toString("%d/%m/%Y");
       }
       resultFields[23]->setAsString(datumZadani);
       resultFields[24]->setAsString(Utilities::defaultForEmpty(field_VEREJNA_ZAKAZKA_NAZEV_VZ->getAsString(), notAvailable));
@@ -877,36 +897,7 @@ FROM combined;)";
       } else {
         resultFields[31]->setAsString(dodavatelICO);
       }
-      //row.emplace_back(Utilities::defaultForEmpty(field_VEREJNA_ZAKAZKA_ID_ZAKAZKY->getAsString(), notAvailable));
-      //row.emplace_back(Utilities::defaultForEmpty(field_VEREJNA_ZAKAZKA_LIMIT_VZ->getAsString(), notAvailable));
-      //row.emplace_back(
-      //    Utilities::defaultForEmpty(field_VEREJNA_ZAKAZKA_CELKOVA_KONECNA_HODNOTA->getAsString(), notAvailable));
-      //row.emplace_back(Utilities::defaultForEmpty(field_VEREJNA_ZAKAZKA_ZADAVATEL_IC->getAsString(), notAvailable));
-      //auto datumZadani = field_VEREJNA_ZAKAZKA_DATUM_ZADANI->getAsString();
-      //if (datumZadani != notAvailable) {
-      //  datumZadani = excelDateTime2DateTimeConverter.convert(Utilities::stringToInt(datumZadani)).toString("%d/%m/%Y");
-      //}
-      //row.emplace_back(datumZadani);
-      //row.emplace_back(Utilities::defaultForEmpty(field_VEREJNA_ZAKAZKA_NAZEV_VZ->getAsString(), notAvailable));
-      //row.emplace_back(Utilities::defaultForEmpty(field_VEREJNA_ZAKAZKA_DRUH_VZ->getAsString(), notAvailable));
-      //row.emplace_back(Utilities::defaultForEmpty(field_VEREJNA_ZAKAZKA_STRUCNY_POPIS_VZ->getAsString(), notAvailable));
-      //row.emplace_back(
-      //    Utilities::defaultForEmpty(field_VEREJNA_ZAKAZKA_ZADAVATEL_UREDNI_NAZEV->getAsString(), notAvailable));
-      //row.emplace_back(
-      //    Utilities::defaultForEmpty(field_VEREJNA_ZAKAZKA_CISLO_CASTI_ZADANI_VZ->getAsString(), notAvailable));
-      //row.emplace_back(Utilities::defaultForEmpty(field_VEREJNA_ZAKAZKA_NAZEV_CASTI_VZ->getAsString(), notAvailable));
-      //row.emplace_back(Utilities::defaultForEmpty(
-      //    field_VEREJNA_ZAKAZKA_PREPOKLADANA_CELKOVA_HODNOTA_CASTI_VZ->getAsString(), notAvailable));
-      //auto dodavatelICO = Utilities::defaultForEmpty(field_DODAVATEL_ICO->getAsString(), notAvailable);
-      //if (dodavatelICO == "0") {
-      //  row.emplace_back(notAvailable);
-      //} else {
-      //  row.emplace_back(dodavatelICO);
-      //}
     } else {
-      //for (auto i : MakeRange::range(13)) {
-      //  row.emplace_back(notAvailable);
-      //}
       for (auto i : MakeRange::range(19, 32)) {
         resultFields[i]->setAsString(notAvailable);
       }
@@ -940,33 +931,6 @@ FROM combined;)";
       resultFields[51]->setAsString(Utilities::defaultForEmpty(field_DOTACE_FINANCNI_ZDROJ_KOD->getAsString(), notAvailable));
       resultFields[52]->setAsString(Utilities::defaultForEmpty(field_DOTACE_FINANCNI_ZDROJ_NAZEV->getAsString(), notAvailable));
       resultFields[53]->setAsString(notAvailable);
-      //row.emplace_back(Utilities::defaultForEmpty(field_DOTACE_POSKYTOVATEL->getAsString(), notAvailable));
-      //row.emplace_back(Utilities::defaultForEmpty(field_DOTACE_CASTKA_UVOLNENA->getAsString(), notAvailable));
-      //row.emplace_back(Utilities::defaultForEmpty(field_DOTACE_CASTKA_CERPANA->getAsString(), notAvailable));
-      //row.emplace_back(Utilities::defaultForEmpty(field_OBDOBI->getAsString(), notAvailable));
-      //row.emplace_back(Utilities::defaultForEmpty(field_ROK_UDELENI_DOTACE->getAsString(), notAvailable));
-      //row.emplace_back(
-      //    Utilities::defaultForEmpty(field_DOTACE_OPERACNI_PROGRAM_NAZEV_PROGRAMU->getAsString(), notAvailable));
-      //row.emplace_back(
-      //    Utilities::defaultForEmpty(field_DOTACE_OPERACNI_PROGRAM_PRIORITNI_OSA->getAsString(), notAvailable));
-      //row.emplace_back(
-      //    Utilities::defaultForEmpty(field_DOTACE_REGISTRACNI_CISLO_PROJEKTU->getAsString(), notAvailable));
-      //row.emplace_back(
-      //    Utilities::defaultForEmpty(field_DOTACE_OPERACNI_PROGRAM_NAZEV_PROJEKTU->getAsString(), notAvailable));
-      //row.emplace_back(
-      //    Utilities::defaultForEmpty(field_DOTACE_OPERACNI_PROGRAM_ANOTACE_PROJEKTU->getAsString(), notAvailable));
-      //row.emplace_back(Utilities::defaultForEmpty(field_DOTACE_OPERACNI_PROGRAM_PRIJEMCE->getAsString(), notAvailable));
-      //row.emplace_back(notAvailable);
-      //row.emplace_back(notAvailable);
-      //row.emplace_back(notAvailable);
-      //row.emplace_back(notAvailable);
-      //row.emplace_back(notAvailable);
-      //row.emplace_back(notAvailable);
-      //row.emplace_back(notAvailable);
-      //row.emplace_back(notAvailable);
-      //row.emplace_back(Utilities::defaultForEmpty(field_DOTACE_FINANCNI_ZDROJ_KOD->getAsString(), notAvailable));
-      //row.emplace_back(Utilities::defaultForEmpty(field_DOTACE_FINANCNI_ZDROJ_NAZEV->getAsString(), notAvailable));
-      //row.emplace_back(notAvailable);
     } else if (zdrojDat == "DotaceEU") {
       resultFields[32]->setAsString(Utilities::defaultForEmpty(field_DOTACE_POSKYTOVATEL->getAsString(), notAvailable));
       resultFields[33]->setAsString(Utilities::defaultForEmpty(field_DOTACE_CASTKA_UVOLNENA->getAsString(), notAvailable));
@@ -1006,48 +970,7 @@ FROM combined;)";
       resultFields[51]->setAsString(notAvailable);
       resultFields[52]->setAsString(notAvailable);
       resultFields[53]->setAsString(Utilities::defaultForEmpty(field_NAZEV_PO->getAsString(), notAvailable));
-      //row.emplace_back(Utilities::defaultForEmpty(field_DOTACE_POSKYTOVATEL->getAsString(), notAvailable));
-      //row.emplace_back(Utilities::defaultForEmpty(field_DOTACE_CASTKA_UVOLNENA->getAsString(), notAvailable));
-      //row.emplace_back(Utilities::defaultForEmpty(field_DOTACE_CASTKA_CERPANA->getAsString(), notAvailable));
-      //row.emplace_back(Utilities::defaultForEmpty(field_OBDOBI->getAsString(), notAvailable));
-      //row.emplace_back(Utilities::defaultForEmpty(field_ROK_UDELENI_DOTACE->getAsString(), notAvailable));
-      //row.emplace_back(
-      //    Utilities::defaultForEmpty(field_DOTACE_OPERACNI_PROGRAM_NAZEV_PROGRAMU->getAsString(), notAvailable));
-      //row.emplace_back(
-      //    Utilities::defaultForEmpty(field_DOTACE_OPERACNI_PROGRAM_PRIORITNI_OSA->getAsString(), notAvailable));
-      //row.emplace_back(
-      //    Utilities::defaultForEmpty(field_DOTACE_REGISTRACNI_CISLO_PROJEKTU->getAsString(), notAvailable));
-      //row.emplace_back(
-      //    Utilities::defaultForEmpty(field_DOTACE_OPERACNI_PROGRAM_NAZEV_PROJEKTU->getAsString(), notAvailable));
-      //row.emplace_back(
-      //    Utilities::defaultForEmpty(field_DOTACE_OPERACNI_PROGRAM_ANOTACE_PROJEKTU->getAsString(), notAvailable));
-      //row.emplace_back(Utilities::defaultForEmpty(field_DOTACE_OPERACNI_PROGRAM_PRIJEMCE->getAsString(), notAvailable));
-      //row.emplace_back(Utilities::defaultForEmpty(
-      //    field_DOTACE_OPERACNI_PROGRAM_DATUM_SKUTECNE_DATUM_ZAHAJENI_FYZICKE_REALIZACE_PROJEKTU->getAsString(),
-      //    notAvailable));
-      //row.emplace_back(Utilities::defaultForEmpty(
-      //    field_DOTACE_OPERACNI_PROGRAM_DATUM_REALIZACE_SKUTECNE_DATUM_UKONCENI_FYZICKE_REALIZACE_PROJEKTU
-      //        ->getAsString(),
-      //    notAvailable));
-      //row.emplace_back(
-      //    Utilities::defaultForEmpty(field_DOTACE_OPERACNI_PROGRAM_OBLAST_INTERVENCE_KOD->getAsString(), notAvailable));
-      //row.emplace_back(Utilities::defaultForEmpty(field_DOTACE_OPERACNI_PROGRAM_OBLAST_INTERVENCE_NAZEV->getAsString(),
-      //                                            notAvailable));
-      //row.emplace_back(Utilities::defaultForEmpty(
-      //    field_DOTACE_OPERACNI_PROGRAM_MISTO_REALIZACE_NUTS3_NAZEV->getAsString(), notAvailable));
-      //row.emplace_back(Utilities::defaultForEmpty(field_DOTACE_OPERACNI_PROGRAM_SPOLUFINANCOVANI_CASTKA->getAsString(),
-      //                                            notAvailable));
-      //row.emplace_back(Utilities::defaultForEmpty(
-      //    field_DOTACE_OPERACNI_PROGRAM_SPOLUFINANCOVANI_PRISPEVEK_EU->getAsString(), notAvailable));
-      //row.emplace_back(Utilities::defaultForEmpty(
-      //    field_DOTACE_OPERACNI_PROGRAM_SPOLUFINANCOVANI_PRISPEVEK_CR->getAsString(), notAvailable));
-      //row.emplace_back(notAvailable);
-      //row.emplace_back(notAvailable);
-      //row.emplace_back(Utilities::defaultForEmpty(field_NAZEV_PO->getAsString(), notAvailable));
     } else {
-      //for (auto i : MakeRange::range(22)) {
-      //  row.emplace_back(notAvailable);
-      //}
       for (auto i : MakeRange::range(32, 54)) {
         resultFields[i]->setAsString(notAvailable);
       }
@@ -1072,28 +995,7 @@ FROM combined;)";
       resultFields[59]->setAsString(Utilities::defaultForEmpty(field_VEREJNA_SBIRKA_UCEL->getAsString(), notAvailable));
       resultFields[60]->setAsString(Utilities::defaultForEmpty(field_VEREJNA_SBIRKA_UCEL_TEXTEM->getAsString(), notAvailable));
       resultFields[61]->setAsString(konecVSRok);
-      //row.emplace_back(Utilities::defaultForEmpty(field_VEREJNA_SBIRKA_OZNACENI->getAsString(), notAvailable));
-      //row.emplace_back(Utilities::defaultForEmpty(field_VEREJNA_SBIRKA_UZEMNI_ROZSAH->getAsString(), notAvailable));
-      //auto verSBZacatek = field_VEREJNA_SBIRKA_ZACATEK->getAsString();
-      //verSBZacatek = excelDateTime2DateTimeConverter.convert(Utilities::stringToInt(verSBZacatek)).toString("%d/%m/%Y");
-      //auto verSBKonec = field_VEREJNA_SBIRKA_KONEC->getAsString();
-      //std::string konecVSRok;
-      //if (verSBKonec != notAvailable) {
-      //  verSBKonec = excelDateTime2DateTimeConverter.convert(Utilities::stringToInt(verSBKonec)).toString("%d/%m/%Y");
-      //  konecVSRok = verSBKonec.substr(verSBKonec.size() - 4);
-      //} else {
-      //  konecVSRok = notAvailable;
-      //}
-      //row.emplace_back(Utilities::defaultForEmpty(verSBZacatek, notAvailable));
-      //row.emplace_back(Utilities::defaultForEmpty(verSBKonec, notAvailable));
-      //row.emplace_back(Utilities::defaultForEmpty(field_VEREJNA_SBIRKA_ZPUSOB->getAsString(), notAvailable));
-      //row.emplace_back(Utilities::defaultForEmpty(field_VEREJNA_SBIRKA_UCEL->getAsString(), notAvailable));
-      //row.emplace_back(Utilities::defaultForEmpty(field_VEREJNA_SBIRKA_UCEL_TEXTEM->getAsString(), notAvailable));
-      //row.emplace_back(konecVSRok);
     } else {
-      //for (auto i : MakeRange::range(8)) {
-      //  row.emplace_back(notAvailable);
-      //}
       for (auto i : MakeRange::range(54, 62)) {
         resultFields[i]->setAsString(notAvailable);
       }
@@ -1120,10 +1022,6 @@ FROM combined;)";
     resultFields[62]->setAsString(Utilities::defaultForEmpty(field_download_period->getAsString(), notAvailable));
     resultFields[63]->setAsString(Utilities::defaultForEmpty(field_X->getAsString(), notAvailable));
     resultFields[64]->setAsString(Utilities::defaultForEmpty(field_Y->getAsString(), notAvailable));
-    //row.emplace_back(Utilities::defaultForEmpty(field_download_period->getAsString(), notAvailable));
-    //row.emplace_back(Utilities::defaultForEmpty(field_X->getAsString(), notAvailable));
-    //row.emplace_back(Utilities::defaultForEmpty(field_Y->getAsString(), notAvailable));
-
   }
 
   logger.endTime();

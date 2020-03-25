@@ -67,12 +67,32 @@ private:
 
 class ExcelDateTime2DateTimeConverter : public Converter<double, DateTime> {
 public:
-  [[nodiscard]] DateTime convert(const double &value) const override;
+  explicit ExcelDateTime2DateTimeConverter(const boost::gregorian::date &customOrigin = boost::gregorian::date(1900, 1, 1));
 
+  [[nodiscard]] DateTime convert(const double &value) const override;
+  [[nodiscard]] double convertBack(const DateTime &value) const override;
+
+protected:
+  const boost::gregorian::date excelStartDate;
+
+  static constexpr unsigned int hoursInDay = 24;
+  static constexpr unsigned int minutesInHour = 60;
+  static constexpr unsigned int secondsInMinute = 60;
+  static constexpr unsigned int daySecondCount = hoursInDay * minutesInHour * secondsInMinute;
+
+private:
+  static constexpr unsigned int windowsExcelDateError = 2;
+  DateTimeType type = DateTimeType::DateTime;
+};
+
+class MacExcelDateTime2DateTimeConverter : public ExcelDateTime2DateTimeConverter {
+public:
+  explicit MacExcelDateTime2DateTimeConverter(const boost::gregorian::date &customOrigin = boost::gregorian::date(1904, 1, 1));
+
+  [[nodiscard]] DateTime convert(const double &value) const override;
   [[nodiscard]] double convertBack(const DateTime &value) const override;
 
 private:
-  const boost::gregorian::date excelStartDate = boost::gregorian::date(1900, 1, 1);
   DateTimeType type = DateTimeType::DateTime;
 };
 
