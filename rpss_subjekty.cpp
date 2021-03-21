@@ -15,6 +15,7 @@ using namespace std::string_literals;
 const auto csvPath = "/home/petr/Desktop/muni/"s;
 const auto outPath = csvPath + "out/";
 const auto rpssPath = csvPath + "rpss/Prehled_socialnich_sluzeb_CR_2.3.2020.xlsx";
+const auto rpssPathList1 = csvPath + "rpss/List1.csv";
 const auto resPath = csvPath + "res/res_full.csv";
 const auto notAvailable = "není k dispozici"s;
 const auto justicePath = csvPath + "or.justice/justice.csv";
@@ -157,8 +158,8 @@ join copni2 on copni1.COPNI = copni2.COPNI_codes;)";
       ValueType::String, ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String,
       ValueType::String, ValueType::String,  ValueType::String,
   };
-  db.addTable(createDataSetFromFile("rpss", FileSettings::Xlsx(rpssPath, "List1"), rpssTypes));
-  db.addTable(createDataSetFromFile("justice", FileSettings::Csv(justicePath),
+  db.addTable(createDataSetFromFile("rpss", FileSettings::Csv(rpssPathList1), rpssTypes));
+  db.addTable(createDataSetFromFile("justice", FileSettings::CsvOld(justicePath),
                                     {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String,
                                      ValueType::String, ValueType::String, ValueType::String, ValueType::String,
                                      ValueType::String, ValueType::String, ValueType::String}));

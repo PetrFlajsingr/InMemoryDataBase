@@ -12,7 +12,7 @@
 #include <MemoryDataSet.h>
 #include <catch2/catch.hpp>
 #include <stdexcept>
-
+#include <Catch2Define.h>
 #define TABLE1_COLUMN_COUNT 3
 #define TABLE1_ROW_COUNT 3
 

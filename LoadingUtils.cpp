@@ -9,7 +9,7 @@
 #include <XlsxReader.h>
 #include "io/logger.h"
 using namespace LoggerStreamModifiers;
-Logger lgr{std::cout};
+inline static Logger lgr{std::cout};
 FileSettings FileSettings::Xlsx(const std::string &path, const std::string &sheet) {
   FileSettings result;
   result.type = xlsx;

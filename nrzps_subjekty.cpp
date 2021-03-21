@@ -145,7 +145,7 @@ int main() {
 
 
 
-  db.addTable(createDataSetFromFile("justice", FileSettings::Csv(justicePath),
+  db.addTable(createDataSetFromFile("justice", FileSettings::CsvOld(justicePath),
                                     {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String,
                                      ValueType::String, ValueType::String, ValueType::String, ValueType::String,
                                      ValueType::String, ValueType::String, ValueType::String}));

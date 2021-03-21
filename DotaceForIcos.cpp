@@ -5,6 +5,7 @@
 
 #include "Combiner.h"
 #include "LoadingUtils.h"
+#include "distinct_copni.h"
 #include "fmt/format.h"
 #include "time/now.h"
 #include <CsvReader.h>
@@ -301,7 +302,7 @@ std::shared_ptr<DataSets::MemoryDataSet> transformCedr(const std::shared_ptr<Dat
       ++cnt;
     }
   }
-  result->fieldByName("ICOnum")->setName("DOTACE_OPERACNI_PROGRAM_PRIJEMCE");
+  result->fieldByName("ICO_number")->setName("DOTACE_OPERACNI_PROGRAM_PRIJEMCE");
   return result;
 }
 
@@ -354,31 +355,7 @@ std::shared_ptr<DataSets::MemoryDataSet> appendCedrDotace(const std::shared_ptr<
   return result;
 }
 
-std::shared_ptr<DataSets::MemoryDataSet> distinctCopniCodes(DataSets::BaseDataSet &ds) {
-  auto result = std::make_shared<DataSets::MemoryDataSet>("copni2");
-  result->openEmpty(ds.getFieldNames(),
-                    {ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String});
-  DataSets::SortOptions sortOptions;
-  sortOptions.addOption(ds.fieldByName("COPNI_codes"), SortOrder::Ascending);
-  ds.sort(sortOptions);
 
-  std::vector<std::string> containedCodes;
-  ds.resetBegin();
-  auto codeField = ds.fieldByName("COPNI_codes");
-  auto srcFields = ds.getFields();
-  auto dstFields = result->getFields();
-  while (ds.next()) {
-    if (isIn(codeField->getAsString(), containedCodes)) {
-      continue;
-    }
-    containedCodes.emplace_back(codeField->getAsString());
-    result->append();
-    for (auto i : MakeRange::range(srcFields.size())) {
-      dstFields[i]->setAsString(srcFields[i]->getAsString());
-    }
-  }
-  return result;
-}
 const auto csvPath = "/home/petr/Desktop/muni/"s;
 const auto copniPath = csvPath + "CSU2019_copni.xlsx";
 const auto geoPath = csvPath + "geo.csv";
@@ -546,7 +523,7 @@ left join geo on res.ICO_number = geo.ICO;
        ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
        ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
        ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
-       ValueType::String, ValueType::String});
+       ValueType::String, ValueType::String, ValueType::String, ValueType::String});
   db.addTable(cedr);
 
   auto cedrView = db.execSimpleQuery("select "
@@ -558,7 +535,7 @@ left join geo on res.ICO_number = geo.ICO;
                                      "cedr.dotaceTitulNazev AS DOTACE_OPERACNI_PROGRAM_PRIORITNI_OSA, "
                                      "cedr.idRozhodnuti AS DOTACE_REGISTRACNI_CISLO_PROJEKTU, "
                                      "cedr.projektNazev AS DOTACE_OPERACNI_PROGRAM_NAZEV_PROJEKTU, "
-                                     "cedr.ICOnum, cedr.financniZdrojKod AS DOTACE_FINANCNI_ZDROJ_KOD, "
+                                     "cedr.ICO_number, cedr.financniZdrojKod AS DOTACE_FINANCNI_ZDROJ_KOD, "
                                      "cedr.financniZdrojNazev AS DOTACE_FINANCNI_ZDROJ_NAZEV from cedr;",
                                      false, "cedrView");
   auto cedrReady = transformCedr(cedrView->dataSet);

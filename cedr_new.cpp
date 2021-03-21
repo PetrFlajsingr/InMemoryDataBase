@@ -23,7 +23,7 @@ const std::string obdobiCSVName = "RozpoctoveObdobi.csv";
 const std::string prijemceCSVName = "PrijemcePomoci.csv";
 const std::string outputCSVName = "cedr_output.xlsx";
 const std::string outputCSVAgrName = "cedr_output_agr.csv";
-const std::string subjektyCSVName = "NNO.xlsx";
+const std::string subjektyCSVName = "res/res.csv";
 
 const std::string operacniProgramCSVName = "ciselnikCedrOperacniProgramv01.csv";
 const std::string grantoveSchemaCSVName = "ciselnikCedrGrantoveSchemav01.csv";
@@ -45,7 +45,7 @@ const std::string QUERY = "SELECT dotace.idDotace, dotace.projektIdnetifikator, 
                           "financniZdroj.financniZdrojKod, financniZdroj.financniZdrojNazev "
                           "FROM dotace "
                           "JOIN prijemce ON dotace.idPrijemce = prijemce.idPrijemce "
-                          "JOIN subjekty ON prijemce.ico = subjekty.ICOnum "
+                          "JOIN subjekty ON prijemce.ico = subjekty.ICO_number "
                           "JOIN rozhodnuti ON dotace.idDotace = rozhodnuti.idDotace "
                           "JOIN obdobi ON rozhodnuti.idRozhodnuti = obdobi.idRozhodnuti "
                           "LEFT JOIN operacniProgram ON dotace.iriOperacniProgram = operacniProgram.idOperacniProgram "
@@ -81,7 +81,7 @@ int main() {
   DataProviders::CsvStreamReader rozhodnutiProvider(csvPath + rozhodnutiCSVName, ',');
   DataProviders::CsvStreamReader obdobiProvider(csvPath + obdobiCSVName, ',');
   DataProviders::CsvStreamReader prijemceProvider(csvPath + prijemceCSVName, ',');
-  DataProviders::XlsxIOReader subjektyProvider(nnoPath + subjektyCSVName);
+  DataProviders::CsvStreamReader subjektyProvider(nnoPath + subjektyCSVName, ',');
 
   DataProviders::CsvReader financniZdrojProvider(csvPath + financniZdrojCSVName, ",");
   auto financniZdrojDataSet = make_dataset("financniZdroj");
@@ -94,6 +94,34 @@ int main() {
                                                         ValueType::String,
                                                     });
   dataBase.addTable(financniZdrojDataSet);
+
+  auto subjektyDataSet = make_dataset("subjekty");
+  subjektyDataSet->open(subjektyProvider, {
+      ValueType::Integer,
+      ValueType::Integer,
+      ValueType::String,
+      ValueType::String,
+      ValueType::String,
+      ValueType::String,
+      ValueType::String,
+      ValueType::String,
+      ValueType::String,
+      ValueType::String,
+      ValueType::String,
+      ValueType::String,
+      ValueType::String,
+      ValueType::String,
+      ValueType::String,
+      ValueType::String,
+      ValueType::String,
+      ValueType::String,
+      ValueType::String,
+     // ValueType::String,
+  });
+  dataBase.addTable(subjektyDataSet);
+  lgr.log<LogLevel::Status>("Loaded: "s + subjektyDataSet->getName());
+  subjektyDataSet->resetEnd();
+  lgr.log<LogLevel::Debug>("Count:", subjektyDataSet->getCurrentRecord());
 
   auto dotaceDataSet = make_dataset("dotace");
   dotaceDataSet->open(dotaceProvider,
@@ -146,31 +174,6 @@ int main() {
   lgr.log<LogLevel::Status>("Loaded: "s + prijemceDataSet->getName());
   prijemceDataSet->resetEnd();
   lgr.log<LogLevel::Debug>("Count:", prijemceDataSet->getCurrentRecord());
-
-  auto subjektyDataSet = make_dataset("subjekty");
-  subjektyDataSet->open(subjektyProvider, {
-                                              ValueType::Integer,
-                                              ValueType::Integer,
-                                              ValueType::String,
-                                              ValueType::String,
-                                              ValueType::String,
-                                              ValueType::String,
-                                              ValueType::String,
-                                              ValueType::String,
-                                              ValueType::String,
-                                              ValueType::String,
-                                              ValueType::String,
-                                              ValueType::String,
-                                              ValueType::String,
-                                              ValueType::String,
-                                              ValueType::String,
-                                              ValueType::String,
-                                              ValueType::String,
-                                          });
-  dataBase.addTable(subjektyDataSet);
-  lgr.log<LogLevel::Status>("Loaded: "s + subjektyDataSet->getName());
-  subjektyDataSet->resetEnd();
-  lgr.log<LogLevel::Debug>("Count:", subjektyDataSet->getCurrentRecord());
 
   DataProviders::CsvReader operacniProgramProvider(csvPath + operacniProgramCSVName, ",");
   auto operacniProgramDataSet = make_dataset("operacniProgram");
@@ -235,9 +238,11 @@ int main() {
   lgr.log<LogLevel::Debug>("Count:", poskytovatelDotaceDataSet->getCurrentRecord());
 
   auto result = dataBase.execSimpleQuery(QUERY_2018, false, "cedr");
-  DataWriters::XlntWriter writer(outPath + outputCSVName);
-
+  //DataWriters::XlntWriter writer(outPath + outputCSVName);
+  DataWriters::XlsxIOWriter writer(outPath + outputCSVName);
+  DataWriters::CsvWriter writer2(outPath + outputCSVName + ".csv");
   writer.writeHeader(result->dataSet->getFieldNames());
+  writer2.writeHeader(result->dataSet->getFieldNames());
   auto fields = result->dataSet->getFields();
   result->dataSet->resetBegin();
 
@@ -247,6 +252,7 @@ int main() {
     std::transform(fields.begin(), fields.end(), std::back_inserter(record),
                    [](const DataSets::BaseField *field) { return field->getAsString(); });
     writer.writeRecord(record);
+    writer2.writeRecord(record);
     record.clear();
   }
 }

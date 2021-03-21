@@ -79,9 +79,9 @@ LEFT JOIN res ON dotace.ICO_number = res.ICO_number
 LEFT JOIN prav_formy_SEKTOR ON res.FORMA = prav_formy_SEKTOR.NNO;
 )";
   auto dotaceDS = db.execSimpleQuery(querySektor, false, "fin")->dataSet;
-  DataWriters::CsvWriter writerFull{csvPath + "nrzps_fin_full.csv"};
+  DataWriters::CsvWriter writerFull{csvPath + "out/nrzps_fin_full.csv"};
   writerFull.setAddQuotes(true);
-  DataWriters::CsvWriter writerGis{csvPath + "nrzps_fin_gis.csv"};
+  DataWriters::CsvWriter writerGis{csvPath + "out/nrzps_fin_gis.csv"};
   writerGis.setAddQuotes(true);
   auto aktivniField = dotaceDS->fieldByName("INSTITUCE_V_LIKVIDACI");
   dotaceDS->resetBegin();

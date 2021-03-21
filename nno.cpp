@@ -14,23 +14,22 @@
 
 using namespace std::string_literals;
 using namespace LoggerStreamModifiers;
-Logger logger{std::cout};
+Logger loggerNNO{std::cout};
 
 const auto notAvailable = "není k dispozici"s;
 const auto csvPath = "/home/petr/Desktop/muni/"s;
-const auto nrzpsPath = csvPath + "nrzps/narodni-registr-poskytovatelu-zdravotnich-sluzeb.csv";
+// const auto nrzpsPath = csvPath + "nrzps/narodni-registr-poskytovatelu-zdravotnich-sluzeb.csv";
 
 std::shared_ptr<DataSets::MemoryDataSet> prepareNACE(const std::shared_ptr<DataSets::MemoryDataSet> &res) {
   DataBase::MemoryDataBase db("db");
   db.addTable(res);
 
   db.addTable(createDataSetFromFile(
-      "res_nace", FileSettings::Csv("/home/petr/Desktop/muni/res/all/RES3B2020M02.csv", ';', true, CharSet::CP1250),
+      "res_nace", FileSettings::Csv("/home/petr/Desktop/muni/res/all/RES3B2020M12.csv", ';', true, CharSet::CP1250),
       {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
        ValueType::String, ValueType::String}));
   db.addTable(createDataSetFromFile(
-      "nace",
-      FileSettings::Csv("/home/petr/Desktop/muni/res/all/DM_ERES_ERES_RES_U_CIS_80004.csv", ';', true, CharSet::CP1250),
+      "nace", FileSettings::Csv(csvPath + "res/all/DM_ERES_ERES_RES_U_CIS_80004.csv", ';', true, CharSet::CP1250),
       {ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
        ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
        ValueType::String, ValueType::String}));
@@ -106,51 +105,50 @@ std::string buildAdresa(const std::string &obec, const std::string &psc, const s
 };
 
 int main() {
-  logger.setDefaultPrintTime(true);
-  logger << status{} << "Starting\n";
+  loggerNNO.setDefaultPrintTime(true);
+  loggerNNO << status{} << "Starting\n";
 
   DataBase::MemoryDataBase db("db");
-  db.addTable(createDataSetFromFile(
-      "nrzps", FileSettings::Csv(nrzpsPath),
-      {ValueType::String, ValueType::String, ValueType::String, ValueType::String,  ValueType::String,
-       ValueType::String, ValueType::String, ValueType::String, ValueType::String,  ValueType::String,
-       ValueType::String, ValueType::String, ValueType::String, ValueType::String,  ValueType::String,
-       ValueType::String, ValueType::String, ValueType::String, ValueType::Integer, ValueType::String,
-       ValueType::String, ValueType::String, ValueType::String, ValueType::String,  ValueType::String,
-       ValueType::String, ValueType::String, ValueType::String, ValueType::String,  ValueType::String,
-       ValueType::String, ValueType::String, ValueType::String}));
+  // db.addTable(createDataSetFromFile(
+  //    "nrzps", FileSettings::Csv(nrzpsPath),
+  //    {ValueType::String, ValueType::String, ValueType::String, ValueType::String,  ValueType::String,
+  //     ValueType::String, ValueType::String, ValueType::String, ValueType::String,  ValueType::String,
+  //     ValueType::String, ValueType::String, ValueType::String, ValueType::String,  ValueType::String,
+  //     ValueType::String, ValueType::String, ValueType::String, ValueType::Integer, ValueType::String,
+  //     ValueType::String, ValueType::String, ValueType::String, ValueType::String,  ValueType::String,
+  //     ValueType::String, ValueType::String, ValueType::String, ValueType::String,  ValueType::String,
+  //     ValueType::String, ValueType::String, ValueType::String}));
 
   db.addTable(createDataSetFromFile(
-      "forma",
-      FileSettings::Csv("/home/petr/Desktop/muni/res/all/DM_ERES_ERES_RES_U_CIS_149.csv", ';', true, CharSet::CP1250),
+      "forma", FileSettings::Csv(csvPath + "res/all/DM_ERES_ERES_RES_U_CIS_149.csv", ';', true, CharSet::CP1250),
       {ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
        ValueType::String}));
 
   db.addTable(createDataSetFromFile(
-      "katpo",
-      FileSettings::Csv("/home/petr/Desktop/muni/res/all/DM_ERES_ERES_RES_U_CIS_579.csv", ';', true, CharSet::CP1250),
+      "katpo", FileSettings::Csv(csvPath + "res/all/DM_ERES_ERES_RES_U_CIS_579.csv", ';', true, CharSet::CP1250),
       {ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
        ValueType::String}));
 
   db.addTable(createDataSetFromFile(
-      "okreslau",
-      FileSettings::Csv("/home/petr/Desktop/muni/res/all/DM_ERES_ERES_RES_U_CIS_109.csv", ';', true, CharSet::CP1250),
+      "okreslau", FileSettings::Csv(csvPath + "res/all/DM_ERES_ERES_RES_U_CIS_109.csv", ';', true, CharSet::CP1250),
       {ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
        ValueType::String}));
 
-  db.addTable(createDataSetFromFile("rso", FileSettings::Csv("/home/petr/Desktop/muni/res/rso.csv", ','),
+  db.addTable(createDataSetFromFile("rso", FileSettings::Csv(csvPath + "res/rso.csv", ','),
                                     {ValueType::String, ValueType::String, ValueType::String, ValueType::String}));
-  auto resDs = db.addTable(createDataSetFromFile(
-      "resFiltered", FileSettings::Csv("/home/petr/Desktop/muni/res/all/RES3A2020M02.csv", ';', true, CharSet::CP1250),
-      {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
-       ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String,
-       ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String,
-       ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String,
-       ValueType::String,  ValueType::String, ValueType::String, ValueType::String}))->dataSet;
-
+  auto resDs =
+      db
+          .addTable(createDataSetFromFile(
+              "resFiltered", FileSettings::Csv(csvPath + "res/all/RES3A2020M12.csv", ';', true, CharSet::CP1250),
+              {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String, ValueType::String,
+               ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String,
+               ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String,
+               ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String,
+               ValueType::String,  ValueType::String, ValueType::String, ValueType::String}))
+          ->dataSet;
 
   db.addTable(prepareNACE(resDs));
-  logger << status{} << "Prepared NACE\n";
+  loggerNNO << status{} << "Prepared NACE\n";
 
   const auto queryCisleniky = R"sql(SELECT
 resFiltered.ICO,
@@ -184,21 +182,21 @@ ORDER BY resFiltered.ICO ASC
   {
     std::vector<std::string> nnoKody;
     {
-      logger << debug{} << "Starting NNO selection\n";
+      loggerNNO << debug{} << "Starting NNO selection\n";
       const std::vector resColumnTypes{ValueType::Integer, ValueType::String, ValueType::String, ValueType::String,
                                        ValueType::String,  ValueType::String, ValueType::String, ValueType::String,
                                        ValueType::String,  ValueType::String, ValueType::String, ValueType::String,
                                        ValueType::String,  ValueType::String, ValueType::String, ValueType::String,
                                        ValueType::String,  ValueType::String, ValueType::String, ValueType::String,
                                        ValueType::String,  ValueType::String, ValueType::String, ValueType::String};
-      DataProviders::CsvReader nnoKodyReader{"/home/petr/Desktop/muni/pravni_formy_nno.csv"};
+      DataProviders::CsvReader nnoKodyReader{csvPath + "pravni_formy_nno.csv"};
       std::transform(nnoKodyReader.begin(), nnoKodyReader.end(), std::back_inserter(nnoKody),
                      [](const auto &row) { return row[0]; });
     }
 
     std::vector<std::string> okresniMesta{};
     {
-      DataProviders::CsvReader csvReader("/home/petr/Desktop/muni/res/okresni_mesta.csv");
+      DataProviders::CsvReader csvReader(csvPath + "res/okresni_mesta.csv");
       std::transform(csvReader.begin(), csvReader.end(), std::back_inserter(okresniMesta),
                      [](const auto &row) { return row[0]; });
     }
@@ -231,10 +229,10 @@ ORDER BY resFiltered.ICO ASC
 
     auto FORMA_field = result->fieldByName("FORMA");
 
-    DataWriters::CsvWriter writer{"/home/petr/Desktop/muni/res/res.csv"};
+    DataWriters::CsvWriter writer{csvPath + "res/res.csv"};
     writer.setAddQuotes(true);
 
-    DataWriters::CsvWriter writerFull{"/home/petr/Desktop/muni/res/res_full.csv"};
+    DataWriters::CsvWriter writerFull{csvPath + "res/res_full.csv"};
     writerFull.setAddQuotes(true);
 
     result->resetBegin();
@@ -310,6 +308,6 @@ ORDER BY resFiltered.ICO ASC
       writerFull.writeRecord(record);
     }
   }
-  logger << debug{} << "Done";
+  loggerNNO << debug{} << "Done";
   return 0;
 }

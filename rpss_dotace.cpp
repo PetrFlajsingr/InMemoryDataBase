@@ -12,6 +12,7 @@ using namespace std::string_literals;
 const auto muniPath = "/home/petr/Desktop/muni/"s;
 const auto csvPath = "/home/petr/Desktop/muni/"s;
 const auto rpssPath = csvPath + "rpss/Prehled_socialnich_sluzeb_CR_2.3.2020.xlsx";
+const auto rpssPathList1 = csvPath + "rpss/List1.csv";
 const auto copniSektorPath = csvPath + "INPUT_pf_copni_okres_sektor.xlsx";
 int main() {
   auto resNrzps = std::make_shared<DataSets::MemoryDataSet>("res");
@@ -47,7 +48,7 @@ int main() {
         ValueType::String, ValueType::String,  ValueType::String, ValueType::String, ValueType::String, ValueType::String,
         ValueType::String, ValueType::String,  ValueType::String,
     };
-    db.addTable(createDataSetFromFile("rpss", FileSettings::Xlsx(rpssPath, "List1"), rpssTypes));
+    db.addTable(createDataSetFromFile("rpss", FileSettings::Csv(rpssPathList1), rpssTypes));
     const auto resQuery = R"(
 SELECT res.*
 FROM res
@@ -94,9 +95,9 @@ LEFT JOIN res ON dotace.ICO_number = res.ICO_number
 LEFT JOIN prav_formy_SEKTOR ON res.FORMA = prav_formy_SEKTOR.NNO;
 )";
   auto dotaceDS = db.execSimpleQuery(querySektor, false, "fin")->dataSet;
-  DataWriters::CsvWriter writerFull{csvPath + "rpss_fin_full.csv"};
+  DataWriters::CsvWriter writerFull{csvPath + "out/rpss_fin_full.csv"};
   writerFull.setAddQuotes(true);
-  DataWriters::CsvWriter writerGis{csvPath + "rpss_fin_gis.csv"};
+  DataWriters::CsvWriter writerGis{csvPath + "out/rpss_fin_gis.csv"};
   writerGis.setAddQuotes(true);
   auto aktivniField = dotaceDS->fieldByName("INSTITUCE_V_LIKVIDACI");
   dotaceDS->resetBegin();

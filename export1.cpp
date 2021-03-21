@@ -16,10 +16,11 @@
 #include <io/print.h>
 #include <memory>
 #include <various/isin.h>
+#include "distinct_copni.h"
 
 using namespace std::string_literals;
 const auto notAvailable = "není k dispozici"s;
-Logger logger{std::cout};
+Logger loggerNNO{std::cout};
 
 const auto csvPath = "/home/petr/Desktop/muni/"s;
 const auto outPath = csvPath + "out/";
@@ -70,31 +71,7 @@ std::shared_ptr<DataSets::MemoryDataSet> shrinkRzp(const std::shared_ptr<DataSet
   return result;
 }
 
-std::shared_ptr<DataSets::MemoryDataSet> distinctCopniCodes(DataSets::BaseDataSet &ds) {
-  auto result = std::make_shared<DataSets::MemoryDataSet>("copni2");
-  result->openEmpty(ds.getFieldNames(),
-                    {ValueType::String, ValueType::String, ValueType::String, ValueType::String, ValueType::String});
-  DataSets::SortOptions sortOptions;
-  sortOptions.addOption(ds.fieldByName("COPNI_codes"), SortOrder::Ascending);
-  ds.sort(sortOptions);
 
-  std::vector<std::string> containedCodes;
-  ds.resetBegin();
-  auto codeField = ds.fieldByName("COPNI_codes");
-  auto srcFields = ds.getFields();
-  auto dstFields = result->getFields();
-  while (ds.next()) {
-    if (isIn(codeField->getAsString(), containedCodes)) {
-      continue;
-    }
-    containedCodes.emplace_back(codeField->getAsString());
-    result->append();
-    for (auto i : MakeRange::range(srcFields.size())) {
-      dstFields[i]->setAsString(srcFields[i]->getAsString());
-    }
-  }
-  return result;
-}
 
 int main() {
   struct CirkevniData {
@@ -112,7 +89,7 @@ int main() {
     }
   }
 
-  logger.setDefaultPrintTime(true);
+  loggerNNO.setDefaultPrintTime(true);
   DataBase::MemoryDataBase db("db");
 
   db.addTable(createDataSetFromFile("rzp", FileSettings::Csv(rzpPath),
@@ -128,7 +105,7 @@ int main() {
                                      ValueType::String, ValueType::String, ValueType::String, ValueType::String,
                                      ValueType::String, ValueType::String, ValueType::String}));
 
-  db.addTable(createDataSetFromFile("justice", FileSettings::Csv(justicePath),
+  db.addTable(createDataSetFromFile("justice", FileSettings::CsvOld(justicePath),
                                     {ValueType::Integer, ValueType::String, ValueType::String, ValueType::String,
                                      ValueType::String, ValueType::String, ValueType::String, ValueType::String,
                                      ValueType::String, ValueType::String, ValueType::String}));
@@ -274,5 +251,5 @@ left join geo on res.ICO_number = geo.ICO;)";
     row.clear();
   }
 
-  logger.log<LogLevel::Debug, true>("Result rows: ", resDS->getCurrentRecord());
+  loggerNNO.log<LogLevel::Debug, true>("Result rows: ", resDS->getCurrentRecord());
 }
