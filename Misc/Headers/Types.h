@@ -5,7 +5,6 @@
 #ifndef MISC_HEADERS_TYPES_H_
 #define MISC_HEADERS_TYPES_H_
 
-#include <Property.h>
 #include <Utilities.h>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>

@@ -11,7 +11,7 @@
 using namespace std::string_literals;
 const auto muniPath = "/home/petr/Desktop/muni/"s;
 const auto csvPath = "/home/petr/Desktop/muni/"s;
-const auto rpssPath = csvPath + "rpss/Prehled_socialnich_sluzeb_CR_2.3.2020.xlsx";
+const auto rpssPath = csvPath + "rpss/Přehled-sociálních-služeb_24.3.2021_v2.xlsx";
 const auto rpssPathList1 = csvPath + "rpss/List1.csv";
 const auto copniSektorPath = csvPath + "INPUT_pf_copni_okres_sektor.xlsx";
 int main() {

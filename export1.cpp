@@ -3,7 +3,10 @@
 //
 
 #include "LoadingUtils.h"
+#include "distinct_copni.h"
 #include "io/logger.h"
+#include <CsvReader.h>
+#include <CsvStreamReader.h>
 #include <CsvWriter.h>
 #include <EmptyWriter.h>
 #include <MemoryDataBase.h>
@@ -12,11 +15,11 @@
 #include <XlntWriter.h>
 #include <XlsxIOReader.h>
 #include <XlsxIOWriter.h>
+#include <XlsxReader.h>
 #include <include/fmt/format.h>
 #include <io/print.h>
 #include <memory>
 #include <various/isin.h>
-#include "distinct_copni.h"
 
 using namespace std::string_literals;
 const auto notAvailable = "není k dispozici"s;
@@ -81,11 +84,12 @@ int main() {
   std::unordered_map<int, CirkevniData> cirkev;
 
   {
-    DataProviders::XlsxIOReader cirkevReader{csvPath + "MK_cirkevni_organizace.xlsx"};
+    DataProviders::XlsxIOReader cirkevReader{csvPath + "cirkve.xlsx"};
 
     for (const auto &row : cirkevReader) {
       CirkevniData data{row[8], row[7]};
-      cirkev[Utilities::stringToInt(row[0])] = data;
+      const auto ico = Utilities::stringToInt(row[0]);
+      cirkev[ico] = data;
     }
   }
 
@@ -192,10 +196,10 @@ left join geo on res.ICO_number = geo.ICO;)";
   }
 
   DataWriters::CsvWriter writerCsv{"/home/petr/Desktop/muni/neziskovky.csv"};
-  DataWriters::EmptyWriter writerXlsx{"/home/petr/Desktop/muni/neziskovky.xlsx"};
+  DataWriters::XlsxIOWriter writerXlsx{"/home/petr/Desktop/muni/neziskovky.xlsx"};
 
   DataWriters::CsvWriter writerCsv_aktivni{"/home/petr/Desktop/muni/neziskovky_aktivni.csv"};
-  DataWriters::EmptyWriter writerXlsx_aktivni{"/home/petr/Desktop/muni/neziskovky_aktivni.xlsx"};
+  DataWriters::XlsxIOWriter writerXlsx_aktivni{"/home/petr/Desktop/muni/neziskovky_aktivni.xlsx"};
   writerCsv.setAddQuotes(true);
   writerCsv_aktivni.setAddQuotes(true);
 

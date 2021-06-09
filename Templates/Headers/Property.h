@@ -59,8 +59,8 @@ public:
   template <PropType Type = SetGet, typename = typename std::enable_if<Type == PropType::W, void>::type>
   explicit Property(const Setter &set) : set(set) {}
   ~Property() = default;
-  Property<T, Owner, SetGet>(const Property<T, Owner, SetGet> &) = delete;
-  Property<T, Owner, SetGet> &operator=(const Property<T, Owner, SetGet> &) = delete;
+  Property(const Property &) = delete;
+  Property &operator=(const Property &) = delete;
   /**
    * Set value using Setter function
    */
@@ -130,10 +130,8 @@ private:
   Property(const Setter &set, T val) : set(set), value(val) {}
 };
 
-template<typename Class>
-struct UseProperty {
-  template <typename T, PropType type>
-  using Property = Property<T, Class, type>;
+template <typename Class> struct UseProperty {
+  template <typename T, PropType type> using Property = Property<T, Class, type>;
 };
 
 template <typename T, typename Owner, typename... Args, typename Getter = std::function<const T &()>>
